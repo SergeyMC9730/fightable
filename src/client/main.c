@@ -6,9 +6,14 @@
 #include <string.h>
 #include <fightable/editor.h>
 #include <stdio.h>
+#include <fightable/intro.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
+
+void *main_thr0(void *user) {
+    _fAudioBegin(&__state.sound_engine);
+}
 
 int main(int argc, char **argv) {
     Vector2 win_sz = {800, 600};
@@ -17,6 +22,10 @@ int main(int argc, char **argv) {
     InitWindow(win_sz.x, win_sz.y, "Fightable");
     SetTargetFPS(60);
 
+    InitAudioDevice();
+
+    pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
+
     __tilemap = _fTilemapCreate("assets/fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
 
@@ -24,6 +33,8 @@ int main(int argc, char **argv) {
 
     __level = _fLevelLoadTest(__state.tilemap, (IVector2){28, 4});
     __state.current_level = &__level;
+
+    _fIntroInit();
 
     if (argc > 1) {
         printf("ARGV[1] = %s\n", argv[1]);
@@ -46,6 +57,7 @@ int main(int argc, char **argv) {
     while (!WindowShouldClose()) {
         BeginDrawing();
         BeginTextureMode(__state.framebuffer);
+        
 
         _fDraw();
 
@@ -71,6 +83,9 @@ int main(int argc, char **argv) {
         UnloadTexture(__state.current_level->background_tile);
         free(__state.current_level->objects);
     }
+
+    __state.sound_engine.should_stop = 1;
+    pthread_join(__state.sound_thread, NULL);
 
     return 0;
 }
