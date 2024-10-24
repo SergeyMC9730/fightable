@@ -35,11 +35,15 @@ struct fightable_state {
     // Music title_song;
     struct renderer_animation *title_song_sync;
     int title_song_stage;
+    float title_a;
+    unsigned char title_r0;
 
     unsigned char intro_can_continue;
 
     pthread_t sound_thread;
     struct faudio_engine sound_engine;
+
+    Texture2D raylib_logo;
 };
 
 extern struct fightable_state __state;

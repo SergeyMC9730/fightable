@@ -5,6 +5,7 @@ set(BUILD_SHARED_LIBS OFF)
 
 add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
+add_subdirectory(ext/portaudio_opensles)
 
 add_executable(fightable 
     src/client/main.c
@@ -60,13 +61,13 @@ add_library(raylib-statistics SHARED
     src/raylib_statistics/test.c
 )
 
-target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON)
+target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(raylib-statistics PRIVATE ext/raylib/src src/raylib_statistics/inc)
 
 set_property(TARGET raylib-statistics PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(raylib-statistics PRIVATE _GNU_SOURCE=1)
 
-target_link_libraries(fightable raylib cjson openmpt portaudio)
+target_link_libraries(fightable raylib cjson openmpt portaudio.a asound jack)
 target_link_libraries(physics-test raylib)
 target_link_libraries(raylib-statistics raylib dl)

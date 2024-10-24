@@ -41,6 +41,10 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
         unsigned long count = openmpt_module_read_stereo(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0], merge_buffer[1]);
 
+        for (int i = 0; i < (bufsize1 / sizeof(short)); i++) {
+            engine->buffer[i] = (float)engine->buffer[i] * 0.06f;
+        }
+
         // double s = openmpt_module_get_position_seconds(engine->current_module);
         // printf("s=%f\n", (float)s);
 

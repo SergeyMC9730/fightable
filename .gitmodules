@@ -4,3 +4,6 @@
 [submodule "ext/cJSON"]
 	path = ext/cJSON
 	url = https://github.com/DaveGamble/cJSON.git
+[submodule "ext/portaudio_opensles"]
+	path = ext/portaudio_opensles
+	url = https://github.com/croissanne/portaudio_opensles.git

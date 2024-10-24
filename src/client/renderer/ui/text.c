@@ -58,7 +58,7 @@ void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color
 
         if (c == '\n') {
             cur_pos.x = pos.x;
-            cur_pos.y += man->tilemap.tile_size.y;
+            cur_pos.y += man->tilemap.tile_size.y + man->char_padding;
         } else {
             if (with_shadow) {
                 Color shadow = color;
