@@ -3,14 +3,24 @@
 #include <fightable/state.h>
 #include <stdio.h>
 #include <math.h>
+#include <fightable/debug.h>
+
+#ifdef DEBUG
+static unsigned char __dbg_continue = 0;
+#endif
 
 void _fIntroDraw() {
     ClearBackground(BLACK);
 
     double t = _fAudioGetPlayTime(&__state.sound_engine);
 
-    char buffer[20] = {};
-    snprintf(buffer, 20, "t: %f\n%d", (float)t, __state.title_song_stage);
+    unsigned char is_dbg = 0;
+#ifdef DEBUG
+    is_dbg = 1;
+#endif
+
+    char buffer[48] = {};
+    snprintf(buffer, 48, "t: %f\n%d [dbg: %d\\", (float)t, __state.title_song_stage, (int)is_dbg);
 
     /**
      * Step at 1.080000
@@ -21,8 +31,23 @@ void _fIntroDraw() {
 
     _fTextDraw(&__state.text_manager, buffer, (IVector2){1, 1}, GREEN, 1);
 
+#ifdef DEBUG
+    if (IsKeyPressed(KEY_ENTER)) {
+        __dbg_continue = 1;
+        __state.title_song_stage = 0;
+        _fIntroInit();
+    }
+
+    if (!__dbg_continue) {
+        _fTextDraw(&__state.text_manager, "enter to continue", (IVector2){1, 20}, YELLOW, 1);
+
+        return;
+    }
+#endif
+
     int w =__state.framebuffer.texture.width;
     int h =__state.framebuffer.texture.height;
+    float delta = GetFrameTime();
 
     if (t >= 1.08f) {
         __state.title_song_stage = 1;
@@ -36,67 +61,72 @@ void _fIntroDraw() {
     if (t >= 4.f) {
         __state.title_song_stage = 4;
         if (__state.title_r0) {
+            _fIntroMenuInit();
+
             __state.title_r0 = 0;
             __state.title_a = 0.f;
         }
     }
 
+#ifdef DEBUG
     if (IsKeyDown(KEY_SPACE)) {
         printf("Step at %f\n", (float)t);
 
         __state.title_song_stage++;
     }
+#endif
 
-    if (__state.title_song_stage >= 1) {
-        int size_x = 6 * __state.tilemap->tile_size.x;
-        int size_y = 1 * __state.tilemap->tile_size.y;
+    if (__state.title_song_stage != 4) {
+        if (__state.title_song_stage >= 1) {
+            int size_x = 6 * __state.tilemap->tile_size.x;
+            int size_y = 1 * __state.tilemap->tile_size.y;
 
-        int cx = (w - size_x) / 2;
-        int cy = (h - size_y) / 2;
+            int cx = (w - size_x) / 2;
+            int cy = (h - size_y) / 2;
 
-        _fTilemapDrawMegatile(*__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
-    }
-
-    if (__state.title_song_stage >= 2) {
-        int size_x = __state.raylib_logo.width;
-        int size_y = 1 * __state.raylib_logo.height;
-
-        int cx = (w - size_x) / 2;
-        int cy = h - size_y - 2;
-
-        Color c = WHITE;
-        c.r = 16;
-        c.g = 16;
-        c.b = 16;
-
-        int offset = 6;
-
-        DrawRectangleGradientV(0, cy - offset, w, size_y + 2 + offset, BLACK, c);
-
-        DrawTexture(__state.raylib_logo, cx, cy, WHITE);
-    }
-    
-    float delta = GetFrameTime();
-
-    if (__state.title_song_stage == 3) {
-        __state.title_a += delta * 4.5f;
-
-        float v = fmax(1.f - __state.title_a, 0.f);
-        Color c = BLACK;
-        c.a = 255.f * (1.f - v);
-
-        DrawRectangle(0, 0, w, h, c);
-
-        if (v <= 0.f) {
-            __state.title_r0 = 1;
+            _fTilemapDrawMegatile(*__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
         }
+
+        if (__state.title_song_stage >= 2) {
+            int size_x = __state.raylib_logo.width;
+            int size_y = 1 * __state.raylib_logo.height;
+
+            int cx = (w - size_x) / 2;
+            int cy = h - size_y - 2;
+
+            Color c = WHITE;
+            c.r = 16;
+            c.g = 16;
+            c.b = 16;
+
+            int offset = 6;
+
+            DrawRectangleGradientV(0, cy - offset, w, size_y + 2 + offset, BLACK, c);
+
+            DrawTexture(__state.raylib_logo, cx, cy, WHITE);
+        }
+
+        if (__state.title_song_stage == 3) {
+            __state.title_a += delta * 4.5f;
+
+            float v = fmax(1.f - __state.title_a, 0.f);
+            Color c = BLACK;
+            c.a = 255.f * (1.f - v);
+
+            DrawRectangle(0, 0, w, h, c);
+
+            if (v <= 0.f) {
+                __state.title_r0 = 1;
+            }
     }
-    if (__state.title_song_stage == 4) {
+    } else {
         __state.title_a += delta * 6.f;
 
         float v = fmax(1.f - __state.title_a, 0.f);
         Color c = BLACK;
         c.a = 255.f * v;
+
+        _fIntroMenuDraw();
 
         DrawRectangle(0, 0, w, h, c);
     }

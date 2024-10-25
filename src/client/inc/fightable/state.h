@@ -44,6 +44,10 @@ struct fightable_state {
     struct faudio_engine sound_engine;
 
     Texture2D raylib_logo;
+
+    Texture2D intro_temp_bg;
+    double intro_bg_offsetf;
+    int intro_bg_offseti;
 };
 
 extern struct fightable_state __state;

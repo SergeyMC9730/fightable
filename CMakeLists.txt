@@ -45,6 +45,8 @@ add_executable(fightable
     src/client/audio/stop.c
     src/client/audio/loop.c
     src/client/audio/get_playtime.c
+    src/client/intro/menu/init.c
+    src/client/intro/menu/draw.c
 )
 
 add_executable(physics-test

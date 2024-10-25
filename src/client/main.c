@@ -7,6 +7,7 @@
 #include <fightable/editor.h>
 #include <stdio.h>
 #include <fightable/intro.h>
+#include <fightable/debug.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
@@ -34,7 +35,9 @@ int main(int argc, char **argv) {
     __level = _fLevelLoadTest(__state.tilemap, (IVector2){28, 4});
     __state.current_level = &__level;
 
+#ifndef DEBUG
     _fIntroInit();
+#endif
 
     if (argc > 1) {
         printf("ARGV[1] = %s\n", argv[1]);

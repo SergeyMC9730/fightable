@@ -1,6 +1,7 @@
 #include <fightable/entity.h>
 #include <raylib.h>
 #include <stdio.h>
+#include <fightable/debug.h>
 
 // #define DEBUG
 
