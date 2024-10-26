@@ -11,9 +11,12 @@ struct flevel;
 struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
+struct ftitle_editor;
 
 #include <fightable/text.h>
 #include <fightable/sound_engine.h>
+#include <fightable/editor_library.h>
+#include <fightable/gfx.h>
 #include <pthread.h>
 
 struct fightable_state {
@@ -27,6 +30,7 @@ struct fightable_state {
     RenderTexture2D framebuffer;
 
     struct feditor *current_editor;
+    struct ftitle_editor *current_title_editor;
 
     struct ftext_manager text_manager;
 
@@ -48,6 +52,20 @@ struct fightable_state {
     Texture2D intro_temp_bg;
     double intro_bg_offsetf;
     int intro_bg_offseti;
+
+    enum fightable_editor selected_editor_type;
+
+    Vector2 gui_render_offset;
+
+    struct gfx_manager gfx;
+
+#define R2D_STACK_SIZE 32
+    // rendertexture stack
+    RenderTexture2D r2dstack[R2D_STACK_SIZE];
+    // pointer to the `r2dstack` end
+    int r2dpointer;
+
+    Texture2D test_label;
 };
 
 extern struct fightable_state __state;

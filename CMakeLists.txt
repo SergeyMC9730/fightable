@@ -1,11 +1,21 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable)
 
+find_library(OPENMPT_LIB openmpt)
+if(NOT OPENMPT_LIB)
+    message(FATAL_ERROR "openmpt library could not be found")
+endif()
+
+set(BUILD_SHARED_LIBS ON)
+
+add_subdirectory(ext/portaudio_opensles)
+
 set(BUILD_SHARED_LIBS OFF)
 
+set(ENABLE_CJSON_UNINSTALL OFF)
 add_subdirectory(ext/cJSON)
+
 add_subdirectory(ext/raylib)
-add_subdirectory(ext/portaudio_opensles)
 
 add_executable(fightable 
     src/client/main.c
@@ -47,29 +57,22 @@ add_executable(fightable
     src/client/audio/get_playtime.c
     src/client/intro/menu/init.c
     src/client/intro/menu/draw.c
+    src/client/intro/editor/init.cpp
+    src/client/intro/editor/draw.cpp
+    src/client/renderer/gfx/shake.c
+    src/client/renderer/gfx/update.c
+    src/client/audio/debug.c
+    src/client/renderer/begin_texture_mode.c
+    src/client/renderer/end_texture_mode.c
+    src/client/renderer/stack_find.c
 )
 
 add_executable(physics-test
     src/physics_test/main.c
 )
 
-add_executable(helloworld
-    src/helloworld/main.c
-)
-
-add_library(raylib-statistics SHARED
-    src/raylib_statistics/state.c
-    src/raylib_statistics/texture.c
-    src/raylib_statistics/test.c
-)
-
 target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
-target_include_directories(raylib-statistics PRIVATE ext/raylib/src src/raylib_statistics/inc)
 
-set_property(TARGET raylib-statistics PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_compile_definitions(raylib-statistics PRIVATE _GNU_SOURCE=1)
-
-target_link_libraries(fightable raylib cjson openmpt portaudio.a asound jack)
+target_link_libraries(fightable raylib cjson openmpt PortAudio)
 target_link_libraries(physics-test raylib)
-target_link_libraries(raylib-statistics raylib dl)

@@ -45,6 +45,11 @@ void _fAudioBegin(struct faudio_engine *engine) {
             engine->buffer[i] = (float)engine->buffer[i] * 0.06f;
         }
 
+        engine->_channels = openmpt_module_get_current_playing_channels(engine->current_module);
+        engine->_order = openmpt_module_get_current_order(engine->current_module);
+        engine->_pattern = openmpt_module_get_current_pattern(engine->current_module);
+        engine->_row = openmpt_module_get_current_row(engine->current_module);
+
         // double s = openmpt_module_get_position_seconds(engine->current_module);
         // printf("s=%f\n", (float)s);
 

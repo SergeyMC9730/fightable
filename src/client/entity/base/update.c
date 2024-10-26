@@ -39,7 +39,16 @@ void _fEntityUpdate(struct fentity *entity) {
             CheckCollisionRecs(entity->hitbox_d, r)
         };
 
-        if (checks[2]) {
+         if (checks[0] && !checks[3]) {
+            entity->touching_wall_l = 1;
+            entity->collided_surface = r;
+        }
+        if (checks[1] && !checks[3]) {
+            entity->touching_wall_r = 1;
+            entity->collided_surface = r;
+        }
+
+        if (checks[2] && !entity->touching_wall_r && !entity->touching_wall_l) {
             entity->touching_ceiling = 1;
             entity->ceiling_surface = r;
             entity->hitbox.y = entity->ceiling_surface.y + (entity->ceiling_surface.height + 1);

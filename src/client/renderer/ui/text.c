@@ -2,6 +2,7 @@
 #include <string.h>
 #include <fightable/tilemap.h>
 #include <stdio.h>
+#include <fightable/renderer.h>
 
 static const IVector2 __default_font_data[0xFF] = {
     {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
@@ -42,6 +43,8 @@ IVector2 _fTextMeasure(struct ftext_manager *man, const char *text) {
     if (result.x != 0) {
         result.x -= padding;
     }
+
+    return result;
 }
 
 void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color color, unsigned char with_shadow) {
@@ -82,4 +85,128 @@ struct ftext_manager _fTextLoadDefault() {
     man.char_mapping = __default_font_data;
 
     return man;
+}
+
+#include <math.h>
+
+unsigned char _hlpTool(unsigned char a, unsigned char b) {
+    unsigned int _a = a;
+    unsigned int _b = b;
+
+    unsigned int mul = _a * _b;
+    unsigned int res = fmin(0xFF, mul);
+
+    return (unsigned char)res;
+}
+
+Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Color top, Color bottom, unsigned char with_shadow) {
+    if (!man || !text) return (Texture2D){};
+
+    IVector2 sz = _fTextMeasure(man, text);
+    sz.x++; sz.y++;
+
+    RenderTexture2D output_char = LoadRenderTexture(man->tilemap.tile_size.x, man->tilemap.tile_size.y);
+    RenderTexture2D output_char_grad = LoadRenderTexture(man->tilemap.tile_size.x, man->tilemap.tile_size.y);
+    RenderTexture2D output = LoadRenderTexture(sz.x, sz.y);
+
+    size_t len = strlen(text);
+    IVector2 cur_pos = {};
+
+    BeginTextureModeStacked(output_char_grad);
+    DrawRectangleGradientV(0, 0, output_char_grad.texture.width, output_char_grad.texture.height, top, bottom);
+    EndTextureModeStacked();
+
+    Image gradient = LoadImageFromTexture(output_char_grad.texture);
+    UnloadRenderTexture(output_char_grad);
+
+    BeginTextureModeStacked(output);
+
+    for (size_t i = 0; i < len; i++) {
+        unsigned char c = text[i];
+
+        if (c != ' ') {
+            char cstr[2] = {c, 0};
+
+            IVector2 cpos = man->char_mapping[c];
+
+            BeginTextureModeStacked(output_char);
+            ClearBackground(BLANK);
+            _fTextDraw(man, cstr, (IVector2){0, 0}, WHITE, 0);
+            EndTextureModeStacked();
+
+            Image img = LoadImageFromTexture(output_char.texture);
+
+            for (int x = 0; x < img.width; x++) {
+                for (int y = 0; y < img.height; y++) {
+                    Color c1 = GetImageColor(img, x, y);
+
+                    if (c1.a != 0) {
+                        ImageDrawPixel(&img, x, y, GetImageColor(gradient, x, y));
+                    }
+                }
+            }
+
+            Texture txt = LoadTextureFromImage(img);
+            UnloadImage(img);
+
+            BeginTextureModeStacked(output_char);
+            ClearBackground(BLANK);
+
+            DrawTexture(txt, 0, 0, WHITE);
+
+            EndTextureModeStacked();
+            UnloadTexture(txt);
+
+            Rectangle source = (Rectangle){ 0, 0, (float)output_char.texture.width, (float)-output_char.texture.height };
+            Rectangle dest = (Rectangle){ cur_pos.x, cur_pos.y, output_char.texture.width, output_char.texture.height };
+
+            DrawTexturePro(output_char.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
+        }
+
+        cur_pos.x += output_char.texture.width + man->char_padding;
+        if (c == '\n') {
+            cur_pos.x = 0;
+            cur_pos.y += output_char.texture.height + man->char_padding;
+        }
+    }
+
+    EndTextureModeStacked();
+
+    UnloadImage(gradient);
+    UnloadRenderTexture(output_char);
+
+    Image output_image = LoadImageFromTexture(output.texture);
+    Texture2D txt = LoadTextureFromImage(output_image);
+
+    if (with_shadow == 0) {
+        UnloadRenderTexture(output);
+        UnloadImage(output_image);
+
+        return txt;
+    }
+
+    RenderTexture2D helper_txt = LoadRenderTexture(output.texture.width, output.texture.height);
+    BeginTextureModeStacked(helper_txt);
+    ClearBackground(BLANK);
+
+    Rectangle source = (Rectangle){ 0, 0, (float)txt.width, (float)-txt.height };
+    Rectangle dest = (Rectangle){ 1, 0, txt.width, txt.height };
+    DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, (Color){255, 255, 255, 128});
+
+    dest = (Rectangle){ 0, 1, txt.width, txt.height };
+    DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, WHITE);
+
+    EndTextureModeStacked();
+
+    UnloadImage(output_image);
+    UnloadRenderTexture(output);
+    UnloadTexture(txt);
+
+    output_image = LoadImageFromTexture(helper_txt.texture);
+    txt = LoadTextureFromImage(output_image);
+
+    UnloadImage(output_image);
+    UnloadRenderTexture(helper_txt);
+
+    return txt;
 }

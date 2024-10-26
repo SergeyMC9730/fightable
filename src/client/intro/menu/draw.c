@@ -23,7 +23,7 @@ void _fIntroMenuDraw() {
     dest.x = 0;
     dest.y = 0;
 
-    Color bg_color = (Color){0, 0, 255, 200};
+    Color bg_color = (Color){0, 0, 200, 255};
 
     DrawTexturePro(__state.intro_temp_bg, source, dest, (Vector2){}, 0.f, bg_color);
 
@@ -37,4 +37,8 @@ void _fIntroMenuDraw() {
     DrawRectangleGradientV(0, 0, wx, wy, begin, end);
 
     EndBlendMode();
+
+    // ClearBackground(BLUE);
+
+    DrawTexture(__state.test_label, 32, 32, WHITE);
 }

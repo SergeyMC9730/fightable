@@ -10,17 +10,13 @@ static unsigned char __dbg_continue = 0;
 #endif
 
 void _fIntroDraw() {
-    ClearBackground(BLACK);
+    // ClearBackground(BLACK);
 
     double t = _fAudioGetPlayTime(&__state.sound_engine);
 
-    unsigned char is_dbg = 0;
 #ifdef DEBUG
-    is_dbg = 1;
-#endif
-
     char buffer[48] = {};
-    snprintf(buffer, 48, "t: %f\n%d [dbg: %d\\", (float)t, __state.title_song_stage, (int)is_dbg);
+    snprintf(buffer, 48, "t: %f\n%d", (float)t, __state.title_song_stage);
 
     /**
      * Step at 1.080000
@@ -31,7 +27,7 @@ void _fIntroDraw() {
 
     _fTextDraw(&__state.text_manager, buffer, (IVector2){1, 1}, GREEN, 1);
 
-#ifdef DEBUG
+
     if (IsKeyPressed(KEY_ENTER)) {
         __dbg_continue = 1;
         __state.title_song_stage = 0;
@@ -52,16 +48,20 @@ void _fIntroDraw() {
     if (t >= 1.08f) {
         __state.title_song_stage = 1;
     }
-    if (t >= 1.44f) {
+    if (t >= 1.8f) {
         __state.title_song_stage = 2;
     }
-    if (t >= 3.56f) {
+    if (t >= 4.06f) {
         __state.title_song_stage = 3;
     }
-    if (t >= 4.f) {
+    if (t >= 4.45f) {
         __state.title_song_stage = 4;
         if (__state.title_r0) {
-            _fIntroMenuInit();
+            if (__state.selected_editor_type == EditorNone) {
+                _fIntroMenuInit();
+            } else {
+                __state.intro_can_continue = 1;
+            }
 
             __state.title_r0 = 0;
             __state.title_a = 0.f;
@@ -126,7 +126,9 @@ void _fIntroDraw() {
         Color c = BLACK;
         c.a = 255.f * v;
 
-        _fIntroMenuDraw();
+        if (__state.selected_editor_type == EditorNone) {
+            _fIntroMenuDraw();
+        } 
 
         DrawRectangle(0, 0, w, h, c);
     }

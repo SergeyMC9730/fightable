@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
+#include <fightable/editor_library.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
@@ -20,11 +21,14 @@ int main(int argc, char **argv) {
     Vector2 win_sz = {800, 600};
     Vector2 editor_sz = {255, 0};
 
+    SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
+
     InitWindow(win_sz.x, win_sz.y, "Fightable");
     SetTargetFPS(60);
 
-    InitAudioDevice();
+    SetWindowIcon(LoadImage("assets/icon.png"));
 
+    InitAudioDevice();
     pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
 
     __tilemap = _fTilemapCreate("assets/fightable1.png", (IVector2){8, 8});
@@ -35,14 +39,33 @@ int main(int argc, char **argv) {
     __level = _fLevelLoadTest(__state.tilemap, (IVector2){28, 4});
     __state.current_level = &__level;
 
-#ifndef DEBUG
-    _fIntroInit();
-#endif
-
     if (argc > 1) {
         printf("ARGV[1] = %s\n", argv[1]);
 
         if (strcmp(argv[1], "editor") == 0) {
+            enum fightable_editor selected_editor = EditorMap;
+
+            if (argc <= 2) {
+                selected_editor = EditorMap;
+            } else {
+                if (strcmp(argv[2], "map") == 0) {
+                    selected_editor = EditorMap;
+                } else if (strcmp(argv[2], "title") == 0) {
+                    selected_editor = EditorTitle;
+                } else {
+                    printf("unknown editor has been selected\n");
+
+                    __state.sound_engine.should_stop = 1;
+
+                    CloseWindow();
+                    pthread_join(__state.sound_thread, NULL);
+
+                    return 1;
+                }
+            }
+
+            __state.selected_editor_type = selected_editor;
+
             __state.current_editor = _fEditorCreate();
             free(__level.objects);
 
@@ -54,17 +77,31 @@ int main(int argc, char **argv) {
         }
     }
 
+#ifndef DEBUG
+    _fIntroInit();
+#endif
+
     RenderTexture2D txt = LoadRenderTexture(win_sz.x / 5, win_sz.y / 5);
     __state.framebuffer = txt;
 
+    char *dbg_buffer = (char *)MemAlloc(2048);
+
     while (!WindowShouldClose()) {
+        _fGfxUpdate(&__state.gfx);
+        __state.gui_render_offset.x = __state.gfx.shake_v.x;
+        __state.gui_render_offset.y = __state.gfx.shake_v.y;
+
+        if (IsKeyPressed(KEY_G)) {
+            // printf("SHAKE\n");
+            _fGfxShake(&__state.gfx, 1.f);
+        }
+
         BeginDrawing();
-        BeginTextureMode(__state.framebuffer);
-        
+        BeginTextureModeStacked(__state.framebuffer);
 
         _fDraw();
 
-        EndTextureMode();
+        EndTextureModeStacked();
 
         Rectangle source = (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width, (float)-__state.framebuffer.texture.height };
         Rectangle dest = (Rectangle){ 0, 0, GetRenderWidth(), GetRenderHeight() };
@@ -72,6 +109,12 @@ int main(int argc, char **argv) {
         DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
         // DrawFPS(4, 4);
+
+        // snprintf(dbg_buffer, 2048, "c%d o%d r%d p%d", 
+        //     __state.sound_engine._channels, __state.sound_engine._order, __state.sound_engine._row, __state.sound_engine._pattern
+        // );
+
+        // DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
 
         EndDrawing();
 

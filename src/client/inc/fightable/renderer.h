@@ -8,6 +8,28 @@ extern "C" {
 
 void _fDraw();
 
+// raylib additions
+
+// switch to the texture mode in stack mode
+//
+// - stack mode means that rendertextures can be pushed and pulled out of the stack
+// - if there are gonna be more than R2D_STACK_SIZE textures inside this stack, this function would behave like a standard `BeginTextureMode` function
+//
+// made for making some routines easier in implementation
+void BeginTextureModeStacked(RenderTexture2D txt);
+
+// move from the texture mode in stack mode
+//
+// - stack mode means that rendertextures can be pushed and pulled out of the stack
+//
+// made for making some routines easier in implementation
+void EndTextureModeStacked();
+
+// tries to find main framebuffer inside the rendertexture stack
+// if it fails, it returns -1
+// else it returns index inside the stack
+int _ntRendererGetMainIdxInStack();
+
 #ifdef __cplusplus
 }
 #endif

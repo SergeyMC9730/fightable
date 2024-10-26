@@ -21,6 +21,11 @@ struct faudio_engine {
     unsigned char mod_lock;
     unsigned char should_stop;
     unsigned char ready;
+
+    unsigned int _order;
+    unsigned int _pattern;
+    unsigned int _row;
+    unsigned int _channels;
 };
 
 void _fAudioBegin(struct faudio_engine *engine);
@@ -28,6 +33,7 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path);
 void _fAudioStop(struct faudio_engine *engine);
 double _fAudioGetPlayTime(struct faudio_engine *engine);
 void _fAudioLoopCurrent(struct faudio_engine *engine);
+const char *_fAudioGetDbg(struct faudio_engine *engine);
 
 #ifdef __cplusplus
 }
