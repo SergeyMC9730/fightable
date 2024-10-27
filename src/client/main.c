@@ -86,15 +86,12 @@ int main(int argc, char **argv) {
 
     char *dbg_buffer = (char *)MemAlloc(2048);
 
+    unsigned char shake_lock = 0;
+
     while (!WindowShouldClose()) {
         _fGfxUpdate(&__state.gfx);
         __state.gui_render_offset.x = __state.gfx.shake_v.x;
         __state.gui_render_offset.y = __state.gfx.shake_v.y;
-
-        if (IsKeyPressed(KEY_G)) {
-            // printf("SHAKE\n");
-            _fGfxShake(&__state.gfx, 1.f);
-        }
 
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
@@ -110,11 +107,29 @@ int main(int argc, char **argv) {
 
         // DrawFPS(4, 4);
 
-        // snprintf(dbg_buffer, 2048, "c%d o%d r%d p%d", 
-        //     __state.sound_engine._channels, __state.sound_engine._order, __state.sound_engine._row, __state.sound_engine._pattern
-        // );
+        const char *row = _fAudioGetDbg(&__state.sound_engine, 5);
 
-        // DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
+        snprintf(dbg_buffer, 2048, "c%d o%d r%d p%d\n%s", 
+            __state.sound_engine._channels, __state.sound_engine._order, __state.sound_engine._row, __state.sound_engine._pattern,
+            row
+        );
+
+        // printf("%s: %p\n", row, strstr(row, "0B"));
+
+        if (strstr(row, "0D") != NULL) {
+            if (!shake_lock) {
+                printf("shaking\n");
+
+                _fGfxShake(&__state.gfx, 1.f);
+                shake_lock = 1;
+            }
+        } else {
+            shake_lock = 0;
+        }
+
+        free(row);
+
+        DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
 
         EndDrawing();
 

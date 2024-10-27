@@ -66,6 +66,8 @@ struct fightable_state {
     int r2dpointer;
 
     Texture2D test_label;
+
+    unsigned char intro_stage_completed;
 };
 
 extern struct fightable_state __state;

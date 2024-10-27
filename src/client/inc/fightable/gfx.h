@@ -16,6 +16,9 @@ struct gfx_manager {
 };
 
 void _fGfxShake(struct gfx_manager *m, float strength);
+void _fGfxShakeConst(struct gfx_manager *m, float strength);
+
+void _fGfxInvBorders(struct gfx_manager *m);
 
 void _fGfxUpdate(struct gfx_manager *m);
 

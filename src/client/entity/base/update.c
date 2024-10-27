@@ -48,7 +48,7 @@ void _fEntityUpdate(struct fentity *entity) {
             entity->collided_surface = r;
         }
 
-        if (checks[2] && !entity->touching_wall_r && !entity->touching_wall_l) {
+        if (checks[2]) {
             entity->touching_ceiling = 1;
             entity->ceiling_surface = r;
             entity->hitbox.y = entity->ceiling_surface.y + (entity->ceiling_surface.height + 1);
