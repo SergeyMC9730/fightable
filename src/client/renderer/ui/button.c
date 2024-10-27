@@ -80,3 +80,11 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
     return ret;
     // DrawRectangleLinesEx(btn_rect, 1.f, RED);
 }
+
+unsigned char _fButtonDrawSimple(const char *text, IVector2 pos) {
+    struct fbutton btn = {};
+    btn.text = text;
+    btn.position = pos;
+    
+    return _fButtonDraw(&btn);
+}

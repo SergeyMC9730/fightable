@@ -66,6 +66,7 @@ add_executable(fightable
     src/client/renderer/end_texture_mode.c
     src/client/renderer/stack_find.c
     src/client/audio/channels_total.c
+    src/client/renderer/ui/rect.c
 )
 
 add_executable(physics-test

@@ -65,9 +65,13 @@ struct fightable_state {
     // pointer to the `r2dstack` end
     int r2dpointer;
 
-    Texture2D test_label;
+    Texture2D menu_borders;
 
     unsigned char intro_stage_completed;
+    
+    unsigned char menu_pressed_play;
+
+    Texture2D playbtn_container;
 };
 
 extern struct fightable_state __state;

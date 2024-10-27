@@ -5,12 +5,12 @@
 #include <stdio.h>
 
 void _fGfxShake(struct gfx_manager *m, float strength) {
-    m->shake_v.max += 0.15f;
+    m->shake_v.max += 0.15f * strength;
     m->shake_v.s += strength;
 }
 void _fGfxShakeConst(struct gfx_manager *m, float strength) {
     m->shake_v.time = 0;
-    m->shake_v.max = 0.15f;
+    m->shake_v.max = 0.15f * strength;
     m->shake_v.x = 0;
     m->shake_v.y = 0;
     m->shake_v.s = strength;

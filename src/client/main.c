@@ -18,18 +18,19 @@ void *main_thr0(void *user) {
 }
 
 int main(int argc, char **argv) {
+    pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
+
     Vector2 win_sz = {800, 600};
     Vector2 editor_sz = {255, 0};
 
     SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
 
     InitWindow(win_sz.x, win_sz.y, "Fightable");
-    SetTargetFPS(60);
+    SetTargetFPS(144);
 
     SetWindowIcon(LoadImage("assets/icon.png"));
 
     InitAudioDevice();
-    pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
 
     __tilemap = _fTilemapCreate("assets/fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
@@ -93,6 +94,10 @@ int main(int argc, char **argv) {
         __state.gui_render_offset.x = __state.gfx.shake_v.x;
         __state.gui_render_offset.y = __state.gfx.shake_v.y;
 
+        if (IsKeyPressed(KEY_G)) {
+            _fGfxShake(&__state.gfx, 4.f);
+        }
+
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
 
@@ -105,20 +110,21 @@ int main(int argc, char **argv) {
 
         DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
-        // DrawFPS(4, 4);
+        DrawFPS(8, 64 + 16);
 
         const char *row = _fAudioGetDbg(&__state.sound_engine, 5);
 
-        snprintf(dbg_buffer, 2048, "c%d o%d r%d p%d\n%s", 
-            __state.sound_engine._channels, __state.sound_engine._order, __state.sound_engine._row, __state.sound_engine._pattern,
-            row
-        );
+        // snprintf(dbg_buffer, 2048, "c%d o%d r%d p%d\n%s\nfbs: %d", 
+        //     __state.sound_engine._channels, __state.sound_engine._order, __state.sound_engine._row, __state.sound_engine._pattern,
+        //     row,
+        //     __state.r2dpointer
+        // );
 
         // printf("%s: %p\n", row, strstr(row, "0B"));
 
-        if (strstr(row, "0D") != NULL) {
+        if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
             if (!shake_lock) {
-                printf("shaking\n");
+                // printf("shaking\n");
 
                 _fGfxShake(&__state.gfx, 1.f);
                 shake_lock = 1;
@@ -129,7 +135,7 @@ int main(int argc, char **argv) {
 
         free(row);
 
-        DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
+        // DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
 
         EndDrawing();
 

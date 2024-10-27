@@ -2,6 +2,10 @@
 #include <raylib.h>
 #include <fightable/state.h>
 #include <stdio.h>
+#include <fightable/button.h>
+#include <stdlib.h>
+#include <fightable/rect.h>
+#include <fightable/renderer.h>
 
 void _fIntroMenuDraw() {
     float delta = GetFrameTime();
@@ -40,29 +44,69 @@ void _fIntroMenuDraw() {
 
     // ClearBackground(BLUE);
 
-    const int yv0 = ((wy / __state.tilemap->tile_size.y) - 2) * __state.tilemap->tile_size.y;
-    const int yv1 = ((wy / __state.tilemap->tile_size.y) - 1) * __state.tilemap->tile_size.y;
+    DrawTexture(__state.menu_borders, 0, 0, WHITE);
 
-    const int xv0 = ((wx / __state.tilemap->tile_size.x) - 1) * __state.tilemap->tile_size.x;
+    if (__state.menu_pressed_play) {
+        int w = 80;
+        Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
 
-    for (int i = 1; i < (wx / __state.tilemap->tile_size.x) - 1; i++) {
-        int x = i * __state.tilemap->tile_size.x;
+        DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);
+    } else {
+        if (_fButtonDrawSimple("PLAY", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 50})) {
+            __state.menu_pressed_play = 1;
+        
+            Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
+            Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Multiplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
 
-        _fTilemapDraw(*__state.tilemap, (IVector2){x, 0}, (IVector2){24, 5}, 0, 0, BLUE);
-        _fTilemapDraw(*__state.tilemap, (IVector2){x, yv0}, (IVector2){21, 5}, 0, 0, BLUE);
+            int w = 80;
+            Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
+
+            RenderTexture2D rt2d = LoadRenderTexture(area.width, area.height);
+            BeginTextureModeStacked(rt2d);
+            ClearBackground(BLANK);
+
+            _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 160});
+
+            int offset = 3;
+
+            BeginScissorMode(1, 1, area.width - 1, area.height - 1);
+
+            // DrawRectanglePro((Rectangle){-10 + area.x, 15 + area.y, 15, 15}, (Vector2){}, 45.f, GREEN);
+            DrawRectangle(0, offset, 15, 15, RED);
+            DrawRectanglePro((Rectangle){6, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+            DrawRectanglePro((Rectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+            DrawRectanglePro((Rectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+            DrawRectanglePro((Rectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
+            DrawTexture(multiplayer_label, 27, 6 + offset, WHITE);
+
+            offset -= 2;
+
+            DrawRectanglePro((Rectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
+            DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
+
+            DrawLine(2, 23 + offset, area.width - 2, 23 + offset, (Color){0x71, 0xaf, 0xfb, 0xff});
+
+            EndScissorMode();
+
+            EndTextureModeStacked();
+
+            UnloadTexture(multiplayer_label);
+            UnloadTexture(singleplayer_label);
+
+            Image img = LoadImageFromTexture(rt2d.texture);
+            ImageFlipVertical(&img);
+
+            __state.playbtn_container = LoadTextureFromImage(img);
+        
+            UnloadImage(img);
+            UnloadRenderTexture(rt2d);
+        }
+        
+        if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 60})) {
+            
+        }
+        if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 70})) {
+            exit(0);
+        }
     }
-    for (int i = 1; i < (wy / __state.tilemap->tile_size.y) - 2; i++) {
-        int y = i * __state.tilemap->tile_size.y;
-
-        _fTilemapDraw(*__state.tilemap, (IVector2){0, y}, (IVector2){20, 5}, 0, 0, BLUE);
-        _fTilemapDraw(*__state.tilemap, (IVector2){xv0, y}, (IVector2){25, 5}, 0, 0, BLUE);
-    }
-    _fTilemapDraw(*__state.tilemap, (IVector2){0, 0}, (IVector2){23, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){xv0, 0}, (IVector2){27, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){0, yv0}, (IVector2){22, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){xv0, yv0}, (IVector2){26, 5}, 0, 0, BLUE);
-
-    DrawRectangle(0, yv1, wx, yv0, BLACK);
-
-    DrawTexture(__state.test_label, 8, wy - __state.test_label.height - 4, WHITE);
 }

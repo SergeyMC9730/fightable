@@ -76,7 +76,7 @@ void _fIntroDraw() {
     }
 #endif
 
-    if (__state.title_song_stage != 4) {
+    if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
         if (__state.title_song_stage >= 1) {
             int size_x = 6 * __state.tilemap->tile_size.x;
             int size_y = 1 * __state.tilemap->tile_size.y;
@@ -123,14 +123,19 @@ void _fIntroDraw() {
         __state.title_a += delta * 6.f;
 
         float v = fmax(1.f - __state.title_a, 0.f);
-        Color c = BLACK;
-        c.a = 255.f * v;
 
-        if (__state.selected_editor_type == EditorNone) {
-            _fIntroMenuDraw();
-        } 
+        if (v <= 1.f) {
+            Color c = BLACK;
+            c.a = 255.f * v;
 
-        DrawRectangle(0, 0, w, h, c);
+            if (__state.selected_editor_type == EditorNone) {
+                _fIntroMenuDraw();
+            } 
+
+            DrawRectangle(0, 0, w, h, c);
+        }
+
+        __state.intro_stage_completed = 1;
     }
 
     return;

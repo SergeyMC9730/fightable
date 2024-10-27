@@ -50,6 +50,15 @@ void _fAudioBegin(struct faudio_engine *engine) {
         engine->_pattern = openmpt_module_get_current_pattern(engine->current_module);
         engine->_row = openmpt_module_get_current_row(engine->current_module);
 
+        double time = _fAudioGetPlayTime(engine);
+        double max = openmpt_module_get_duration_seconds(engine->current_module);
+
+        if (openmpt_module_get_repeat_count(engine->current_module) != 0 && time > max) {
+            printf("resetting song\n");
+
+            openmpt_module_set_position_seconds(engine->current_module, 0);
+        }
+
         // double s = openmpt_module_get_position_seconds(engine->current_module);
         // printf("s=%f\n", (float)s);
 

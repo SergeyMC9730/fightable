@@ -20,6 +20,7 @@ struct fbutton {
 };
 
 unsigned char _fButtonDraw(struct fbutton *btn);
+unsigned char _fButtonDrawSimple(const char *text, IVector2 pos);
 
 #ifdef __cplusplus
 }
