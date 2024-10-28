@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
         DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
-        DrawFPS(8, 64 + 16);
+        DrawFPS(8, 8);
 
         const char *row = _fAudioGetDbg(&__state.sound_engine, 5);
 
@@ -122,18 +122,20 @@ int main(int argc, char **argv) {
 
         // printf("%s: %p\n", row, strstr(row, "0B"));
 
-        if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
-            if (!shake_lock) {
-                // printf("shaking\n");
+        if (row != NULL) {
+            if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
+                if (!shake_lock) {
+                    // printf("shaking\n");
 
-                _fGfxShake(&__state.gfx, 1.f);
-                shake_lock = 1;
+                    _fGfxShake(&__state.gfx, 1.f);
+                    shake_lock = 1;
+                }
+            } else {
+                shake_lock = 0;
             }
-        } else {
-            shake_lock = 0;
-        }
 
-        free(row);
+            free(row);
+        }
 
         // DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
 

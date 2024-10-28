@@ -73,7 +73,6 @@ void _fIntroMenuDraw() {
 
             // DrawRectanglePro((Rectangle){-10 + area.x, 15 + area.y, 15, 15}, (Vector2){}, 45.f, GREEN);
             DrawRectangle(0, offset, 15, 15, RED);
-            DrawRectanglePro((Rectangle){6, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
             DrawRectanglePro((Rectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
             DrawRectanglePro((Rectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
             DrawRectanglePro((Rectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
