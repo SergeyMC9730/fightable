@@ -74,7 +74,7 @@ struct fightable_state {
 
     struct gfx_manager gfx;
 
-#define R2D_STACK_SIZE 48
+#define R2D_STACK_SIZE 24
     // rendertexture stack
     RenderTexture2D r2dstack[R2D_STACK_SIZE];
     // pointer to the `r2dstack` end
@@ -93,6 +93,8 @@ struct fightable_state {
     Vector2 base_game_size;
     Vector2 editor_size;
     Vector2 initial_game_size;
+
+    short song_id;
 };
 
 extern struct fightable_state __state;

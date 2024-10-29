@@ -82,6 +82,10 @@ set(FIGHTABLE_SRC
     src/client/renderer/ui/rect.c
     src/client/editor/swipe_cur_objects.cpp
     src/client/editor/in_playback_mode.cpp
+    src/client/audio/get_song_name.c
+    src/client/intro/electric_drug.c
+    src/client/intro/endless_dream.c
+    src/client/intro/seekable_row.c
 )
 
 if (ANDROID)
@@ -93,7 +97,7 @@ if (ANDROID)
 	include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
 
 	add_library(fightable SHARED ${FIGHTABLE_SRC})
-	set(FIGHTABLE_NATIVE_LIBS android log aaudio)
+	set(FIGHTABLE_NATIVE_LIBS android log)
 	target_compile_definitions(fightable PUBLIC TARGET_ANDROID)
     target_compile_definitions(fightable PUBLIC TARGET_UNIX)
 elseif(WIN32)

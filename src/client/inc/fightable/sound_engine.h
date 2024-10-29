@@ -34,10 +34,6 @@ struct faudio_engine {
 #endif
 };
 
-struct faudio_beat_info {
-    
-};
-
 void _fAudioBegin(struct faudio_engine *engine);
 void _fAudioPlayModule(struct faudio_engine *engine, const char *path);
 void _fAudioStop(struct faudio_engine *engine);
@@ -45,6 +41,7 @@ double _fAudioGetPlayTime(struct faudio_engine *engine);
 void _fAudioLoopCurrent(struct faudio_engine *engine);
 const char *_fAudioGetDbg(struct faudio_engine *engine, int channel);
 int _fAudioGetChannelsTotal(struct faudio_engine *engine);
+const char *_fAudioGetSongName(struct faudio_engine *engine);
 
 #ifdef __cplusplus
 }

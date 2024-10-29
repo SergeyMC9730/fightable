@@ -23,6 +23,10 @@ void main_thr0(void *user) {
 }
 
 #ifdef TARGET_ANDROID
+
+#include <stdarg.h>
+#include <android/log.h>
+
 void _fAndroidTraceLog(int level, const char *text, __builtin_va_list args) {
     __android_log_vprint(ANDROID_LOG_VERBOSE, "fightable", text, args);
 }
@@ -115,7 +119,7 @@ int main(int argc, char **argv) {
 
     char *dbg_buffer = (char *)MemAlloc(2048);
 
-    unsigned char shake_lock = 0;
+    unsigned char shake_lock[8] = {0};
 
     ChangeDirectory("..");
 
@@ -155,31 +159,63 @@ int main(int argc, char **argv) {
 
         DrawFPS(32, 8);
 
-        const char *row = _fAudioGetDbg(&__state.sound_engine, 5);
+        const char *row = _fAudioGetDbg(&__state.sound_engine, _fIntroGetSeekableRow());
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d", 
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   row(%d): %s", 
             align_x,
             (float)UI_SCALE,
             (float)__state.window_scale,
             (float)_fAudioGetPlayTime(&__state.sound_engine),
-            __state.r2dpointer
+            __state.r2dpointer,
+            _fAudioGetSongName(&__state.sound_engine),
+            __state.title_song_stage,
+            (int)__state.song_id,
+            _fIntroGetSeekableRow(),
+            row
         );
 
-        DrawText(dbg_buffer, 8, 32, 20, RED);
-
+        // DrawText(dbg_buffer, 8, 32, 20, RED);
+        
         if (row != NULL) {
-            if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
-                if (!shake_lock) {
-                    // printf("shaking\n");
-
-                    _fGfxShake(&__state.gfx, 1.f);
-                    shake_lock = 1;
+            switch (__state.song_id) {
+                case 0: {
+                    if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
+                        if (!shake_lock[0]) {
+                            _fGfxShake(&__state.gfx, 1.f);
+                            shake_lock[0] = 1;
+                        }
+                    } else {
+                        shake_lock[0] = 0;
+                    }
+                    
+                    break;
                 }
-            } else {
-                shake_lock = 0;
+                case 1: {
+                    free((void *)row);
+                    
+                    for (int i = 0; i < _fAudioGetChannelsTotal(&__state.sound_engine); i++) {
+                        row = _fAudioGetDbg(&__state.sound_engine, i);
+
+                        if (strstr(row, "08") != NULL) {
+                            if (!shake_lock[i]) {
+                                _fGfxShake(&__state.gfx, 1.f);
+                                shake_lock[i] = 1;
+                            }
+                        } else {
+                            shake_lock[i] = 0;
+                        }
+
+                        free((void *)row);
+                        row = NULL;
+                    }
+
+                    break;
+                }
             }
 
-            free(row);
+            if (row != NULL) {
+                free((void *)row);
+            }
         }
 
         EndDrawing();
