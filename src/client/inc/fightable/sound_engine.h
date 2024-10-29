@@ -13,6 +13,8 @@ extern "C" {
 
 typedef struct openmpt_module openmpt_module;
 
+typedef struct AudioStream AudioStream;
+
 struct faudio_engine {
     openmpt_module *current_module;
 
@@ -26,6 +28,10 @@ struct faudio_engine {
     unsigned int _pattern;
     unsigned int _row;
     unsigned int _channels;
+
+#ifdef TARGET_ANDROID
+    AudioStream *stream;
+#endif
 };
 
 void _fAudioBegin(struct faudio_engine *engine);

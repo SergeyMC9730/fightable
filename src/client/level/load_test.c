@@ -31,7 +31,7 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
         }
     }
 
-    level.background_tile = _fTilemapExportTile(*tilemap, background_tile);
+    level.background_tile = _fTilemapExportTile(tilemap, background_tile);
     SetTextureWrap(level.background_tile, TEXTURE_WRAP_REPEAT);
 
     return level;

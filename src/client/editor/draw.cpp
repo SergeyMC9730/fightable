@@ -8,38 +8,40 @@
 #include <stdio.h>
 #include <cmath>
 #include <optional>
+#include <fightable/renderer.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
     bool mouse_out_of_bounds = false;
+
+    if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        editor->swipe_enabled = 1;
+    } else {
+        editor->swipe_enabled = 0;
+    }
 
     editor->level.in_workbench_mode = !editor->should_playback;
     if (editor->level.in_workbench_mode) {
         editor->entities.clear();
     }
 
+    float speed = 1.f;
+
+    Rectangle mobile_swipe_area = {};
+
+    mobile_swipe_area.width = 8;
+    mobile_swipe_area.height = 32;
+    mobile_swipe_area.x = 4;
+    mobile_swipe_area.y = __state.framebuffer.texture.height - mobile_swipe_area.height - 4;
+
     if (editor->should_process_interactions) {
         float delta = GetFrameTime();
-        float speed = 60.f;
 
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        if (IsKeyDown(KEY_RIGHT_SHIFT)) {
             speed *= 1.6f;
         }
 
         float delta_speed = delta * speed;
-
-        if (IsKeyDown(KEY_A)) {
-            editor->camera.target.x -= delta_speed;
-        }
-        if (IsKeyDown(KEY_D)) {
-            editor->camera.target.x += delta_speed;
-        }
-        if (IsKeyDown(KEY_W)) {
-            editor->camera.target.y -= delta_speed;
-        }
-        if (IsKeyDown(KEY_S)) {
-            editor->camera.target.y += delta_speed;
-        }
 
         editor->level.camera = editor->camera;
 
@@ -73,7 +75,8 @@ void _fEditorDraw(struct feditor *editor) {
         actual_cam.target.y = (int)actual_cam.target.y;
 
         Vector2 mouse_pos = GetMousePosition();
-        mouse_pos.x /= 5; mouse_pos.y /= 5;
+        mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale; 
+        mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale;
 
         Vector2 m_world_pos = mouse_pos;
 
@@ -83,9 +86,11 @@ void _fEditorDraw(struct feditor *editor) {
         float tx = editor->level.tilemap->tile_size.x;
         float ty = editor->level.tilemap->tile_size.y;
 
-        if (mouse_pos.x > (800.f / 5.f)) {
+        if (mouse_pos.x > 160 || mouse_pos.x < 0) {
             mouse_out_of_bounds = true;
         }
+
+        DrawRectangle(mouse_pos.x, mouse_pos.y, 4, 4, YELLOW);
 
         Vector2 mapped_block_pos = {
             std::floor(m_world_pos.x / tx) * tx,
@@ -103,7 +108,63 @@ void _fEditorDraw(struct feditor *editor) {
             }
         }
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            editor->holded_previosly = 0;
+        }
+
+// #ifdef TARGET_ANDROID
+        mobile_swipe_area.height /= 2;
+
+        DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {253, 249, 0, 128});
+        DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, YELLOW);
+
+        if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
+            mouse_out_of_bounds = true;
+
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                _fEditorSwipeCurrentObjects(editor, 1.f);
+            }
+        }
+
+        mobile_swipe_area.y += mobile_swipe_area.height;
+
+        DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {255, 64, 64, 128});
+        DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, RED);
+
+        if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
+            mouse_out_of_bounds = true;
+
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                _fEditorSwipeCurrentObjects(editor, -1.f);
+            }
+        }
+// #endif
+
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
+            if (editor->swipe_enabled) {
+                auto block = _fBlockFromId(editor->current_block_id);
+
+                if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
+                    IVector2 pos = _fEditorGetPosOfFirstId(editor, editor->current_block_id);
+                    editor->objects[pos.x][pos.y] = _fBlockFromId(0);
+                }
+
+                editor->objects[selected_block_pos.x][selected_block_pos.y] = block;
+            } else {
+                Vector2 mdelta = GetMouseDelta();
+
+                if (mdelta.x * mdelta.y != 0.f) {
+                    editor->holded_previosly = 1;
+                }
+
+                mdelta.x /= __state.window_scale / speed;
+                mdelta.y /= __state.window_scale / speed;
+            
+                editor->camera.target.x -= mdelta.x;
+                editor->camera.target.y -= mdelta.y;
+            }
+        }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !editor->swipe_enabled && !editor->holded_previosly && !mouse_out_of_bounds) {
             auto block = _fBlockFromId(editor->current_block_id);
 
             if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
@@ -137,23 +198,15 @@ void _fEditorDraw(struct feditor *editor) {
         }
     
         float v = GetMouseWheelMove();
-        if (v > 0.f) {
-            editor->current_block_id = (editor->current_block_id + 1) % editor->block_listing.total;
-        } else if (v < 0.f) {
-            if (editor->current_block_id == 0) {
-                editor->current_block_id = editor->block_listing.total - 1;
-            } else {
-                editor->current_block_id = (editor->current_block_id - 1) % editor->block_listing.total;
-            }
-        }
+        _fEditorSwipeCurrentObjects(editor, v);
     }
 
     if (editor->should_display_sidebar) {
-        int blackbox_startx = GetRenderWidth() / 5 - 51;
+        int blackbox_startx = (__state.framebuffer.texture.width) - 51;
         int blackbox_starty = 0;
-        int space = GetRenderWidth() / 5 - blackbox_startx;
+        int space = __state.framebuffer.texture.width - blackbox_startx;
 
-        DrawRectangle(GetRenderWidth() / 5 - 51, 0, 51, GetRenderHeight() / 5, {0, 0, 0, 200});
+        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, (Color){0, 0, 0, 200});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
@@ -171,7 +224,7 @@ void _fEditorDraw(struct feditor *editor) {
             
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
-            _fTilemapDraw(*editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
         }
 
         Color grad_black = { 0 };
@@ -185,7 +238,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         fblock block = _fBlockFromId(editor->current_block_id);
 
-        _fTilemapDraw(*editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
+        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
         
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);
@@ -234,9 +287,9 @@ void _fEditorDraw(struct feditor *editor) {
 
                 editor->entities.push_back(player);
 
-                SetWindowSize(800, 600);
+                // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
                 UnloadRenderTexture(__state.framebuffer);
-                __state.framebuffer = LoadRenderTexture(800 / 5, 600 / 5);
+                __state.framebuffer = LoadRenderTexture((__state.base_game_size.x - __state.editor_size.x - (__state.mouse_pos_offset.x * 2)) / __state.window_scale, (__state.base_game_size.y - __state.editor_size.y) / __state.window_scale);
 
                 editor->f1_lock = true;
             }
@@ -244,17 +297,22 @@ void _fEditorDraw(struct feditor *editor) {
     }
 
     if (editor->should_playback) {
-        _fTextDraw(&__state.text_manager, "f1 to exit", {2, 2}, BLUE, 1);
+        bool flag = false;
 
-        if (IsKeyPressed(KEY_F1) && !editor->f1_lock) {
+#ifndef TARGET_ANDROID
+        _fTextDraw(&__state.text_manager, "f1 to exit", {2, 2}, BLUE, 1);
+#else
+        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4});
+#endif
+
+        if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {
             editor->should_display_sidebar = true;
             editor->should_process_interactions = true;
             editor->should_playback = false;
             editor->level.entities = 0;
 
-            SetWindowSize(800 + 255, 600);
             UnloadRenderTexture(__state.framebuffer);
-            __state.framebuffer = LoadRenderTexture((800 + 255) / 5, 600 / 5);
+            __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
         }
 
         editor->f1_lock = false;

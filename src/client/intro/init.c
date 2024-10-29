@@ -3,10 +3,10 @@
 #include <stdio.h>
 
 void _fIntroInit() {
-    const char *file_to_load = "assets/EndlessDream.SymMOD";
+    const char *file_to_load = "EndlessDream.SymMOD";
 
     _fAudioPlayModule(&__state.sound_engine, file_to_load);
     _fAudioLoopCurrent(&__state.sound_engine);
 
-    __state.raylib_logo = LoadTexture("assets/raylib_16x16.png");
+    __state.raylib_logo = LoadTexture("raylib_16x16.png");
 }

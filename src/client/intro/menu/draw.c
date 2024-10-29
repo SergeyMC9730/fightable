@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <fightable/rect.h>
 #include <fightable/renderer.h>
+#include <fightable/level.h>
+#include <fightable/editor.h>
 
 void _fIntroMenuDraw() {
     float delta = GetFrameTime();
     float speed = 24.f;
-
     __state.intro_bg_offsetf += delta * speed;
 
     int wx = __state.framebuffer.texture.width;
@@ -45,16 +46,22 @@ void _fIntroMenuDraw() {
     // ClearBackground(BLUE);
 
     DrawTexture(__state.menu_borders, 0, 0, WHITE);
-
     if (__state.menu_pressed_play) {
         int w = 80;
         Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
+        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height})) {
+            __state.menu_pressed_play = 0;
+            UnloadTexture(__state.playbtn_container);
+        } else {
+            area.width = __state.playbtn_container.width;
+            area.height = __state.playbtn_container.height;
 
-        DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);
+            // DrawRectangleRec(area, (Color){0, 0, 0, 64});
+            DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);   
+        }
     } else {
         if (_fButtonDrawSimple("PLAY", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 50})) {
             __state.menu_pressed_play = 1;
-        
             Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
             Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Multiplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
 
@@ -63,9 +70,9 @@ void _fIntroMenuDraw() {
 
             RenderTexture2D rt2d = LoadRenderTexture(area.width, area.height);
             BeginTextureModeStacked(rt2d);
-            ClearBackground(BLANK);
+            ClearBackground((Color){0, 0, 0, 64}); // (Color){0, 0, 0, 160}
 
-            _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 160});
+            _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 0});
 
             int offset = 3;
 
@@ -102,9 +109,29 @@ void _fIntroMenuDraw() {
         }
         
         if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 60})) {
-            
+
         }
-        if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 70})) {
+        if (_fButtonDrawSimple("EDITOR", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 70})) {
+            __state.current_editor = _fEditorCreate();
+            free(__state.current_level->objects);
+            __state.current_level->objects = NULL;
+
+            __state.current_level = NULL;
+
+            __state.initial_game_size.x += __state.editor_size.x;
+            __state.initial_game_size.y += __state.editor_size.y;
+
+            __state.intro_can_continue = 1;
+
+#ifndef TARGET_ANDROID
+            SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
+#endif
+            SetWindowTitle("Fightable Editor");
+
+            UnloadRenderTexture(__state.framebuffer);
+            __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE, __state.initial_game_size.y / UI_SCALE);
+        }
+        if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 80})) {
             exit(0);
         }
     }

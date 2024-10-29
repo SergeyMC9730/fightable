@@ -15,6 +15,10 @@ struct feditor *_fEditorCreate();
 unsigned char _fEditorContainsId(struct feditor *editor, unsigned short id);
 IVector2 _fEditorGetPosOfFirstId(struct feditor *editor, unsigned short id);
 
+void _fEditorSwipeCurrentObjects(struct feditor *editor, float swipe_delta);
+
+unsigned char _fEditorInPlaybackMode(struct feditor *editor);
+
 #ifdef __cplusplus
 }
 #endif

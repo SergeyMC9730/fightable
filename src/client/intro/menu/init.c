@@ -5,7 +5,7 @@
 #include <fightable/renderer.h>
 
 void _fIntroMenuInit() {
-    __state.intro_temp_bg = _fTilemapExportTile(*__state.tilemap, (IVector2){28.f, 5.f});
+    __state.intro_temp_bg = _fTilemapExportTile(__state.tilemap, (IVector2){28.f, 5.f});
     SetTextureWrap(__state.intro_temp_bg, TEXTURE_WRAP_REPEAT);
 
     int wx = __state.framebuffer.texture.width;
@@ -25,19 +25,19 @@ void _fIntroMenuInit() {
     for (int i = 1; i < (wx / __state.tilemap->tile_size.x) - 1; i++) {
         int x = i * __state.tilemap->tile_size.x;
 
-        _fTilemapDraw(*__state.tilemap, (IVector2){x, 0}, (IVector2){24, 5}, 0, 0, BLUE);
-        _fTilemapDraw(*__state.tilemap, (IVector2){x, yv0}, (IVector2){21, 5}, 0, 0, BLUE);
+        _fTilemapDraw(__state.tilemap, (IVector2){x, 0}, (IVector2){24, 5}, 0, 0, BLUE);
+        _fTilemapDraw(__state.tilemap, (IVector2){x, yv0}, (IVector2){21, 5}, 0, 0, BLUE);
     }
     for (int i = 1; i < (wy / __state.tilemap->tile_size.y) - 2; i++) {
         int y = i * __state.tilemap->tile_size.y;
 
-        _fTilemapDraw(*__state.tilemap, (IVector2){0, y}, (IVector2){20, 5}, 0, 0, BLUE);
-        _fTilemapDraw(*__state.tilemap, (IVector2){xv0, y}, (IVector2){25, 5}, 0, 0, BLUE);
+        _fTilemapDraw(__state.tilemap, (IVector2){0, y}, (IVector2){20, 5}, 0, 0, BLUE);
+        _fTilemapDraw(__state.tilemap, (IVector2){xv0, y}, (IVector2){25, 5}, 0, 0, BLUE);
     }
-    _fTilemapDraw(*__state.tilemap, (IVector2){0, 0}, (IVector2){23, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){xv0, 0}, (IVector2){27, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){0, yv0}, (IVector2){22, 5}, 0, 0, BLUE);
-    _fTilemapDraw(*__state.tilemap, (IVector2){xv0, yv0}, (IVector2){26, 5}, 0, 0, BLUE);
+    _fTilemapDraw(__state.tilemap, (IVector2){0, 0}, (IVector2){23, 5}, 0, 0, BLUE);
+    _fTilemapDraw(__state.tilemap, (IVector2){xv0, 0}, (IVector2){27, 5}, 0, 0, BLUE);
+    _fTilemapDraw(__state.tilemap, (IVector2){0, yv0}, (IVector2){22, 5}, 0, 0, BLUE);
+    _fTilemapDraw(__state.tilemap, (IVector2){xv0, yv0}, (IVector2){26, 5}, 0, 0, BLUE);
 
     DrawRectangle(0, yv1, wx, yv0, BLACK);
 
@@ -49,7 +49,7 @@ void _fIntroMenuInit() {
     logo_size.x /= __state.tilemap->tile_size.x;
     logo_size.y /= __state.tilemap->tile_size.y;
 
-    _fTilemapDrawMegatile(*__state.tilemap, (IVector2){aligned_logo_x, 20}, (IVector2){0, 3}, logo_size, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){aligned_logo_x, 20}, (IVector2){0, 3}, logo_size, 0, 0, WHITE);
 
     EndTextureModeStacked();
 

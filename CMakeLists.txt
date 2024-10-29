@@ -10,6 +10,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(BUILD_SHARED_LIBS ON)
 
+if (ANDROID)
+	set(JACK OFF)
+	set(JACK_FOUND OFF)
+	set(PLATFORM Android)
+
+	message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
+endif()
 add_subdirectory(ext/portaudio_opensles)
 
 set(BUILD_SHARED_LIBS OFF)
@@ -19,7 +26,13 @@ add_subdirectory(ext/cJSON)
 
 add_subdirectory(ext/raylib)
 
-add_executable(fightable 
+CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
+
+if (NOT HAVE_LIBOPENMPT)
+	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
+endif()
+
+set(FIGHTABLE_SRC
     src/client/main.c
     src/client/etc/state.c
     src/client/renderer/ui/tilemap.c
@@ -59,8 +72,6 @@ add_executable(fightable
     src/client/audio/get_playtime.c
     src/client/intro/menu/init.c
     src/client/intro/menu/draw.c
-    src/client/intro/editor/init.cpp
-    src/client/intro/editor/draw.cpp
     src/client/renderer/gfx/shake.c
     src/client/renderer/gfx/update.c
     src/client/audio/debug.c
@@ -69,7 +80,28 @@ add_executable(fightable
     src/client/renderer/stack_find.c
     src/client/audio/channels_total.c
     src/client/renderer/ui/rect.c
+    src/client/editor/swipe_cur_objects.cpp
+    src/client/editor/in_playback_mode.cpp
 )
+
+if (ANDROID)
+	set(FIGHTABLE_SRC
+		${FIGHTABLE_SRC}
+		$ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+	)
+
+	include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
+
+	add_library(fightable SHARED ${FIGHTABLE_SRC})
+	set(FIGHTABLE_NATIVE_LIBS android log aaudio)
+	target_compile_definitions(fightable PUBLIC TARGET_ANDROID)
+elseif(WIN32)
+	add_executable(fightable ${FIGHTABLE_SRC})
+	target_compile_definitions(fightable PUBLIC TARGET_WIN32)
+else()
+	add_executable(fightable ${FIGHTABLE_SRC})
+        target_compile_definitions(fightable PUBLIC TARGET_UNIX)
+endif()
 
 add_executable(physics-test
     src/physics_test/main.c
@@ -78,5 +110,5 @@ add_executable(physics-test
 target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB})
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS})
 target_link_libraries(physics-test raylib)
