@@ -6,11 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <raylib.h>
+
 void _fIntroMusLog(const char *message, void *user) {
-    printf("DEBUG: LIBOPENMPT: %s\n", message);
+    // printf("DEBUG: LIBOPENMPT: %s\n", message);
+    TraceLog(LOG_INFO, "libopenmpt: %s", message);
 }
 int _fIntroMusError(int error, void *user) {
-    printf("ERROR: LIBOPENMPT: error %d\n", error);
+    TraceLog(LOG_ERROR, "libopenmpt: error %d", error);
 
     return 0;
 }
@@ -28,29 +31,31 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
     int error = 0;
     const char *error_desc = NULL;
 
-    FILE *mod_file = fopen(path, "rb");
+    int sz = 0;
+    unsigned char *data = LoadFileData(path, &sz);
 
-    if (!mod_file) {
-        printf("file %s cannot be found", path);
+    if (!data || sz == 0) {
+        TraceLog(LOG_ERROR, "File %s could not be found", path);
 
         return;
     }
 
     engine->mod_lock = 1;
-    openmpt_module *module = openmpt_module_create2(openmpt_stream_get_file_callbacks2(), mod_file, _fIntroMusLog, NULL, _fIntroMusError, NULL, NULL, NULL, NULL);
+    openmpt_module *module = openmpt_module_create_from_memory2(data, sz, _fIntroMusLog, 0, _fIntroMusError, 0, &error, &error_desc, 0);
 
-    openmpt_module_set_position_seconds(module, 0);
-
-    if (error != 0) {
-        printf("failure on opening mod file: %s (%d)", error_desc, error);
+    if (error != 0 || !module) {
+        TraceLog(LOG_ERROR, "Failure on opening mod file: %s (%d)", error_desc, error);
 
         engine->mod_lock = 0;
+
+        MemFree(data);
+
         return;
     }
 
-    fclose(mod_file);
+    openmpt_module_set_position_seconds(module, 0);
 
-    printf("opened module %s\n", path);
+    TraceLog(LOG_INFO, "Opened mod file %s", path);
 
     engine->current_module = module;
     engine->mod_lock = 0;

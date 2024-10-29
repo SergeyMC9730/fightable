@@ -3,13 +3,14 @@
 #include <fightable/state.h>
 #include <fightable/text.h>
 #include <math.h>
+#include <fightable/renderer.h>
 
 unsigned char _fButtonDraw(struct fbutton *btn) {
     if (!btn || !btn->text) return 0;
 
     Vector2 mpos = GetMousePosition();
-    mpos.x /= 5;
-    mpos.y /= 5;
+    mpos.x -= __state.mouse_pos_offset.x; mpos.x /= (__state.window_scale);
+    mpos.y -= __state.mouse_pos_offset.y; mpos.y /= (__state.window_scale);
 
     IVector2 text_sz = _fTextMeasure(&__state.text_manager, btn->text);
 
@@ -76,6 +77,8 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
     _fTilemapDraw(*__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
 
     _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, WHITE, 0);
+
+    DrawRectangle(mpos.x, mpos.y, 4, 4, BLUE);
 
     return ret;
     // DrawRectangleLinesEx(btn_rect, 1.f, RED);

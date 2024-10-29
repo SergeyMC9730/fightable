@@ -6,9 +6,9 @@
 #include <fightable/level.h>
 #include <fightable/editor.h>
 #include <fightable/intro.h>
-#include <fightable/title_editor.h>
 #include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 
 void _fDraw() {
     ClearBackground(BLACK);
@@ -16,8 +16,6 @@ void _fDraw() {
     if (__state.intro_can_continue) {
         if (__state.current_editor != NULL) {
             _fEditorDraw(__state.current_editor);
-        } else if (__state.current_title_editor != NULL) {
-            _fTitleEditorDraw(__state.current_title_editor);
         } else {
             if (__state.current_level) {
                 _fLevelDraw(__state.current_level, (IVector2){0, 0});

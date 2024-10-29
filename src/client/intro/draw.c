@@ -57,7 +57,7 @@ void _fIntroDraw() {
     if (t >= 4.45f) {
         __state.title_song_stage = 4;
         if (__state.title_r0) {
-            if (__state.selected_editor_type == EditorNone) {
+            if (!__state.current_editor) {
                 _fIntroMenuInit();
             } else {
                 __state.intro_can_continue = 1;
@@ -128,7 +128,7 @@ void _fIntroDraw() {
             Color c = BLACK;
             c.a = 255.f * v;
 
-            if (__state.selected_editor_type == EditorNone) {
+            if (!__state.current_editor) {
                 _fIntroMenuDraw();
             } 
 

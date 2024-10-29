@@ -1,4 +1,8 @@
 .vscode
 .vs
-build
 src/bin/*.mptm
+build*
+bin
+libs
+private_setup.sh
+lib

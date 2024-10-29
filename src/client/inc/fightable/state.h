@@ -11,11 +11,11 @@ struct flevel;
 struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
-struct ftitle_editor;
+
+#define IAUDIO_ENGINE
 
 #include <fightable/text.h>
 #include <fightable/sound_engine.h>
-#include <fightable/editor_library.h>
 #include <fightable/gfx.h>
 #include <pthread.h>
 
@@ -53,8 +53,6 @@ struct fightable_state {
     double intro_bg_offsetf;
     int intro_bg_offseti;
 
-    enum fightable_editor selected_editor_type;
-
     Vector2 gui_render_offset;
 
     struct gfx_manager gfx;
@@ -68,10 +66,16 @@ struct fightable_state {
     Texture2D menu_borders;
 
     unsigned char intro_stage_completed;
-    
     unsigned char menu_pressed_play;
 
     Texture2D playbtn_container;
+
+    Vector2 mouse_pos_offset;
+    double window_scale;
+    
+    Vector2 base_game_size;
+    Vector2 editor_size;
+    Vector2 initial_game_size;
 };
 
 extern struct fightable_state __state;
