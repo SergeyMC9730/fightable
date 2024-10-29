@@ -8,12 +8,15 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
-#include <fightable/editor_library.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
 
+#ifdef TARGET_UNIX
+void *main_thr0(void *user) {
+#else
 void main_thr0(void *user) {
+#endif
     _fAudioBegin(&__state.sound_engine);
 
     return 0;
@@ -26,8 +29,6 @@ void _fAndroidTraceLog(int level, const char *text, __builtin_va_list args) {
 #endif
 
 int main(int argc, char **argv) {
-    pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
-
     Vector2 win_sz = {800, 600};
     Vector2 actual_sz = win_sz;
     Vector2 editor_sz = {255, 0};
@@ -90,29 +91,6 @@ int main(int argc, char **argv) {
         printf("ARGV[1] = %s\n", argv[1]);
 
         if (strcmp(argv[1], "editor") == 0) {
-            enum fightable_editor selected_editor = EditorMap;
-
-            if (argc <= 2) {
-                selected_editor = EditorMap;
-            } else {
-                if (strcmp(argv[2], "map") == 0) {
-                    selected_editor = EditorMap;
-                } else if (strcmp(argv[2], "title") == 0) {
-                    selected_editor = EditorTitle;
-                } else {
-                    printf("unknown editor has been selected\n");
-
-                    __state.sound_engine.should_stop = 1;
-
-                    CloseWindow();
-                    pthread_join(__state.sound_thread, NULL);
-
-                    return 1;
-                }
-            }
-
-            __state.selected_editor_type = selected_editor;
-
             __state.current_editor = _fEditorCreate();
             free(__level.objects);
 

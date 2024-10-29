@@ -34,6 +34,10 @@ struct faudio_engine {
 #endif
 };
 
+struct faudio_beat_info {
+    
+};
+
 void _fAudioBegin(struct faudio_engine *engine);
 void _fAudioPlayModule(struct faudio_engine *engine, const char *path);
 void _fAudioStop(struct faudio_engine *engine);
