@@ -49,7 +49,7 @@ void _fIntroMenuDraw() {
     if (__state.menu_pressed_play) {
         int w = 80;
         Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
-        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height - 1})) {
+        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height})) {
             __state.menu_pressed_play = 0;
             UnloadTexture(__state.playbtn_container);
         } else {
