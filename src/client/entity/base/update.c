@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <fightable/debug.h>
 
+#define X_SPEED 70.f
+#define Y_SPEED 150.f
+
 // #define DEBUG
 
 void _fEntityUpdate(struct fentity *entity) {
@@ -12,10 +15,10 @@ void _fEntityUpdate(struct fentity *entity) {
 
     double delta = entity->delta;
 
-    static const double x_speed = 70.f;
+    static const double x_speed = X_SPEED;
     static const double x_stop_speed = 3.f;
 
-    static const double max_accel_x = x_speed;
+    static const double max_accel_x = X_SPEED;
     static const double min_accel_x = 0.f;
 
     double flag = 1.f;
@@ -24,8 +27,8 @@ void _fEntityUpdate(struct fentity *entity) {
     entity->touching_wall_l = 0;
     entity->touching_wall_r = 0;
     entity->standing = 0;
-    entity->standing_surface = (Rectangle){};
-    entity->ceiling_surface = (Rectangle){};
+    entity->standing_surface = (Rectangle){ 0 };
+    entity->ceiling_surface = (Rectangle){ 0 };
 
     for (int i = 0; i < entity->obstacles_length; i++) {
         Rectangle r = entity->obstacles[i];
@@ -125,8 +128,8 @@ void _fEntityUpdate(struct fentity *entity) {
         }
     }
 
-    static const double y_speed = 150.f;
-    static const double max_accel_y = y_speed;
+    static const double y_speed = Y_SPEED;
+    static const double max_accel_y = Y_SPEED;
 
     if (!entity->standing || entity->jumping || entity->touching_ceiling) {
         entity->accel_y += y_speed * delta * 3;
