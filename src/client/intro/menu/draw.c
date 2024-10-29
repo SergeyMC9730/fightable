@@ -49,10 +49,14 @@ void _fIntroMenuDraw() {
     if (__state.menu_pressed_play) {
         int w = 80;
         Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
-        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 95})) {
+        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height - 1})) {
             __state.menu_pressed_play = 0;
             UnloadTexture(__state.playbtn_container);
         } else {
+            area.width = __state.playbtn_container.width;
+            area.height = __state.playbtn_container.height;
+
+            // DrawRectangleRec(area, (Color){0, 0, 0, 64});
             DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);   
         }
     } else {
@@ -66,9 +70,9 @@ void _fIntroMenuDraw() {
 
             RenderTexture2D rt2d = LoadRenderTexture(area.width, area.height);
             BeginTextureModeStacked(rt2d);
-            ClearBackground(BLANK);
+            ClearBackground((Color){0, 0, 0, 64}); // (Color){0, 0, 0, 160}
 
-            _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 160});
+            _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 0});
 
             int offset = 3;
 
