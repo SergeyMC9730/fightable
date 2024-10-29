@@ -10,7 +10,6 @@
 void _fIntroMenuDraw() {
     float delta = GetFrameTime();
     float speed = 24.f;
-
     __state.intro_bg_offsetf += delta * speed;
 
     int wx = __state.framebuffer.texture.width;
@@ -45,16 +44,16 @@ void _fIntroMenuDraw() {
     // ClearBackground(BLUE);
 
     DrawTexture(__state.menu_borders, 0, 0, WHITE);
-
     if (__state.menu_pressed_play) {
         int w = 80;
         Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
-
+        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 95})) {
+            __state.menu_pressed_play = 0;
+        }
         DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);
     } else {
         if (_fButtonDrawSimple("PLAY", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 50})) {
             __state.menu_pressed_play = 1;
-        
             Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
             Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Multiplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
 
@@ -102,7 +101,7 @@ void _fIntroMenuDraw() {
         }
         
         if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 60})) {
-            
+
         }
         if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 70})) {
             exit(0);
