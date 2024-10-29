@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <fightable/rect.h>
 #include <fightable/renderer.h>
+#include <fightable/level.h>
+#include <fightable/editor.h>
 
 void _fIntroMenuDraw() {
     float delta = GetFrameTime();
@@ -104,7 +106,27 @@ void _fIntroMenuDraw() {
         if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 60})) {
             
         }
-        if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 70})) {
+        if (_fButtonDrawSimple("EDITOR", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2, 70})) {
+            __state.current_editor = _fEditorCreate();
+            free(__state.current_level->objects);
+            __state.current_level->objects = NULL;
+
+            __state.current_level = NULL;
+
+            __state.initial_game_size.x += __state.editor_size.x;
+            __state.initial_game_size.y += __state.editor_size.y;
+
+            __state.intro_can_continue = 1;
+
+#ifndef TARGET_ANDROID
+            SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
+#endif
+            SetWindowTitle("Fightable Editor");
+
+            UnloadRenderTexture(__state.framebuffer);
+            __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE, __state.initial_game_size.y / UI_SCALE);
+        }
+        if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 80})) {
             exit(0);
         }
     }

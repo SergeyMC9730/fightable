@@ -36,6 +36,8 @@ int main(int argc, char **argv) {
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
     actual_sz = (Vector2){0, 0};
+#else
+    __state.window_scale = UI_SCALE;
 #endif
 
     // SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
@@ -47,8 +49,18 @@ int main(int argc, char **argv) {
     SetWindowState(FLAG_WINDOW_RESIZABLE);
 
     Vector2 ui_scaling = GetWindowScaleDPI();
+
     actual_sz.x *= ui_scaling.x;
     actual_sz.y *= ui_scaling.y;
+
+    editor_sz.x *= ui_scaling.x;
+    editor_sz.y *= ui_scaling.y;
+
+#ifdef TARGET_ANDROID
+    __state.initial_game_size = win_sz;
+#else
+    __state.initial_game_size = actual_sz;
+#endif
 
     SetWindowSize(actual_sz.x, actual_sz.y);
 
@@ -84,11 +96,15 @@ int main(int argc, char **argv) {
 
             __state.current_level = NULL;
 
-            win_sz.x += editor_sz.x;
-            SetWindowSize(win_sz.x, win_sz.y);
+            actual_sz.x += editor_sz.x; win_sz.x += editor_sz.x;
+            actual_sz.y += editor_sz.y; win_sz.y += editor_sz.y;
+            SetWindowSize(actual_sz.x, actual_sz.y);
             SetWindowTitle("Fightable Editor");
         }
     }
+
+    __state.base_game_size = actual_sz;
+    __state.editor_size = editor_sz;
 
 #ifndef DEBUG
     _fIntroInit();
@@ -106,6 +122,8 @@ int main(int argc, char **argv) {
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
+
+        __state.base_game_size = actual_sz;
 
         _fGfxUpdate(&__state.gfx);
         __state.gui_render_offset.x = __state.gfx.shake_v.x;
@@ -161,12 +179,6 @@ int main(int argc, char **argv) {
 
             free(row);
         }
-
-        Vector2 mpos = GetMousePosition();
-
-        DrawRectangle(mpos.x, mpos.y, 12, 12, RED);
-
-        // DrawText(dbg_buffer, 8, 8, 20.f, YELLOW);
 
         EndDrawing();
 

@@ -25,4 +25,8 @@ struct feditor {
     std::vector<fentity> entities;
 
     bool f1_lock;
+    bool swipe_enabled;
+
+    bool holded_previosly;
+    bool hp1;
 };

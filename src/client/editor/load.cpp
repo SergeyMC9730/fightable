@@ -11,7 +11,7 @@ struct feditor *_fEditorCreate() {
     // editor->camera.target.x = 261340;
 
     editor->level = _fLevelLoadTest(__state.tilemap, {28, 4});
-    editor->level.camera_size = {GetRenderWidth() / 5, GetRenderHeight() / 5};
+    editor->level.camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
     editor->render_objects.assign(editor->level.objects, editor->level.objects + editor->level.data_size);
 
@@ -25,7 +25,8 @@ struct feditor *_fEditorCreate() {
     editor->should_playback = 0;
     editor->should_process_interactions = 1;
 
-    printf("loaded %ld objects (%ld)\n", editor->render_objects.size(), editor->objects.size());    
+    TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
+    TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);
 
     return editor;
 }

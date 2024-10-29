@@ -78,6 +78,8 @@ set(FIGHTABLE_SRC
     src/client/renderer/stack_find.c
     src/client/audio/channels_total.c
     src/client/renderer/ui/rect.c
+    src/client/editor/swipe_cur_objects.cpp
+    src/client/editor/in_playback_mode.cpp
 )
 
 if (ANDROID)

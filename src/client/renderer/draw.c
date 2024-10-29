@@ -8,6 +8,7 @@
 #include <fightable/intro.h>
 #include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 
 void _fDraw() {
     ClearBackground(BLACK);
@@ -29,10 +30,4 @@ void _fDraw() {
     BeginMode2D(cam);
     _fIntroDraw();
     EndMode2D();
-
-    Vector2 mpos = GetMousePosition();
-    mpos.x /= UI_SCALE;
-    mpos.y /= UI_SCALE;
-
-    DrawRectangle(mpos.x, mpos.y, 4, 4, GREEN);
 }

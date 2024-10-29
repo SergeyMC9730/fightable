@@ -72,6 +72,10 @@ struct fightable_state {
 
     Vector2 mouse_pos_offset;
     double window_scale;
+    
+    Vector2 base_game_size;
+    Vector2 editor_size;
+    Vector2 initial_game_size;
 };
 
 extern struct fightable_state __state;
