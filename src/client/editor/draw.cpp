@@ -153,7 +153,7 @@ void _fEditorDraw(struct feditor *editor) {
         int blackbox_starty = 0;
         int space = GetRenderWidth() / 5 - blackbox_startx;
 
-        DrawRectangle(GetRenderWidth() / 5 - 51, 0, 51, GetRenderHeight() / 5, (Color){0, 0, 0, 200});
+        DrawRectangle(GetRenderWidth() / 5 - 51, 0, 51, GetRenderHeight() / 5, {0, 0, 0, 200});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
@@ -174,7 +174,7 @@ void _fEditorDraw(struct feditor *editor) {
             _fTilemapDraw(*editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
         }
 
-        Color grad_black = (Color){};
+        Color grad_black = { 0 };
         Color grad_gray = GRAY;
 
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 23, space / 2, 1, grad_black, grad_gray);

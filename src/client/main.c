@@ -10,15 +10,23 @@
 #include <fightable/debug.h>
 #include <fightable/editor_library.h>
 
+#ifdef _WIN32
+    #include <process.h>
+#endif
+
 struct flevel __level;
 struct ftilemap __tilemap;
 
-void *main_thr0(void *user) {
+void main_thr0(void *user) {
     _fAudioBegin(&__state.sound_engine);
 }
 
 int main(int argc, char **argv) {
+#ifdef _WIN32
+    __state.sound_thread = (HANDLE)_beginthread(main_thr0, 0, NULL); // not sure
+#else
     pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
+#endif
 
     Vector2 win_sz = {800, 600};
     Vector2 editor_sz = {255, 0};
@@ -59,8 +67,9 @@ int main(int argc, char **argv) {
                     __state.sound_engine.should_stop = 1;
 
                     CloseWindow();
+#ifndef _WIN32
                     pthread_join(__state.sound_thread, NULL);
-
+#endif
                     return 1;
                 }
             }
@@ -154,7 +163,8 @@ int main(int argc, char **argv) {
     }
 
     __state.sound_engine.should_stop = 1;
+#ifndef _WIN32
     pthread_join(__state.sound_thread, NULL);
-
+#endif
     return 0;
 }

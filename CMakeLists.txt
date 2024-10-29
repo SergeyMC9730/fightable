@@ -6,6 +6,8 @@ if(NOT OPENMPT_LIB)
     message(FATAL_ERROR "openmpt library could not be found")
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+
 set(BUILD_SHARED_LIBS ON)
 
 add_subdirectory(ext/portaudio_opensles)
@@ -76,5 +78,5 @@ add_executable(physics-test
 target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 
-target_link_libraries(fightable raylib cjson openmpt PortAudio)
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB})
 target_link_libraries(physics-test raylib)

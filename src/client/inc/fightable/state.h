@@ -17,7 +17,20 @@ struct ftitle_editor;
 #include <fightable/sound_engine.h>
 #include <fightable/editor_library.h>
 #include <fightable/gfx.h>
-#include <pthread.h>
+
+#if _WIN32
+    #define NOUSER
+    #define NOGDI
+
+    #include <windows.h>
+    
+    #undef far
+    #undef near
+    #undef min
+    #undef max
+#else // unix
+    #include <pthread.h>
+#endif
 
 struct fightable_state {
     struct ftilemap *tilemap;
@@ -44,7 +57,11 @@ struct fightable_state {
 
     unsigned char intro_can_continue;
 
+#ifdef _WIN32
+    HANDLE sound_thread;
+#else
     pthread_t sound_thread;
+#endif
     struct faudio_engine sound_engine;
 
     Texture2D raylib_logo;
