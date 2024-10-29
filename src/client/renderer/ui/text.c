@@ -67,10 +67,10 @@ void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color
                 Color shadow = color;
                 shadow.a /= 4.5;
 
-                _fTilemapDraw(man->tilemap, (IVector2){cur_pos.x + 1, cur_pos.y + 1}, tile_pos, 0, 0, shadow);
+                _fTilemapDraw(&man->tilemap, (IVector2){cur_pos.x + 1, cur_pos.y + 1}, tile_pos, 0, 0, shadow);
             }
 
-            _fTilemapDraw(man->tilemap, cur_pos, tile_pos, 0, 0, color);
+            _fTilemapDraw(&man->tilemap, cur_pos, tile_pos, 0, 0, color);
             
             cur_pos.x += man->tilemap.tile_size.x + man->char_padding;
         }
@@ -105,77 +105,64 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     IVector2 sz = _fTextMeasure(man, text);
     sz.x++; sz.y++;
 
-    RenderTexture2D output_char = LoadRenderTexture(man->tilemap.tile_size.x, man->tilemap.tile_size.y);
-    RenderTexture2D output_char_grad = LoadRenderTexture(man->tilemap.tile_size.x, man->tilemap.tile_size.y);
+    Image gradient = GenImageGradientLinear(man->tilemap.tile_size.x, man->tilemap.tile_size.y, 0, top, bottom);
     RenderTexture2D output = LoadRenderTexture(sz.x, sz.y);
 
     size_t len = strlen(text);
     IVector2 cur_pos = {};
 
-    BeginTextureModeStacked(output_char_grad);
-    DrawRectangleGradientV(0, 0, output_char_grad.texture.width, output_char_grad.texture.height, top, bottom);
-    EndTextureModeStacked();
+    Texture2D *char_textures = (Texture2D *)MemAlloc(sizeof(Texture2D) * len);
 
-    Image gradient = LoadImageFromTexture(output_char_grad.texture);
-    UnloadRenderTexture(output_char_grad);
+    for (size_t i = 0; i < len; i++) {
+        unsigned char c = text[i];
+        IVector2 cpos = man->char_mapping[c];
+
+        Image img = _fTilemapExportTileAsImage(&man->tilemap, cpos);
+
+        for (int x = 0; x < img.width; x++) {
+            for (int y = 0; y < img.height; y++) {
+                Color c1 = GetImageColor(img, x, y);
+
+                if (c1.a != 0) {
+                    Color c2 = GetImageColor(gradient, x, y);
+                    ImageDrawPixel(&img, x, y, c2);
+                }
+            }
+        }
+
+        char_textures[i] = LoadTextureFromImage(img);
+        UnloadImage(img);
+    }
+
+    UnloadImage(gradient);
 
     BeginTextureModeStacked(output);
+    ClearBackground(BLANK);
 
     for (size_t i = 0; i < len; i++) {
         unsigned char c = text[i];
 
-        if (c != ' ') {
-            char cstr[2] = {c, 0};
+        Texture2D txt = char_textures[i];
 
-            IVector2 cpos = man->char_mapping[c];
+        DrawTexture(txt, cur_pos.x, cur_pos.y, WHITE);
 
-            BeginTextureModeStacked(output_char);
-            ClearBackground(BLANK);
-            _fTextDraw(man, cstr, (IVector2){0, 0}, WHITE, 0);
-            EndTextureModeStacked();
-
-            Image img = LoadImageFromTexture(output_char.texture);
-
-            for (int x = 0; x < img.width; x++) {
-                for (int y = 0; y < img.height; y++) {
-                    Color c1 = GetImageColor(img, x, y);
-
-                    if (c1.a != 0) {
-                        ImageDrawPixel(&img, x, y, GetImageColor(gradient, x, y));
-                    }
-                }
-            }
-
-            Texture txt = LoadTextureFromImage(img);
-            UnloadImage(img);
-
-            BeginTextureModeStacked(output_char);
-            ClearBackground(BLANK);
-
-            DrawTexture(txt, 0, 0, WHITE);
-
-            EndTextureModeStacked();
-            UnloadTexture(txt);
-
-            Rectangle source = (Rectangle){ 0, 0, (float)output_char.texture.width, (float)-output_char.texture.height };
-            Rectangle dest = (Rectangle){ cur_pos.x, cur_pos.y, output_char.texture.width, output_char.texture.height };
-
-            DrawTexturePro(output_char.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
-        }
-
-        cur_pos.x += output_char.texture.width + man->char_padding;
+        cur_pos.x += txt.width + man->char_padding;
         if (c == '\n') {
             cur_pos.x = 0;
-            cur_pos.y += output_char.texture.height + man->char_padding;
+            cur_pos.y += txt.height + man->char_padding;
         }
     }
 
     EndTextureModeStacked();
 
-    UnloadImage(gradient);
-    UnloadRenderTexture(output_char);
+    for (size_t i = 0; i < len; i++) {
+        UnloadTexture(char_textures[i]);
+    }
+    MemFree(char_textures);
 
     Image output_image = LoadImageFromTexture(output.texture);
+    ImageFlipVertical(&output_image);
+
     Texture2D txt = LoadTextureFromImage(output_image);
 
     if (with_shadow == 0) {
@@ -190,10 +177,10 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     ClearBackground(BLANK);
 
     Rectangle source = (Rectangle){ 0, 0, (float)txt.width, (float)-txt.height };
-    Rectangle dest = (Rectangle){ 1, 0, txt.width, txt.height };
+    Rectangle dest = (Rectangle){ 1, -1, txt.width, txt.height };
     DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, (Color){255, 255, 255, 128});
 
-    dest = (Rectangle){ 0, 1, txt.width, txt.height };
+    dest = (Rectangle){ 0, 0, txt.width, txt.height };
     DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
     EndTextureModeStacked();

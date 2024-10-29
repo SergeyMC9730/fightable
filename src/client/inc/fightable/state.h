@@ -57,7 +57,7 @@ struct fightable_state {
 
     struct gfx_manager gfx;
 
-#define R2D_STACK_SIZE 32
+#define R2D_STACK_SIZE 48
     // rendertexture stack
     RenderTexture2D r2dstack[R2D_STACK_SIZE];
     // pointer to the `r2dstack` end

@@ -64,17 +64,17 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
     cur_pos = btn->position;
 
-    _fTilemapDraw(*__state.tilemap, cur_pos, (IVector2){35 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
+    _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){35 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
 
     cur_pos.x += __state.tilemap->tile_size.x;
 
     for (int i = 0; i < 1 + additional_size; i++) {
-        _fTilemapDraw(*__state.tilemap, cur_pos, (IVector2){36 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
+        _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){36 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
 
         cur_pos.x += __state.tilemap->tile_size.x;
     }
     
-    _fTilemapDraw(*__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
+    _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
 
     _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, WHITE, 0);
 

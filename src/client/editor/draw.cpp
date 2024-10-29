@@ -224,7 +224,7 @@ void _fEditorDraw(struct feditor *editor) {
             
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
-            _fTilemapDraw(*editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
         }
 
         Color grad_black = (Color){};
@@ -238,7 +238,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         fblock block = _fBlockFromId(editor->current_block_id);
 
-        _fTilemapDraw(*editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
+        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
         
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);

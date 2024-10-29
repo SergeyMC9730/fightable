@@ -157,10 +157,12 @@ int main(int argc, char **argv) {
 
         const char *row = _fAudioGetDbg(&__state.sound_engine, 5);
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f", 
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d", 
             align_x,
             (float)UI_SCALE,
-            (float)__state.window_scale
+            (float)__state.window_scale,
+            (float)_fAudioGetPlayTime(&__state.sound_engine),
+            __state.r2dpointer
         );
 
         DrawText(dbg_buffer, 8, 32, 20, RED);
@@ -186,7 +188,7 @@ int main(int argc, char **argv) {
         __state.time += (double)GetFrameTime();
     }
 
-    _fTilemapUnload(__tilemap);
+    _fTilemapUnload(&__tilemap);
     UnloadRenderTexture(txt);
     
     if (__state.current_level) {

@@ -84,7 +84,7 @@ void _fIntroDraw() {
             int cx = (w - size_x) / 2;
             int cy = (h - size_y) / 2;
 
-            _fTilemapDrawMegatile(*__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
+            _fTilemapDrawMegatile(__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
         }
 
         if (__state.title_song_stage >= 2) {
