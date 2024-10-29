@@ -6,7 +6,6 @@
 #include <fightable/level.h>
 #include <fightable/editor.h>
 #include <fightable/intro.h>
-#include <fightable/title_editor.h>
 #include <math.h>
 #include <stddef.h>
 
@@ -16,8 +15,6 @@ void _fDraw() {
     if (__state.intro_can_continue) {
         if (__state.current_editor != NULL) {
             _fEditorDraw(__state.current_editor);
-        } else if (__state.current_title_editor != NULL) {
-            _fTitleEditorDraw(__state.current_title_editor);
         } else {
             if (__state.current_level) {
                 _fLevelDraw(__state.current_level, (IVector2){0, 0});
@@ -32,4 +29,10 @@ void _fDraw() {
     BeginMode2D(cam);
     _fIntroDraw();
     EndMode2D();
+
+    Vector2 mpos = GetMousePosition();
+    mpos.x /= UI_SCALE;
+    mpos.y /= UI_SCALE;
+
+    DrawRectangle(mpos.x, mpos.y, 4, 4, GREEN);
 }

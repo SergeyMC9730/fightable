@@ -10,16 +10,50 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <raylib.h>
+
+#ifdef TARGET_ANDROID
+#include <aaudio/AAudio.h>
+#endif
+
 void _fAudioBegin(struct faudio_engine *engine) {
     size_t bufsize1 = sizeof(short) * CHANNEL_BUFFER_SIZE * 2;
 
     engine->buffer = (short *)malloc(bufsize1);
 
+#ifndef TARGET_ANDROID
     PaStream *stream;
 
-    Pa_Initialize();
-    Pa_OpenDefaultStream(&stream, 0, 2, paInt16 | paNonInterleaved, CHANNEL_SAMPLE_RATE, paFramesPerBufferUnspecified, NULL, NULL);
-    Pa_StartStream(stream);
+    PaError result = Pa_Initialize();
+    if (result != paNoError) {
+        TraceLog(LOG_ERROR, "PortAudio failed to initialize itself: %d, %s", (int)result, Pa_GetErrorText(result));
+
+        return;
+    }
+
+    result = Pa_OpenDefaultStream(&stream, 0, 2, paInt16 | paNonInterleaved, CHANNEL_SAMPLE_RATE, paFramesPerBufferUnspecified, NULL, NULL);
+    if (result != paNoError) {
+        TraceLog(LOG_ERROR, "PortAudio failed to open device: %d, %s", (int)result, Pa_GetErrorText(result));
+
+        return;
+    }
+
+    result = Pa_StartStream(stream);
+    if (result != paNoError) {
+        TraceLog(LOG_ERROR, "PortAudio failed to start stream: %d, %s", (int)result, Pa_GetErrorText(result));
+
+        return;
+    }
+
+    TraceLog(LOG_INFO, "Initialized PortAudio");
+#else
+    AudioStream stream = LoadAudioStream(CHANNEL_SAMPLE_RATE, 16, 2);
+    PlayAudioStream(stream);
+
+    engine->stream = &stream;
+
+    TraceLog(LOG_INFO, "Initialized audio stream");
+#endif
 
     engine->ready = 1;
 
@@ -37,12 +71,19 @@ void _fAudioBegin(struct faudio_engine *engine) {
             continue;
         }
 
-        // memset(engine->buffer, 0, bufsize1);
+        memset(engine->buffer, 0, bufsize1);
+
+#ifndef TARGET_ANDROID
+        float limit_volume = 0.06f;
+#else
+        float limit_volume = 0.3f;
+        while (!IsAudioStreamProcessed(stream));
+#endif
 
         unsigned long count = openmpt_module_read_stereo(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0], merge_buffer[1]);
 
         for (int i = 0; i < (bufsize1 / sizeof(short)); i++) {
-            engine->buffer[i] = (float)engine->buffer[i] * 0.06f;
+            engine->buffer[i] = (float)engine->buffer[i] * limit_volume;
         }
 
         engine->_channels = openmpt_module_get_current_playing_channels(engine->current_module);
@@ -53,8 +94,10 @@ void _fAudioBegin(struct faudio_engine *engine) {
         double time = _fAudioGetPlayTime(engine);
         double max = openmpt_module_get_duration_seconds(engine->current_module);
 
+        // TraceLog(LOG_DEBUG, "MPT info: c%d; o%d; p%d; r%d... time: %f/%f", engine->_channels, engine->_order, engine->_pattern, engine->_row, (float)time, (float)max);
+
         if (openmpt_module_get_repeat_count(engine->current_module) != 0 && time > max) {
-            printf("resetting song\n");
+            TraceLog(LOG_INFO, "Resetting song");
 
             openmpt_module_set_position_seconds(engine->current_module, 0);
         }
@@ -73,14 +116,28 @@ void _fAudioBegin(struct faudio_engine *engine) {
             continue;
         }
 
-        Pa_WriteStream(stream, merge_buffer, count);
+#ifndef TARGET_ANDROID
+        result = Pa_WriteStream(stream, merge_buffer, count);
+        if (result != paNoError) {
+            TraceLog(LOG_ERROR, "Portaudio failed to write stream: %d, %s", (int)result, Pa_GetErrorText(result));
+
+            continue;
+        }
+#else
+        UpdateAudioStream(stream, merge_buffer[0], count);
+#endif
     }
 
-    printf("closing sound engine\n");
+    TraceLog(LOG_INFO, "Closing sound engine");
 
+#ifndef TARGET_ANDROID
     Pa_StopStream(stream);
     Pa_CloseStream(stream);
     Pa_Terminate();
+#else
+    StopAudioStream(stream);
+    UnloadAudioStream(stream);
+#endif
 
     if (engine->current_module) {
         engine->mod_lock = 1;

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="dogotrigger.fightable">
+
+    <uses-sdk
+        android:minSdkVersion="26"
+        android:targetSdkVersion="26" 
+    />
+
+    <!-- This .apk has no Java code itself, so set hasCode to false. -->
+    <application
+        android:debuggable="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:label="Fightable"
+        android:hasCode="false">
+
+        <!-- Our activity is the built-in NativeActivity framework class.
+             This will take care of integrating with our NDK code. -->
+        <activity android:name="android.app.NativeActivity"
+            android:label="Fightable"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="userLandscape"
+            android:resizeableActivity="true"
+            android:hardwareAccelerated="true">
+            <!-- Tell NativeActivity the name of our .so -->
+            <meta-data android:name="android.app.lib_name"
+                android:value="fightable" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
