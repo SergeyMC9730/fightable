@@ -51,8 +51,10 @@ void _fIntroMenuDraw() {
         Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
         if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 95})) {
             __state.menu_pressed_play = 0;
+            UnloadTexture(__state.playbtn_container);
+        } else {
+            DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);
         }
-        DrawTexture(__state.playbtn_container, area.x, area.y, WHITE);
     } else {
         if (_fButtonDrawSimple("PLAY", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, 50})) {
             __state.menu_pressed_play = 1;

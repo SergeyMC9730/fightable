@@ -104,9 +104,16 @@ endif()
 add_executable(physics-test
     src/physics_test/main.c
 )
-
+add_executable(collide-test
+    src/collide_test/main.c
+    src/collide_test/hitbox/clip_x.c
+    src/collide_test/hitbox/clip_y.c
+    src/collide_test/hitbox/move.c
+)
 target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
+target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
 
 target_link_libraries(fightable raylib cjson openmpt PortAudio ${FIGHTABLE_NATIVE_LIBS})
 target_link_libraries(physics-test raylib)
+target_link_libraries(collide-test raylib)
