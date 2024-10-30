@@ -15,6 +15,22 @@ void _fIntroMenuDraw();
 
 int _fIntroGetSeekableRow();
 
+void _fIntroMenuOnPlay();
+void _fIntroMenuOnEditor();
+
+void _fIntroMenuOnMultiplayer();
+
+void _fIntroMenuProcessPlay();
+void _fIntroMenuProcessBase();
+
+void _fIntroMenuProcessMultiplayer();
+
+void _fIntroMenuDrawBackground();
+
+#define INTRO_MENU_BASE_SELECTOR    0
+#define INTRO_MENU_PLAY             1
+#define INTRO_MENU_MULTIPLAYER      2
+
 #ifdef __cplusplus
 }
 #endif

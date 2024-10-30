@@ -33,6 +33,10 @@ struct fhttpserver;
     #include <pthread.h>
 #endif
 
+#ifdef TARGET_ANDROID
+struct android_app;
+#endif
+
 struct fightable_state {
     struct ftilemap *tilemap;
 
@@ -84,7 +88,7 @@ struct fightable_state {
     Texture2D menu_borders;
 
     unsigned char intro_stage_completed;
-    unsigned char menu_pressed_play;
+    unsigned char menu_state;
 
     Texture2D playbtn_container;
 
@@ -98,6 +102,10 @@ struct fightable_state {
     short song_id;
 
     struct fhttpserver *webserver;
+
+#ifdef TARGET_ANDROID
+    struct android_app *system;
+#endif
 };
 
 extern struct fightable_state __state;

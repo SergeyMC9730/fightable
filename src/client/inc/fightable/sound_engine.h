@@ -32,6 +32,8 @@ struct faudio_engine {
 #ifdef TARGET_ANDROID
     AudioStream *stream;
 #endif
+
+    float volume;
 };
 
 void _fAudioBegin(struct faudio_engine *engine);

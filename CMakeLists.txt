@@ -94,6 +94,13 @@ set(FIGHTABLE_SRC
     src/client/intro/electric_drug.c
     src/client/intro/endless_dream.c
     src/client/intro/seekable_row.c
+    src/client/etc/storage.c
+    src/client/intro/menu/on_play.c
+    src/client/intro/menu/on_multiplayer.c
+    src/client/intro/menu/on_editor.c
+    src/client/intro/menu/process_play.c
+    src/client/intro/menu/draw_background.c
+    src/client/intro/menu/process_base.c
 )
 
 file(GLOB HTTPSERVER_SRC
