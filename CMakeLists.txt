@@ -132,6 +132,9 @@ add_library(fightable-http STATIC
     src/http/req/v1.helloworld.cpp
     src/http/http_server_create.cpp
     src/http/http_server_destroy.cpp
+    src/http/req/v1.res.request.cpp
+    src/http/resource_dir.cpp
+    src/http/content_type/HttpContentTypeOctet.cpp
 )
 target_include_directories(fightable-http PRIVATE
     src/http/inc
@@ -149,14 +152,14 @@ if (ANDROID)
 
 	add_library(fightable SHARED ${FIGHTABLE_SRC})
 	set(FIGHTABLE_NATIVE_LIBS android log)
-	target_compile_definitions(fightable PUBLIC TARGET_ANDROID)
-    target_compile_definitions(fightable PUBLIC TARGET_UNIX)
+	add_compile_definitions(TARGET_ANDROID)
+    add_compile_definitions(TARGET_UNIX)
 elseif(WIN32)
 	add_executable(fightable ${FIGHTABLE_SRC})
-	target_compile_definitions(fightable PUBLIC TARGET_WIN32)
+	add_compile_definitions(TARGET_WIN32)
 else()
 	add_executable(fightable ${FIGHTABLE_SRC})
-        target_compile_definitions(fightable PUBLIC TARGET_UNIX)
+    add_compile_definitions(TARGET_UNIX)
 endif()
 
 add_executable(physics-test

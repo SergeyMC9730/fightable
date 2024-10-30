@@ -19,10 +19,13 @@ struct fhttpserver *_fHttpServerCreate(unsigned short port, void (*logger)(const
     srv->ws = new httpserver::webserver(params);
     
     std::vector<APIRequest *> requests = {
-        new LevelAPI::v1::HelloWorldRequest()
+        new LevelAPI::v1::HelloWorldRequest(),
+        new LevelAPI::v1::ResourceRequest()
     };
 
     for (APIRequest *request : requests) {
+        request->setServer(srv);
+
         srv->ws->register_resource(request->request_url, request->getAsResource());
     }
 
@@ -39,6 +42,8 @@ struct fhttpserver *_fHttpServerCreate(unsigned short port, void (*logger)(const
 
         return nullptr;
     }
+
+    _fHttpSetAllowedResourceDir(srv, "assets");
 
     return srv;
 }

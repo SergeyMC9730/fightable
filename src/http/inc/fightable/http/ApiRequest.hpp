@@ -8,9 +8,13 @@
 
 #include <fightable/http/HttpContentType.hpp>
 
+struct fhttpserver;
+
 class APIRequest : public httpserver::http_resource {
 protected:
     std::string decodeURIComponent(std::string encoded);
+
+    struct fhttpserver *_httpServer = nullptr;
 public:
     std::shared_ptr<httpserver::http_response> generateResponse(std::string data, int status = 200);
     std::shared_ptr<httpserver::http_response> generateResponse(std::string_view data, int status = 200);
@@ -32,4 +36,7 @@ public:
     const char *request_url;
 
     httpserver::http_resource *getAsResource();
+
+    struct fhttpserver *getServer();
+    void setServer(struct fhttpserver *srv);
 };

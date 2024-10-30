@@ -105,3 +105,10 @@ std::string APIRequest::decodeURIComponent(std::string encoded) {
 
     return decoded;
 }
+
+struct fhttpserver *APIRequest::getServer() {
+    return _httpServer;
+}
+void APIRequest::setServer(struct fhttpserver *srv) {
+    _httpServer = srv;
+}
