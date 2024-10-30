@@ -73,3 +73,32 @@ Image _fTilemapExportTileAsImage(struct ftilemap *tilemap, IVector2 tile_pos) {
     
     return mapimg;
 }
+
+#include <cJSON.h>
+
+struct cJSON *_fTilemapCreateJson(struct ftilemap *tilemap) {
+    int v[2] = {tilemap->tile_size.x, tilemap->tile_size.y};
+
+    cJSON *j = cJSON_CreateObject();
+    cJSON *j1 = cJSON_AddArrayToObject(j, "tile_size");
+
+    cJSON_InsertItemInArray(j1, 0, cJSON_CreateNumber(v[0]));
+    cJSON_InsertItemInArray(j1, 1, cJSON_CreateNumber(v[1]));
+
+    return j;
+}
+void _fTilemapFromJson(struct ftilemap *tilemap, struct cJSON *j) {
+    if (!j || !cJSON_IsObject(j)) return;
+
+    cJSON *array = cJSON_GetObjectItem(j, "tile_size");
+    if (!array || !cJSON_IsArray(array)) return;
+
+    int array_size = cJSON_GetArraySize(array);
+    if (array_size < 2) return;
+
+    cJSON *v = cJSON_GetArrayItem(array, 0);
+    tilemap->tile_size.x = v->valueint;
+
+    v = cJSON_GetArrayItem(array, 10);
+    tilemap->tile_size.y = v->valueint;
+}

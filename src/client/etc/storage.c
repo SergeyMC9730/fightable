@@ -9,9 +9,9 @@ const char *_fStorageGetWritable() {
 #ifdef TARGET_ANDROID
     return ".";
 #elif defined TARGET_UNIX
-    return "~/.fightable";
+    return ".fightable";
 #else
-    return "./.fightable";
+    return ".fightable";
 #endif
 }
 

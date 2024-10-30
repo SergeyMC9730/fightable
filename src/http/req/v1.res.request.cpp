@@ -37,6 +37,8 @@ std::shared_ptr<http_response> LevelAPI::v1::ResourceRequest::render(const http_
 
     auto file = std::string(_fHttpGetAllowedResourceDir(srv)) + std::string("/") + filename;
 
+    printf("accessing %s\n", file.c_str());
+
     if (file.ends_with(".mp3")) {
         return sendFile(std::string(file), HTTPContentTypeAudio());
     } else if (file.ends_with(".png")) {

@@ -1,5 +1,7 @@
 #include <fightable/state.h>
 #include <fightable/intro.h>
+#include <fightable/renderer.h>
+#include <fightable/rect.h>
 
 void _fIntroMenuOnPlay() {
     __state.menu_state = INTRO_MENU_PLAY;

@@ -10,6 +10,7 @@
 #include <fightable/debug.h>
 #include <fightable/http/http_server.h>
 #include <fightable/storage.h>
+#include <cJSON.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
@@ -206,8 +207,30 @@ int main(int argc, char **argv) {
     _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
+    {
+        cJSON *data = _fTilemapCreateJson(__state.tilemap);
+        if (data) {
+            char *data_str = cJSON_Print(data);
+
+            snprintf(dbg_buffer, 2048, "%s/fightable1.json", _fStorageGetWritable());
+            SaveFileText(dbg_buffer, data_str);
+        }
+    }
+
+    {
+        cJSON *data = _fTilemapCreateJson(&__state.text_manager.tilemap);
+        if (data) {
+            char *data_str = cJSON_Print(data);
+
+            snprintf(dbg_buffer, 2048, "%s/text.json", _fStorageGetWritable());
+            SaveFileText(dbg_buffer, data_str);
+        }
+    }
+
 #ifdef TARGET_ANDROID
     _fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
+#else
+    _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
 #endif
 
     while (!WindowShouldClose()) {
