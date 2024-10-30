@@ -11,6 +11,7 @@ struct flevel;
 struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
+struct fhttpserver;
 
 #define IAUDIO_ENGINE
 
@@ -95,6 +96,8 @@ struct fightable_state {
     Vector2 initial_game_size;
 
     short song_id;
+
+    struct fhttpserver *webserver;
 };
 
 extern struct fightable_state __state;

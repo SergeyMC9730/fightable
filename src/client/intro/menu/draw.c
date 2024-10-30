@@ -48,8 +48,9 @@ void _fIntroMenuDraw() {
     DrawTexture(__state.menu_borders, 0, 0, WHITE);
     if (__state.menu_pressed_play) {
         int w = 80;
-        Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
-        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height})) {
+        Rectangle area = (Rectangle){(wx - w) / 2, 42, w, 50};
+
+        if (_fButtonDrawSimple("BACK", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height + 2})) {
             __state.menu_pressed_play = 0;
             UnloadTexture(__state.playbtn_container);
         } else {
@@ -126,7 +127,6 @@ void _fIntroMenuDraw() {
 #ifndef TARGET_ANDROID
             SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
 #endif
-            SetWindowTitle("Fightable Editor");
 
             UnloadRenderTexture(__state.framebuffer);
             __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE, __state.initial_game_size.y / UI_SCALE);

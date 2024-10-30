@@ -78,8 +78,6 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
     _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, WHITE, 0);
 
-    DrawRectangle(mpos.x, mpos.y, 4, 4, BLUE);
-
     return ret;
     // DrawRectangleLinesEx(btn_rect, 1.f, RED);
 }

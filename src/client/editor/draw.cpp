@@ -90,8 +90,6 @@ void _fEditorDraw(struct feditor *editor) {
             mouse_out_of_bounds = true;
         }
 
-        DrawRectangle(mouse_pos.x, mouse_pos.y, 4, 4, YELLOW);
-
         Vector2 mapped_block_pos = {
             std::floor(m_world_pos.x / tx) * tx,
             std::floor(m_world_pos.y / ty) * ty,

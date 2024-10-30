@@ -3,7 +3,11 @@ project(fightable)
 
 find_library(OPENMPT_LIB openmpt)
 if(NOT OPENMPT_LIB)
-    message(FATAL_ERROR "openmpt library could not be found")
+    message(FATAL_ERROR "libopenmpt could not be found")
+endif()
+find_library(MICROHTTPD_LIB microhttpd)
+if(NOT MICROHTTPD_LIB)
+    message(FATAL_ERROR "libmicrohttpd could not be found")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -27,9 +31,13 @@ add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
 
 CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
+CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
 
 if (NOT HAVE_LIBOPENMPT)
 	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
+endif()
+if (NOT HAVE_LIBMICROHTTPD)
+	message(FATAL_ERROR "libmicrohttpd binaries were found but the header files itself are missing")
 endif()
 
 set(FIGHTABLE_SRC
@@ -88,6 +96,49 @@ set(FIGHTABLE_SRC
     src/client/intro/seekable_row.c
 )
 
+file(GLOB HTTPSERVER_SRC
+    "ext/libhttpserver/src/*.hpp"
+    "ext/libhttpserver/src/*.h"
+    "ext/libhttpserver/src/*.cpp"
+
+    "ext/libhttpserver/src/details/*.cpp"
+
+    "ext/libhttpserver/src/httpserver/*.hpp"
+    "ext/libhttpserver/src/httpserver/details/*.hpp"
+)
+
+set(HTTPSERVER_INC
+    ext/libhttpserver/src
+    ext/libhttpserver/src/details
+    ext/libhttpserver/src/httpserver
+    ext/libhttpserver/src/httpserver/details
+)
+
+add_library(httpserver STATIC ${HTTPSERVER_SRC})
+target_include_directories(httpserver PRIVATE ${HTTPSERVER_INC})
+add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
+
+target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
+
+add_library(fightable-http STATIC
+    src/http/req/APIRequest.cpp
+    src/http/req/SplitString.cpp
+    src/http/content_type/HttpContentType.cpp
+    src/http/content_type/HttpContentTypeAudio.cpp
+    src/http/content_type/HttpContentTypeHtml.cpp
+    src/http/content_type/HttpContentTypeImage.cpp
+    src/http/content_type/HttpContentTypeJson.cpp
+    src/http/content_type/HttpContentTypeText.cpp
+    src/http/req/v1.helloworld.cpp
+    src/http/http_server_create.cpp
+    src/http/http_server_destroy.cpp
+)
+target_include_directories(fightable-http PRIVATE
+    src/http/inc
+    ${HTTPSERVER_INC}
+)
+target_link_libraries(fightable-http PUBLIC httpserver)
+
 if (ANDROID)
 	set(FIGHTABLE_SRC
 		${FIGHTABLE_SRC}
@@ -112,8 +163,8 @@ add_executable(physics-test
     src/physics_test/main.c
 )
 
-target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include)
+target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/cJSON ext/portaudio_opensles/include src/http/inc)
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} fightable-http)
 target_link_libraries(physics-test raylib)

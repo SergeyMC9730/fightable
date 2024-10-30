@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
+#include <fightable/http/http_server.h>
 
 struct flevel __level;
 struct ftilemap __tilemap;
@@ -32,10 +33,16 @@ void _fAndroidTraceLog(int level, const char *text, __builtin_va_list args) {
 }
 #endif
 
+void _fMainLog(const char *msg) {
+    TraceLog(LOG_INFO, msg);
+}
+
 int main(int argc, char **argv) {
     Vector2 win_sz = {800, 600};
     Vector2 actual_sz = win_sz;
     Vector2 editor_sz = {255, 0};
+
+    SetRandomSeed(time(0));
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -102,8 +109,10 @@ int main(int argc, char **argv) {
 
             actual_sz.x += editor_sz.x; win_sz.x += editor_sz.x;
             actual_sz.y += editor_sz.y; win_sz.y += editor_sz.y;
+
+#ifndef TARGET_ANDROID
             SetWindowSize(actual_sz.x, actual_sz.y);
-            SetWindowTitle("Fightable Editor");
+#endif
         }
     }
 
@@ -122,6 +131,8 @@ int main(int argc, char **argv) {
     unsigned char shake_lock[8] = {0};
 
     ChangeDirectory("..");
+
+    __state.webserver = _fHttpServerCreate(3000, _fMainLog);
 
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
@@ -236,5 +247,10 @@ int main(int argc, char **argv) {
 #ifndef _WIN32
     pthread_join(__state.sound_thread, NULL);
 #endif
+
+    if (__state.webserver != NULL) {
+        _fHttpServerDestroy(__state.webserver);
+    }
+
     return 0;
 }
