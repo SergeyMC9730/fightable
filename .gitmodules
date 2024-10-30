@@ -7,6 +7,6 @@
 [submodule "ext/portaudio_opensles"]
 	path = ext/portaudio_opensles
 	url = https://github.com/croissanne/portaudio_opensles.git
-[submodule "ext/android-cmake"]
-	path = ext/android-cmake
-	url = https://github.com/Discordia/android-cmake.git
+[submodule "ext/libhttpserver"]
+	path = ext/libhttpserver
+	url = https://github.com/etr/libhttpserver.git

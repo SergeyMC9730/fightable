@@ -32,6 +32,8 @@ struct faudio_engine {
 #ifdef TARGET_ANDROID
     AudioStream *stream;
 #endif
+
+    float volume;
 };
 
 void _fAudioBegin(struct faudio_engine *engine);
@@ -41,6 +43,7 @@ double _fAudioGetPlayTime(struct faudio_engine *engine);
 void _fAudioLoopCurrent(struct faudio_engine *engine);
 const char *_fAudioGetDbg(struct faudio_engine *engine, int channel);
 int _fAudioGetChannelsTotal(struct faudio_engine *engine);
+const char *_fAudioGetSongName(struct faudio_engine *engine);
 
 #ifdef __cplusplus
 }

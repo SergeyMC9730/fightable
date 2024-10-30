@@ -27,7 +27,6 @@ void _fIntroDraw() {
 
     _fTextDraw(&__state.text_manager, buffer, (IVector2){1, 1}, GREEN, 1);
 
-
     if (IsKeyPressed(KEY_ENTER)) {
         __dbg_continue = 1;
         __state.title_song_stage = 0;
@@ -41,101 +40,19 @@ void _fIntroDraw() {
     }
 #endif
 
-    int w =__state.framebuffer.texture.width;
-    int h =__state.framebuffer.texture.height;
-    float delta = GetFrameTime();
+    if (IsKeyPressed(KEY_P)) {
+        TraceLog(LOG_INFO, "Playtime: %f", (float)t);
+    }
 
-    if (t >= 1.08f) {
-        __state.title_song_stage = 1;
-    }
-    if (t >= 1.8f) {
-        __state.title_song_stage = 2;
-    }
-    if (t >= 4.06f) {
-        __state.title_song_stage = 3;
-    }
-    if (t >= 4.45f) {
-        __state.title_song_stage = 4;
-        if (__state.title_r0) {
-            if (!__state.current_editor) {
-                _fIntroMenuInit();
-            } else {
-                __state.intro_can_continue = 1;
-            }
-
-            __state.title_r0 = 0;
-            __state.title_a = 0.f;
+    switch (__state.song_id) {
+        case 0: {
+            _fIntroProcessEndlessDream();
+            break;
         }
-    }
-
-#ifdef DEBUG
-    if (IsKeyDown(KEY_SPACE)) {
-        printf("Step at %f\n", (float)t);
-
-        __state.title_song_stage++;
-    }
-#endif
-
-    if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
-        if (__state.title_song_stage >= 1) {
-            int size_x = 6 * __state.tilemap->tile_size.x;
-            int size_y = 1 * __state.tilemap->tile_size.y;
-
-            int cx = (w - size_x) / 2;
-            int cy = (h - size_y) / 2;
-
-            _fTilemapDrawMegatile(*__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
+        case 1: {
+            _fIntroProcessElectricDrug();
+            break;
         }
-
-        if (__state.title_song_stage >= 2) {
-            int size_x = __state.raylib_logo.width;
-            int size_y = 1 * __state.raylib_logo.height;
-
-            int cx = (w - size_x) / 2;
-            int cy = h - size_y - 2;
-
-            Color c = WHITE;
-            c.r = 16;
-            c.g = 16;
-            c.b = 16;
-
-            int offset = 6;
-
-            DrawRectangleGradientV(0, cy - offset, w, size_y + 2 + offset, BLACK, c);
-
-            DrawTexture(__state.raylib_logo, cx, cy, WHITE);
-        }
-
-        if (__state.title_song_stage == 3) {
-            __state.title_a += delta * 4.5f;
-
-            float v = fmax(1.f - __state.title_a, 0.f);
-            Color c = BLACK;
-            c.a = 255.f * (1.f - v);
-
-            DrawRectangle(0, 0, w, h, c);
-
-            if (v <= 0.f) {
-                __state.title_r0 = 1;
-            }
-    }
-    } else {
-        __state.title_a += delta * 6.f;
-
-        float v = fmax(1.f - __state.title_a, 0.f);
-
-        if (v <= 1.f) {
-            Color c = BLACK;
-            c.a = 255.f * v;
-
-            if (!__state.current_editor) {
-                _fIntroMenuDraw();
-            } 
-
-            DrawRectangle(0, 0, w, h, c);
-        }
-
-        __state.intro_stage_completed = 1;
     }
 
     return;

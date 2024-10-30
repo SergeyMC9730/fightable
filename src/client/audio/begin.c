@@ -12,10 +12,6 @@
 
 #include <raylib.h>
 
-#ifdef TARGET_ANDROID
-#include <aaudio/AAudio.h>
-#endif
-
 void _fAudioBegin(struct faudio_engine *engine) {
     size_t bufsize1 = sizeof(short) * CHANNEL_BUFFER_SIZE * 2;
 
@@ -47,7 +43,7 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
     TraceLog(LOG_INFO, "Initialized PortAudio");
 #else
-    AudioStream stream = LoadAudioStream(CHANNEL_SAMPLE_RATE, 16, 2);
+    AudioStream stream = LoadAudioStream(CHANNEL_SAMPLE_RATE, 16, 1);
     PlayAudioStream(stream);
 
     engine->stream = &stream;
@@ -75,12 +71,12 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
 #ifndef TARGET_ANDROID
         float limit_volume = 0.06f;
+        unsigned long count = openmpt_module_read_stereo(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0], merge_buffer[1]);
 #else
         float limit_volume = 0.3f;
         while (!IsAudioStreamProcessed(stream));
+        unsigned long count = openmpt_module_read_mono(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0]);
 #endif
-
-        unsigned long count = openmpt_module_read_stereo(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0], merge_buffer[1]);
 
         for (int i = 0; i < (bufsize1 / sizeof(short)); i++) {
             engine->buffer[i] = (float)engine->buffer[i] * limit_volume;

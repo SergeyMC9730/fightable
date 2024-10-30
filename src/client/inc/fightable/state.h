@@ -11,13 +11,31 @@ struct flevel;
 struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
+struct fhttpserver;
 
 #define IAUDIO_ENGINE
 
 #include <fightable/text.h>
 #include <fightable/sound_engine.h>
 #include <fightable/gfx.h>
-#include <pthread.h>
+
+#if _WIN32
+    #define NOUSER
+    #define NOGDI
+
+    #include <windows.h>
+    
+    #undef far
+    #undef near
+    #undef min
+    #undef max
+#else // unix
+    #include <pthread.h>
+#endif
+
+#ifdef TARGET_ANDROID
+struct android_app;
+#endif
 
 struct fightable_state {
     struct ftilemap *tilemap;
@@ -44,7 +62,11 @@ struct fightable_state {
 
     unsigned char intro_can_continue;
 
+#ifdef _WIN32
+    HANDLE sound_thread;
+#else
     pthread_t sound_thread;
+#endif
     struct faudio_engine sound_engine;
 
     Texture2D raylib_logo;
@@ -57,7 +79,7 @@ struct fightable_state {
 
     struct gfx_manager gfx;
 
-#define R2D_STACK_SIZE 32
+#define R2D_STACK_SIZE 24
     // rendertexture stack
     RenderTexture2D r2dstack[R2D_STACK_SIZE];
     // pointer to the `r2dstack` end
@@ -66,7 +88,7 @@ struct fightable_state {
     Texture2D menu_borders;
 
     unsigned char intro_stage_completed;
-    unsigned char menu_pressed_play;
+    unsigned char menu_state;
 
     Texture2D playbtn_container;
 
@@ -76,6 +98,14 @@ struct fightable_state {
     Vector2 base_game_size;
     Vector2 editor_size;
     Vector2 initial_game_size;
+
+    short song_id;
+
+    struct fhttpserver *webserver;
+
+#ifdef TARGET_ANDROID
+    struct android_app *system;
+#endif
 };
 
 extern struct fightable_state __state;

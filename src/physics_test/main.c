@@ -1,5 +1,9 @@
 #include <raylib.h>
 
+
+#define X_SPEED 70.f
+#define Y_SPEED 150.f
+
 struct fentity {
     double time1;
 
@@ -47,10 +51,10 @@ void update_entity(struct fentity *entity) {
 
     double delta = (double)GetFrameTime();
 
-    static const double x_speed = 70.f;
+    static const double x_speed = X_SPEED;
     static const double x_stop_speed = 3.f;
 
-    static const double max_accel_x = x_speed;
+    static const double max_accel_x = X_SPEED;
     static const double min_accel_x = 0.f;
 
     double flag = 1.f;
@@ -59,8 +63,8 @@ void update_entity(struct fentity *entity) {
     entity->touching_wall_l = 0;
     entity->touching_wall_r = 0;
     entity->standing = 0;
-    entity->standing_surface = (Rectangle){};
-    entity->ceiling_surface = (Rectangle){};
+    entity->standing_surface = (Rectangle){ 0 };
+    entity->ceiling_surface = (Rectangle){ 0 };
 
     for (int i = 0; i < entity->obstacles_length; i++) {
         Rectangle r = entity->obstacles[i];
@@ -133,8 +137,8 @@ void update_entity(struct fentity *entity) {
         }
     }
 
-    static const double y_speed = 150.f;
-    static const double max_accel_y = y_speed;
+    static const double y_speed = Y_SPEED;
+    static const double max_accel_y = Y_SPEED;
 
     // if (entity->accel_y < 0 && entity->jumping) {
     //     entity->ccheck0 = 1;
@@ -210,7 +214,7 @@ int main() {
     player.obstacles = obstacles;
     player.obstacles_length = sizeof(obstacles) / sizeof(Rectangle);
 
-    Camera2D cam = {};
+    Camera2D cam = { 0 };
     cam.zoom = 1.f;
 
     while (!WindowShouldClose()) {

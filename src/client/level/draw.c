@@ -74,7 +74,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             int _x = initial_pos.x + (obj.base.block_x * tx);
             int _y = initial_pos.y + (obj.base.block_y * ty);
 
-            _fTilemapDraw(*level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
+            _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
         }
     }
 
@@ -87,7 +87,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         int _x = initial_pos.x + (obj.base.block_x * tx);
         int _y = initial_pos.y + (obj.base.block_y * ty);
 
-        _fTilemapDraw(*level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
+        _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
 
         level->objects_rendered++;
     }
@@ -148,16 +148,16 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             .y = (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3
         };
 
-        _fTilemapDraw(*level->tilemap, rpos, (IVector2){12, 0}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
+        _fTilemapDraw(level->tilemap, rpos, (IVector2){12, 0}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
 
-        rpos.y -= 6;
+        rpos.y -= (level->tilemap->tile_size.y - 2);
         rpos.x--;
 
         if (player->render_direction == ENTITY_DIR_LEFT) {
             rpos.x += 2;
         }
 
-        _fTilemapDraw(*level->tilemap, rpos, (IVector2){11, 1}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
+        _fTilemapDraw(level->tilemap, rpos, (IVector2){11, 1}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
 
         //DrawRectangle((__state.framebuffer.texture.width - player->hitbox.width) / 2 + 5, (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3, player->hitbox.width, player->hitbox.height, RED);
     }

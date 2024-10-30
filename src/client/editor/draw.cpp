@@ -90,8 +90,6 @@ void _fEditorDraw(struct feditor *editor) {
             mouse_out_of_bounds = true;
         }
 
-        DrawRectangle(mouse_pos.x, mouse_pos.y, 4, 4, YELLOW);
-
         Vector2 mapped_block_pos = {
             std::floor(m_world_pos.x / tx) * tx,
             std::floor(m_world_pos.y / ty) * ty,
@@ -224,10 +222,10 @@ void _fEditorDraw(struct feditor *editor) {
             
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
-            _fTilemapDraw(*editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
         }
 
-        Color grad_black = (Color){};
+        Color grad_black = BLANK;
         Color grad_gray = GRAY;
 
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 23, space / 2, 1, grad_black, grad_gray);
@@ -238,7 +236,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         fblock block = _fBlockFromId(editor->current_block_id);
 
-        _fTilemapDraw(*editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
+        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
         
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);

@@ -3,8 +3,14 @@ project(fightable)
 
 find_library(OPENMPT_LIB openmpt)
 if(NOT OPENMPT_LIB)
-    message(FATAL_ERROR "openmpt library could not be found")
+    message(FATAL_ERROR "libopenmpt could not be found")
 endif()
+find_library(MICROHTTPD_LIB microhttpd)
+if(NOT MICROHTTPD_LIB)
+    message(FATAL_ERROR "libmicrohttpd could not be found")
+endif()
+
+set(CMAKE_CXX_STANDARD 20)
 
 set(BUILD_SHARED_LIBS ON)
 
@@ -25,9 +31,13 @@ add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
 
 CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
+CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
 
 if (NOT HAVE_LIBOPENMPT)
 	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
+endif()
+if (NOT HAVE_LIBMICROHTTPD)
+	message(FATAL_ERROR "libmicrohttpd binaries were found but the header files itself are missing")
 endif()
 
 set(FIGHTABLE_SRC
@@ -80,7 +90,64 @@ set(FIGHTABLE_SRC
     src/client/renderer/ui/rect.c
     src/client/editor/swipe_cur_objects.cpp
     src/client/editor/in_playback_mode.cpp
+    src/client/audio/get_song_name.c
+    src/client/intro/electric_drug.c
+    src/client/intro/endless_dream.c
+    src/client/intro/seekable_row.c
+    src/client/etc/storage.c
+    src/client/intro/menu/on_play.c
+    src/client/intro/menu/on_multiplayer.c
+    src/client/intro/menu/on_editor.c
+    src/client/intro/menu/process_play.c
+    src/client/intro/menu/draw_background.c
+    src/client/intro/menu/process_base.c
 )
+
+file(GLOB HTTPSERVER_SRC
+    "ext/libhttpserver/src/*.hpp"
+    "ext/libhttpserver/src/*.h"
+    "ext/libhttpserver/src/*.cpp"
+
+    "ext/libhttpserver/src/details/*.cpp"
+
+    "ext/libhttpserver/src/httpserver/*.hpp"
+    "ext/libhttpserver/src/httpserver/details/*.hpp"
+)
+
+set(HTTPSERVER_INC
+    ext/libhttpserver/src
+    ext/libhttpserver/src/details
+    ext/libhttpserver/src/httpserver
+    ext/libhttpserver/src/httpserver/details
+)
+
+add_library(httpserver STATIC ${HTTPSERVER_SRC})
+target_include_directories(httpserver PRIVATE ${HTTPSERVER_INC})
+add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
+
+target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
+
+add_library(fightable-http STATIC
+    src/http/req/APIRequest.cpp
+    src/http/req/SplitString.cpp
+    src/http/content_type/HttpContentType.cpp
+    src/http/content_type/HttpContentTypeAudio.cpp
+    src/http/content_type/HttpContentTypeHtml.cpp
+    src/http/content_type/HttpContentTypeImage.cpp
+    src/http/content_type/HttpContentTypeJson.cpp
+    src/http/content_type/HttpContentTypeText.cpp
+    src/http/req/v1.helloworld.cpp
+    src/http/http_server_create.cpp
+    src/http/http_server_destroy.cpp
+    src/http/req/v1.res.request.cpp
+    src/http/resource_dir.cpp
+    src/http/content_type/HttpContentTypeOctet.cpp
+)
+target_include_directories(fightable-http PRIVATE
+    src/http/inc
+    ${HTTPSERVER_INC}
+)
+target_link_libraries(fightable-http PUBLIC httpserver)
 
 if (ANDROID)
 	set(FIGHTABLE_SRC
@@ -91,14 +158,15 @@ if (ANDROID)
 	include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
 
 	add_library(fightable SHARED ${FIGHTABLE_SRC})
-	set(FIGHTABLE_NATIVE_LIBS android log aaudio)
-	target_compile_definitions(fightable PUBLIC TARGET_ANDROID)
+	set(FIGHTABLE_NATIVE_LIBS android log)
+	add_compile_definitions(TARGET_ANDROID)
+    add_compile_definitions(TARGET_UNIX)
 elseif(WIN32)
 	add_executable(fightable ${FIGHTABLE_SRC})
-	target_compile_definitions(fightable PUBLIC TARGET_WIN32)
+	add_compile_definitions(TARGET_WIN32)
 else()
 	add_executable(fightable ${FIGHTABLE_SRC})
-        target_compile_definitions(fightable PUBLIC TARGET_UNIX)
+    add_compile_definitions(TARGET_UNIX)
 endif()
 
 add_executable(physics-test
@@ -114,6 +182,6 @@ target_include_directories(fightable PRIVATE src/client/inc ext/raylib/src ext/c
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
 
-target_link_libraries(fightable raylib cjson openmpt PortAudio ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} fightable-http)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
