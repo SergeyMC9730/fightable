@@ -56,7 +56,7 @@ int main() {
         m_speedY *= 0.98f;
         
         if(m_onGround) {
-            m_speedX *= 0.80f;
+            m_speedX *= 0.7f;
             m_speedY *= 0.80f;
         }
         

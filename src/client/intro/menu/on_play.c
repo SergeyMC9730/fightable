@@ -4,6 +4,8 @@
 #include <fightable/rect.h>
 
 void _fIntroMenuOnPlay() {
+    if (__state.menu_block_ui) return;
+
     __state.menu_state = INTRO_MENU_PLAY;
 
     Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);

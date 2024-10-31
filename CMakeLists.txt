@@ -101,6 +101,9 @@ set(FIGHTABLE_SRC
     src/client/intro/menu/process_play.c
     src/client/intro/menu/draw_background.c
     src/client/intro/menu/process_base.c
+    src/client/renderer/gfx/draw.c
+    src/client/renderer/gfx/fade.c
+    src/client/etc/color.c
 )
 
 file(GLOB HTTPSERVER_SRC

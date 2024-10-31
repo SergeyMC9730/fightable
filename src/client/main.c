@@ -233,6 +233,8 @@ int main(int argc, char **argv) {
     _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
 #endif
 
+    __state.gfx.fade_v.should_process = 1;
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -244,13 +246,15 @@ int main(int argc, char **argv) {
         __state.gui_render_offset.y = __state.gfx.shake_v.y;
 
         if (IsKeyPressed(KEY_G)) {
-            _fGfxShake(&__state.gfx, 4.f);
+            // _fGfxShake(&__state.gfx, 4.f);
+            _fGfxFadeInOut(&__state.gfx, BLACK, BLANK, 0.5f);
         }
 
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
 
         _fDraw();
+        _fGfxDraw(&__state.gfx);
 
         EndTextureModeStacked();
 
