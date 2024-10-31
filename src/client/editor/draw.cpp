@@ -204,7 +204,7 @@ void _fEditorDraw(struct feditor *editor) {
         int blackbox_starty = 0;
         int space = __state.framebuffer.texture.width - blackbox_startx;
 
-        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, (Color){0, 0, 0, 200});
+        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, Color{0, 0, 0, 200});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
@@ -285,9 +285,15 @@ void _fEditorDraw(struct feditor *editor) {
 
                 editor->entities.push_back(player);
 
+                Vector2 dpi = GetWindowScaleDPI();
+                Vector2 wanted_resolution = {
+                    .x = (__state.base_game_size.x - __state.editor_size.x - (__state.mouse_pos_offset.x * 2.f)) / (float)__state.window_scale,
+                    .y = (__state.base_game_size.y - __state.editor_size.y - (__state.mouse_pos_offset.y * 2.f)) / (float)__state.window_scale
+                };
+
                 // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
                 UnloadRenderTexture(__state.framebuffer);
-                __state.framebuffer = LoadRenderTexture((__state.base_game_size.x - __state.editor_size.x - (__state.mouse_pos_offset.x * 2)) / __state.window_scale, (__state.base_game_size.y - __state.editor_size.y) / __state.window_scale);
+                __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
 
                 editor->f1_lock = true;
             }
@@ -304,6 +310,8 @@ void _fEditorDraw(struct feditor *editor) {
 #endif
 
         if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {
+            Vector2 dpi = GetWindowScaleDPI();
+
             editor->should_display_sidebar = true;
             editor->should_process_interactions = true;
             editor->should_playback = false;

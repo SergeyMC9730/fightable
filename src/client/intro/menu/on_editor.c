@@ -19,8 +19,10 @@ void _fIntroMenuOnEditorCallback() {
     SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
 #endif
 
+    Vector2 dpi = GetWindowScaleDPI();
+
     UnloadRenderTexture(__state.framebuffer);
-    __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE, __state.initial_game_size.y / UI_SCALE);
+    __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE / dpi.x, __state.initial_game_size.y / UI_SCALE / dpi.y);
 }
 
 void _fIntroMenuOnEditor() {

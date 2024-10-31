@@ -3,7 +3,6 @@
 #include <fightable/http/requests.hpp>
 #include <vector>
 #include <string.h>
-#include <arpa/inet.h>
 
 struct fhttpserver *_fHttpServerCreate(unsigned short port, void (*logger)(const char *msg)) {
     struct fhttpserver *srv = new struct fhttpserver;

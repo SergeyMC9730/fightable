@@ -10,3 +10,12 @@
 [submodule "ext/libhttpserver"]
 	path = ext/libhttpserver
 	url = https://github.com/etr/libhttpserver.git
+[submodule "ext/pthread-win32"]
+	path = ext/pthread-win32
+	url = https://github.com/GerHobbelt/pthread-win32.git
+[submodule "ext/strings_h"]
+	path = ext/strings_h
+	url = https://github.com/win32ports/strings_h.git
+[submodule "ext/libhttpserver-win32"]
+	path = ext/libhttpserver-win32
+	url = https://github.com/SergeyMC9730/libhttpserver-win32.git

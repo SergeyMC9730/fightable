@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <fightable/renderer.h>
 
-static const IVector2 __default_font_data[0xFF] = {
-    {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
+static IVector2 __default_font_data[0xFF] = {
+    {0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},
     {26,0}, // ' '
     {0,2}, {1,2}, {2,2}, {3,2}, {4,2}, {5,2}, {6,2}, {7,2}, {8,2}, {9,2}, {10,2}, {11,2}, {12,2}, {13,2}, {14,2},
     {0,1}, {1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}, {9,1},
@@ -17,7 +17,7 @@ static const IVector2 __default_font_data[0xFF] = {
 };
 
 IVector2 _fTextMeasure(struct ftext_manager *man, const char *text) {
-    IVector2 result = {};
+    IVector2 result = {0};
 
     if (!man) return result;
 
@@ -78,7 +78,7 @@ void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color
 }
 
 struct ftext_manager _fTextLoadDefault() {
-    struct ftext_manager man = {};
+    struct ftext_manager man = {0};
  
     man.char_padding = 1;
     man.tilemap = _fTilemapCreate("text.png", (IVector2){3, 5});
@@ -100,7 +100,7 @@ unsigned char _hlpTool(unsigned char a, unsigned char b) {
 }
 
 Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Color top, Color bottom, unsigned char with_shadow) {
-    if (!man || !text) return (Texture2D){};
+    if (!man || !text) return (Texture2D){0};
 
     IVector2 sz = _fTextMeasure(man, text);
     sz.x++; sz.y++;
@@ -109,7 +109,7 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     RenderTexture2D output = LoadRenderTexture(sz.x, sz.y);
 
     size_t len = strlen(text);
-    IVector2 cur_pos = {};
+    IVector2 cur_pos = {0};
 
     Texture2D *char_textures = (Texture2D *)MemAlloc(sizeof(Texture2D) * len);
 
