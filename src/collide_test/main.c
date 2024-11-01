@@ -31,11 +31,11 @@ void _fMovePlayer(float x, float y, struct fhitbox* room, struct fhitbox* player
 int main() {
     InitWindow(800, 600, "Collide Test");
 
-    SetTargetFPS(144);
+    SetTargetFPS(60);
 
     fhitbox player = {0, 200, 50, 100};
     fhitbox placement[] = {
-        {0, 500, 720, 100},
+        {0, 500, 2000, 2000},
         {0, 0, 720, 8},
     };
 
@@ -43,23 +43,27 @@ int main() {
 
     while(!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) m_speedX += 60 * deltaTime;
-        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) m_speedX -= 60 * deltaTime;
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) m_speedX += 1.1 * 1.1;
+        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) m_speedX -= 1.1 * 1.1;
         if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && m_onGround) {
-            m_speedY = -3;
+            m_speedY = -15;
         }
         _fMovePlayer(m_speedX, m_speedY, placement, &player);
 
-        m_speedY += 3 * deltaTime;
-
-        m_speedX *= 0.7f;
-        m_speedY *= 0.98f;
-        
+        m_speedY += 1;
+        m_speedX *= 0.850f;
+        m_speedY *= 0.850f; 
+        // m_speedX *= 0.91f;
+        // m_speedY *= 0.98f;
         if(m_onGround) {
+<<<<<<< HEAD
+
+            printf("%f \n %f", m_speedX, m_speedY);
+=======
             m_speedX *= 0.7f;
             m_speedY *= 0.80f;
+>>>>>>> 9419d427c5a9d1ff3782fcace5f5f187887460a7
         }
-        
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
