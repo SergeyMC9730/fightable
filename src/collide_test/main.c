@@ -56,13 +56,7 @@ int main() {
         // m_speedX *= 0.91f;
         // m_speedY *= 0.98f;
         if(m_onGround) {
-<<<<<<< HEAD
-
             printf("%f \n %f", m_speedX, m_speedY);
-=======
-            m_speedX *= 0.7f;
-            m_speedY *= 0.80f;
->>>>>>> 9419d427c5a9d1ff3782fcace5f5f187887460a7
         }
         BeginDrawing();
             ClearBackground(RAYWHITE);
