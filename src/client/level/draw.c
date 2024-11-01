@@ -30,8 +30,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         actual_cam.target.x = (int)player->hitbox.x - (int)(__state.framebuffer.texture.width / 2);
         actual_cam.target.y = (int)player->hitbox.y - (int)(__state.framebuffer.texture.height / 2);
 
-        level->camera_size.x = __state.framebuffer.texture.width * tx;
-        level->camera_size.y = __state.framebuffer.texture.height * ty;
+        // level->camera_size.x = __state.framebuffer.texture.width * tx;
+        // level->camera_size.y = __state.framebuffer.texture.height * ty;
 
         // printf("%d:%d\n", (int)actual_cam.target.x, (int)actual_cam.target.y);
     }
