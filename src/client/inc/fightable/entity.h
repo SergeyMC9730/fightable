@@ -17,6 +17,8 @@ enum fentity_direction {
     ENTITY_DIR_LEFT = 1
 };
 
+#include <fightable/hitbox.h>
+
 struct fentity {
     double accel_x;
     double accel_y;

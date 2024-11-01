@@ -1,8 +1,8 @@
 #include <fightable/hitbox.h>
 #include <math.h>
 
-Rectangle _fHitboxExpand(Rectangle *h, float x, float y) {
-    Rectangle newh = {};
+fhitbox _fHitboxExpand(fhitbox *h, float x, float y) {
+    fhitbox newh = {};
 
     if (x < 0.f) {
         newh.x += x;

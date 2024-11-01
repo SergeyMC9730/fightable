@@ -6,3 +6,5 @@ bin
 libs
 private_setup.sh
 lib
+extlib
+out

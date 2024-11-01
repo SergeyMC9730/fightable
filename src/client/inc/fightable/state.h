@@ -89,6 +89,7 @@ struct fightable_state {
 
     unsigned char intro_stage_completed;
     unsigned char menu_state;
+    unsigned char menu_block_ui;
 
     Texture2D playbtn_container;
 

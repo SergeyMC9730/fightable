@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(fightable)
+project(fightable LANGUAGES C CXX)
 
 find_library(OPENMPT_LIB openmpt)
 if(NOT OPENMPT_LIB)
@@ -10,7 +10,13 @@ if(NOT MICROHTTPD_LIB)
     message(FATAL_ERROR "libmicrohttpd could not be found")
 endif()
 
+message(STATUS "libopenmpt lib path: ${OPENMPT_LIB}")
+message(STATUS "libmicrohttpd lib path: ${MICROHTTPD_LIB}")
+
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CXX_STANDARD 20)
+set(CXX_STANDARD_REQUIRED TRUE)
 
 set(BUILD_SHARED_LIBS ON)
 
@@ -33,12 +39,15 @@ add_subdirectory(ext/raylib)
 CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
 CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
 
-if (NOT HAVE_LIBOPENMPT)
+if (NOT HAVE_LIBOPENMPT AND NOT OPENMPT_INC)
 	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
 endif()
-if (NOT HAVE_LIBMICROHTTPD)
+if (NOT HAVE_LIBMICROHTTPD AND NOT MICROHTTPD_INC)
 	message(FATAL_ERROR "libmicrohttpd binaries were found but the header files itself are missing")
 endif()
+
+message(STATUS "libopenmpt custom include path: ${OPENMPT_INC}")
+message(STATUS "libmicrohttpd custom include path: ${MICROHTTPD_INC}")
 
 set(FIGHTABLE_SRC
     src/client/main.c
@@ -101,28 +110,40 @@ set(FIGHTABLE_SRC
     src/client/intro/menu/process_play.c
     src/client/intro/menu/draw_background.c
     src/client/intro/menu/process_base.c
+    src/client/renderer/gfx/draw.c
+    src/client/renderer/gfx/fade.c
+    src/client/etc/color.c
 )
 
+if (WIN32)
+    set(HTTPSERVER_NAME libhttpserver-win32)
+else()
+    set(HTTPSERVER_NAME libhttpserver-win32)
+endif()
+
 file(GLOB HTTPSERVER_SRC
-    "ext/libhttpserver/src/*.hpp"
-    "ext/libhttpserver/src/*.h"
-    "ext/libhttpserver/src/*.cpp"
+    "ext/${HTTPSERVER_NAME}/src/*.hpp"
+    "ext/${HTTPSERVER_NAME}/src/*.h"
+    "ext/${HTTPSERVER_NAME}/src/*.cpp"
 
-    "ext/libhttpserver/src/details/*.cpp"
+    "ext/${HTTPSERVER_NAME}/src/details/*.cpp"
 
-    "ext/libhttpserver/src/httpserver/*.hpp"
-    "ext/libhttpserver/src/httpserver/details/*.hpp"
+    "ext/${HTTPSERVER_NAME}/src/httpserver/*.hpp"
+    "ext/${HTTPSERVER_NAME}/src/httpserver/details/*.hpp"
 )
 
 set(HTTPSERVER_INC
-    ext/libhttpserver/src
-    ext/libhttpserver/src/details
-    ext/libhttpserver/src/httpserver
-    ext/libhttpserver/src/httpserver/details
+    ext/${HTTPSERVER_NAME}/src
+    ext/${HTTPSERVER_NAME}/src/details
+    ext/${HTTPSERVER_NAME}/src/httpserver
+    ext/${HTTPSERVER_NAME}/src/httpserver/details
 )
 
 add_library(httpserver STATIC ${HTTPSERVER_SRC})
-target_include_directories(httpserver PRIVATE ${HTTPSERVER_INC})
+target_include_directories(httpserver PRIVATE
+    ${HTTPSERVER_INC}
+    ${MICROHTTPD_INC}
+)
 add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
 
 target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
@@ -146,10 +167,13 @@ add_library(fightable-http STATIC
 target_include_directories(fightable-http PRIVATE
     src/http/inc
     ${HTTPSERVER_INC}
+    ${MICROHTTPD_INC}
 )
 target_link_libraries(fightable-http PUBLIC httpserver)
 
 if (ANDROID)
+    message(STATUS "Compiling for Android")
+
 	set(FIGHTABLE_SRC
 		${FIGHTABLE_SRC}
 		$ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
@@ -162,9 +186,23 @@ if (ANDROID)
 	add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
 elseif(WIN32)
+    message(STATUS "Compiling for Windows")
+
+    set(BUILD_SHARED_LIBS OFF)
+    add_subdirectory(ext/pthread-win32)
+
 	add_executable(fightable ${FIGHTABLE_SRC})
 	add_compile_definitions(TARGET_WIN32)
+    add_compile_definitions(__MINGW32__)
+
+    set(FIGHTABLE_NATIVE_LIBS pthreadVC3)
+    set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
+
+    target_include_directories(httpserver PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
+    target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
 else()
+    message(STATUS "Compiling for UNIX-like operating systems")
+
 	add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
 endif()
@@ -184,6 +222,8 @@ target_include_directories(fightable PRIVATE
     ext/cJSON 
     ext/portaudio_opensles/include
     src/http/inc
+    ${OPENMPT_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
 )
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)

@@ -3,7 +3,7 @@
 #include <fightable/renderer.h>
 #include <fightable/level.h>
 
-void _fIntroMenuOnEditor() {
+void _fIntroMenuOnEditorCallback() {
     __state.current_editor = _fEditorCreate();
     MemFree(__state.current_level->objects);
     __state.current_level->objects = NULL;
@@ -19,6 +19,17 @@ void _fIntroMenuOnEditor() {
     SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
 #endif
 
+    Vector2 dpi = GetWindowScaleDPI();
+
     UnloadRenderTexture(__state.framebuffer);
-    __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE, __state.initial_game_size.y / UI_SCALE);
+    __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE / dpi.x, __state.initial_game_size.y / UI_SCALE / dpi.y);
+}
+
+void _fIntroMenuOnEditor() {
+    if (__state.menu_block_ui) return;
+
+    _fGfxFadeOut(&__state.gfx, BLACK, 0.5);
+    _fGfxSetFadeOutFunc(&__state.gfx, _fIntroMenuOnEditorCallback, 0);
+
+    __state.menu_block_ui = 1;
 }

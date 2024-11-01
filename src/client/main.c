@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
 
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
-    SetTargetFPS(60);
+    SetTargetFPS(GetMonitorRefreshRate(0));
     SetWindowState(FLAG_WINDOW_RESIZABLE);
 
     Vector2 ui_scaling = GetWindowScaleDPI();
@@ -233,6 +233,8 @@ int main(int argc, char **argv) {
     _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
 #endif
 
+    __state.gfx.fade_v.should_process = 1;
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -244,13 +246,15 @@ int main(int argc, char **argv) {
         __state.gui_render_offset.y = __state.gfx.shake_v.y;
 
         if (IsKeyPressed(KEY_G)) {
-            _fGfxShake(&__state.gfx, 4.f);
+            // _fGfxShake(&__state.gfx, 4.f);
+            _fGfxFadeInOut(&__state.gfx, BLACK, BLANK, 0.5f);
         }
 
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
 
         _fDraw();
+        _fGfxDraw(&__state.gfx);
 
         EndTextureModeStacked();
 
@@ -271,7 +275,7 @@ int main(int argc, char **argv) {
 
         const char *row = _fAudioGetDbg(&__state.sound_engine, _fIntroGetSeekableRow());
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   row(%d): %s", 
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   row(%d): %s\nrender area: %d:%d (%d:%d tiles)", 
             align_x,
             (float)UI_SCALE,
             (float)__state.window_scale,
@@ -281,10 +285,12 @@ int main(int argc, char **argv) {
             __state.title_song_stage,
             (int)__state.song_id,
             _fIntroGetSeekableRow(),
-            row
+            row,
+            __state.framebuffer.texture.width, __state.framebuffer.texture.height,
+            __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y
         );
 
-        // DrawText(dbg_buffer, 8, 32, 20, RED);
+         DrawText(dbg_buffer, 8, 32, 20, RED);
         
         if (row != NULL) {
             switch (__state.song_id) {

@@ -4,6 +4,16 @@
 extern "C" {
 #endif
 
+#include <nt5emul/renderer_event.h>
+
+enum ffade_type {
+    FadeIn,
+    FadeOut,
+    FadeInOut
+};
+
+#include <raylib.h>
+
 struct gfx_manager {
     struct shake {
         double time;
@@ -13,14 +23,34 @@ struct gfx_manager {
         double x;
         double y;
     } shake_v;
+
+    struct fade {
+        double time;
+        double max;
+
+        renderer_event_t on_fade_out;
+
+        Color begin;
+        Color end;
+        Color current;
+
+        unsigned char should_process : 1;
+        unsigned char do_not_display : 1;
+        unsigned char callback_lock : 1;
+    } fade_v;
 };
 
 void _fGfxShake(struct gfx_manager *m, float strength);
 void _fGfxShakeConst(struct gfx_manager *m, float strength);
 
-void _fGfxInvBorders(struct gfx_manager *m);
+void _fGfxFadeIn(struct gfx_manager *m, Color end, double time);
+void _fGfxFadeOut(struct gfx_manager *m, Color begin, double time);
+void _fGfxFadeInOut(struct gfx_manager *m, Color begin, Color end, double time);
+
+void _fGfxSetFadeOutFunc(struct gfx_manager *m, void (*callback)(void *user), void *user);
 
 void _fGfxUpdate(struct gfx_manager *m);
+void _fGfxDraw(struct gfx_manager *m);
 
 #ifdef __cplusplus
 }
