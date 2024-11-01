@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
 
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
-    SetTargetFPS(60);
+    SetTargetFPS(GetMonitorRefreshRate(0));
     SetWindowState(FLAG_WINDOW_RESIZABLE);
 
     Vector2 ui_scaling = GetWindowScaleDPI();
