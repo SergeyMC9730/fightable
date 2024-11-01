@@ -8,6 +8,17 @@
 void _fIntroMenuDraw() {
     _fIntroMenuDrawBackground();
 
+    if (__state.menu_perform_move) {
+        float delta = GetFrameTime();
+
+        __state.time1 += delta;
+        __state.menu_cur_x = -__state.framebuffer.texture.width * __state.time1;
+
+        if (__state.time1 >= 1.f) {
+            __state.time1 = 1.f;
+        }
+    }
+
     switch (__state.menu_state) {
         case INTRO_MENU_BASE_SELECTOR: {
             _fIntroMenuProcessBase();
