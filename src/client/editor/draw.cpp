@@ -287,8 +287,8 @@ void _fEditorDraw(struct feditor *editor) {
 
                 Vector2 dpi = GetWindowScaleDPI();
                 Vector2 wanted_resolution = {
-                    .x = (__state.base_game_size.x - __state.editor_size.x - (__state.mouse_pos_offset.x * 2.f)) / (float)__state.window_scale,
-                    .y = (__state.base_game_size.y - __state.editor_size.y - (__state.mouse_pos_offset.y * 2.f)) / (float)__state.window_scale
+                    .x = 160,
+                    .y = 120
                 };
 
                 // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
