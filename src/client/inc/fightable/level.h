@@ -29,7 +29,7 @@ struct flevel {
 
     unsigned char in_workbench_mode : 1;
 
-    struct fentity *entities;
+    struct fentity **entities;
     unsigned int entity_data_size;
 };
 

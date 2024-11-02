@@ -60,6 +60,13 @@ void _fEntityMove(struct fentity* entity, Vector2 pos);
 void _fEntityInit(struct fentity* entity);
 void _fEntityJump(struct fentity* entity);
 
+#include <fightable/intvec.h>
+
+IVector2 _fEntityGetDrawingPos(struct fentity* entity);
+
+void _fEntitySetHitbox(struct fentity* entity, Rectangle rec);
+void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
+
 #ifdef __cplusplus
 }
 #endif

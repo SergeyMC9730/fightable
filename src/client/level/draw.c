@@ -89,42 +89,40 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     if (level->entities && rects) {
         for (int i = 0; i < level->entity_data_size; i++) {
-            struct fentity *entity = level->entities + i;
+            struct fentity *entity = level->entities[i];
+            if (!entity) continue;
 
             entity->obstacles = rects;
             entity->obstacles_length = level->data_size;
-
-            if (entity->global_entity_id == 1) {
-                entity->moving_horizontally = 0;
-                entity->moving_negative = 0;
-
-                if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-                    entity->moving_horizontally = 1;
-                    entity->moving_negative = 0;
-                }
-                if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-                    entity->moving_horizontally = 1;
-                    entity->moving_negative = 1;
-                }
-                if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))) {
-                    _fEntityJump(entity);
-                }
-            }
         
             if (!entity->update) {
                 _fEntityUpdate(entity);
             }
+            else {
+                entity->update(entity);
+            }
+        }
+
+        if (player) {
+            EndMode2D();
+
+            actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
+            actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
+
+            BeginMode2D(actual_cam);
+        }
+
+        for (int i = 0; i < level->entity_data_size; i++) {
+            struct fentity* entity = level->entities[i];
+            if (!entity) continue;
+
+            printf("entity %d {%f, %f, %f, %f}\n", entity->global_entity_id, entity->hitbox.x, entity->hitbox.y, entity->hitbox.width, entity->hitbox.height);
 
             if (!entity->draw) {
-                if (entity == player) {
-                    EndMode2D();
-
-                    actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
-                    actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
-
-                    BeginMode2D(actual_cam);
-                }
                 _fEntityDraw(entity);
+            }
+            else {
+                entity->draw(entity);
             }
         }
     }

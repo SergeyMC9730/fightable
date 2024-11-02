@@ -116,6 +116,11 @@ set(FIGHTABLE_SRC
     src/client/entity/base/init.c
     src/client/entity/base/jump.c
     src/client/entity/base/move.c
+    src/client/entity/lplayer/init.c
+    src/client/entity/lplayer/update.c
+    src/client/entity/lplayer/draw.c
+    src/client/entity/base/draw_pos.c
+    src/client/entity/base/setters.c
 )
 
 if (WIN32)

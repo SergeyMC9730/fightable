@@ -27,7 +27,7 @@ struct feditor {
     unsigned char holded_previosly : 1;
     unsigned char hp1 : 1;
 
-    std::vector<fentity> entities;
+    std::vector<fentity*> entities;
 
     unsigned short current_object_page;
 };

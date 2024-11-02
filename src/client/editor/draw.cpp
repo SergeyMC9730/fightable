@@ -10,6 +10,7 @@
 #include <optional>
 #include <fightable/renderer.h>
 #include <fightable/intvec_math.h>
+#include <fightable/player.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
@@ -285,15 +286,12 @@ void _fEditorDraw(struct feditor *editor) {
                 editor->should_process_interactions = false;
                 editor->should_playback = true;
 
-                struct fentity player = { .global_entity_id = 1 };
-                _fEntityInit(&player);
+                felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 
-                player.hitbox.width = editor->level.tilemap->tile_size.x;
-                player.hitbox.height = editor->level.tilemap->tile_size.y;
-                player.hitbox.x = pos.x * player.hitbox.width;
-                player.hitbox.y = pos.y * player.hitbox.height;
+                _flPlayerInit(player);
+                _fEntitySetPosition((fentity *)player, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
 
-                editor->entities.push_back(player);
+                editor->entities.push_back((fentity *)player);
 
                 Vector2 dpi = GetWindowScaleDPI();
                 Vector2 wanted_resolution = {
@@ -329,6 +327,11 @@ void _fEditorDraw(struct feditor *editor) {
 
             UnloadRenderTexture(__state.framebuffer);
             __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
+
+            for (fentity* e : editor->entities) {
+                MemFree(e);
+            }
+            editor->entities.clear();
         }
 
         editor->f1_lock = false;
