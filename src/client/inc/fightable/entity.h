@@ -28,6 +28,7 @@ struct fentity {
     unsigned char moving_negative : 1;
     unsigned char complete_px : 1;
     unsigned char complete_nx : 1;
+    unsigned char can_double_jump : 1;
 
     fhitbox hitbox;
 
@@ -58,7 +59,7 @@ void _fEntityDraw(struct fentity *entity);
 
 void _fEntityMove(struct fentity* entity, Vector2 pos);
 void _fEntityInit(struct fentity* entity);
-void _fEntityJump(struct fentity* entity);
+void _fEntityJump(struct fentity* entity, unsigned char holding);
 
 #include <fightable/intvec.h>
 

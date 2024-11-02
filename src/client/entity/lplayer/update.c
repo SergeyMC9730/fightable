@@ -16,7 +16,10 @@ void _flPlayerUpdate(struct felplayer* instance) {
         entity->moving_negative = 1;
     }
     if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))) {
-        _fEntityJump(entity);
+        _fEntityJump(entity, 1);
+    }
+    if ((IsKeyPressed(KEY_W) || IsKeyPressed(KEY_SPACE))) {
+        _fEntityJump(entity, 0);
     }
 
     _fEntityUpdate(entity);
