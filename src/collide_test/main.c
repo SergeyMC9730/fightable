@@ -185,7 +185,7 @@ int main() {
 
         _fEntityUpdate(&test_entity);
 
-        snprintf(buf, 512, "on_ground: %d\nspeed: {%ff, %ff}\npos: {%ff, %ff}\n%d%d%d%d%d%d%d%d",
+        snprintf(buf, 512, "on_ground: %d\nspeed: {%ff, %ff}\npos: {%ff, %ff}\n%d%d%d%d%d%d%d",
             test_entity.on_ground,
             test_entity.speed.x, test_entity.speed.y,
             test_entity.hitbox.x, test_entity.hitbox.y,
