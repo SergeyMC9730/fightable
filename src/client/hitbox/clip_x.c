@@ -1,7 +1,7 @@
 #include <fightable/hitbox.h>
 #include <math.h>
 
-float _fHitboxClipXCollide(struct fhitbox *h1, struct fhitbox *h2, float xa) {
+float _fHitboxClipXCollide(fhitbox *h1, fhitbox *h2, float xa) {
     if (h2->y + h2->height <= h1->y || h2->y >= h1->y + h1->height) {
         return xa;
     }

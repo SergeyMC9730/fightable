@@ -1,79 +1,228 @@
 #include <raylib.h>
 #include <hitbox.h>
 #include <stdlib.h>
-float m_speedX = 0.0f;
-float m_speedY = 0.0f;
-bool m_onGround;
 
-void _fMovePlayer(float x, float y, struct fhitbox* room, struct fhitbox* player) {
-    float prevX = x;
-    float prevY = y;
-    bool isTouch = 0;
-    // Check for X collision
-    for (int i = 0; i < 2; i++) {
-        x = _fHitboxClipXCollide(room + i, player, x);
+struct fentity {
+    Vector2 speed;
+
+    unsigned char on_ground : 1;
+    unsigned char moving_horizontally : 1;
+    unsigned char jumping : 1;
+    unsigned char moving_negative : 1;
+    unsigned char complete_px : 1;
+    unsigned char complete_nx : 1;
+
+    fhitbox hitbox;
+
+    fhitbox *obstacles;
+    unsigned int obstacles_length;
+
+    fhitbox ground_hitbox;
+};
+
+void _fEntityMove(struct fentity *entity, Vector2 pos) {
+    float delta = GetFrameTime();
+    pos.y *= delta;
+    pos.x *= delta;
+
+    float prevX = pos.x;
+    float prevY = pos.y;
+
+    if (prevX != 0.f) {
+        // Check for X collision
+        for (unsigned int i = 0; i < entity->obstacles_length; i++) {
+            pos.x = _fHitboxClipXCollide(entity->obstacles + i, &entity->hitbox, pos.x);
+        }
+
+        entity->hitbox.x += pos.x;
+
+        // Stop motion on collision
+        if (prevX != pos.x) entity->speed.x = 0.f;
     }
-    player->x += x;
-    // printf("%f \n", x);
-    // Check for Y collision
-    for (int i = 0; i < 2; i++) {
-        y = _fHitboxClipYCollide(room + i, player, y);
+
+    if (prevY != 0.f) {
+        for (unsigned int i = 0; i < entity->obstacles_length; i++) {
+            pos.y = _fHitboxClipYCollide(entity->obstacles + i, &entity->hitbox, pos.y);
+        }
+
+        entity->hitbox.y += pos.y;
+
+        // Stop motion on collision
+        if (prevY != pos.y) entity->speed.y = 0.f;  
+    }
+}
+
+void _fEntityUpdate(struct fentity *entity) {
+    static const double max_speed_x = 1.5 / 1.1 * 70.f;
+    static const double max_speed_y = 3.f * 25.f;
+
+    const double delta = GetFrameTime();
+
+    if (entity->moving_horizontally && !entity->moving_negative) {
+        entity->speed.x += delta * 180.f;
+        if (entity->speed.x > max_speed_x) {
+            entity->speed.x = max_speed_x;
+        }
+        entity->complete_px = 1;
+    } 
+    if (entity->moving_horizontally && entity->moving_negative) {
+        entity->speed.x -= delta * 180.f;
+        if (entity->speed.x < -max_speed_x) {
+            entity->speed.x = -max_speed_x;
+        }
+        entity->complete_nx = 1;
+    }
+    else if (!entity->moving_horizontally) {
+        if (entity->complete_nx) {
+            entity->speed.x += delta * 350.f;
+
+            if (entity->speed.x > 0) {
+                entity->speed.x = 0;
+                entity->complete_nx = 0;
+            }
+        }
+        if (entity->complete_px) {
+            entity->speed.x -= delta * 350.f;
+
+            if (entity->speed.x < 0) {
+                entity->speed.x = 0;
+                entity->complete_px = 0;
+            }
+        }
     }
 
-    player->y += y;
-    // printf("%f \n", y);
+    if (!entity->on_ground) {
+        entity->speed.y += delta * 100.f;
+        if (entity->speed.y > max_speed_y) {
+            entity->speed.y = max_speed_y;
+        }
 
-    m_onGround = prevY != y && prevY > 0.f;
-    // Stop motion on collision
-    if (prevX != x) m_speedX = 0.f;
-    if (prevY != y) m_speedY = 0.f;
-} 
+        float s = entity->speed.y;
+
+        if (entity->speed.y > 0.f) {
+            s *= 1.25f;
+        }
+
+        _fEntityMove(entity, (Vector2){0, s * 3.f});
+    }
+
+    _fEntityMove(entity, entity->speed);
+
+    entity->ground_hitbox.width = entity->hitbox.width;
+    entity->ground_hitbox.height = 1;
+    entity->ground_hitbox.x = entity->hitbox.x;
+    entity->ground_hitbox.y = entity->hitbox.y + (entity->hitbox.height - entity->ground_hitbox.height) + 1;
+
+    Rectangle r1 = *(Rectangle*)(&entity->ground_hitbox);
+
+    entity->on_ground = 0;
+
+    for (unsigned int i = 0; i < entity->obstacles_length; i++) {
+        Rectangle r2 = *(Rectangle*)(entity->obstacles + i);
+
+        if (CheckCollisionRecs(r1, r2)) {
+            entity->on_ground = 1;
+            break;
+        }
+    }
+}
+void _fEntityInit(struct fentity* entity) {
+
+}
+void _fEntityJump(struct fentity* entity) {
+     if (entity->on_ground) {
+        entity->speed.y = -32.5f;
+     }
+}
+
 int main() {
     InitWindow(800, 600, "Collide Test");
 
     SetTargetFPS(60);
 
-    fhitbox player = {0, 200, 50, 100};
+    fhitbox player = {0, -128, 8, 8};
     fhitbox placement[] = {
-        {0, 500, 2000, 2000},
-        {0, 0, 720, 8},
+        {.width = 8, .height = 32, .x = 60},
+        {.width = 8, .height = 8, .x = 0, .y = 64},
+        {.width = 8, .height = 8, .x = 8, .y = 64},
+        {.width = 8, .height = 8, .x = 16, .y = 64},
+        {.width = 8, .height = 8, .x = 32, .y = 64},
+        {.width = 128, .height = 8, .x = 40, .y = 48},
+        {.width = 8, .height = 32, .x = 40, .y = 0},
     };
 
-    bool isCanJump = 1;
+    struct fentity test_entity = { 0 };
+    _fEntityInit(&test_entity);
+
+    test_entity.hitbox = player;
+    test_entity.obstacles = placement;
+    test_entity.obstacles_length = sizeof(placement) / sizeof(fhitbox);
+
+    char* buf = (char*)MemAlloc(512);
+
+    RenderTexture2D txt = LoadRenderTexture(800 / 5, 600 / 5);
+
+    Camera2D cam = { 0 };
+    cam.zoom = 1.f;
 
     while(!WindowShouldClose()) {
-        float deltaTime = GetFrameTime();
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) m_speedX += 1.1 * 1.1;
-        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) m_speedX -= 1.1 * 1.1;
-        if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && m_onGround) {
-            m_speedY = -15;
-        }
-        _fMovePlayer(m_speedX, m_speedY, placement, &player);
+        double deltaTime = GetFrameTime();
 
-        m_speedY += 1;
-        m_speedX *= 0.850f;
-        m_speedY *= 0.850f; 
-        // m_speedX *= 0.91f;
-        // m_speedY *= 0.98f;
-        if(m_onGround) {
-<<<<<<< HEAD
+        test_entity.moving_horizontally = 0;
+        test_entity.moving_negative = 0;
 
-            printf("%f \n %f", m_speedX, m_speedY);
-=======
-            m_speedX *= 0.7f;
-            m_speedY *= 0.80f;
->>>>>>> 9419d427c5a9d1ff3782fcace5f5f187887460a7
+        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+            test_entity.moving_horizontally = 1;
+            test_entity.moving_negative = 0;
         }
+        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+            test_entity.moving_horizontally = 1;
+            test_entity.moving_negative = 1;
+        }
+        if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))) {
+            _fEntityJump(&test_entity);
+        }
+
+        _fEntityUpdate(&test_entity);
+
+        snprintf(buf, 512, "on_ground: %d\nspeed: {%ff, %ff}\npos: {%ff, %ff}\n%d%d%d%d%d%d%d%d",
+            test_entity.on_ground,
+            test_entity.speed.x, test_entity.speed.y,
+            test_entity.hitbox.x, test_entity.hitbox.y,
+            test_entity.on_ground, 0, test_entity.moving_horizontally,
+            test_entity.jumping, test_entity.moving_negative, test_entity.complete_px,
+            test_entity.complete_px
+        );
+
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+        BeginTextureMode(txt);
+        BeginMode2D(cam);
 
-            DrawRectangle(placement[0].x, placement[0].y, placement[0].width, placement[0].height, MAROON);
-            DrawRectangle(placement[1].x, placement[1].y, placement[1].width, placement[1].height, MAROON);
-            DrawRectangle(player.x, player.y, player.width, player.height, MAROON);
+        ClearBackground(RAYWHITE);
 
-            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        DrawRectangle(0, GetRenderHeight() - 24, GetRenderWidth(), 24, RED);
+        
+        fhitbox h = test_entity.hitbox;
+        Rectangle r = { h.x, h.y, h.width, h.height };
 
-            DrawFPS(0, 0);
+        DrawRectangleRec(r, GREEN);
+
+        for (int i = 0; i < test_entity.obstacles_length; i++) {
+            h = test_entity.obstacles[i];
+            r = (Rectangle){ h.x, h.y, h.width, h.height };
+
+            DrawRectangleRec(r, RED);
+        }
+
+        EndMode2D();
+        EndTextureMode();
+
+        Rectangle source = (Rectangle){ 0, 0, (double)txt.texture.width, (double)-txt.texture.height };
+        Rectangle dest = (Rectangle){ 0, 0, 800, 600 };
+
+        DrawTexturePro(txt.texture, source, dest, (Vector2) { 0, 0 }, 0.f, WHITE);
+
+        DrawText(buf, 2, 2, 20, BLUE);
 
         EndDrawing();
     }

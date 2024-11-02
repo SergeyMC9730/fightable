@@ -113,6 +113,9 @@ set(FIGHTABLE_SRC
     src/client/renderer/gfx/draw.c
     src/client/renderer/gfx/fade.c
     src/client/etc/color.c
+    src/client/entity/base/init.c
+    src/client/entity/base/jump.c
+    src/client/entity/base/move.c
 )
 
 if (WIN32)

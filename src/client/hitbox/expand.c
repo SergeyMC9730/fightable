@@ -2,7 +2,7 @@
 #include <math.h>
 
 fhitbox _fHitboxExpand(fhitbox *h, float x, float y) {
-    fhitbox newh = {};
+    fhitbox newh = {0};
 
     if (x < 0.f) {
         newh.x += x;

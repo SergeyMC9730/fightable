@@ -276,12 +276,13 @@ void _fEditorDraw(struct feditor *editor) {
                 editor->should_process_interactions = false;
                 editor->should_playback = true;
 
-                struct fentity player = {.global_entity_id = 1};
+                struct fentity player = { .global_entity_id = 1 };
+                _fEntityInit(&player);
+
                 player.hitbox.width = editor->level.tilemap->tile_size.x;
                 player.hitbox.height = editor->level.tilemap->tile_size.y;
                 player.hitbox.x = pos.x * player.hitbox.width;
                 player.hitbox.y = pos.y * player.hitbox.height;
-                player.debug_draw = 1;
 
                 editor->entities.push_back(player);
 

@@ -93,41 +93,26 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     if (level->entities && rects) {
-        float delta = GetFrameTime();
-
-        // for (int i = 0; i < level->data_size; i++) {
-        //     Color col = RED;
-        //     col.a = 128;
-
-        //     Rectangle r = rects[i];
-
-        //     DrawRectangleRec(r, col);
-        // }
-
         for (int i = 0; i < level->entity_data_size; i++) {
             struct fentity *entity = level->entities + i;
 
             entity->obstacles = rects;
             entity->obstacles_length = level->data_size;
-            entity->delta = delta;
 
             if (entity->global_entity_id == 1) {
-                entity->walking = 0;
-                entity->jumping = 0;
+                entity->moving_horizontally = 0;
+                entity->moving_negative = 0;
 
-                if (IsKeyDown(KEY_A)) {
-                    entity->walking = 1;
-                    entity->negative_move = 1;
-                    entity->render_direction = ENTITY_DIR_LEFT;
-                } else if (IsKeyDown(KEY_D)) {
-                    entity->walking = 1;
-                    entity->negative_move = 0;
-                    entity->render_direction = ENTITY_DIR_RIGHT;
+                if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
+                    entity->moving_horizontally = 1;
+                    entity->moving_negative = 0;
                 }
-
-                if (IsKeyPressed(KEY_SPACE)) {
-                    entity->jumping = 1;
-                    entity->accel_y = -138;
+                if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
+                    entity->moving_horizontally = 1;
+                    entity->moving_negative = 1;
+                }
+                if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE))) {
+                    _fEntityJump(entity);
                 }
             }
         

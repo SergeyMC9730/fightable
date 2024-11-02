@@ -1,7 +1,7 @@
 #include <fightable/hitbox.h>
 #include <math.h>
 
-float _fHitboxClipYCollide(struct fhitbox *h1, struct fhitbox *h2, float ya) {
+float _fHitboxClipYCollide(fhitbox *h1, fhitbox *h2, float ya) {
     if (h2->x + h2->width <= h1->x || h2->x >= h1->x + h1->width) {
         return ya;
     }
