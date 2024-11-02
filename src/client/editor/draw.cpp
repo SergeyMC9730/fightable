@@ -9,6 +9,7 @@
 #include <cmath>
 #include <optional>
 #include <fightable/renderer.h>
+#include <fightable/intvec_math.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
@@ -34,7 +35,7 @@ void _fEditorDraw(struct feditor *editor) {
     mobile_swipe_area.x = 4;
     mobile_swipe_area.y = __state.framebuffer.texture.height - mobile_swipe_area.height - 4;
 
-    if (editor->should_process_interactions) {
+    if (editor->should_process_interactions && !editor->should_display_selector) {
         float delta = GetFrameTime();
 
         if (IsKeyDown(KEY_RIGHT_SHIFT)) {
@@ -69,14 +70,14 @@ void _fEditorDraw(struct feditor *editor) {
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
 
-    if (editor->should_process_interactions) {
+    Vector2 mouse_pos = GetMousePosition();
+    mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale;
+    mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale;
+
+    if (editor->should_process_interactions && !editor->should_display_selector) {
         Camera2D actual_cam = editor->level.camera;
         actual_cam.target.x = (int)actual_cam.target.x;
         actual_cam.target.y = (int)actual_cam.target.y;
-
-        Vector2 mouse_pos = GetMousePosition();
-        mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale; 
-        mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale;
 
         Vector2 m_world_pos = mouse_pos;
 
@@ -110,7 +111,7 @@ void _fEditorDraw(struct feditor *editor) {
             editor->holded_previosly = 0;
         }
 
-// #ifdef TARGET_ANDROID
+#ifdef TARGET_ANDROID
         mobile_swipe_area.height /= 2;
 
         DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {253, 249, 0, 128});
@@ -136,7 +137,7 @@ void _fEditorDraw(struct feditor *editor) {
                 _fEditorSwipeCurrentObjects(editor, -1.f);
             }
         }
-// #endif
+#endif
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
             if (editor->swipe_enabled) {
@@ -204,6 +205,8 @@ void _fEditorDraw(struct feditor *editor) {
         int blackbox_starty = 0;
         int space = __state.framebuffer.texture.width - blackbox_startx;
 
+        int current_position_y = blackbox_starty;
+
         DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, Color{0, 0, 0, 200});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
@@ -211,32 +214,37 @@ void _fEditorDraw(struct feditor *editor) {
 
         int center = (space - sel_block_len.x) / 2;
 
-        _fTextDraw(&__state.text_manager, "sel block", {blackbox_startx + center, blackbox_starty + 4}, GREEN, 1);
+        _fTextDraw(&__state.text_manager, "sel block", {blackbox_startx + center, current_position_y + 4}, GREEN, 1);
+        current_position_y += 4 + sel_block_len.y;
 
         if (!selected_object.has_value()) {
             center = (space - none_len.x) / 2;
             
-            _fTextDraw(&__state.text_manager, "none", {blackbox_startx + center, blackbox_starty + 14}, RED, 1);
+            _fTextDraw(&__state.text_manager, "none", {blackbox_startx + center, current_position_y + 4}, RED, 1);
+            current_position_y += 5 + none_len.y;
         } else {
             fblock obj = selected_object.value();
             
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
-            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, blackbox_starty + 12}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, current_position_y + 2}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            current_position_y += 2 + __state.tilemap->tile_size.y;
         }
 
         Color grad_black = BLANK;
         Color grad_gray = GRAY;
 
-        DrawRectangleGradientH(blackbox_startx, blackbox_starty + 23, space / 2, 1, grad_black, grad_gray);
-        DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 23, space / 2, 1, grad_gray, grad_black);
+        DrawRectangleGradientH(blackbox_startx, current_position_y + 2, space / 2, 1, grad_black, grad_gray);
+        DrawRectangleGradientH(blackbox_startx + (space / 2), current_position_y + 2, space / 2, 1, grad_gray, grad_black);
+        current_position_y += 4;
 
         center = (space - sel_block_len.x) / 2;
-        _fTextDraw(&__state.text_manager, "set block", {blackbox_startx + center, blackbox_starty + 27}, YELLOW, 1);
+        _fTextDraw(&__state.text_manager, "set block", {blackbox_startx + center, current_position_y + 3}, YELLOW, 1);
+        current_position_y += 6 + sel_block_len.y;
 
         fblock block = _fBlockFromId(editor->current_block_id);
 
-        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, blackbox_starty + 36}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
+        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, current_position_y + 1}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
         
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);
@@ -266,6 +274,7 @@ void _fEditorDraw(struct feditor *editor) {
             
             btn.position.x = blackbox_startx + 14;
             btn.position.y = blackbox_starty + 66;
+            btn.tint = WHITE;
             
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                 printf("click\n");
@@ -323,5 +332,17 @@ void _fEditorDraw(struct feditor *editor) {
         }
 
         editor->f1_lock = false;
+    }
+
+    if (editor->should_display_selector) {
+        IVector2 wsz = {
+            __state.framebuffer.texture.width,
+            __state.framebuffer.texture.height
+        };
+
+        Color c = BLACK;
+        c.a = 128;
+
+        DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
 }

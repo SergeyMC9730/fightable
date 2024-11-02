@@ -27,18 +27,13 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)player->hitbox.x - (int)(__state.framebuffer.texture.width / 2);
-        actual_cam.target.y = (int)player->hitbox.y - (int)(__state.framebuffer.texture.height / 2);
-
-        // level->camera_size.x = __state.framebuffer.texture.width * tx;
-        // level->camera_size.y = __state.framebuffer.texture.height * ty;
-
-        // printf("%d:%d\n", (int)actual_cam.target.x, (int)actual_cam.target.y);
+        actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
+        actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
     }
 
     BeginMode2D(actual_cam);
     
-    Rectangle source = {};
+    Rectangle source = {0};
     source.width = __state.framebuffer.texture.width;
     source.height = __state.framebuffer.texture.height;
     source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
@@ -48,7 +43,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     dest.x = actual_cam.target.x;
     dest.y = actual_cam.target.y;
     
-    DrawTexturePro(level->background_tile, source, dest, (Vector2){}, 0.f, DARKGRAY);
+    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, DARKGRAY);
 
     level->objects_rendered = 0;
 
@@ -119,7 +114,16 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             if (!entity->update) {
                 _fEntityUpdate(entity);
             }
-            if (!entity->draw && entity != player) {
+
+            if (!entity->draw) {
+                if (entity == player) {
+                    EndMode2D();
+
+                    actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
+                    actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
+
+                    BeginMode2D(actual_cam);
+                }
                 _fEntityDraw(entity);
             }
         }
@@ -127,7 +131,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     EndMode2D();
 
-    if (player) {
+    if (player && false) {
         IVector2 rpos = {
             .x = (__state.framebuffer.texture.width - player->hitbox.width) / 2 + 4,
             .y = (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3

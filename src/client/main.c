@@ -116,15 +116,15 @@ int main(int argc, char **argv) {
     actual_sz = (Vector2){0, 0};
 #else
     __state.window_scale = UI_SCALE;
+    SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
 #endif
-
-    // SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
 
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
 
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(0));
     SetWindowState(FLAG_WINDOW_RESIZABLE);
+    SetExitKey(KEY_NULL);
 
     Vector2 ui_scaling = GetWindowScaleDPI();
 

@@ -11,6 +11,9 @@ void _fEntityMove(struct fentity *entity, Vector2 pos) {
     if (prevX != 0.f) {
         // Check for X collision
         for (unsigned int i = 0; i < entity->obstacles_length; i++) {
+            fhitbox o = entity->obstacles[i];
+            if (o.width * o.height <= 0.f) continue;
+    
             pos.x = _fHitboxClipXCollide(entity->obstacles + i, &entity->hitbox, pos.x);
         }
 
@@ -22,6 +25,9 @@ void _fEntityMove(struct fentity *entity, Vector2 pos) {
 
     if (prevY != 0.f) {
         for (unsigned int i = 0; i < entity->obstacles_length; i++) {
+            fhitbox o = entity->obstacles[i];
+            if (o.width * o.height <= 0.f) continue;
+
             pos.y = _fHitboxClipYCollide(entity->obstacles + i, &entity->hitbox, pos.y);
         }
 

@@ -6,7 +6,7 @@
 Rectangle *_fLevelGetHitboxes(struct flevel *level) {
     if (!level) return 0;
 
-    Rectangle *array = (Rectangle *)malloc(level->data_size * sizeof(Rectangle));
+    Rectangle *array = (Rectangle *)MemAlloc(level->data_size * sizeof(Rectangle));
     
     for (unsigned int i = 0; i < level->data_size; i++) {
         Rectangle *ref = array + i;

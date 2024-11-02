@@ -43,6 +43,8 @@ struct fentity {
     unsigned short global_entity_id;
     unsigned short entity_id;
 
+    fhitbox standing_object;
+
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
 };

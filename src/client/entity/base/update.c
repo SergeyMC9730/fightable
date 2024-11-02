@@ -60,7 +60,7 @@ void _fEntityUpdate(struct fentity* entity) {
         float s = entity->speed.y;
 
         if (entity->speed.y > 0.f) {
-            s *= 1.25f;
+            s *= 1.f;
         }
 
         _fEntityMove(entity, (Vector2) { 0, s * 3.f });
@@ -76,12 +76,15 @@ void _fEntityUpdate(struct fentity* entity) {
     Rectangle r1 = *(Rectangle*)(&entity->ground_hitbox);
 
     entity->on_ground = 0;
+    entity->standing_object = (fhitbox){ 0 };
 
     for (unsigned int i = 0; i < entity->obstacles_length; i++) {
         Rectangle r2 = *(Rectangle*)(entity->obstacles + i);
 
         if (CheckCollisionRecs(r1, r2)) {
             entity->on_ground = 1;
+            entity->standing_object = entity->obstacles[i];
+
             break;
         }
     }

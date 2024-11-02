@@ -21,12 +21,13 @@ struct feditor {
     unsigned char should_process_interactions : 1;
     unsigned char should_display_sidebar : 1;
     unsigned char should_playback : 1;
+    unsigned char should_display_selector : 1;
+    unsigned char f1_lock : 1;
+    unsigned char swipe_enabled : 1;
+    unsigned char holded_previosly : 1;
+    unsigned char hp1 : 1;
 
     std::vector<fentity> entities;
 
-    bool f1_lock;
-    bool swipe_enabled;
-
-    bool holded_previosly;
-    bool hp1;
+    unsigned short current_object_page;
 };
