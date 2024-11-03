@@ -121,6 +121,7 @@ set(FIGHTABLE_SRC
     src/client/entity/lplayer/draw.c
     src/client/entity/base/draw_pos.c
     src/client/entity/base/setters.c
+    src/client/intro/gfx.cpp
 )
 
 if (WIN32)

@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
     actual_sz = (Vector2){0, 0};
 #else
     __state.window_scale = UI_SCALE;
-    SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
+    // SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
 #endif
 
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
@@ -273,9 +273,7 @@ int main(int argc, char **argv) {
 
         DrawFPS(32, 8);
 
-        const char *row = _fAudioGetDbg(&__state.sound_engine, _fIntroGetSeekableRow());
-
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   row(%d): %s\nrender area: %d:%d (%d:%d tiles)", 
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   wanted row : %d\nrender area: %d:%d (%d:%d tiles)", 
             align_x,
             (float)UI_SCALE,
             (float)__state.window_scale,
@@ -285,54 +283,11 @@ int main(int argc, char **argv) {
             __state.title_song_stage,
             (int)__state.song_id,
             _fIntroGetSeekableRow(),
-            row,
             __state.framebuffer.texture.width, __state.framebuffer.texture.height,
             __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y
         );
 
-         DrawText(dbg_buffer, 8, 32, 20, RED);
-        
-        if (row != NULL) {
-            switch (__state.song_id) {
-                case 0: {
-                    if (strstr(row, "0D") != NULL || strstr(row, "14") != NULL) {
-                        if (!shake_lock[0]) {
-                            _fGfxShake(&__state.gfx, 1.f);
-                            shake_lock[0] = 1;
-                        }
-                    } else {
-                        shake_lock[0] = 0;
-                    }
-                    
-                    break;
-                }
-                case 1: {
-                    free((void *)row);
-                    
-                    for (int i = 0; i < _fAudioGetChannelsTotal(&__state.sound_engine); i++) {
-                        row = _fAudioGetDbg(&__state.sound_engine, i);
-
-                        if (strstr(row, "08") != NULL) {
-                            if (!shake_lock[i]) {
-                                _fGfxShake(&__state.gfx, 1.f);
-                                shake_lock[i] = 1;
-                            }
-                        } else {
-                            shake_lock[i] = 0;
-                        }
-
-                        free((void *)row);
-                        row = NULL;
-                    }
-
-                    break;
-                }
-            }
-
-            if (row != NULL) {
-                free((void *)row);
-            }
-        }
+        DrawText(dbg_buffer, 8, 32, 20, RED);
 
         EndDrawing();
 
