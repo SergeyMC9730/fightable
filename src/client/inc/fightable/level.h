@@ -3,6 +3,9 @@
 #include <fightable/rendered_object.h>
 #include <raylib.h>
 #include <fightable/intvec.h>
+#include <fightable/serializable.h>
+
+#define LEVEL_FORMAT_VERSION (uint16_t)1
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +40,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
 struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
 Rectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
+fserializable _fLevelSerialize(struct flevel *level);
+struct flevel _fLevelLoad(fserializable *serializable);
 
 #ifdef __cplusplus
 }
