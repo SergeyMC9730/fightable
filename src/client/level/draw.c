@@ -116,8 +116,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             struct fentity* entity = level->entities[i];
             if (!entity) continue;
 
-            printf("entity %d {%f, %f, %f, %f}\n", entity->global_entity_id, entity->hitbox.x, entity->hitbox.y, entity->hitbox.width, entity->hitbox.height);
-
             if (!entity->draw) {
                 _fEntityDraw(entity);
             }
@@ -128,26 +126,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     EndMode2D();
-
-    if (player && false) {
-        IVector2 rpos = {
-            .x = (__state.framebuffer.texture.width - player->hitbox.width) / 2 + 4,
-            .y = (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3
-        };
-
-        _fTilemapDraw(level->tilemap, rpos, (IVector2){12, 0}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
-
-        rpos.y -= (level->tilemap->tile_size.y - 2);
-        rpos.x--;
-
-        if (player->render_direction == ENTITY_DIR_LEFT) {
-            rpos.x += 2;
-        }
-
-        _fTilemapDraw(level->tilemap, rpos, (IVector2){11, 1}, (player->render_direction == ENTITY_DIR_LEFT) ? 1 : 0, 0, WHITE);
-
-        //DrawRectangle((__state.framebuffer.texture.width - player->hitbox.width) / 2 + 5, (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3, player->hitbox.width, player->hitbox.height, RED);
-    }
 
     if (rects) {
         MemFree(rects);
