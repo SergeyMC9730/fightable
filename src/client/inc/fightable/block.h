@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fightable/rendered_object.h>
+#include <fightable/serializable.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,6 +16,13 @@ struct fblock {
     unsigned char passable : 1;
 };
 
+#define BLOCK_SIZE (                \   
+    sizeof(short) + /* id */        \ 
+    sizeof(short) + /* block_x */   \
+    sizeof(short) + /* block_y */   \
+    sizeof(uint8_t) /* bitflags */  \
+)
+
 struct fblock _fBlockFromId(unsigned short id);
 
 #define INVALID_BLOCK_ID 0xFFFF
@@ -27,6 +35,8 @@ struct fblock_listing {
 };
 
 struct fblock_listing _fBlockGetAvailable();
+fserializable _fBlockSerialize(struct fblock block);
+struct fblock _fBlockLoad(fserializable *serializable, uint16_t level_version);
 
 #ifdef __cplusplus
 }

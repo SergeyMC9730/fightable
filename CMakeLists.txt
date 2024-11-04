@@ -5,6 +5,7 @@ find_library(OPENMPT_LIB openmpt)
 if(NOT OPENMPT_LIB)
     message(FATAL_ERROR "libopenmpt could not be found")
 endif()
+
 find_library(MICROHTTPD_LIB microhttpd)
 if(NOT MICROHTTPD_LIB)
     message(FATAL_ERROR "libmicrohttpd could not be found")
@@ -17,7 +18,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED TRUE)
-
 set(BUILD_SHARED_LIBS ON)
 
 if (ANDROID)
@@ -27,13 +27,13 @@ if (ANDROID)
 
 	message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
+
 add_subdirectory(ext/portaudio_opensles)
 
 set(BUILD_SHARED_LIBS OFF)
-
 set(ENABLE_CJSON_UNINSTALL OFF)
-add_subdirectory(ext/cJSON)
 
+add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
 
 CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
@@ -121,6 +121,7 @@ set(FIGHTABLE_SRC
     src/client/entity/lplayer/draw.c
     src/client/entity/base/draw_pos.c
     src/client/entity/base/setters.c
+    src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
 )
 
@@ -149,10 +150,12 @@ set(HTTPSERVER_INC
 )
 
 add_library(httpserver STATIC ${HTTPSERVER_SRC})
+
 target_include_directories(httpserver PRIVATE
     ${HTTPSERVER_INC}
     ${MICROHTTPD_INC}
 )
+
 add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
 
 target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
@@ -173,11 +176,13 @@ add_library(fightable-http STATIC
     src/http/resource_dir.cpp
     src/http/content_type/HttpContentTypeOctet.cpp
 )
+
 target_include_directories(fightable-http PRIVATE
     src/http/inc
     ${HTTPSERVER_INC}
     ${MICROHTTPD_INC}
 )
+
 target_link_libraries(fightable-http PUBLIC httpserver)
 
 if (ANDROID)
@@ -214,17 +219,21 @@ else()
 
 	add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
+
+    file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
 endif()
 
 add_executable(physics-test
     src/physics_test/main.c
 )
+
 add_executable(collide-test
     src/collide_test/main.c
     src/collide_test/hitbox/clip_x.c
     src/collide_test/hitbox/clip_y.c
     src/collide_test/hitbox/move.c
 )
+
 target_include_directories(fightable PRIVATE 
     src/client/inc 
     ext/raylib/src 
@@ -234,6 +243,7 @@ target_include_directories(fightable PRIVATE
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
 
