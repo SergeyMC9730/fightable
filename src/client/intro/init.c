@@ -24,4 +24,6 @@ void _fIntroInit() {
     }
 
     __state.raylib_logo = LoadTexture("raylib_16x16.png");
+
+    _fIntroGfxInit();
 }

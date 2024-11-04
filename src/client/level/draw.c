@@ -27,18 +27,13 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)player->hitbox.x - (int)(__state.framebuffer.texture.width / 2);
-        actual_cam.target.y = (int)player->hitbox.y - (int)(__state.framebuffer.texture.height / 2);
-
-        level->camera_size.x = __state.framebuffer.texture.width * tx;
-        level->camera_size.y = __state.framebuffer.texture.height * ty;
-
-        // printf("%d:%d\n", (int)actual_cam.target.x, (int)actual_cam.target.y);
+        actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
+        actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
     }
 
     BeginMode2D(actual_cam);
     
-    Rectangle source = {};
+    Rectangle source = {0};
     source.width = __state.framebuffer.texture.width;
     source.height = __state.framebuffer.texture.height;
     source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
@@ -48,7 +43,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     dest.x = actual_cam.target.x;
     dest.y = actual_cam.target.y;
     
-    DrawTexturePro(level->background_tile, source, dest, (Vector2){}, 0.f, DARKGRAY);
+    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, DARKGRAY);
 
     level->objects_rendered = 0;
 
@@ -93,56 +88,48 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     if (level->entities && rects) {
-        float delta = GetFrameTime();
-
-        // for (int i = 0; i < level->data_size; i++) {
-        //     Color col = RED;
-        //     col.a = 128;
-
-        //     Rectangle r = rects[i];
-
-        //     DrawRectangleRec(r, col);
-        // }
-
         for (int i = 0; i < level->entity_data_size; i++) {
-            struct fentity *entity = level->entities + i;
+            struct fentity *entity = level->entities[i];
+            if (!entity) continue;
 
             entity->obstacles = rects;
             entity->obstacles_length = level->data_size;
-            entity->delta = delta;
-
-            if (entity->global_entity_id == 1) {
-                entity->walking = 0;
-                entity->jumping = 0;
-
-                if (IsKeyDown(KEY_A)) {
-                    entity->walking = 1;
-                    entity->negative_move = 1;
-                    entity->render_direction = ENTITY_DIR_LEFT;
-                } else if (IsKeyDown(KEY_D)) {
-                    entity->walking = 1;
-                    entity->negative_move = 0;
-                    entity->render_direction = ENTITY_DIR_RIGHT;
-                }
-
-                if (IsKeyPressed(KEY_SPACE)) {
-                    entity->jumping = 1;
-                    entity->accel_y = -138;
-                }
-            }
         
             if (!entity->update) {
                 _fEntityUpdate(entity);
             }
-            if (!entity->draw && entity != player) {
+            else {
+                entity->update(entity);
+            }
+        }
+
+        if (player) {
+            EndMode2D();
+
+            actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
+            actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
+
+            BeginMode2D(actual_cam);
+        }
+
+        for (int i = 0; i < level->entity_data_size; i++) {
+            struct fentity* entity = level->entities[i];
+            if (!entity) continue;
+
+            printf("entity %d {%f, %f, %f, %f}\n", entity->global_entity_id, entity->hitbox.x, entity->hitbox.y, entity->hitbox.width, entity->hitbox.height);
+
+            if (!entity->draw) {
                 _fEntityDraw(entity);
+            }
+            else {
+                entity->draw(entity);
             }
         }
     }
 
     EndMode2D();
 
-    if (player) {
+    if (player && false) {
         IVector2 rpos = {
             .x = (__state.framebuffer.texture.width - player->hitbox.width) / 2 + 4,
             .y = (__state.framebuffer.texture.height - player->hitbox.height) / 2 + 3

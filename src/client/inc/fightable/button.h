@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fightable/intvec.h>
+#include <raylib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,10 +18,12 @@ struct fbutton {
     int (*on_click)(struct fbutton *btn);
 
     IVector2 position;
+
+    Color tint;
 };
 
 unsigned char _fButtonDraw(struct fbutton *btn);
-unsigned char _fButtonDrawSimple(const char *text, IVector2 pos);
+unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint);
 
 #ifdef __cplusplus
 }

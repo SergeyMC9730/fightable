@@ -1,7 +1,7 @@
 #include <fightable/entity.h>
 
-void _fEntityDraw(struct fentity *entity) {
-    if (!entity) return;
+IVector2 _fEntityGetDrawingPos(struct fentity* entity) {
+    if (!entity) return (IVector2) { 0 };
 
     fhitbox hitbox = entity->hitbox;
 
@@ -9,5 +9,5 @@ void _fEntityDraw(struct fentity *entity) {
         hitbox.y = entity->standing_object.y - entity->hitbox.height;
     }
 
-    DrawRectangle((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLUE);
+    return (IVector2) { hitbox.x, hitbox.y };
 }

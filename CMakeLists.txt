@@ -113,6 +113,15 @@ set(FIGHTABLE_SRC
     src/client/renderer/gfx/draw.c
     src/client/renderer/gfx/fade.c
     src/client/etc/color.c
+    src/client/entity/base/init.c
+    src/client/entity/base/jump.c
+    src/client/entity/base/move.c
+    src/client/entity/lplayer/init.c
+    src/client/entity/lplayer/update.c
+    src/client/entity/lplayer/draw.c
+    src/client/entity/base/draw_pos.c
+    src/client/entity/base/setters.c
+    src/client/intro/gfx.cpp
 )
 
 if (WIN32)

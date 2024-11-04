@@ -1,6 +1,6 @@
 #include <fightable/hitbox.h>
 
-unsigned char _fHitboxIntersects(Rectangle *h1, Rectangle *h2) {
+unsigned char _fHitboxIntersects(fhitbox *h1, fhitbox *h2) {
     if (h2->x + h2->width <= h1->x || h2->x >= h1->x + h1->width) {
         return 0;
     }

@@ -12,6 +12,8 @@ static unsigned char __dbg_continue = 0;
 void _fIntroDraw() {
     // ClearBackground(BLACK);
 
+    _fIntroProcessGfx();
+
     double t = _fAudioGetPlayTime(&__state.sound_engine);
 
 #ifdef DEBUG

@@ -107,6 +107,10 @@ struct fightable_state {
 #ifdef TARGET_ANDROID
     struct android_app *system;
 #endif
+
+    float time1;
+    unsigned char menu_perform_move;
+    float menu_cur_x;
 };
 
 extern struct fightable_state __state;

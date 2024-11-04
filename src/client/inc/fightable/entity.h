@@ -20,47 +20,31 @@ enum fentity_direction {
 #include <fightable/hitbox.h>
 
 struct fentity {
-    double accel_x;
-    double accel_y;
-    
+    Vector2 speed;
+
+    unsigned char on_ground : 1;
+    unsigned char moving_horizontally : 1;
     unsigned char jumping : 1;
-    unsigned char walking : 1;
-    unsigned char negative_move : 1;
-    unsigned char falling : 1;
+    unsigned char moving_negative : 1;
+    unsigned char complete_px : 1;
+    unsigned char complete_nx : 1;
+    unsigned char can_double_jump : 1;
 
-    unsigned char touching_wall_l : 1;
-    unsigned char touching_wall_r : 1;
-    unsigned char touching_ceiling : 1;
-    unsigned char standing : 1;
+    fhitbox hitbox;
 
-    Rectangle hitbox;
-    Rectangle *obstacles;
+    fhitbox* obstacles;
     unsigned int obstacles_length;
 
-    Rectangle hitbox_r;
-    Rectangle hitbox_l;
-    Rectangle hitbox_u;
-    Rectangle hitbox_d;
-
-    Rectangle standing_surface;
-    Rectangle ceiling_surface;
-    Rectangle collided_surface;
-
-    unsigned char ccheck0 : 1;
-    unsigned char ccheck1 : 1;
-    unsigned char debug_draw : 1;
-    unsigned char no_ai : 1;
-
-    unsigned int frames_since_jump;
+    fhitbox ground_hitbox;
 
     struct flevel *level;
 
-    enum fentity_direction render_direction;
-
-    double delta;
+    unsigned char render_direction;
 
     unsigned short global_entity_id;
     unsigned short entity_id;
+
+    fhitbox standing_object;
 
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
@@ -72,6 +56,17 @@ struct fentity {
 void _fEntityUpdate(struct fentity *entity);
 void _fEntityDraw(struct fentity *entity);
 #endif
+
+void _fEntityMove(struct fentity* entity, Vector2 pos);
+void _fEntityInit(struct fentity* entity);
+void _fEntityJump(struct fentity* entity, unsigned char holding);
+
+#include <fightable/intvec.h>
+
+IVector2 _fEntityGetDrawingPos(struct fentity* entity);
+
+void _fEntitySetHitbox(struct fentity* entity, Rectangle rec);
+void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
 
 #ifdef __cplusplus
 }

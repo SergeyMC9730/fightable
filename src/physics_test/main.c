@@ -194,7 +194,7 @@ int main() {
 
     printf("Preinit!\n");
 
-    InitWindow(800, 600, "raylib");
+    InitWindow(800, 600, "Physics Test");
 
     SetTargetFPS(60);
 
