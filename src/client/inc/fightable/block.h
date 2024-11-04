@@ -16,12 +16,8 @@ struct fblock {
     unsigned char passable : 1;
 };
 
-#define BLOCK_SIZE (                \   
-    sizeof(short) + /* id */        \ 
-    sizeof(short) + /* block_x */   \
-    sizeof(short) + /* block_y */   \
-    sizeof(uint8_t) /* bitflags */  \
-)
+// id + block_x + block_y + bitflags
+#define BLOCK_SIZE (sizeof(short) + sizeof(short) + sizeof(short) + sizeof(uint8_t))
 
 struct fblock _fBlockFromId(unsigned short id);
 
