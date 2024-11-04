@@ -2,7 +2,7 @@
 #include <fightable/player.h>
 
 void _flPlayerUpdate(struct felplayer* instance) {
-    struct fentity* entity = instance;
+    struct fentity* entity = &instance->base;
 
     entity->moving_horizontally = 0;
     entity->moving_negative = 0;
