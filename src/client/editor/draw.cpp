@@ -289,7 +289,7 @@ void _fEditorDraw(struct feditor *editor) {
                 felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 
                 _flPlayerInit(player);
-                _fEntitySetPosition((fentity *)player, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
+                _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
 
                 editor->entities.push_back((fentity *)player);
 

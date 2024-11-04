@@ -128,7 +128,7 @@ set(FIGHTABLE_SRC
 if (WIN32)
     set(HTTPSERVER_NAME libhttpserver-win32)
 else()
-    set(HTTPSERVER_NAME libhttpserver-win32)
+    set(HTTPSERVER_NAME libhttpserver)
 endif()
 
 file(GLOB HTTPSERVER_SRC
