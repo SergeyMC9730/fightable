@@ -235,6 +235,14 @@ int main(int argc, char **argv) {
 
     __state.gfx.fade_v.should_process = 1;
 
+    _fKeyboardRegister(&__state.kbd, KEY_ESCAPE);
+    _fKeyboardRegister(&__state.kbd, KEY_F1);
+    _fKeyboardRegister(&__state.kbd, KEY_A);
+    _fKeyboardRegister(&__state.kbd, KEY_D);
+    _fKeyboardRegister(&__state.kbd, KEY_LEFT);
+    _fKeyboardRegister(&__state.kbd, KEY_RIGHT);
+    _fKeyboardRegister(&__state.kbd, KEY_SPACE);
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();

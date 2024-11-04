@@ -79,7 +79,7 @@ unsigned short _fBlockIdFromRenderable(struct frendered_object obj) {
 }
 
 struct fblock_listing _fBlockGetAvailable() {
-    struct fblock_listing l = {};
+    struct fblock_listing l = {0};
     l.blocks = __blocks;
     l.total = sizeof(__blocks) / sizeof(struct fblock);
 

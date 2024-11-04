@@ -25,7 +25,7 @@ public:
         _shake_lock.fill(false);
     }
 
-    std::string getShakeLocks() {
+    std::string get_shake_locks() {
         std::string res = "";
 
         for (int i = 0; i < _shake_lock.size(); i++) {
@@ -40,7 +40,7 @@ public:
     }
 
     void update() override {
-        std::string rows = getShakeLocks();
+        // std::string rows = get_shake_locks();
 
         // TraceLog(LOG_INFO, "rows: %s", rows.c_str());
 
@@ -49,6 +49,7 @@ public:
             
             if (!rowc) {
                 TraceLog(LOG_ERROR, "pattern row at %d is null!", i);
+                continue;
             }
 
             std::string row = rowc;

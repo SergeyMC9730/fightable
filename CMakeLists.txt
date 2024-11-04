@@ -122,6 +122,7 @@ set(FIGHTABLE_SRC
     src/client/entity/base/draw_pos.c
     src/client/entity/base/setters.c
     src/client/intro/gfx.cpp
+    src/client/renderer/keyboard.c
 )
 
 if (WIN32)

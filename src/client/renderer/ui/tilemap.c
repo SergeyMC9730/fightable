@@ -1,5 +1,5 @@
 #include <fightable/tilemap.h>
-#include <fightable/intvec_math.h>
+#include <fightable/intvec.h>
 
 void _fTilemapDraw(struct ftilemap *tilemap, IVector2 render_pos, IVector2 tile_pos, unsigned char fliped_x, unsigned char fliped_y, Color tint) {
     Rectangle r;

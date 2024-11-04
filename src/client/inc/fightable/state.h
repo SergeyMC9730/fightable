@@ -18,6 +18,7 @@ struct fhttpserver;
 #include <fightable/text.h>
 #include <fightable/sound_engine.h>
 #include <fightable/gfx.h>
+#include <fightable/keyboard.h>
 
 #if _WIN32
     #define NOUSER
@@ -111,6 +112,8 @@ struct fightable_state {
     float time1;
     unsigned char menu_perform_move;
     float menu_cur_x;
+    
+    struct fkeyboard_mgr kbd;
 };
 
 extern struct fightable_state __state;
