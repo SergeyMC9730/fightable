@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
+#ifndef _DISABLE_MP_SERVER_
 #include <fightable/http/http_server.h>
+#endif
 #include <fightable/storage.h>
 #include <cJSON.h>
 
@@ -202,7 +204,9 @@ int main(int argc, char **argv) {
     ChangeDirectory("..");
 #endif
 
+#ifndef _DISABLE_MP_SERVER_
     __state.webserver = _fHttpServerCreate(3000, _fMainLog);
+#endif
 
     _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -227,10 +231,12 @@ int main(int argc, char **argv) {
         }
     }
 
+#ifndef _DISABLE_MP_SERVER_
 #ifdef TARGET_ANDROID
     _fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
 #else
     _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
+#endif
 #endif
 
     __state.gfx.fade_v.should_process = 1;
@@ -308,9 +314,11 @@ int main(int argc, char **argv) {
     pthread_join(__state.sound_thread, NULL);
 #endif
 
+#ifndef _DISABLE_MP_SERVER_
     if (__state.webserver != NULL) {
         _fHttpServerDestroy(__state.webserver);
     }
+#endif
 
     return 0;
 }

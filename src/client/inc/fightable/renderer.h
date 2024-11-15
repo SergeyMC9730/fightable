@@ -30,6 +30,8 @@ void EndTextureModeStacked();
 // else it returns index inside the stack
 int _ntRendererGetMainIdxInStack();
 
+void _fRescale(int width, int height);
+
 #define UI_SCALE 5
 
 #ifdef __cplusplus
