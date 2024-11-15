@@ -140,6 +140,7 @@ set(FIGHTABLE_SRC
     src/client/entity/base/setters.c
     src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
+    src/client/renderer/overlay_scheduler.cpp
 )
 
 if (NOT DISABLE_MP_SERVER)
@@ -243,12 +244,10 @@ else()
     message(STATUS "Compiling for console homebrews")
     set(FIGHTABLE_TARGET Unknown homebrew)
 	
-    message(FATAL_ERROR "Support for other platforms other than UNIX and NT is not implemented yet!")
+    message(FATAL_ERROR "Support for platforms other than UNIX and NT is not implemented yet!")
 
     add_compile_definitions(TARGET_HOMEBREW_UNKNOWN)
 endif()
-
-target_include_directories(httpserver PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
 
 if (NOT DISABLE_MP_SERVER)
     target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})

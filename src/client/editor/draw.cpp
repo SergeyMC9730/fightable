@@ -301,7 +301,10 @@ void _fEditorDraw(struct feditor *editor) {
 
                 // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
                 UnloadRenderTexture(__state.framebuffer);
+                UnloadRenderTexture(__state.overlay_framebuffer);
+
                 __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
+                __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
 
                 editor->f1_lock = true;
             }
@@ -326,7 +329,10 @@ void _fEditorDraw(struct feditor *editor) {
             editor->level.entities = 0;
 
             UnloadRenderTexture(__state.framebuffer);
+            UnloadRenderTexture(__state.overlay_framebuffer);
+
             __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
+            __state.overlay_framebuffer = LoadRenderTexture(800 + 255, 600);
 
             for (fentity* e : editor->entities) {
                 MemFree(e);
@@ -348,4 +354,9 @@ void _fEditorDraw(struct feditor *editor) {
 
         DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
+
+    _fScheduleOverlayFunc([](Vector2 mpos) {
+        DrawTextPro(GetFontDefault(), "Kruto", (Vector2){50, 50}, (Vector2){0, 0}, 60.f, 40.f, 1.f, (Color){255, 0, 0, 128});
+        DrawRectangle(mpos.x, mpos.y, 60, 60, GREEN);
+    });
 }

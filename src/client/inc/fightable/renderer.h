@@ -30,10 +30,18 @@ void EndTextureModeStacked();
 // else it returns index inside the stack
 int _ntRendererGetMainIdxInStack();
 
-void _fRescale(int width, int height);
+void _fScheduleOverlayFunc(void (*callback)(void *user), void *user);
+void _fSchedulerIterateOverlays();
 
 #define UI_SCALE 5
 
 #ifdef __cplusplus
+
 }
+
+#include <functional>
+
+using foverlay_callback = std::function<void(Vector2)>;
+
+void _fScheduleOverlayFunc(const foverlay_callback &callback);
 #endif
