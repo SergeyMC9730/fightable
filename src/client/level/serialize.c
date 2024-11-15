@@ -1,6 +1,7 @@
 #include <fightable/level.h>
 #include <fightable/block.h>
 #include <fightable/entity.h>
+#include <fightable/block_library.h>
 
 fserializable _fLevelSerialize(struct flevel *level) {
     size_t sz = level->data_size * BLOCK_SIZE + 
@@ -11,14 +12,28 @@ fserializable _fLevelSerialize(struct flevel *level) {
                 sizeof(level->data_size) +
                 sizeof(level->entity_data_size);
 
+    int air_blocks = 0;
+    for (int i = 0; i < level->data_size; i++) {
+        struct fblock block = level->objects[i];
+
+        if (_fBlockIdFromBlock(block) == BLOCK_AIR) {
+            air_blocks++;
+        }
+    }
+
     fserializable ret = fCreateSerializableObject(sz);
     fSerializableAddInt16(&ret, LEVEL_FORMAT_VERSION);
     fSerializableAddInt16(&ret, level->width);
     fSerializableAddInt16(&ret, level->height);
-    fSerializableAddInt32(&ret, level->data_size);
+    fSerializableAddInt32(&ret, level->data_size - air_blocks);
 
-    for(int i = 0; i < level->data_size; i++) {
-        fserializable block = _fBlockSerialize(level->objects[i]);
+    for(int i = 0; i < level->data_size - air_blocks; i++) {
+        struct fblock lblock = level->objects[i];
+        unsigned short id = _fBlockIdFromBlock(lblock);
+
+        if (id == BLOCK_AIR) continue;
+
+        fserializable block = _fBlockSerialize(lblock);
         fSerializableAddData(&ret, block.data, block.size);
         fUnloadSerializableObject(&block);
     }
