@@ -3,6 +3,7 @@
 #define ENTITY_PLAYER 1
 
 #include <raylib.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +19,7 @@ enum fentity_direction {
 };
 
 #include <fightable/hitbox.h>
+#include <fightable/serializable.h>
 
 struct fentity {
     Vector2 speed;
@@ -52,6 +54,9 @@ struct fentity {
 
 #pragma pack(pop)
 
+// hitbox.x + hitbox.y + global_entity_id + entity_id
+#define ENTITY_SIZE (sizeof(float) + sizeof(float) + sizeof(short) + sizeof(short))
+
 #ifdef WITH_PLACEHOLDERS
 void _fEntityUpdate(struct fentity *entity);
 void _fEntityDraw(struct fentity *entity);
@@ -67,6 +72,8 @@ IVector2 _fEntityGetDrawingPos(struct fentity* entity);
 
 void _fEntitySetHitbox(struct fentity* entity, Rectangle rec);
 void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
+fserializable _fEntitySerialize(struct fentity* entity);
+struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version);
 
 #ifdef __cplusplus
 }

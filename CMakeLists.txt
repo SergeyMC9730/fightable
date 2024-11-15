@@ -48,7 +48,6 @@ set(CMAKE_CXX_STANDARD ${OVERRIDE_CXX_STD})
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CXX_STANDARD ${OVERRIDE_CXX_STD})
 set(CXX_STANDARD_REQUIRED TRUE)
-
 set(BUILD_SHARED_LIBS ON)
 
 if (ANDROID)
@@ -58,13 +57,13 @@ if (ANDROID)
 
 	message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
+
 add_subdirectory(ext/portaudio_opensles)
 
 set(BUILD_SHARED_LIBS OFF)
-
 set(ENABLE_CJSON_UNINSTALL OFF)
-add_subdirectory(ext/cJSON)
 
+add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
 
 set(FIGHTABLE_SRC
@@ -139,6 +138,7 @@ set(FIGHTABLE_SRC
     src/client/entity/lplayer/draw.c
     src/client/entity/base/draw_pos.c
     src/client/entity/base/setters.c
+    src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
 )
 
@@ -256,15 +256,19 @@ if (NOT DISABLE_MP_SERVER)
     set(FIGHTABLE_HTTP_INC src/http/inc)
 endif()
 
+file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
+
 add_executable(physics-test
     src/physics_test/main.c
 )
+
 add_executable(collide-test
     src/collide_test/main.c
     src/collide_test/hitbox/clip_x.c
     src/collide_test/hitbox/clip_y.c
     src/collide_test/hitbox/move.c
 )
+
 target_include_directories(fightable PRIVATE 
     src/client/inc 
     ext/raylib/src 
@@ -274,6 +278,7 @@ target_include_directories(fightable PRIVATE
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
 
