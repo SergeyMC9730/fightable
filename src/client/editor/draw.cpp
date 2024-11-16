@@ -36,6 +36,8 @@ void _fEditorDraw(struct feditor *editor) {
     mobile_swipe_area.x = 4;
     mobile_swipe_area.y = __state.framebuffer.texture.height - mobile_swipe_area.height - 4;
 
+    // printf("a\n");
+
     if (editor->should_process_interactions && !editor->should_display_selector) {
         float delta = GetFrameTime();
 
@@ -73,6 +75,8 @@ void _fEditorDraw(struct feditor *editor) {
 
     Vector2 mouse_pos = _fGetMousePosPix();
 
+    // printf("b\n");
+
     if (editor->should_process_interactions && !editor->should_display_selector) {
         Camera2D actual_cam = editor->level.camera;
         actual_cam.target.x = (int)actual_cam.target.x;
@@ -82,6 +86,8 @@ void _fEditorDraw(struct feditor *editor) {
 
         m_world_pos.x += actual_cam.target.x;
         m_world_pos.y += actual_cam.target.y;
+
+        // printf("pos: %f:%f\n", m_world_pos.x, m_world_pos.y);
 
         float tx = editor->level.tilemap->tile_size.x;
         float ty = editor->level.tilemap->tile_size.y;
@@ -198,6 +204,8 @@ void _fEditorDraw(struct feditor *editor) {
         float v = GetMouseWheelMove();
         _fEditorSwipeCurrentObjects(editor, v);
     }
+
+    // printf("c\n");
 
     if (editor->should_display_sidebar) {
         int blackbox_startx = (__state.framebuffer.texture.width) - 51;
@@ -353,8 +361,12 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
 
-    _fScheduleOverlayFunc([](Vector2 mpos) {
-        DrawTextPro(GetFontDefault(), "Kruto", (Vector2){50, 50}, (Vector2){0, 0}, 60.f, 40.f, 1.f, (Color){255, 0, 0, 128});
-        DrawRectangle(mpos.x, mpos.y, 60, 60, GREEN);
-    });
+    if (IsKeyPressed(KEY_B)) {
+        editor->should_display_selector = !editor->should_display_selector;
+    }
+
+    // _fScheduleOverlayFunc([](Vector2 mpos) {
+    //     DrawTextPro(GetFontDefault(), "Kruto", (Vector2){50, 50}, (Vector2){0, 0}, 60.f, 40.f, 1.f, (Color){255, 0, 0, 128});
+    //     DrawRectangle(mpos.x, mpos.y, 60, 60, GREEN);
+    // });
 }

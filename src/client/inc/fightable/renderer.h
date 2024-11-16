@@ -36,6 +36,10 @@ void _fSchedulerIterateOverlays();
 Vector2 _fGetMousePosPix();
 Vector2 _fGetMousePosOverlay();
 
+#ifdef COTARGET_PTX
+void _fPtxInit();
+#endif
+
 #define UI_SCALE 5
 
 #ifdef __cplusplus

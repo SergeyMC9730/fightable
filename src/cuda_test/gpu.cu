@@ -31,7 +31,13 @@ __global__ void helloFromGPU(Rectangle area, Vector2 *blocks, unsigned char tile
     allows[i] = CheckCollisionPointRec(Vector2{block.x * tile_w, block.y * tile_h}, area);
 }
 
-int main() {
+#include "test.h"
+
+void setup() {
+    cudaInitDevice(0, 0, 0);
+}
+
+void performGpuAction() {
     constexpr int n = 128;
     Vector2 *host_objects = (Vector2 *)calloc(128, sizeof(Vector2));
     unsigned char *host_allows = (unsigned char *)calloc(128, 1);
@@ -80,9 +86,7 @@ int main() {
 
     cudaDeviceReset();
 
-    printf("\n-----------\ntook %ld ms to execute\n-----------\n",
-        time / std::chrono::milliseconds(1)
+    printf("\n-----------\ntook %ld ns to execute\n-----------\n",
+        time.count()
     );
-
-    return 0;
 }

@@ -117,6 +117,8 @@ struct fightable_state {
     float menu_cur_x;
 
     RenderTexture2D overlay_framebuffer;
+
+    unsigned char can_use_gpu_accel;
 };
 
 extern struct fightable_state __state;

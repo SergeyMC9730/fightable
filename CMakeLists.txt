@@ -8,10 +8,11 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     endif()
     enable_language(CUDA)
 
-    # set(FIGHTABLE_GPU_SRC
-    #     src/client/init_ptx.cu
-    #     src/client/level/prepare_render.cu
-    # )
+    set(FIGHTABLE_GPU_SRC
+        src/client/init_ptx.cu
+        src/client/level/prepare_render.cu
+        src/client/level/reload_cuda_ctx.cu
+    )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Enabling PTX debugger")
@@ -21,7 +22,8 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     add_compile_definitions(COTARGET_PTX)
 
     add_executable(cuda-test
-        src/cuda_test/main.cu
+        src/cuda_test/gpu.cu
+        src/cuda_test/main.c
     )
 endif()
 
