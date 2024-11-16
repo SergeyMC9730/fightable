@@ -125,6 +125,10 @@ int main(int argc, char **argv) {
 
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
 
+#ifdef COTARGET_PTX
+
+#endif
+
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(0));
     SetWindowState(FLAG_WINDOW_RESIZABLE);

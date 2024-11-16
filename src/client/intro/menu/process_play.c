@@ -16,10 +16,21 @@ void _fIntroMenuProcessPlay() {
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
         __state.menu_state = INTRO_MENU_BASE_SELECTOR;
         UnloadTexture(__state.playbtn_container);
-    } else {
-        area.width = __state.playbtn_container.width;
-        area.height = __state.playbtn_container.height;
 
-        DrawTexture(__state.playbtn_container, area.x, area.y, tint);   
+        return;
+    }
+
+    area.width = __state.playbtn_container.width;
+    area.height = __state.playbtn_container.height;
+
+    DrawTexture(__state.playbtn_container, area.x, area.y, tint);
+
+
+
+    {
+        Rectangle r = area;
+        r.height /= 2;
+
+        
     }
 }

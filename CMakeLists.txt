@@ -1,6 +1,30 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable LANGUAGES C CXX)
 
+if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
+    message(STATUS "Enabling PTX co-target")
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+        set(CMAKE_CUDA_ARCHITECTURES 52)
+    endif()
+    enable_language(CUDA)
+
+    # set(FIGHTABLE_GPU_SRC
+    #     src/client/init_ptx.cu
+    #     src/client/level/prepare_render.cu
+    # )
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "Enabling PTX debugger")
+        set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
+    endif()
+
+    add_compile_definitions(COTARGET_PTX)
+
+    add_executable(cuda-test
+        src/cuda_test/main.cu
+    )
+endif()
+
 if (OPENMPT_LIB)
     set(OPENMPT_LIB_CUSTOM TRUE)
 endif()
@@ -142,6 +166,7 @@ set(FIGHTABLE_SRC
     src/client/intro/gfx.cpp
     src/client/renderer/overlay_scheduler.cpp
     src/client/renderer/mouse.c
+    ${FIGHTABLE_GPU_SRC}
 )
 
 if (NOT DISABLE_MP_SERVER)
@@ -309,6 +334,10 @@ if (OPENMPT_LIB_CUSTOM)
 endif()
 if (MICROHTTPD_LIB_CUSTOM)
     message(STATUS "  libmicrohttpd lib path: ${MICROHTTPD_LIB}")
+endif()
+
+if (FIGHTABLE_CUDA)
+    message(STATUS "  CUDA support: ${FIGHTABLE_CUDA}")
 endif()
 
 message(STATUS "")
