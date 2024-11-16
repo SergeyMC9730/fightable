@@ -146,14 +146,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
             if (editor->swipe_enabled) {
-                auto block = _fBlockFromId(editor->current_block_id);
-
-                if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
-                    IVector2 pos = _fEditorGetPosOfFirstId(editor, editor->current_block_id);
-                    editor->objects[pos.x][pos.y] = _fBlockFromId(0);
-                }
-
-                editor->objects[selected_block_pos.x][selected_block_pos.y] = block;
+                _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
             } else {
                 Vector2 mdelta = GetMouseDelta();
 
@@ -169,16 +162,7 @@ void _fEditorDraw(struct feditor *editor) {
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !editor->swipe_enabled && !editor->holded_previosly && !mouse_out_of_bounds) {
-            auto block = _fBlockFromId(editor->current_block_id);
-
-            if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
-                IVector2 pos = _fEditorGetPosOfFirstId(editor, editor->current_block_id);
-                editor->objects[pos.x][pos.y] = _fBlockFromId(0);
-            }
-
-            editor->objects[selected_block_pos.x][selected_block_pos.y] = block;
-
-            // printf("placed block at %d:%d\n", selected_block_pos.x, selected_block_pos.y);
+            _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
         }
 
         {

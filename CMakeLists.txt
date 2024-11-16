@@ -168,6 +168,7 @@ set(FIGHTABLE_SRC
     src/client/intro/gfx.cpp
     src/client/renderer/overlay_scheduler.cpp
     src/client/renderer/mouse.c
+    src/client/editor/place_block.cpp
     ${FIGHTABLE_GPU_SRC}
 )
 

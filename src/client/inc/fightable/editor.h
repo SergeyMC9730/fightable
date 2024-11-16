@@ -19,6 +19,8 @@ void _fEditorSwipeCurrentObjects(struct feditor *editor, float swipe_delta);
 
 unsigned char _fEditorInPlaybackMode(struct feditor *editor);
 
+void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos);
+
 #ifdef __cplusplus
 }
 #endif
