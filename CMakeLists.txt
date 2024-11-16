@@ -141,6 +141,7 @@ set(FIGHTABLE_SRC
     src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
     src/client/renderer/overlay_scheduler.cpp
+    src/client/renderer/mouse.c
 )
 
 if (NOT DISABLE_MP_SERVER)

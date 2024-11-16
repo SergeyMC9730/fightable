@@ -71,9 +71,7 @@ void _fEditorDraw(struct feditor *editor) {
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
 
-    Vector2 mouse_pos = GetMousePosition();
-    mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale;
-    mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale;
+    Vector2 mouse_pos = _fGetMousePosPix();
 
     if (editor->should_process_interactions && !editor->should_display_selector) {
         Camera2D actual_cam = editor->level.camera;

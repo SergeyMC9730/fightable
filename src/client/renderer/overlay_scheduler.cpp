@@ -17,9 +17,7 @@ void _fScheduleOverlayFunc(const foverlay_callback &callback) {
 }
 
 void _fSchedulerIterateOverlays() {
-    Vector2 mouse_pos = GetMousePosition();
-    mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale; mouse_pos.x *= UI_SCALE;
-    mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale; mouse_pos.y *= UI_SCALE;
+    Vector2 mouse_pos = _fGetMousePosOverlay();
 
     for (const auto &callback : __overlay_callbacks) {
         if (std::holds_alternative<foverlay_callback>(callback)) {

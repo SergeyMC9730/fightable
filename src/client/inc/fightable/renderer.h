@@ -33,6 +33,9 @@ int _ntRendererGetMainIdxInStack();
 void _fScheduleOverlayFunc(void (*callback)(void *user), void *user);
 void _fSchedulerIterateOverlays();
 
+Vector2 _fGetMousePosPix();
+Vector2 _fGetMousePosOverlay();
+
 #define UI_SCALE 5
 
 #ifdef __cplusplus
