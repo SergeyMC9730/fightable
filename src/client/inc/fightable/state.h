@@ -119,6 +119,7 @@ struct fightable_state {
     RenderTexture2D overlay_framebuffer;
 
     unsigned char can_use_gpu_accel;
+    double cuda_time;
 };
 
 extern struct fightable_state __state;

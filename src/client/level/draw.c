@@ -73,11 +73,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             for (unsigned int i = 0; i < level->data_size; i++) {
                 struct fblock obj = level->objects[i];
 
-                if (
-                    _fBlockIdFromRenderable(obj.base) == 0
-                    ||
-                    !level->host_allow_pipeline[i]
-                ) continue;
+                if (!level->host_allow_pipeline[i]) continue;
 
                 int _x = initial_pos.x + (obj.base.block_x * tx);
                 int _y = initial_pos.y + (obj.base.block_y * ty);
@@ -89,11 +85,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         for (unsigned int i = 0; i < level->data_size; i++) {
             struct fblock obj = level->objects[i];
 
-            if (
-                _fBlockIdFromRenderable(obj.base) == 0
-                ||
-                !level->host_allow_pipeline[i]
-            ) continue;
+            if (!level->host_allow_pipeline[i]) continue;
 
             int _x = initial_pos.x + (obj.base.block_x * tx);
             int _y = initial_pos.y + (obj.base.block_y * ty);
