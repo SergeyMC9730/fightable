@@ -27,6 +27,10 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     )
 endif()
 
+if (FIGHTABLE_IMGUI)
+    add_compile_definitions(_FIGHTABLE_IMGUI_)
+endif()
+
 if (OPENMPT_LIB)
     set(OPENMPT_LIB_CUSTOM TRUE)
 endif()
