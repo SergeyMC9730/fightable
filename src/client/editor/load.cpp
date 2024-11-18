@@ -13,7 +13,7 @@ struct feditor *_fEditorCreate() {
     editor->level = _fLevelLoadTest(__state.tilemap, {28, 4});
     editor->level.camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
-    editor->sb = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
+    editor->select_block_label = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
 
     editor->render_objects.assign(editor->level.objects, editor->level.objects + editor->level.data_size);
 

@@ -210,7 +210,7 @@ void _fEditorDraw(struct feditor *editor) {
         btnBlock.position.y = blackbox_starty + 66;
         btnBlock.tint = WHITE;
         if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
-            block_select = 1;
+            editor->should_display_selector = ~editor->should_display_selector;
         }
         _fTextDraw(&__state.text_manager, "sel block", {blackbox_startx + center, current_position_y + 4}, GREEN, 1);
         current_position_y += 4 + sel_block_len.y;
@@ -351,39 +351,41 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
 
-    if (IsKeyPressed(KEY_B)) {
-        editor->should_display_selector = !editor->should_display_selector;
-    }
+    if (editor->should_display_selector) {
+        _fScheduleOverlayFunc([editor, bouncing_color](Vector2 mpos) {
+            constexpr float offset_x = 50;
+            constexpr float offset_y = 50;
 
-    _fScheduleOverlayFunc([editor, bouncing_color](Vector2 mpos) {
-        if(block_select) {
-            Vector2 mpos = _fGetMousePosOverlay();
-            Rectangle BG = {10, 30, 1000, 500};
-            Rectangle blocks_check = {0};
+            Rectangle BG = { offset_x, offset_y, __state.overlay_framebuffer.texture.width - (offset_x * 2), __state.overlay_framebuffer.texture.height - (offset_y * 2) };
+            Rectangle blocks_check = { 0 };
 
             int blocks_count = 0;
             int layer = 1;
             int x_pos = 0;
 
-            IVector2 cur_blocks_pos = {0, 100};
-            DrawRectangle(BG.x, BG.y, BG.width, BG.height, {50, 50, 50, 200});
-            DrawTextureEx(editor->sb, {BG.width / 2 - 90, 50}, 0, 4, WHITE);
+            IVector2 cur_blocks_pos = { 0, 115 };
+
+            constexpr float label_scaling = 5;
+            float center_x = (BG.width - (editor->select_block_label.width * label_scaling)) / 2;
+
+            DrawRectangle(BG.x, BG.y, BG.width, BG.height, { 50, 50, 50, 200 });
+            DrawTextureEx(editor->select_block_label, { center_x + BG.x, BG.y + 15.f }, 0, label_scaling, WHITE);
             for (int i = 0; i < editor->block_listing.total; i++) {
                 fblock block = editor->block_listing.blocks[i];
-                if(block.parent_id == 0) {
-                    if(blocks_count > 0) {
+                if (block.parent_id == 0) {
+                    if (blocks_count > 0) {
                         cur_blocks_pos.x += 100;
                     }
                     blocks_count++;
 
-                    if(cur_blocks_pos.x >= BG.width) {
+                    if (cur_blocks_pos.x >= BG.width) {
                         cur_blocks_pos.y += 100;
                         cur_blocks_pos.x = 100;
                     }
-                    blocks_check = {(float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level.tilemap->tile_size.x * 5, (float)editor->level.tilemap->tile_size.x * 5};
-                    
-                    _fTilemapDrawScaled(editor->level.tilemap, cur_blocks_pos, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE, 5);
-                    if(CheckCollisionPointRec(mpos, blocks_check)) {
+                    blocks_check = { (float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level.tilemap->tile_size.x * 5, (float)editor->level.tilemap->tile_size.x * 5 };
+
+                    _fTilemapDrawScaled(editor->level.tilemap, cur_blocks_pos, { block.base.tile_x, block.base.tile_y }, 0, 0, WHITE, 5);
+                    if (CheckCollisionPointRec(mpos, blocks_check)) {
                         DrawRectangleRec(blocks_check, bouncing_color);
                         if (CheckCollisionPointRec(mpos, blocks_check) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                             editor->current_block_id = i;
@@ -392,6 +394,6 @@ void _fEditorDraw(struct feditor *editor) {
                     }
                 }
             }
-        }
-    });
+        });
+    }
 }

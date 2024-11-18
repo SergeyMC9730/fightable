@@ -17,7 +17,7 @@ struct feditor {
     Camera2D camera;
     struct flevel level;
 
-    Texture2D sb;
+    Texture2D select_block_label;
 
     unsigned char should_process_interactions : 1;
     unsigned char should_display_sidebar : 1;

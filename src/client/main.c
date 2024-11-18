@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    unsigned char debug_output = 1;
+    unsigned char debug_output = 0;
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
