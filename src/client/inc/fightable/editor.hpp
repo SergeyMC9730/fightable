@@ -7,7 +7,6 @@
 #include <vector>
 #include <fightable/block.h>
 #include <fightable/entity.h>
-
 struct feditor {
     std::map<int, std::map<int, fblock>> objects;
     std::vector<fblock> render_objects;
@@ -17,6 +16,8 @@ struct feditor {
 
     Camera2D camera;
     struct flevel level;
+
+    Texture2D sb;
 
     unsigned char should_process_interactions : 1;
     unsigned char should_display_sidebar : 1;

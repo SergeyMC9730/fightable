@@ -13,6 +13,8 @@ struct feditor *_fEditorCreate() {
     editor->level = _fLevelLoadTest(__state.tilemap, {28, 4});
     editor->level.camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
+    editor->sb = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
+
     editor->render_objects.assign(editor->level.objects, editor->level.objects + editor->level.data_size);
 
     for (fblock &obj : editor->render_objects) {
@@ -24,6 +26,7 @@ struct feditor *_fEditorCreate() {
     editor->should_display_sidebar = 1;
     editor->should_playback = 0;
     editor->should_process_interactions = 1;
+
 
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);

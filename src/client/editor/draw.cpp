@@ -11,7 +11,7 @@
 #include <fightable/renderer.h>
 #include <fightable/intvec_math.h>
 #include <fightable/player.h>
-
+bool block_select = false;
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
     bool mouse_out_of_bounds = false;
@@ -28,7 +28,6 @@ void _fEditorDraw(struct feditor *editor) {
     }
 
     float speed = 1.f;
-
     Rectangle mobile_swipe_area = {};
 
     mobile_swipe_area.width = 8;
@@ -44,11 +43,9 @@ void _fEditorDraw(struct feditor *editor) {
         if (IsKeyDown(KEY_RIGHT_SHIFT)) {
             speed *= 1.6f;
         }
-
         float delta_speed = delta * speed;
 
         editor->level.camera = editor->camera;
-
         editor->render_objects.clear();
         for (auto &[x, ys] : editor->objects) {
             for (auto &[y, _obj] : ys) {
@@ -72,12 +69,14 @@ void _fEditorDraw(struct feditor *editor) {
     float v = 128.f * ((std::sin(__state.time * 3.f) / 2.f) + 0.5f) + 15.f;
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
-
+    
+    
     Vector2 mouse_pos = _fGetMousePosPix();
 
     // printf("b\n");
 
     if (editor->should_process_interactions && !editor->should_display_selector) {
+
         Camera2D actual_cam = editor->level.camera;
         actual_cam.target.x = (int)actual_cam.target.x;
         actual_cam.target.y = (int)actual_cam.target.y;
@@ -204,7 +203,15 @@ void _fEditorDraw(struct feditor *editor) {
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
 
         int center = (space - sel_block_len.x) / 2;
-
+        struct fbutton btnBlock = {};
+        btnBlock.text = "Blocks";
+        
+        btnBlock.position.x = blackbox_startx + 10;
+        btnBlock.position.y = blackbox_starty + 66;
+        btnBlock.tint = WHITE;
+        if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
+            block_select = 1;
+        }
         _fTextDraw(&__state.text_manager, "sel block", {blackbox_startx + center, current_position_y + 4}, GREEN, 1);
         current_position_y += 4 + sel_block_len.y;
 
@@ -236,7 +243,6 @@ void _fEditorDraw(struct feditor *editor) {
         fblock block = _fBlockFromId(editor->current_block_id);
 
         _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, current_position_y + 1}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
-        
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);
 
@@ -264,12 +270,12 @@ void _fEditorDraw(struct feditor *editor) {
             btn.text = "Play";
             
             btn.position.x = blackbox_startx + 14;
-            btn.position.y = blackbox_starty + 66;
+            btn.position.y = blackbox_starty + 75;
             btn.tint = WHITE;
             
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                 printf("click\n");
-
+                block_select = false;
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
                 editor->should_display_sidebar = false;
@@ -349,8 +355,43 @@ void _fEditorDraw(struct feditor *editor) {
         editor->should_display_selector = !editor->should_display_selector;
     }
 
-    // _fScheduleOverlayFunc([](Vector2 mpos) {
-    //     DrawTextPro(GetFontDefault(), "Kruto", (Vector2){50, 50}, (Vector2){0, 0}, 60.f, 40.f, 1.f, (Color){255, 0, 0, 128});
-    //     DrawRectangle(mpos.x, mpos.y, 60, 60, GREEN);
-    // });
+    _fScheduleOverlayFunc([editor, bouncing_color](Vector2 mpos) {
+        if(block_select) {
+            Vector2 mpos = _fGetMousePosOverlay();
+            Rectangle BG = {10, 30, 1000, 500};
+            Rectangle blocks_check = {0};
+
+            int blocks_count = 0;
+            int layer = 1;
+            int x_pos = 0;
+
+            IVector2 cur_blocks_pos = {0, 100};
+            DrawRectangle(BG.x, BG.y, BG.width, BG.height, {50, 50, 50, 200});
+            DrawTextureEx(editor->sb, {BG.width / 2 - 90, 50}, 0, 4, WHITE);
+            for (int i = 0; i < editor->block_listing.total; i++) {
+                fblock block = editor->block_listing.blocks[i];
+                if(block.parent_id == 0) {
+                    if(blocks_count > 0) {
+                        cur_blocks_pos.x += 100;
+                    }
+                    blocks_count++;
+
+                    if(cur_blocks_pos.x >= BG.width) {
+                        cur_blocks_pos.y += 100;
+                        cur_blocks_pos.x = 100;
+                    }
+                    blocks_check = {(float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level.tilemap->tile_size.x * 5, (float)editor->level.tilemap->tile_size.x * 5};
+                    
+                    _fTilemapDrawScaled(editor->level.tilemap, cur_blocks_pos, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE, 5);
+                    if(CheckCollisionPointRec(mpos, blocks_check)) {
+                        DrawRectangleRec(blocks_check, bouncing_color);
+                        if (CheckCollisionPointRec(mpos, blocks_check) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                            editor->current_block_id = i;
+                            block_select = 0;
+                        }
+                    }
+                }
+            }
+        }
+    });
 }

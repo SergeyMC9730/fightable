@@ -105,6 +105,7 @@ set(FIGHTABLE_SRC
     src/client/editor/draw.cpp
     src/client/block/id.c
     src/client/renderer/ui/text.c
+    src/client/renderer/ui/square_button.c
     src/client/hitbox/clip_x.c
     src/client/hitbox/clip_y.c
     src/client/hitbox/expand.c

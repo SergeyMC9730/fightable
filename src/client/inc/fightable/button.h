@@ -24,7 +24,8 @@ struct fbutton {
 
 unsigned char _fButtonDraw(struct fbutton *btn);
 unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint);
-
+unsigned char _fSquareButtonDrawSimple(const char *text, IVector2 pos, Color tint);
+unsigned char _fSquareButtonDraw(struct fbutton *btn);
 #ifdef __cplusplus
 }
 #endif
