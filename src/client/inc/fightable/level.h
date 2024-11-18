@@ -36,9 +36,8 @@ struct flevel {
     unsigned int entity_data_size;
 
 #ifdef COTARGET_PTX
-    Vector2 *dev_block_pipeline;
-    Vector2 *host_block_pipeline;
-
+    struct fblock *dev_block_pipeline;
+    
     unsigned char *dev_allow_pipeline;
     unsigned char *host_allow_pipeline;
 

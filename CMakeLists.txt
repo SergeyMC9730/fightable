@@ -27,6 +27,10 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     )
 endif()
 
+if (FIGHTABLE_IMGUI)
+    add_compile_definitions(_FIGHTABLE_IMGUI_)
+endif()
+
 if (OPENMPT_LIB)
     set(OPENMPT_LIB_CUSTOM TRUE)
 endif()
@@ -167,71 +171,12 @@ set(FIGHTABLE_SRC
     src/client/entity/base/setters.c
     src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
+    src/client/renderer/keyboard.c
     src/client/renderer/overlay_scheduler.cpp
     src/client/renderer/mouse.c
     src/client/editor/place_block.cpp
     ${FIGHTABLE_GPU_SRC}
 )
-
-if (NOT DISABLE_MP_SERVER)
-    if (WIN32)
-        set(HTTPSERVER_NAME libhttpserver-win32)
-    else()
-        set(HTTPSERVER_NAME libhttpserver)
-    endif()
-
-    file(GLOB HTTPSERVER_SRC
-        "ext/${HTTPSERVER_NAME}/src/*.hpp"
-        "ext/${HTTPSERVER_NAME}/src/*.h"
-        "ext/${HTTPSERVER_NAME}/src/*.cpp"
-
-        "ext/${HTTPSERVER_NAME}/src/details/*.cpp"
-
-        "ext/${HTTPSERVER_NAME}/src/httpserver/*.hpp"
-        "ext/${HTTPSERVER_NAME}/src/httpserver/details/*.hpp"
-    )
-
-    set(HTTPSERVER_INC
-        ext/${HTTPSERVER_NAME}/src
-        ext/${HTTPSERVER_NAME}/src/details
-        ext/${HTTPSERVER_NAME}/src/httpserver
-        ext/${HTTPSERVER_NAME}/src/httpserver/details
-    )
-
-    add_library(httpserver STATIC ${HTTPSERVER_SRC})
-    target_include_directories(httpserver PRIVATE
-        ${HTTPSERVER_INC}
-        ${MICROHTTPD_INC}
-    )
-    add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
-
-    target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
-
-    add_library(fightable-http STATIC
-        src/http/req/APIRequest.cpp
-        src/http/req/SplitString.cpp
-        src/http/content_type/HttpContentType.cpp
-        src/http/content_type/HttpContentTypeAudio.cpp
-        src/http/content_type/HttpContentTypeHtml.cpp
-        src/http/content_type/HttpContentTypeImage.cpp
-        src/http/content_type/HttpContentTypeJson.cpp
-        src/http/content_type/HttpContentTypeText.cpp
-        src/http/req/v1.helloworld.cpp
-        src/http/http_server_create.cpp
-        src/http/http_server_destroy.cpp
-        src/http/req/v1.res.request.cpp
-        src/http/resource_dir.cpp
-        src/http/content_type/HttpContentTypeOctet.cpp
-    )
-    target_include_directories(fightable-http PRIVATE
-        src/http/inc
-        ${HTTPSERVER_INC}
-        ${MICROHTTPD_INC}
-    )
-    target_link_libraries(fightable-http PUBLIC httpserver)
-else()
-    add_compile_definitions(_DISABLE_MP_SERVER_)
-endif()
 
 if (ANDROID)
     message(STATUS "Compiling for Android")
@@ -277,6 +222,67 @@ else()
     message(FATAL_ERROR "Support for platforms other than UNIX and NT is not implemented yet!")
 
     add_compile_definitions(TARGET_HOMEBREW_UNKNOWN)
+endif()
+
+if (NOT DISABLE_MP_SERVER)
+    if (WIN32)
+        set(HTTPSERVER_NAME libhttpserver-win32)
+    else()
+        set(HTTPSERVER_NAME libhttpserver)
+    endif()
+
+    file(GLOB HTTPSERVER_SRC
+        "ext/${HTTPSERVER_NAME}/src/*.hpp"
+        "ext/${HTTPSERVER_NAME}/src/*.h"
+        "ext/${HTTPSERVER_NAME}/src/*.cpp"
+
+        "ext/${HTTPSERVER_NAME}/src/details/*.cpp"
+
+        "ext/${HTTPSERVER_NAME}/src/httpserver/*.hpp"
+        "ext/${HTTPSERVER_NAME}/src/httpserver/details/*.hpp"
+    )
+
+    set(HTTPSERVER_INC
+        ext/${HTTPSERVER_NAME}/src
+        ext/${HTTPSERVER_NAME}/src/details
+        ext/${HTTPSERVER_NAME}/src/httpserver
+        ext/${HTTPSERVER_NAME}/src/httpserver/details
+        ${FIGHTABLE_NATIVE_INCLUDES}
+    )
+
+    add_library(httpserver STATIC ${HTTPSERVER_SRC})
+    target_include_directories(httpserver PRIVATE
+        ${HTTPSERVER_INC}
+        ${MICROHTTPD_INC}
+    )
+    add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
+
+    target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
+
+    add_library(fightable-http STATIC
+        src/http/req/APIRequest.cpp
+        src/http/req/SplitString.cpp
+        src/http/content_type/HttpContentType.cpp
+        src/http/content_type/HttpContentTypeAudio.cpp
+        src/http/content_type/HttpContentTypeHtml.cpp
+        src/http/content_type/HttpContentTypeImage.cpp
+        src/http/content_type/HttpContentTypeJson.cpp
+        src/http/content_type/HttpContentTypeText.cpp
+        src/http/req/v1.helloworld.cpp
+        src/http/http_server_create.cpp
+        src/http/http_server_destroy.cpp
+        src/http/req/v1.res.request.cpp
+        src/http/resource_dir.cpp
+        src/http/content_type/HttpContentTypeOctet.cpp
+    )
+    target_include_directories(fightable-http PRIVATE
+        src/http/inc
+        ${HTTPSERVER_INC}
+        ${MICROHTTPD_INC}
+    )
+    target_link_libraries(fightable-http PUBLIC httpserver)
+else()
+    add_compile_definitions(_DISABLE_MP_SERVER_)
 endif()
 
 if (NOT DISABLE_MP_SERVER)

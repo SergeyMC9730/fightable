@@ -9,7 +9,7 @@
 #include <cmath>
 #include <optional>
 #include <fightable/renderer.h>
-#include <fightable/intvec_math.h>
+#include <fightable/intvec.h>
 #include <fightable/player.h>
 bool block_select = false;
 void _fEditorDraw(struct feditor *editor) {

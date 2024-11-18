@@ -21,13 +21,13 @@ static struct fblock __blocks[] = {
     {.base.tile_x = 26, .base.tile_y = 4, .name = "Grass", .parent_id=16},  // 17
     {.base.tile_x = 27, .base.tile_y = 4, .name = "Grass", .parent_id=16},  // 18
     {.base.tile_x = 15, .base.tile_y = 0, .name = "Dirt", .metaobject=1},   // 19
-    {.base.tile_x = 16, .base.tile_y = 0, .name = "Dirt", .parent_id=20},   // 20
+    {.base.tile_x = 16, .base.tile_y = 0, .name = "Dirt", .parent_id=19},   // 20
     {.base.tile_x = 18, .base.tile_y = 0, .name = "Dirt", .metaobject=1},   // 21
     {.base.tile_x = 19, .base.tile_y = 0, .name = "Dirt", .metaobject=1},   // 22
-    {.base.tile_x = 15, .base.tile_y = 1, .name = "Dirt", .parent_id=20},   // 23
-    {.base.tile_x = 18, .base.tile_y = 1, .name = "Dirt", .parent_id=24},   // 24
+    {.base.tile_x = 15, .base.tile_y = 1, .name = "Dirt", .parent_id=19},   // 23
+    {.base.tile_x = 18, .base.tile_y = 1, .name = "Dirt", .parent_id=21},   // 24
     {.base.tile_x = 19, .base.tile_y = 1, .name = "Dirt", .parent_id=22},   // 25
-    {.base.tile_x = 14, .base.tile_y = 2, .name = "Dirt", .parent_id=20},   // 26
+    {.base.tile_x = 14, .base.tile_y = 2, .name = "Dirt", .parent_id=19},   // 26
     {.base.tile_x = 18, .base.tile_y = 2, .name = "Dirt", .parent_id=22},   // 27
     {.base.tile_x = 13, .base.tile_y = 4, .name = "Dirt", .metaobject=1},   // 28
     {.base.tile_x = 14, .base.tile_y = 4, .name = "Dirt", .parent_id=28},   // 29
@@ -79,7 +79,7 @@ unsigned short _fBlockIdFromRenderable(struct frendered_object obj) {
 }
 
 struct fblock_listing _fBlockGetAvailable() {
-    struct fblock_listing l = {};
+    struct fblock_listing l = {0};
     l.blocks = __blocks;
     l.total = sizeof(__blocks) / sizeof(struct fblock);
 

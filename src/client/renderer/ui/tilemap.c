@@ -1,5 +1,5 @@
 #include <fightable/tilemap.h>
-#include <fightable/intvec_math.h>
+#include <fightable/intvec.h>
 
 void _fTilemapDrawScaled(struct ftilemap *tilemap, IVector2 render_pos, IVector2 tile_pos, unsigned char fliped_x, unsigned char fliped_y, Color tint, float scale) {
     Rectangle r;
@@ -29,6 +29,10 @@ void _fTilemapDraw(struct ftilemap *tilemap, IVector2 render_pos, IVector2 tile_
 }
 
 void _fTilemapDrawMegatile(struct ftilemap *tilemap, IVector2 render_pos, IVector2 start_pos, IVector2 tiles, unsigned char fliped_x, unsigned char fliped_y, Color tint) {
+    _fTilemapDrawMegatileScaled(tilemap, render_pos, start_pos, tiles, fliped_x, fliped_y, tint, 1.f);
+}
+
+void _fTilemapDrawMegatileScaled(struct ftilemap* tilemap, IVector2 render_pos, IVector2 start_pos, IVector2 tiles, unsigned char fliped_x, unsigned char fliped_y, Color tint, float scale) {
     for (int x = 0; x < tiles.x; x++) {
         for (int y = 0; y < tiles.y; y++) {
             int _x = x;
@@ -41,16 +45,19 @@ void _fTilemapDrawMegatile(struct ftilemap *tilemap, IVector2 render_pos, IVecto
                 _y = tiles.y - y;
             }
 
-            IVector2 rpos = {render_pos.x + (x * tilemap->tile_size.x), render_pos.y + (y * tilemap->tile_size.y)};
-            IVector2 tpos = {start_pos.x + _x, start_pos.y + _y};
+            IVector2 rpos = { 
+                render_pos.x + (x * tilemap->tile_size.x * scale), 
+                render_pos.y + (y * tilemap->tile_size.y * scale) 
+            };
+            IVector2 tpos = { start_pos.x + _x, start_pos.y + _y };
 
-            _fTilemapDraw(tilemap, rpos, tpos, fliped_x, fliped_y, tint);
+            _fTilemapDrawScaled(tilemap, rpos, tpos, fliped_x, fliped_y, tint, scale);
         }
     }
 }
 
 struct ftilemap _fTilemapCreate(const char *path, IVector2 tile_size) {
-    struct ftilemap m = {};
+    struct ftilemap m = {0};
 
     m.tile_size = tile_size;
     m.texture = LoadTexture(path);

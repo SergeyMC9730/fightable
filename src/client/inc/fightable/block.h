@@ -11,12 +11,12 @@ struct fblock {
     struct frendered_object base;
     const char *name;
 
+    unsigned short parent_id;
+
     unsigned char is_start_pos : 1;
     unsigned char singular : 1;
     unsigned char passable : 1;
     unsigned char metaobject : 1;
-
-    unsigned short parent_id;
 };
 
 // id + block_x + block_y + bitflags

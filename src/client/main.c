@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    unsigned char debug_output = 0;
+    unsigned char debug_output = 1;
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -127,10 +127,13 @@ int main(int argc, char **argv) {
 
 #ifdef COTARGET_PTX
     _fPtxInit();
+
+    // __state.can_use_gpu_accel = 0;
 #endif
 
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(0));
+    // SetTargetFPS(30);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
 
@@ -249,6 +252,14 @@ int main(int argc, char **argv) {
 
     __state.gfx.fade_v.should_process = 1;
 
+    _fKeyboardRegister(&__state.kbd, KEY_ESCAPE);
+    _fKeyboardRegister(&__state.kbd, KEY_F1);
+    _fKeyboardRegister(&__state.kbd, KEY_A);
+    _fKeyboardRegister(&__state.kbd, KEY_D);
+    _fKeyboardRegister(&__state.kbd, KEY_LEFT);
+    _fKeyboardRegister(&__state.kbd, KEY_RIGHT);
+    _fKeyboardRegister(&__state.kbd, KEY_SPACE);
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -306,18 +317,17 @@ int main(int argc, char **argv) {
         DrawFPS(32, 8);
 
         if (debug_output) {
-            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   wanted row : %d\nrender area: %d:%d (%d:%d tiles)", 
+            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n gpu time: %fms", 
                 align_x,
                 (float)UI_SCALE,
                 (float)__state.window_scale,
                 (float)_fAudioGetPlayTime(&__state.sound_engine),
-                __state.r2dpointer,
                 _fAudioGetSongName(&__state.sound_engine),
                 __state.title_song_stage,
                 (int)__state.song_id,
-                _fIntroGetSeekableRow(),
                 __state.framebuffer.texture.width, __state.framebuffer.texture.height,
-                __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y
+                __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y,
+                __state.cuda_time
             );
 
             DrawText(dbg_buffer, 8, 32, 20, RED);
