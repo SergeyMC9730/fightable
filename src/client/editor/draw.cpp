@@ -358,18 +358,35 @@ void _fEditorDraw(struct feditor *editor) {
 
             Rectangle BG = { offset_x, offset_y, __state.overlay_framebuffer.texture.width - (offset_x * 2), __state.overlay_framebuffer.texture.height - (offset_y * 2) };
             Rectangle blocks_check = { 0 };
+            Rectangle back = {60, 60, 50, 50};
 
             int blocks_count = 0;
             int layer = 1;
             int x_pos = 0;
 
+            int mouse_button_down = 0;
+
             IVector2 cur_blocks_pos = { 0, 115 };
+            IVector2 btn_tile_offset = {29, 6};
 
             constexpr float label_scaling = 5;
             float center_x = (BG.width - (editor->select_block_label.width * label_scaling)) / 2;
-
+            
             DrawRectangle(BG.x, BG.y, BG.width, BG.height, { 50, 50, 50, 200 });
             DrawTextureEx(editor->select_block_label, { center_x + BG.x, BG.y + 15.f }, 0, label_scaling, WHITE);
+            DrawRectangle(mpos.x, mpos.y, 10, 10, MAROON);
+            if(CheckCollisionPointRec(mpos, back)) {
+                btn_tile_offset.x = 31;
+                if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+                    btn_tile_offset.x = 33;    
+                    mouse_button_down = 5;
+                }
+                if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                    editor->should_display_selector = ~editor->should_display_selector;            
+                }
+            }
+            _fTilemapDrawMegatileScaled(editor->level.tilemap, {(int)back.x - 15, (int)back.y - 15}, btn_tile_offset, {2, 2}, 0, 0, WHITE, 5);
+            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);  
             for (int i = 0; i < editor->block_listing.total; i++) {
                 fblock block = editor->block_listing.blocks[i];
                 if (block.parent_id == 0) {
@@ -389,7 +406,7 @@ void _fEditorDraw(struct feditor *editor) {
                         DrawRectangleRec(blocks_check, bouncing_color);
                         if (CheckCollisionPointRec(mpos, blocks_check) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                             editor->current_block_id = i;
-                            block_select = 0;
+                            editor->should_display_selector = ~editor->should_display_selector;          
                         }
                     }
                 }
