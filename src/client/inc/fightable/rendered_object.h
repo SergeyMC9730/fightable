@@ -10,11 +10,11 @@ struct frendered_object {
     unsigned char tile_x;
     unsigned char tile_y;
 
-    unsigned char flipped_x : 1;
-    unsigned char flipped_y : 1;
-
     short block_x;
     short block_y;
+
+    unsigned char flipped_x : 1;
+    unsigned char flipped_y : 1;
 };
 
 #ifdef __cplusplus

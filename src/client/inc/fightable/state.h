@@ -11,7 +11,9 @@ struct flevel;
 struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
+#ifndef _DISABLE_MP_SERVER_
 struct fhttpserver;
+#endif
 
 #define IAUDIO_ENGINE
 
@@ -103,7 +105,9 @@ struct fightable_state {
 
     short song_id;
 
+#ifndef _DISABLE_MP_SERVER_
     struct fhttpserver *webserver;
+#endif
 
 #ifdef TARGET_ANDROID
     struct android_app *system;
@@ -114,6 +118,11 @@ struct fightable_state {
     float menu_cur_x;
     
     struct fkeyboard_mgr kbd;
+
+    RenderTexture2D overlay_framebuffer;
+
+    unsigned char can_use_gpu_accel;
+    double cuda_time;
 };
 
 extern struct fightable_state __state;

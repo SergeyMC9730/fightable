@@ -1,0 +1,34 @@
+#include <fightable/renderer.h>
+#include <nt5emul/renderer_event.h>
+#include <fightable/state.h>
+#include <variant>
+
+static std::vector<std::variant<foverlay_callback, renderer_event_t>> __overlay_callbacks = {};
+
+void _fScheduleOverlayFunc(void (*callback)(void *user), void *user) {
+    if (!callback) return;
+
+    __overlay_callbacks.push_back(renderer_event_t{callback, user});
+}
+void _fScheduleOverlayFunc(const foverlay_callback &callback) {
+    if (!callback) return;
+
+    __overlay_callbacks.push_back(callback);
+}
+
+void _fSchedulerIterateOverlays() {
+    Vector2 mouse_pos = _fGetMousePosOverlay();
+
+    for (const auto &callback : __overlay_callbacks) {
+        if (std::holds_alternative<foverlay_callback>(callback)) {
+            const auto &c = std::get<foverlay_callback>(callback);
+
+            c(mouse_pos);
+        } else if (std::holds_alternative<renderer_event_t>(callback)) {
+            const auto &c = std::get<renderer_event_t>(callback);
+            c.callback(c.user);
+        }
+    }
+
+    __overlay_callbacks.clear();
+}

@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
+#ifndef _DISABLE_MP_SERVER_
 #include <fightable/http/http_server.h>
+#endif
 #include <fightable/storage.h>
 #include <cJSON.h>
 
@@ -111,6 +113,8 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
+    unsigned char debug_output = 1;
+
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
     actual_sz = (Vector2){0, 0};
@@ -121,8 +125,15 @@ int main(int argc, char **argv) {
 
     SetAudioStreamBufferSizeDefault(CHANNEL_BUFFER_SIZE);
 
+#ifdef COTARGET_PTX
+    _fPtxInit();
+
+    // __state.can_use_gpu_accel = 0;
+#endif
+
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(0));
+    // SetTargetFPS(30);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
 
@@ -196,13 +207,17 @@ int main(int argc, char **argv) {
     RenderTexture2D txt = LoadRenderTexture(win_sz.x / UI_SCALE, win_sz.y / UI_SCALE);
     __state.framebuffer = txt;
 
+    __state.overlay_framebuffer = LoadRenderTexture(actual_sz.x / ui_scaling.x, actual_sz.y / ui_scaling.y);
+
     unsigned char shake_lock[8] = {0};
 
 #ifndef TARGET_ANDROID
     ChangeDirectory("..");
 #endif
 
+#ifndef _DISABLE_MP_SERVER_
     __state.webserver = _fHttpServerCreate(3000, _fMainLog);
+#endif
 
     _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -227,10 +242,12 @@ int main(int argc, char **argv) {
         }
     }
 
+#ifndef _DISABLE_MP_SERVER_
 #ifdef TARGET_ANDROID
     _fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
 #else
     _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
+#endif
 #endif
 
     __state.gfx.fade_v.should_process = 1;
@@ -262,8 +279,12 @@ int main(int argc, char **argv) {
         BeginTextureModeStacked(__state.framebuffer);
 
         _fDraw();
-        _fGfxDraw(&__state.gfx);
 
+        EndTextureModeStacked();
+
+        BeginTextureModeStacked(__state.overlay_framebuffer);
+        ClearBackground(BLANK);
+        _fSchedulerIterateOverlays();
         EndTextureModeStacked();
 
         ClearBackground(BLACK);
@@ -274,28 +295,43 @@ int main(int argc, char **argv) {
         __state.mouse_pos_offset = (Vector2){align_x, 0};
         __state.window_scale = scaling_y;
 
-        Rectangle source = (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width, (float)-__state.framebuffer.texture.height };
-        Rectangle dest = (Rectangle){ align_x, 0, (float)__state.framebuffer.texture.width * scaling_y, (float)__state.framebuffer.texture.height * scaling_y };
+        {
+            Rectangle source = (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width, (float)-__state.framebuffer.texture.height };
+            Rectangle dest = (Rectangle){ align_x, 0, (float)__state.framebuffer.texture.width * scaling_y, (float)__state.framebuffer.texture.height * scaling_y };
 
-        DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
+            DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
+        }
+
+        {
+            double scaling_y = (double)actual_sz.y / (double)__state.overlay_framebuffer.texture.height; 
+            int align_x = (actual_sz.x - (__state.overlay_framebuffer.texture.width * scaling_y)) / 2;
+
+            Rectangle source = (Rectangle){ 0, 0, (float)__state.overlay_framebuffer.texture.width, (float)-__state.overlay_framebuffer.texture.height };
+            Rectangle dest = (Rectangle){ align_x, 0, (float)__state.overlay_framebuffer.texture.width * scaling_y, (float)__state.overlay_framebuffer.texture.height * scaling_y };
+
+            DrawTexturePro(__state.overlay_framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
+        }
+
+        _fGfxDraw(&__state.gfx);
 
         DrawFPS(32, 8);
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   fb pointer: %d\n   playing: %s\n   song stage: %d\n   song id: %d\n   wanted row : %d\nrender area: %d:%d (%d:%d tiles)", 
-            align_x,
-            (float)UI_SCALE,
-            (float)__state.window_scale,
-            (float)_fAudioGetPlayTime(&__state.sound_engine),
-            __state.r2dpointer,
-            _fAudioGetSongName(&__state.sound_engine),
-            __state.title_song_stage,
-            (int)__state.song_id,
-            _fIntroGetSeekableRow(),
-            __state.framebuffer.texture.width, __state.framebuffer.texture.height,
-            __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y
-        );
+        if (debug_output) {
+            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n gpu time: %fms", 
+                align_x,
+                (float)UI_SCALE,
+                (float)__state.window_scale,
+                (float)_fAudioGetPlayTime(&__state.sound_engine),
+                _fAudioGetSongName(&__state.sound_engine),
+                __state.title_song_stage,
+                (int)__state.song_id,
+                __state.framebuffer.texture.width, __state.framebuffer.texture.height,
+                __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y,
+                __state.cuda_time
+            );
 
-        DrawText(dbg_buffer, 8, 32, 20, RED);
+            DrawText(dbg_buffer, 8, 32, 20, RED);
+        }
 
         EndDrawing();
 
@@ -316,9 +352,11 @@ int main(int argc, char **argv) {
     pthread_join(__state.sound_thread, NULL);
 #endif
 
+#ifndef _DISABLE_MP_SERVER_
     if (__state.webserver != NULL) {
         _fHttpServerDestroy(__state.webserver);
     }
+#endif
 
     return 0;
 }

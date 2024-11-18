@@ -11,17 +11,16 @@ struct fblock {
     struct frendered_object base;
     const char *name;
 
+    unsigned short parent_id;
+
     unsigned char is_start_pos : 1;
     unsigned char singular : 1;
     unsigned char passable : 1;
+    unsigned char metaobject : 1;
 };
 
-#define BLOCK_SIZE (                \   
-    sizeof(short) + /* id */        \ 
-    sizeof(short) + /* block_x */   \
-    sizeof(short) + /* block_y */   \
-    sizeof(uint8_t) /* bitflags */  \
-)
+// id + block_x + block_y + bitflags
+#define BLOCK_SIZE (sizeof(short) + sizeof(short) + sizeof(short) + sizeof(uint8_t))
 
 struct fblock _fBlockFromId(unsigned short id);
 

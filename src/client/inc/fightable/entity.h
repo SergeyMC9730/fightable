@@ -54,12 +54,8 @@ struct fentity {
 
 #pragma pack(pop)
 
-#define ENTITY_SIZE (                       \   
-    sizeof(float) + /* hitbox.x */          \ 
-    sizeof(float) + /* hitbox.y */          \
-    sizeof(short) + /* global_entity_id */  \
-    sizeof(short)   /* entity_id */         \
-)
+// hitbox.x + hitbox.y + global_entity_id + entity_id
+#define ENTITY_SIZE (sizeof(float) + sizeof(float) + sizeof(short) + sizeof(short))
 
 #ifdef WITH_PLACEHOLDERS
 void _fEntityUpdate(struct fentity *entity);

@@ -9,7 +9,7 @@ void _fIntroMenuDrawBackground() {
     int wx = __state.framebuffer.texture.width;
     int wy = __state.framebuffer.texture.height;
 
-    Rectangle source = {};
+    Rectangle source = {0};
     source.width = wx;
     source.height = wy;
 

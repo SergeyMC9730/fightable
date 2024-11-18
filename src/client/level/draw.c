@@ -11,6 +11,12 @@
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (!level || !level->tilemap) return;
 
+#ifdef COTARGET_PTX
+    if (__state.can_use_gpu_accel) {
+        _fLevelReloadCudaCtx(level);   
+    }
+#endif
+
     Rectangle *rects = 0;
     struct fentity *player = 0;
 
@@ -59,6 +65,38 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         level->camera_size.y + tx
     };
 
+#ifdef COTARGET_PTX
+    if (__state.can_use_gpu_accel) {
+        _fLevelPrepareCudaRender(level, area);
+
+        if (level->in_workbench_mode) {
+            for (unsigned int i = 0; i < level->data_size; i++) {
+                struct fblock obj = level->objects[i];
+
+                if (!level->host_allow_pipeline[i]) continue;
+
+                int _x = initial_pos.x + (obj.base.block_x * tx);
+                int _y = initial_pos.y + (obj.base.block_y * ty);
+
+                _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
+            }
+        }
+        
+        for (unsigned int i = 0; i < level->data_size; i++) {
+            struct fblock obj = level->objects[i];
+
+            if (!level->host_allow_pipeline[i]) continue;
+
+            int _x = initial_pos.x + (obj.base.block_x * tx);
+            int _y = initial_pos.y + (obj.base.block_y * ty);
+
+            _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
+        
+            level->objects_rendered++;
+        }
+    } else {
+#endif
+
     if (level->in_workbench_mode) {
         for (unsigned int i = 0; i < level->data_size; i++) {
             struct fblock obj = level->objects[i];
@@ -86,6 +124,9 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         level->objects_rendered++;
     }
+#ifdef COTARGET_PTX
+    }
+#endif
 
     if (level->entities && rects) {
         for (int i = 0; i < level->entity_data_size; i++) {

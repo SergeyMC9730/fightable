@@ -22,7 +22,10 @@ void _fIntroMenuOnEditorCallback() {
     Vector2 dpi = GetWindowScaleDPI();
 
     UnloadRenderTexture(__state.framebuffer);
+    UnloadRenderTexture(__state.overlay_framebuffer);
+
     __state.framebuffer = LoadRenderTexture(__state.initial_game_size.x / UI_SCALE / dpi.x, __state.initial_game_size.y / UI_SCALE / dpi.y);
+    __state.overlay_framebuffer = LoadRenderTexture(__state.initial_game_size.x / dpi.x, __state.initial_game_size.y / dpi.y);
 }
 
 void _fIntroMenuOnEditor() {

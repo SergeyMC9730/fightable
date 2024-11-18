@@ -34,6 +34,15 @@ struct flevel {
 
     struct fentity **entities;
     unsigned int entity_data_size;
+
+#ifdef COTARGET_PTX
+    struct fblock *dev_block_pipeline;
+    
+    unsigned char *dev_allow_pipeline;
+    unsigned char *host_allow_pipeline;
+
+    int old_block_amount;
+#endif
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
@@ -42,6 +51,11 @@ Rectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
 fserializable _fLevelSerialize(struct flevel *level);
 struct flevel _fLevelLoad(fserializable *serializable);
+
+#ifdef COTARGET_PTX
+void _fLevelReloadCudaCtx(struct flevel *level);
+void _fLevelPrepareCudaRender(struct flevel *level, Rectangle area);
+#endif
 
 #ifdef __cplusplus
 }

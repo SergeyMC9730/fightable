@@ -36,6 +36,8 @@ void _fEditorDraw(struct feditor *editor) {
     mobile_swipe_area.x = 4;
     mobile_swipe_area.y = __state.framebuffer.texture.height - mobile_swipe_area.height - 4;
 
+    // printf("a\n");
+
     if (editor->should_process_interactions && !editor->should_display_selector) {
         float delta = GetFrameTime();
 
@@ -71,9 +73,9 @@ void _fEditorDraw(struct feditor *editor) {
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
 
-    Vector2 mouse_pos = GetMousePosition();
-    mouse_pos.x -= __state.mouse_pos_offset.x; mouse_pos.x /= __state.window_scale;
-    mouse_pos.y -= __state.mouse_pos_offset.y; mouse_pos.y /= __state.window_scale;
+    Vector2 mouse_pos = _fGetMousePosPix();
+
+    // printf("b\n");
 
     if (editor->should_process_interactions && !editor->should_display_selector) {
         Camera2D actual_cam = editor->level.camera;
@@ -84,6 +86,8 @@ void _fEditorDraw(struct feditor *editor) {
 
         m_world_pos.x += actual_cam.target.x;
         m_world_pos.y += actual_cam.target.y;
+
+        // printf("pos: %f:%f\n", m_world_pos.x, m_world_pos.y);
 
         float tx = editor->level.tilemap->tile_size.x;
         float ty = editor->level.tilemap->tile_size.y;
@@ -142,14 +146,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
             if (editor->swipe_enabled) {
-                auto block = _fBlockFromId(editor->current_block_id);
-
-                if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
-                    IVector2 pos = _fEditorGetPosOfFirstId(editor, editor->current_block_id);
-                    editor->objects[pos.x][pos.y] = _fBlockFromId(0);
-                }
-
-                editor->objects[selected_block_pos.x][selected_block_pos.y] = block;
+                _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
             } else {
                 Vector2 mdelta = GetMouseDelta();
 
@@ -165,16 +162,7 @@ void _fEditorDraw(struct feditor *editor) {
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !editor->swipe_enabled && !editor->holded_previosly && !mouse_out_of_bounds) {
-            auto block = _fBlockFromId(editor->current_block_id);
-
-            if (block.singular && _fEditorContainsId(editor, editor->current_block_id)) {
-                IVector2 pos = _fEditorGetPosOfFirstId(editor, editor->current_block_id);
-                editor->objects[pos.x][pos.y] = _fBlockFromId(0);
-            }
-
-            editor->objects[selected_block_pos.x][selected_block_pos.y] = block;
-
-            // printf("placed block at %d:%d\n", selected_block_pos.x, selected_block_pos.y);
+            _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
         }
 
         {
@@ -200,6 +188,8 @@ void _fEditorDraw(struct feditor *editor) {
         float v = GetMouseWheelMove();
         _fEditorSwipeCurrentObjects(editor, v);
     }
+
+    // printf("c\n");
 
     if (editor->should_display_sidebar) {
         int blackbox_startx = (__state.framebuffer.texture.width) - 51;
@@ -301,7 +291,10 @@ void _fEditorDraw(struct feditor *editor) {
 
                 // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
                 UnloadRenderTexture(__state.framebuffer);
+                UnloadRenderTexture(__state.overlay_framebuffer);
+
                 __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
+                __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
 
                 editor->f1_lock = true;
             }
@@ -326,7 +319,10 @@ void _fEditorDraw(struct feditor *editor) {
             editor->level.entities = 0;
 
             UnloadRenderTexture(__state.framebuffer);
+            UnloadRenderTexture(__state.overlay_framebuffer);
+
             __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
+            __state.overlay_framebuffer = LoadRenderTexture(800 + 255, 600);
 
             for (fentity* e : editor->entities) {
                 MemFree(e);
@@ -348,4 +344,13 @@ void _fEditorDraw(struct feditor *editor) {
 
         DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
+
+    if (IsKeyPressed(KEY_B)) {
+        editor->should_display_selector = !editor->should_display_selector;
+    }
+
+    // _fScheduleOverlayFunc([](Vector2 mpos) {
+    //     DrawTextPro(GetFontDefault(), "Kruto", (Vector2){50, 50}, (Vector2){0, 0}, 60.f, 40.f, 1.f, (Color){255, 0, 0, 128});
+    //     DrawRectangle(mpos.x, mpos.y, 60, 60, GREEN);
+    // });
 }

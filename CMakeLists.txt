@@ -1,22 +1,82 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable LANGUAGES C CXX)
 
+if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
+    message(STATUS "Enabling PTX co-target")
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+        set(CMAKE_CUDA_ARCHITECTURES 52)
+    endif()
+    enable_language(CUDA)
+
+    set(FIGHTABLE_GPU_SRC
+        src/client/init_ptx.cu
+        src/client/level/prepare_render.cu
+        src/client/level/reload_cuda_ctx.cu
+    )
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "Enabling PTX debugger")
+        set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
+    endif()
+
+    add_compile_definitions(COTARGET_PTX)
+
+    add_executable(cuda-test
+        src/cuda_test/gpu.cu
+        src/cuda_test/main.c
+    )
+endif()
+
+if (FIGHTABLE_IMGUI)
+    add_compile_definitions(_FIGHTABLE_IMGUI_)
+endif()
+
+if (OPENMPT_LIB)
+    set(OPENMPT_LIB_CUSTOM TRUE)
+endif()
+if (MICROHTTPD_LIB)
+    set(MICROHTTPD_LIB_CUSTOM TRUE)
+endif()
+
+include(CheckIncludeFile)
+
+if (NOT OVERRIDE_CXX_STD)
+    set(OVERRIDE_CXX_STD 20)
+endif()
+
 find_library(OPENMPT_LIB openmpt)
 if(NOT OPENMPT_LIB)
     message(FATAL_ERROR "libopenmpt could not be found")
 endif()
 
-find_library(MICROHTTPD_LIB microhttpd)
-if(NOT MICROHTTPD_LIB)
-    message(FATAL_ERROR "libmicrohttpd could not be found")
+message(STATUS "libopenmpt lib path: ${OPENMPT_LIB}")
+
+CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
+if (NOT HAVE_LIBOPENMPT AND NOT OPENMPT_INC)
+	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
+endif()
+message(STATUS "libopenmpt custom include path: ${OPENMPT_INC}")
+
+if (NOT DISABLE_MP_SERVER)
+    find_library(MICROHTTPD_LIB microhttpd)
+    if(NOT MICROHTTPD_LIB)
+        message(FATAL_ERROR "libmicrohttpd could not be found")
+    endif()
+
+    message(STATUS "libmicrohttpd lib path: ${MICROHTTPD_LIB}")
+
+    CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
+    if (NOT HAVE_LIBMICROHTTPD AND NOT MICROHTTPD_INC)
+        message(FATAL_ERROR "libmicrohttpd binaries were found but the header files itself are missing")
+    endif()
+    message(STATUS "libmicrohttpd custom include path: ${MICROHTTPD_INC}")
+else()
+    set(OVERRIDE_CXX_STD 17)
 endif()
 
-message(STATUS "libopenmpt lib path: ${OPENMPT_LIB}")
-message(STATUS "libmicrohttpd lib path: ${MICROHTTPD_LIB}")
-
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD ${OVERRIDE_CXX_STD})
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-set(CXX_STANDARD 20)
+set(CXX_STANDARD ${OVERRIDE_CXX_STD})
 set(CXX_STANDARD_REQUIRED TRUE)
 set(BUILD_SHARED_LIBS ON)
 
@@ -35,19 +95,6 @@ set(ENABLE_CJSON_UNINSTALL OFF)
 
 add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
-
-CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
-CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
-
-if (NOT HAVE_LIBOPENMPT AND NOT OPENMPT_INC)
-	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
-endif()
-if (NOT HAVE_LIBMICROHTTPD AND NOT MICROHTTPD_INC)
-	message(FATAL_ERROR "libmicrohttpd binaries were found but the header files itself are missing")
-endif()
-
-message(STATUS "libopenmpt custom include path: ${OPENMPT_INC}")
-message(STATUS "libmicrohttpd custom include path: ${MICROHTTPD_INC}")
 
 set(FIGHTABLE_SRC
     src/client/main.c
@@ -124,70 +171,15 @@ set(FIGHTABLE_SRC
     src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
     src/client/renderer/keyboard.c
+    src/client/renderer/overlay_scheduler.cpp
+    src/client/renderer/mouse.c
+    src/client/editor/place_block.cpp
+    ${FIGHTABLE_GPU_SRC}
 )
-
-if (WIN32)
-    set(HTTPSERVER_NAME libhttpserver-win32)
-else()
-    set(HTTPSERVER_NAME libhttpserver)
-endif()
-
-file(GLOB HTTPSERVER_SRC
-    "ext/${HTTPSERVER_NAME}/src/*.hpp"
-    "ext/${HTTPSERVER_NAME}/src/*.h"
-    "ext/${HTTPSERVER_NAME}/src/*.cpp"
-
-    "ext/${HTTPSERVER_NAME}/src/details/*.cpp"
-
-    "ext/${HTTPSERVER_NAME}/src/httpserver/*.hpp"
-    "ext/${HTTPSERVER_NAME}/src/httpserver/details/*.hpp"
-)
-
-set(HTTPSERVER_INC
-    ext/${HTTPSERVER_NAME}/src
-    ext/${HTTPSERVER_NAME}/src/details
-    ext/${HTTPSERVER_NAME}/src/httpserver
-    ext/${HTTPSERVER_NAME}/src/httpserver/details
-)
-
-add_library(httpserver STATIC ${HTTPSERVER_SRC})
-
-target_include_directories(httpserver PRIVATE
-    ${HTTPSERVER_INC}
-    ${MICROHTTPD_INC}
-)
-
-add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
-
-target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
-
-add_library(fightable-http STATIC
-    src/http/req/APIRequest.cpp
-    src/http/req/SplitString.cpp
-    src/http/content_type/HttpContentType.cpp
-    src/http/content_type/HttpContentTypeAudio.cpp
-    src/http/content_type/HttpContentTypeHtml.cpp
-    src/http/content_type/HttpContentTypeImage.cpp
-    src/http/content_type/HttpContentTypeJson.cpp
-    src/http/content_type/HttpContentTypeText.cpp
-    src/http/req/v1.helloworld.cpp
-    src/http/http_server_create.cpp
-    src/http/http_server_destroy.cpp
-    src/http/req/v1.res.request.cpp
-    src/http/resource_dir.cpp
-    src/http/content_type/HttpContentTypeOctet.cpp
-)
-
-target_include_directories(fightable-http PRIVATE
-    src/http/inc
-    ${HTTPSERVER_INC}
-    ${MICROHTTPD_INC}
-)
-
-target_link_libraries(fightable-http PUBLIC httpserver)
 
 if (ANDROID)
     message(STATUS "Compiling for Android")
+    set(FIGHTABLE_TARGET Android)
 
 	set(FIGHTABLE_SRC
 		${FIGHTABLE_SRC}
@@ -197,11 +189,14 @@ if (ANDROID)
 	include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
 
 	add_library(fightable SHARED ${FIGHTABLE_SRC})
+
 	set(FIGHTABLE_NATIVE_LIBS android log)
+
 	add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
 elseif(WIN32)
     message(STATUS "Compiling for Windows")
+    set(FIGHTABLE_TARGET Windows)
 
     set(BUILD_SHARED_LIBS OFF)
     add_subdirectory(ext/pthread-win32)
@@ -212,17 +207,90 @@ elseif(WIN32)
 
     set(FIGHTABLE_NATIVE_LIBS pthreadVC3)
     set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
-
-    target_include_directories(httpserver PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
-    target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
-else()
+elseif(UNIX)
     message(STATUS "Compiling for UNIX-like operating systems")
+
+    set(FIGHTABLE_TARGET UNIX)
 
 	add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
+else()
+    message(STATUS "Compiling for console homebrews")
+    set(FIGHTABLE_TARGET Unknown homebrew)
+	
+    message(FATAL_ERROR "Support for platforms other than UNIX and NT is not implemented yet!")
 
-    file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
+    add_compile_definitions(TARGET_HOMEBREW_UNKNOWN)
 endif()
+
+if (NOT DISABLE_MP_SERVER)
+    if (WIN32)
+        set(HTTPSERVER_NAME libhttpserver-win32)
+    else()
+        set(HTTPSERVER_NAME libhttpserver)
+    endif()
+
+    file(GLOB HTTPSERVER_SRC
+        "ext/${HTTPSERVER_NAME}/src/*.hpp"
+        "ext/${HTTPSERVER_NAME}/src/*.h"
+        "ext/${HTTPSERVER_NAME}/src/*.cpp"
+
+        "ext/${HTTPSERVER_NAME}/src/details/*.cpp"
+
+        "ext/${HTTPSERVER_NAME}/src/httpserver/*.hpp"
+        "ext/${HTTPSERVER_NAME}/src/httpserver/details/*.hpp"
+    )
+
+    set(HTTPSERVER_INC
+        ext/${HTTPSERVER_NAME}/src
+        ext/${HTTPSERVER_NAME}/src/details
+        ext/${HTTPSERVER_NAME}/src/httpserver
+        ext/${HTTPSERVER_NAME}/src/httpserver/details
+        ${FIGHTABLE_NATIVE_INCLUDES}
+    )
+
+    add_library(httpserver STATIC ${HTTPSERVER_SRC})
+    target_include_directories(httpserver PRIVATE
+        ${HTTPSERVER_INC}
+        ${MICROHTTPD_INC}
+    )
+    add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
+
+    target_link_libraries(httpserver PUBLIC ${MICROHTTPD_LIB})
+
+    add_library(fightable-http STATIC
+        src/http/req/APIRequest.cpp
+        src/http/req/SplitString.cpp
+        src/http/content_type/HttpContentType.cpp
+        src/http/content_type/HttpContentTypeAudio.cpp
+        src/http/content_type/HttpContentTypeHtml.cpp
+        src/http/content_type/HttpContentTypeImage.cpp
+        src/http/content_type/HttpContentTypeJson.cpp
+        src/http/content_type/HttpContentTypeText.cpp
+        src/http/req/v1.helloworld.cpp
+        src/http/http_server_create.cpp
+        src/http/http_server_destroy.cpp
+        src/http/req/v1.res.request.cpp
+        src/http/resource_dir.cpp
+        src/http/content_type/HttpContentTypeOctet.cpp
+    )
+    target_include_directories(fightable-http PRIVATE
+        src/http/inc
+        ${HTTPSERVER_INC}
+        ${MICROHTTPD_INC}
+    )
+    target_link_libraries(fightable-http PUBLIC httpserver)
+else()
+    add_compile_definitions(_DISABLE_MP_SERVER_)
+endif()
+
+if (NOT DISABLE_MP_SERVER)
+    target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
+    set(FIGHTABLE_HTTP_LINK fightable-http)
+    set(FIGHTABLE_HTTP_INC src/http/inc)
+endif()
+
+file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_executable(physics-test
     src/physics_test/main.c
@@ -240,7 +308,7 @@ target_include_directories(fightable PRIVATE
     ext/raylib/src 
     ext/cJSON 
     ext/portaudio_opensles/include
-    src/http/inc
+    ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
@@ -248,6 +316,38 @@ target_include_directories(fightable PRIVATE
 target_include_directories(physics-test PRIVATE ext/raylib/src)
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
 
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} fightable-http)
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK})
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
+
+
+message(STATUS "")
+message(STATUS "")
+
+message(STATUS "           Fightable Compile Settings")
+if (DISABLE_MP_SERVER)
+    message(STATUS "  MP server IS disabled")
+endif()
+message(STATUS "  CXX standard: ${OVERRIDE_CXX_STD}")
+message(STATUS "  Platform: ${FIGHTABLE_TARGET}")
+
+if (OPENMPT_INC)
+    message(STATUS "  libopenmpt custom include path: ${OPENMPT_INC}")
+endif()
+if (MICROHTTPD_INC)
+    message(STATUS "  libmicrohttpd custom include path: ${MICROHTTPD_INC}")
+endif()
+
+if (OPENMPT_LIB_CUSTOM)
+    message(STATUS "  libopenmpt lib path: ${OPENMPT_LIB}")
+endif()
+if (MICROHTTPD_LIB_CUSTOM)
+    message(STATUS "  libmicrohttpd lib path: ${MICROHTTPD_LIB}")
+endif()
+
+if (FIGHTABLE_CUDA)
+    message(STATUS "  CUDA support: ${FIGHTABLE_CUDA}")
+endif()
+
+message(STATUS "")
+message(STATUS "")

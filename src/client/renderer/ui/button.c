@@ -8,10 +8,7 @@
 unsigned char _fButtonDraw(struct fbutton *btn) {
     if (!btn || !btn->text) return 0;
 
-    Vector2 mpos = GetMousePosition();
-    mpos.x -= __state.mouse_pos_offset.x; mpos.x /= (__state.window_scale);
-    mpos.y -= __state.mouse_pos_offset.y; mpos.y /= (__state.window_scale);
-
+    Vector2 mpos = _fGetMousePosPix();
     IVector2 text_sz = _fTextMeasure(&__state.text_manager, btn->text);
 
     if (text_sz.x == 0) return 0;

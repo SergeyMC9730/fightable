@@ -23,7 +23,7 @@ void _fDraw() {
         }
     }
 
-    Camera2D cam = {};
+    Camera2D cam = {0};
     cam.zoom = 1.f;
     cam.target = __state.gui_render_offset;
 
