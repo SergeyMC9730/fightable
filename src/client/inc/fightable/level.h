@@ -43,6 +43,8 @@ struct flevel {
 
     int old_block_amount;
 #endif
+
+    Rectangle render_crop_area;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);

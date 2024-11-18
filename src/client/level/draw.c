@@ -65,6 +65,10 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         level->camera_size.y + tx
     };
 
+    if (level->render_crop_area.width * level->render_crop_area.height > 0.f) {
+        BeginScissorMode(level->render_crop_area.x, level->render_crop_area.x, level->render_crop_area.width, level->render_crop_area.height);
+    }
+
 #ifdef COTARGET_PTX
     if (__state.can_use_gpu_accel) {
         _fLevelPrepareCudaRender(level, area);
@@ -164,6 +168,10 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
                 entity->draw(entity);
             }
         }
+    }
+
+    if (level->render_crop_area.width * level->render_crop_area.height > 0.f) {
+        EndScissorMode();
     }
 
     EndMode2D();

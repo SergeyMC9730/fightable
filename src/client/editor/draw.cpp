@@ -63,6 +63,13 @@ void _fEditorDraw(struct feditor *editor) {
     editor->level.entities = editor->entities.data();
     editor->level.entity_data_size = editor->entities.size();
 
+    if (!editor->should_playback) {
+        editor->level.render_crop_area = { 0, 0, 160, 120 };
+    }
+    else {
+        editor->level.render_crop_area = { 0, 0, 0, 0 };
+    }
+
     _fLevelDraw(&editor->level, {0, 0});
 
     Color bouncing_color = RED;
@@ -76,7 +83,6 @@ void _fEditorDraw(struct feditor *editor) {
     // printf("b\n");
 
     if (editor->should_process_interactions && !editor->should_display_selector) {
-
         Camera2D actual_cam = editor->level.camera;
         actual_cam.target.x = (int)actual_cam.target.x;
         actual_cam.target.y = (int)actual_cam.target.y;
@@ -197,7 +203,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         int current_position_y = blackbox_starty;
 
-        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, Color{0, 0, 0, 200});
+        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, Color{0, 0, 0, 100});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
@@ -404,7 +410,7 @@ void _fEditorDraw(struct feditor *editor) {
                     _fTilemapDrawScaled(editor->level.tilemap, cur_blocks_pos, { block.base.tile_x, block.base.tile_y }, 0, 0, WHITE, 5);
                     if (CheckCollisionPointRec(mpos, blocks_check)) {
                         DrawRectangleRec(blocks_check, bouncing_color);
-                        if (CheckCollisionPointRec(mpos, blocks_check) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                             editor->current_block_id = i;
                             editor->should_display_selector = ~editor->should_display_selector;          
                         }

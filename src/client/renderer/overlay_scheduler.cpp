@@ -28,6 +28,8 @@ void _fSchedulerIterateOverlays() {
             const auto &c = std::get<renderer_event_t>(callback);
             c.callback(c.user);
         }
+
+        EndMode2D();
     }
 
     __overlay_callbacks.clear();
