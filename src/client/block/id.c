@@ -1,5 +1,7 @@
 #include <fightable/block.h>
 
+#define TSET(x,y,n) .base.tile_x = x, .base.tile_y = y, .name = #n
+
 static struct fblock __blocks[] = {
     {.base.tile_x = 40, .base.tile_y = 7, .name = "Air", .passable = 1},    // 0
     {.base.tile_x = 13, .base.tile_y = 0, .name = "Grass"},                 // 1
@@ -41,13 +43,20 @@ static struct fblock __blocks[] = {
     {.base.tile_x = 28, .base.tile_y = 4, .name = "BG1", .passable = 1},    // 37
     {.base.tile_x = 34, .base.tile_y = 1, .name = "Black"},                 // 38
     {.base.tile_x = 11, .base.tile_y = 0, .name = "White"},                 // 39
+    {TSET(21, 1,Stone), .metaobject = 1},       // 40
+    {TSET(21, 0,Stone), .parent_id = 40},       // 41
+    {TSET(22, 0,Stone), .parent_id = 40},       // 42
+    {TSET(23, 0,Stone), .parent_id = 40},       // 43
+    {TSET(24, 0,Stone), .parent_id = 40},       // 44
+    {TSET(25, 0,Stone), .parent_id = 40},       // 45
+    {TSET(26, 0,Stone), .parent_id = 40},       // 46
 };
 
 struct fblock _fBlockFromId(unsigned short id) {
     const unsigned short blocks_total = sizeof(__blocks) / sizeof(struct fblock);
     
     if (id >= blocks_total) {
-        struct fblock empty_block = {};
+        struct fblock empty_block = {0};
 
         return empty_block;
     }
