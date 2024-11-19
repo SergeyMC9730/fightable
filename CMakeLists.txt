@@ -175,6 +175,8 @@ set(FIGHTABLE_SRC
     src/client/renderer/overlay_scheduler.cpp
     src/client/renderer/mouse.c
     src/client/editor/place_block.cpp
+    src/client/audio/volume.c
+    src/client/etc/sanitizer.c
     ${FIGHTABLE_GPU_SRC}
 )
 

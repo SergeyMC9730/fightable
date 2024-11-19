@@ -33,6 +33,7 @@ struct faudio_engine {
     AudioStream *stream;
 #endif
 
+    // VOLUME SHOULD BE FROM 0 TO 2
     float volume;
 };
 
@@ -44,6 +45,8 @@ void _fAudioLoopCurrent(struct faudio_engine *engine);
 const char *_fAudioGetDbg(struct faudio_engine *engine, int channel);
 int _fAudioGetChannelsTotal(struct faudio_engine *engine);
 const char *_fAudioGetSongName(struct faudio_engine *engine);
+float _fAudioGetVolume(struct faudio_engine *engine);
+void _fAudioSetVolume(struct faudio_engine *engine, float v);
 
 #ifdef __cplusplus
 }

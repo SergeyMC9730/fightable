@@ -78,8 +78,10 @@ void _fAudioBegin(struct faudio_engine *engine) {
         unsigned long count = openmpt_module_read_mono(engine->current_module, CHANNEL_SAMPLE_RATE, CHANNEL_BUFFER_SIZE, merge_buffer[0]);
 #endif
 
+        float base_volume = _fAudioGetVolume(engine);
+
         for (int i = 0; i < (bufsize1 / sizeof(short)); i++) {
-            engine->buffer[i] = (float)engine->buffer[i] * limit_volume;
+            engine->buffer[i] = (float)engine->buffer[i] * limit_volume * base_volume;
         }
 
         engine->_channels = openmpt_module_get_current_playing_channels(engine->current_module);
