@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-float _fSanitizeFloat(float v, float min, float max);
+void _fSleep(int milliseconds);
 
 #ifdef __cplusplus
 }

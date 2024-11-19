@@ -12,3 +12,5 @@ export PACKAGE_NAME=dogotrigger.fightable
 export ANDROID_HOME=$ANDROID_SDK
 
 export BUILD_TOOLS=$ANDROID_HOME/build-tools/29.0.3
+
+export BUILD_TYPE=MinSizeRel

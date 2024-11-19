@@ -1,7 +1,9 @@
 #define IAUDIO_ENGINE
 #include <fightable/sound_engine.h>
 
+#ifndef TARGET_ANDROID
 #include <portaudio.h>
+#endif
 
 #include <libopenmpt/libopenmpt.h>
 #include <libopenmpt/libopenmpt_stream_callbacks_file.h>
@@ -11,6 +13,8 @@
 #include <string.h>
 
 #include <raylib.h>
+
+#include <fightable/time.h>
 
 void _fAudioBegin(struct faudio_engine *engine) {
     size_t bufsize1 = sizeof(short) * CHANNEL_BUFFER_SIZE * 2;
@@ -63,7 +67,7 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
         if (engine->mod_lock || !engine->current_module) {
             // printf("2\n");
-            Pa_Sleep((1.f / 30.f) * 1000.f);
+            _fSleep(33);
             continue;
         }
 
