@@ -153,11 +153,7 @@ set(FIGHTABLE_SRC
     src/client/intro/seekable_row.c
     src/client/etc/storage.c
     src/client/intro/menu/on_play.c
-<<<<<<< HEAD
-    src/client/intro/menu/on_multiplayer.c
     src/client/intro/menu/on_options.c
-=======
->>>>>>> 2ddd018ea6c381fd293ead3bdc50e5376749727a
     src/client/intro/menu/on_editor.c
     src/client/intro/menu/process_play.c
     src/client/intro/menu/process_options.c
