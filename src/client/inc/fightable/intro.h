@@ -21,7 +21,8 @@ void _fIntroProcessGfx();
 void _fIntroMenuOnPlay();
 void _fIntroMenuOnEditor();
 
-void _fIntroMenuOnMultiplayer();
+void _fIntroMenuOnMpCreate();
+void _fIntroMenuOnMpJoin();
 
 void _fIntroMenuProcessPlay();
 void _fIntroMenuProcessBase();

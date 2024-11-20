@@ -1,6 +1,7 @@
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/button.h>
+#include <fightable/renderer.h>
 
 void _fIntroMenuProcessPlay() {
     int wx = __state.framebuffer.texture.width;
@@ -25,12 +26,30 @@ void _fIntroMenuProcessPlay() {
 
     DrawTexture(__state.playbtn_container, area.x, area.y, tint);
 
-
-
     {
         Rectangle r = area;
-        r.height /= 2;
+        Vector2 mpos = _fGetMousePosPix();
 
+        r.height /= 2;
+        if (CheckCollisionPointRec(mpos, r)) {
+            BeginBlendMode(BLEND_MULTIPLIED);
+            DrawRectangleRec(r, (Color){255, 255, 255, 64});
+            EndBlendMode();
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+
+            }
+        }
         
+        r.y += r.height;
+        if (CheckCollisionPointRec(mpos, r)) {
+            BeginBlendMode(BLEND_MULTIPLIED);
+            DrawRectangleRec(r, (Color){255, 255, 255, 64});
+            EndBlendMode();
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                
+            }
+        }
     }
 }

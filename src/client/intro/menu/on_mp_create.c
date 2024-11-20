@@ -9,3 +9,7 @@
 #include <fightable/level.h>
 #include <fightable/editor.h>
 #include <fightable/storage.h>
+
+void _fIntroMenuOnMpCreate() {
+    
+}

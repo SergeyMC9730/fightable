@@ -153,7 +153,6 @@ set(FIGHTABLE_SRC
     src/client/intro/seekable_row.c
     src/client/etc/storage.c
     src/client/intro/menu/on_play.c
-    src/client/intro/menu/on_multiplayer.c
     src/client/intro/menu/on_editor.c
     src/client/intro/menu/process_play.c
     src/client/intro/menu/draw_background.c
@@ -178,6 +177,8 @@ set(FIGHTABLE_SRC
     src/client/audio/volume.c
     src/client/etc/sanitizer.c
     src/client/etc/time.c
+    src/client/intro/menu/on_mp_create.c
+    src/client/intro/menu/on_mp_join.c
     ${FIGHTABLE_GPU_SRC}
 )
 
