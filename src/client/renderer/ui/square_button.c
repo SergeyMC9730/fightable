@@ -4,14 +4,10 @@
 #include <fightable/text.h>
 #include <math.h>
 #include <fightable/renderer.h>
+#include <stdio.h>
 
-unsigned char _fSquareButtonDraw(struct fbutton *btn) {
-    if (!btn || !btn->text) return 0;
-
+unsigned char _fSquareButtonDraw(struct fcheckbox *btn) {
     Vector2 mpos = _fGetMousePosPix();
-    IVector2 text_sz = _fTextMeasure(&__state.text_manager, btn->text);
-
-    if (text_sz.x == 0) return 0;
 
     Rectangle r = {
         .x = btn->position.x,
@@ -31,10 +27,9 @@ unsigned char _fSquareButtonDraw(struct fbutton *btn) {
     cur_pos.x += __state.tilemap->tile_size.x;
 
     int size = 10;
-    int center_x = (size - text_sz.x) / 2;
+    int center_x = (size - 8) / 2;
 
     Rectangle btn_rect = {btn->position.x + 3, btn->position.y + 3, 10, 10};
-    DrawRectangle(btn_rect.x, btn_rect.y, btn_rect.width, btn_rect.height, MAROON);
     unsigned char ret = 0;
 
     if (CheckCollisionPointRec(mpos, btn_rect) ){ 
@@ -45,6 +40,7 @@ unsigned char _fSquareButtonDraw(struct fbutton *btn) {
             btn_label_offset.y--;
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            btn->checkmark = !btn->checkmark;
             ret = 1;
         }
     }
@@ -53,19 +49,20 @@ unsigned char _fSquareButtonDraw(struct fbutton *btn) {
 
     _fTilemapDrawMegatile(__state.tilemap, cur_pos, btn_tile_offset, (IVector2){2, 2}, 0, 0, WHITE);
 
-    cur_pos.x += __state.tilemap->tile_size.x;
+    if(btn->checkmark) {
+        _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0,WHITE);
+    }
 
-    _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + btn_label_offset.y}, btn->tint, 0);
+    cur_pos.x += __state.tilemap->tile_size.x;
 
     return ret;
     // DrawRectangleLinesEx(btn_rect, 1.f, RED);
 }
 
-unsigned char _fSquareButtonDrawSimple(const char *text, IVector2 pos, Color tint) {
-    struct fbutton btn = {0};
-    btn.text = text;
+unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, bool checkmark) {
+    struct fcheckbox btn = {0};
     btn.position = pos;
     btn.tint = tint;
-    
+    btn.checkmark = checkmark;
     return _fSquareButtonDraw(&btn);
 }

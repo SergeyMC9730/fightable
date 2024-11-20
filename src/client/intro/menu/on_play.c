@@ -50,7 +50,7 @@ void _fIntroMenuOnPlay() {
 
     Image img = LoadImageFromTexture(rt2d.texture);
     ImageFlipVertical(&img);
-
+    
     __state.playbtn_container = LoadTextureFromImage(img);
         
     UnloadImage(img);

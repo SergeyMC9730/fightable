@@ -154,8 +154,10 @@ set(FIGHTABLE_SRC
     src/client/etc/storage.c
     src/client/intro/menu/on_play.c
     src/client/intro/menu/on_multiplayer.c
+    src/client/intro/menu/on_options.c
     src/client/intro/menu/on_editor.c
     src/client/intro/menu/process_play.c
+    src/client/intro/menu/process_options.c
     src/client/intro/menu/draw_background.c
     src/client/intro/menu/process_base.c
     src/client/renderer/gfx/draw.c

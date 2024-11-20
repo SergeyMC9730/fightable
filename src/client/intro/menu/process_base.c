@@ -15,7 +15,7 @@ void _fIntroMenuProcessBase() {
     }
             
     if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 60}, WHITE)) {
-        
+        _fIntroMenuOnOptions();
     }
 
     if (_fButtonDrawSimple("EDITOR", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 70}, WHITE)) {

@@ -20,11 +20,13 @@ void _fIntroProcessGfx();
 
 void _fIntroMenuOnPlay();
 void _fIntroMenuOnEditor();
+void _fIntroMenuOnOptions();
 
 void _fIntroMenuOnMultiplayer();
 
 void _fIntroMenuProcessPlay();
 void _fIntroMenuProcessBase();
+void _fIntroMenuProcessOptions();
 
 void _fIntroMenuProcessMultiplayer();
 
@@ -33,6 +35,7 @@ void _fIntroMenuDrawBackground();
 #define INTRO_MENU_BASE_SELECTOR    0
 #define INTRO_MENU_PLAY             1
 #define INTRO_MENU_MULTIPLAYER      2
+#define INTRO_MENU_OPTIONS          3
 
 #ifdef __cplusplus
 }

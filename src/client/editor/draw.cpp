@@ -148,7 +148,9 @@ void _fEditorDraw(struct feditor *editor) {
             }
         }
 #endif
-
+        if(selected_object.has_value() && IsKeyPressed(KEY_DELETE)) {
+            _fEditorPlaceBlock(editor, BLOCK_AIR, selected_block_pos);
+        }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
             if (editor->swipe_enabled) {
                 _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
@@ -341,7 +343,7 @@ void _fEditorDraw(struct feditor *editor) {
             }
             editor->entities.clear();
         }
-
+        
         editor->f1_lock = false;
     }
 

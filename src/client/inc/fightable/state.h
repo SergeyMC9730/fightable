@@ -21,7 +21,7 @@ struct fhttpserver;
 #include <fightable/sound_engine.h>
 #include <fightable/gfx.h>
 #include <fightable/keyboard.h>
-
+#include <fightable/button.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -93,6 +93,8 @@ struct fightable_state {
     unsigned char intro_stage_completed;
     unsigned char menu_state;
     unsigned char menu_block_ui;
+    struct fcheckbox vsync_btn;
+
 
     Texture2D playbtn_container;
 

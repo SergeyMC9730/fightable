@@ -13,7 +13,9 @@
 #endif
 #include <fightable/storage.h>
 #include <cJSON.h>
-
+#include <fightable/flags.h>
+int flags = 0;
+bool v_sync_flag = 1;
 struct flevel __level;
 struct ftilemap __tilemap;
 
@@ -130,9 +132,11 @@ int main(int argc, char **argv) {
 
     // __state.can_use_gpu_accel = 0;
 #endif
-
+    flags = 0;
+    v_sync_flag = 1;
+    if(v_sync_flag) flags |= FLAG_VSYNC_HINT;
+    SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
-    SetTargetFPS(GetMonitorRefreshRate(0));
     // SetTargetFPS(30);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
