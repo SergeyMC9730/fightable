@@ -321,7 +321,7 @@ void _fEditorDraw(struct feditor *editor) {
 #ifndef TARGET_ANDROID
         _fTextDraw(&__state.text_manager, "f1 to exit", {2, 2}, BLUE, 1);
 #else
-        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4});
+        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE);
 #endif
 
         if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {

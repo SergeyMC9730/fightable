@@ -22,7 +22,8 @@ void _fIntroMenuOnPlay();
 void _fIntroMenuOnEditor();
 void _fIntroMenuOnOptions();
 
-void _fIntroMenuOnMultiplayer();
+void _fIntroMenuOnMpCreate();
+void _fIntroMenuOnMpJoin();
 
 void _fIntroMenuProcessPlay();
 void _fIntroMenuProcessBase();

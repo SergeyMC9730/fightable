@@ -8,8 +8,8 @@ void _fIntroMenuOnPlay() {
 
     __state.menu_state = INTRO_MENU_PLAY;
 
-    Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
-    Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Multiplayer", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
+    Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Create", WHITE, GREEN, 1);
+    Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Join", WHITE, BLUE, 1);
 
     int wx = __state.framebuffer.texture.width;
     int wy = __state.framebuffer.texture.height;
@@ -25,23 +25,27 @@ void _fIntroMenuOnPlay() {
 
     int offset = 3;
 
-    BeginScissorMode(1, 1, area.width - 1, area.height - 1);
+    // BeginScissorMode(1, 1, area.width - 1, area.height - 1);
 
     // DrawRectanglePro((Rectangle){-10 + area.x, 15 + area.y, 15, 15}, (Vector2){}, 45.f, GREEN);
-    DrawRectangle(0, offset, 15, 15, RED);
-    DrawRectanglePro((Rectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
-    DrawRectanglePro((Rectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
-    DrawRectanglePro((Rectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
+    // DrawRectangle(0, offset, 15, 15, RED);
+    // DrawRectanglePro((Rectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+    // DrawRectanglePro((Rectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+    // DrawRectanglePro((Rectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
     DrawTexture(multiplayer_label, 27, 6 + offset, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     offset -= 2;
 
-    DrawRectanglePro((Rectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
+    // DrawRectanglePro((Rectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
     DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){33, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     DrawLine(2, 23 + offset, area.width - 2, 23 + offset, (Color){0x71, 0xaf, 0xfb, 0xff});
 
-    EndScissorMode();
+    // EndScissorMode();
 
     EndTextureModeStacked();
 
