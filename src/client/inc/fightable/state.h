@@ -22,6 +22,7 @@ struct fhttpserver;
 #include <fightable/gfx.h>
 #include <fightable/keyboard.h>
 #include <fightable/button.h>
+#include <fightable/config.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -39,7 +40,6 @@ struct fhttpserver;
 #ifdef TARGET_ANDROID
 struct android_app;
 #endif
-
 struct fightable_state {
     struct ftilemap *tilemap;
 
@@ -54,8 +54,6 @@ struct fightable_state {
     struct ftitle_editor *current_title_editor;
 
     struct ftext_manager text_manager;
-
-    unsigned long draw_calls;
 
     // Music title_song;
     struct renderer_animation *title_song_sync;
@@ -93,8 +91,6 @@ struct fightable_state {
     unsigned char intro_stage_completed;
     unsigned char menu_state;
     unsigned char menu_block_ui;
-    struct fcheckbox vsync_btn;
-
 
     Texture2D playbtn_container;
 
@@ -125,6 +121,8 @@ struct fightable_state {
 
     unsigned char can_use_gpu_accel;
     double cuda_time;
+
+    struct fconfig config;
 };
 
 extern struct fightable_state __state;

@@ -6,7 +6,7 @@
 #include <fightable/renderer.h>
 #include <stdio.h>
 
-unsigned char _fSquareButtonDraw(struct fcheckbox *btn) {
+unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
     Vector2 mpos = _fGetMousePosPix();
 
     Rectangle r = {
@@ -40,8 +40,11 @@ unsigned char _fSquareButtonDraw(struct fcheckbox *btn) {
             btn_label_offset.y--;
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            btn->checkmark = !btn->checkmark;
+            btn->flag = !btn->flag;
             ret = 1;
+            if (btn->on_click) {
+                btn->on_click(btn);
+            }
         }
     }
 
@@ -49,20 +52,37 @@ unsigned char _fSquareButtonDraw(struct fcheckbox *btn) {
 
     _fTilemapDrawMegatile(__state.tilemap, cur_pos, btn_tile_offset, (IVector2){2, 2}, 0, 0, WHITE);
 
-    if(btn->checkmark) {
-        _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0,WHITE);
+    switch (btn->type) {
+        case SQRBTN_CHECKBOX: {
+            if (!btn->flag) break;
+
+            _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0, WHITE);
+            
+            break;
+        }
+        case SQRBTN_EXIT: {
+            _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){28, 6}, 0, 0, WHITE);
+            break;
+        }
+        case SQRBTN_REVCHECKBOX: {
+            if (btn->flag) break;
+
+            _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0, WHITE);
+            
+            break;
+        }
     }
 
     cur_pos.x += __state.tilemap->tile_size.x;
 
     return ret;
-    // DrawRectangleLinesEx(btn_rect, 1.f, RED);
 }
 
-unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, bool checkmark) {
-    struct fcheckbox btn = {0};
+unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, unsigned char type, unsigned char flag) {
+    struct fsquare_button btn = {0};
     btn.position = pos;
     btn.tint = tint;
-    btn.checkmark = checkmark;
+    btn.type = type;
+    btn.flag = flag;
     return _fSquareButtonDraw(&btn);
 }

@@ -15,31 +15,36 @@ struct fbutton {
     unsigned char up : 1;
 
     void *ctx;
-    int (*on_click)(struct fbutton *btn);
+    void (*on_click)(struct fbutton *btn);
 
     IVector2 position;
 
     Color tint;
 };
-struct fcheckbox {
-    
+
+#define SQRBTN_NONE         0
+#define SQRBTN_CHECKBOX     1
+#define SQRBTN_EXIT         2
+#define SQRBTN_REVCHECKBOX  3
+
+struct fsquare_button {
     unsigned char howered : 1;
     unsigned char down : 1;
     unsigned char up : 1;
+    unsigned char flag : 1;
 
     void *ctx;
-    int (*on_click)(struct fbutton *btn);
+    void (*on_click)(struct fsquare_button *btn);
 
     IVector2 position;
-
     Color tint;
 
-    bool checkmark;
+    unsigned char type;
 };
 unsigned char _fButtonDraw(struct fbutton *btn);
 unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint);
-unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, bool checkmark);
-unsigned char _fSquareButtonDraw(struct fcheckbox *btn);
+unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, unsigned char type, unsigned char flag);
+unsigned char _fSquareButtonDraw(struct fsquare_button *btn);
 #ifdef __cplusplus
 }
 #endif

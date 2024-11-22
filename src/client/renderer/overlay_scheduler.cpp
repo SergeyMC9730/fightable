@@ -22,11 +22,16 @@ void _fSchedulerIterateOverlays() {
     for (const auto &callback : __overlay_callbacks) {
         if (std::holds_alternative<foverlay_callback>(callback)) {
             const auto &c = std::get<foverlay_callback>(callback);
-
-            c(mouse_pos);
+            
+            if (c) {
+                c(mouse_pos);
+            }
         } else if (std::holds_alternative<renderer_event_t>(callback)) {
             const auto &c = std::get<renderer_event_t>(callback);
-            c.callback(c.user);
+
+            if (c.callback) {
+                c.callback(c.user);
+            }
         }
 
         EndMode2D();

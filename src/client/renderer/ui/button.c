@@ -56,6 +56,9 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             ret = 1;
+            if (btn->on_click) {
+                btn->on_click(btn);
+            }
         }
     }
 

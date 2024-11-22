@@ -38,4 +38,13 @@ void _fIntroMenuOnOptions() {
         
     UnloadImage(img);
     UnloadRenderTexture(rt2d);
+
+    struct fsquare_button btn = {0};
+
+    btn.position = (IVector2){10, area.y + 5};
+    btn.tint = WHITE;
+    btn.flag = __state.config.vsync_flag;
+    btn.type = SQRBTN_REVCHECKBOX;
+
+    __state.config.vsync_btn = btn;
 }
