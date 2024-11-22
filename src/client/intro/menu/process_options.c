@@ -2,7 +2,10 @@
 #include <fightable/state.h>
 #include <fightable/button.h>
 #include <fightable/flags.h>
+#include <fightable/slider.h>
 #include <stdlib.h>
+
+
 void _fIntroMenuProcessOptions() {
     int wx = 130;
     int wy = 52;
@@ -18,7 +21,6 @@ void _fIntroMenuProcessOptions() {
 
     Rectangle area = (Rectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 
-    bool checkmark = 1;
     unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint);
 
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
@@ -34,4 +36,9 @@ void _fIntroMenuProcessOptions() {
     }
     
     DrawTexture(__state.playbtn_container, area.x, area.y, tint);
+
+    _fSliderDraw(&__state.config.volume_slider);
+    __state.sound_engine.volume = __state.config.volume_slider.progress;
+
+    TraceLog(LOG_INFO, "percentage: %f", __state.config.volume_slider.progress * 100.f);
 }

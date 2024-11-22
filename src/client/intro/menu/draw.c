@@ -29,12 +29,11 @@ void _fIntroMenuDraw() {
             _fIntroMenuProcessPlay();
 
             break;
-            
+        }
         case INTRO_MENU_OPTIONS: {
             _fIntroMenuProcessOptions();
 
             break;
-        }
         }
 
         default: {}

@@ -18,6 +18,11 @@ typedef struct FColor FColor;
 FColor _fColorToFloat(Color col);
 Color _fFloatToColor(FColor col);
 
+Color _fInvertColor(Color col);
+FColor _fInvertFColor(FColor col);
+
+void _fFColorSanitize(FColor *col);
+
 #ifdef __cplusplus
 }
 #endif

@@ -47,4 +47,13 @@ void _fIntroMenuOnOptions() {
     btn.type = SQRBTN_REVCHECKBOX;
 
     __state.config.vsync_btn = btn;
+
+    struct fslider slider = {0};
+    slider.tint = BLUE;
+    slider.scaling = 1.f;
+    slider.rect = (Rectangle){10, 10, 30, 4};
+    slider.movable_width = 4.f;
+    slider.progress = __state.sound_engine.volume;
+
+    __state.config.volume_slider = slider;
 }

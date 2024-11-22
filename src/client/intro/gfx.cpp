@@ -92,6 +92,8 @@ void _fIntroProcessGfx() {
 }
 
 void _fIntroGfxInit() {
+    // return;
+
     switch (__state.song_id) {
     case MUS_ENDLESS_DREAM: {
         __current_shaker = new fintro_ed0_shaker();

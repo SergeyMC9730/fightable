@@ -2,6 +2,7 @@
 #include <fightable/editor.h>
 #include <fightable/state.h>
 #include <fightable/camera.h>
+#include <fightable/renderer.h>
 #include <stdio.h>
 
 struct feditor *_fEditorCreate() {
@@ -27,6 +28,13 @@ struct feditor *_fEditorCreate() {
     editor->should_playback = 0;
     editor->should_process_interactions = 1;
 
+    struct fslider slider = {0};
+    slider.tint = BLUE;
+    slider.scaling = UI_SCALE;
+    slider.rect = (Rectangle){10, 10, 30, 4};
+    slider.movable_width = 4.f;
+
+    editor->test_slider = slider;
 
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);

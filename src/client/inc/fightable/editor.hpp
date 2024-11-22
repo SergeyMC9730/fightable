@@ -7,6 +7,7 @@
 #include <vector>
 #include <fightable/block.h>
 #include <fightable/entity.h>
+#include <fightable/slider.h>
 struct feditor {
     std::map<int, std::map<int, fblock>> objects;
     std::vector<fblock> render_objects;
@@ -31,4 +32,6 @@ struct feditor {
     std::vector<fentity*> entities;
 
     unsigned short current_object_page;
+
+    fslider test_slider;
 };

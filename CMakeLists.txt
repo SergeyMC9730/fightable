@@ -181,6 +181,7 @@ set(FIGHTABLE_SRC
     src/client/etc/time.c
     src/client/intro/menu/on_mp_create.c
     src/client/intro/menu/on_mp_join.c
+    src/client/renderer/ui/slider.c
     ${FIGHTABLE_GPU_SRC}
 )
 

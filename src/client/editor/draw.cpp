@@ -419,6 +419,8 @@ void _fEditorDraw(struct feditor *editor) {
                     }
                 }
             }
+
+            _fSliderDraw(&editor->test_slider);
         });
     }
 }
