@@ -4,7 +4,11 @@
 #include <string.h>
 #include <strings.h>
 
+#ifdef TARGET_UNIX
 #include <unistd.h>
+#elif defined(TARGET_WIN32)
+#include <io.h>
+#endif
 #include <stdio.h>
 
 #include <math.h>

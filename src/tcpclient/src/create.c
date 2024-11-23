@@ -4,8 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 #include <strings.h>
+#ifdef TARGET_UNIX
 #include <netdb.h>
 #include <unistd.h>
+#elif defined(TARGET_WIN32)
+#include <io.h>
+#endif
 
 struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, struct ftcpclient_delegate *delegate) {
     if (delegate == NULL) {

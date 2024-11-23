@@ -7,10 +7,14 @@ extern "C" {
 #include <pthread.h>
 #include <rsb/rsb_array_cstr.h>
 
+#ifdef TARGET_UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h> 
+#include <netdb.h>
+#elif defined(TARGET_WIN32)
+#include <winsock.h>
+#endif
 
 struct ftcpclient_delegate;
 struct ftcpclient {
