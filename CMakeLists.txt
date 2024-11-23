@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable LANGUAGES C CXX)
 
+set(FIGHTABLE_SHARED_INC
+    src/shared/inc
+)
+
+add_library(fshared STATIC
+    src/shared/src/cstr.c
+)
+target_include_directories(fshared PRIVATE
+    ${FIGHTABLE_SHARED_INC}
+)
+
 if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     message(STATUS "Enabling PTX co-target")
     if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
@@ -185,6 +196,33 @@ set(FIGHTABLE_SRC
     ${FIGHTABLE_GPU_SRC}
 )
 
+set(FIGHTABLE_TCP_SERVER_SRC
+    src/tcpsrv/src/daemon.cpp
+    src/tcpsrv/src/message.cpp
+    src/tcpsrv/src/user.cpp
+    src/tcpsrv/src/tools.cpp
+)
+set(FIGHTABLE_TCP_CLIENT_SRC
+    src/tcpclient/src/create.c
+    src/tcpclient/src/thread.c
+)
+
+add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
+
+add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
+target_link_libraries(ftcpsrv-test ftcpsrv)
+target_include_directories(ftcpsrv-test PRIVATE
+    src/tcpsrv/inc
+    ${FIGHTABLE_SHARED_INC}
+)
+
+add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
+target_link_libraries(ftcpclient fshared)
+target_include_directories(ftcpclient PRIVATE
+    src/tcpclient/inc
+    ${FIGHTABLE_SHARED_INC}
+)
+
 if (ANDROID)
     message(STATUS "Compiling for Android")
     set(FIGHTABLE_TARGET Android)
@@ -261,6 +299,7 @@ if (NOT DISABLE_MP_SERVER)
     target_include_directories(httpserver PRIVATE
         ${HTTPSERVER_INC}
         ${MICROHTTPD_INC}
+        ${FIGHTABLE_SHARED_INC}
     )
     add_compile_definitions(_HTTPSERVER_HPP_INSIDE_)
 
@@ -286,6 +325,7 @@ if (NOT DISABLE_MP_SERVER)
         src/http/inc
         ${HTTPSERVER_INC}
         ${MICROHTTPD_INC}
+        ${FIGHTABLE_SHARED_INC}
     )
     target_link_libraries(fightable-http PUBLIC httpserver)
 else()
@@ -293,12 +333,19 @@ else()
 endif()
 
 if (NOT DISABLE_MP_SERVER)
-    target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES})
+    target_include_directories(fightable-http PRIVATE ${FIGHTABLE_NATIVE_INCLUDES} ${FIGHTABLE_SHARED_INC})
     set(FIGHTABLE_HTTP_LINK fightable-http)
     set(FIGHTABLE_HTTP_INC src/http/inc)
 endif()
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
+
+target_include_directories(ftcpsrv PRIVATE
+    src/tcpsrv/inc
+    ext/base64/include
+    ${FIGHTABLE_NATIVE_INCLUDES}
+    ${FIGHTABLE_SHARED_INC}
+)
 
 add_executable(physics-test
     src/physics_test/main.c
@@ -319,12 +366,13 @@ target_include_directories(fightable PRIVATE
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
+    ${FIGHTABLE_SHARED_INC}
 )
 
-target_include_directories(physics-test PRIVATE ext/raylib/src)
-target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc)
+target_include_directories(physics-test PRIVATE ext/raylib/src ${FIGHTABLE_SHARED_INC})
+target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc ${FIGHTABLE_SHARED_INC})
 
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK})
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 

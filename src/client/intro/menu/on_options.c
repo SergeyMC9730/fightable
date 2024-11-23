@@ -19,6 +19,7 @@ void _fIntroMenuOnOptions() {
     RenderTexture2D rt2d = LoadRenderTexture(wx, wy);
 
     Texture2D v_sync = _fTextRenderGradientV(&__state.text_manager, "V-Sync", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
+    Texture2D fullscreen = _fTextRenderGradientV(&__state.text_manager, "FullScreen", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
 
     Rectangle area = (Rectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 
@@ -27,9 +28,11 @@ void _fIntroMenuOnOptions() {
     ClearBackground((Color){0, 0, 0, 0}); // (Color){0, 0, 0, 160}
 
     DrawTexture(v_sync, 3, 10, WHITE);
+    DrawTexture(fullscreen, 3, 25, WHITE);
 
     EndTextureModeStacked();
     UnloadTexture(v_sync);
+    UnloadTexture(fullscreen);
 
     Image img = LoadImageFromTexture(rt2d.texture);
     ImageFlipVertical(&img);
@@ -56,4 +59,12 @@ void _fIntroMenuOnOptions() {
     slider.progress = __state.sound_engine.volume;
 
     __state.config.volume_slider = slider;
+
+    struct fsquare_button btn_fullscreen = {0};
+    btn_fullscreen.tint = WHITE;
+    btn_fullscreen.position = (IVector2){10, area.y + 20};
+    btn_fullscreen.type = SQRBTN_CHECKBOX;
+    btn_fullscreen.flag = __state.config.fullscreen_flag;
+
+    __state.config.fullscreen_btn = btn_fullscreen;
 }

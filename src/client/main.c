@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    unsigned char debug_output = 0;
+    unsigned char debug_output = 1;
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -134,9 +134,10 @@ int main(int argc, char **argv) {
 #endif
     flags = 0;
     v_sync_flag = 1;
-    if(v_sync_flag) flags |= FLAG_VSYNC_HINT;
+    // if(v_sync_flag) flags |= FLAG_VSYNC_HINT; 
     SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
+    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     // SetTargetFPS(30);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);

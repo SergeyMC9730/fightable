@@ -19,3 +19,6 @@
 [submodule "ext/libhttpserver-win32"]
 	path = ext/libhttpserver-win32
 	url = https://github.com/SergeyMC9730/libhttpserver-win32.git
+[submodule "ext/base64"]
+	path = ext/base64
+	url = https://github.com/tobiaslocker/base64.git

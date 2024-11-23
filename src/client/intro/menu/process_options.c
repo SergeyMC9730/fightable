@@ -23,6 +23,10 @@ void _fIntroMenuProcessOptions() {
 
     unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint);
 
+    // тебе надо сначала инициализировать кнопку в глобальном __state.config,
+    // чтобы значения не ресетались каждый кадр
+// f а у тебя где инзаполняется структ кнопки vsync
+    // пробуй запустить тогда
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
         __state.menu_state = INTRO_MENU_BASE_SELECTOR;
         UnloadTexture(__state.playbtn_container);
@@ -30,6 +34,17 @@ void _fIntroMenuProcessOptions() {
         return;
     }
 
+    if(_fSquareButtonDraw(&__state.config.fullscreen_btn)) {
+ 		int display = GetCurrentMonitor();
+        if(!IsWindowFullscreen()) {
+            SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
+            ToggleFullscreen();     
+        } else {
+            ToggleFullscreen();
+            SetWindowSize(800, 600);
+        }
+    }
+    
     if(_fSquareButtonDraw(&__state.config.vsync_btn)) {
         if (IsWindowState(FLAG_VSYNC_HINT)) ClearWindowState(FLAG_VSYNC_HINT);
         else SetWindowState(FLAG_VSYNC_HINT);    
@@ -40,5 +55,6 @@ void _fIntroMenuProcessOptions() {
     _fSliderDraw(&__state.config.volume_slider);
     __state.sound_engine.volume = __state.config.volume_slider.progress;
 
-    TraceLog(LOG_INFO, "percentage: %f", __state.config.volume_slider.progress * 100.f);
+    __state.config.fullscreen_flag = __state.config.fullscreen_btn.flag;
+    __state.config.vsync_flag = __state.config.vsync_btn.flag;
 }
