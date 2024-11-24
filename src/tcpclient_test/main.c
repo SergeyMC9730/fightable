@@ -1,6 +1,7 @@
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
 #include <stdio.h>
+#include <string.h>
 
 void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
     printf("* received %d bytes\n", len);
@@ -22,6 +23,17 @@ int main() {
     }
 
     printf("* client has been created\n* press enter to stop\n");
+
+    printf("* sending test messages\n");
+
+    const char *msg = "Hello";
+    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
+
+    msg = ", fricking";
+    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
+
+    msg = " world!";
+    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
 
     char buffer[16] = {0};
     fgets(buffer, 16, stdin);

@@ -25,6 +25,8 @@ void *_fTcpClientWriteThread(struct ftcpclient *client) {
             for (int i = 0; i < client->requested_messages->len; i++) {
                 char *msg = RSBGetAtIndex_pchar(client->requested_messages, i);
                 size_t len = strlen(msg);
+
+                printf("%d -> message %s with length %d\n", i, msg, len);
                 
                 size_t sim = total_len + len;
                 if (sim >= client->buf_size) {
@@ -32,27 +34,34 @@ void *_fTcpClientWriteThread(struct ftcpclient *client) {
                 }
 
                 memcpy(client->buf_w + total_len, msg, len);
-                memset(client->buf_w + total_len + len, '|', 1);
+                memset(client->buf_w + total_len + len + 1, '|', 1);
 
-                total_len += len;
+                total_len += len + 1;
 
                 free(msg);
             }
 
+            RSBClear_pchar(client->requested_messages);
+
+            total_len++;
+
+            memset(client->buf_w + total_len, 0, 1);
+
             if (total_len != 0) {
-                int max = (int)fmin(client->buf_size, total_len) - 1;
+                int max = (int)fmin(client->buf_size, total_len);
+
+                printf("sending message %s (len=%d)\n", client->buf_w, max);
 
                 client->buf_w[max] = 0;
                 int res = write(client->sockfd, client->buf_w, max);
 
                 if (res < 0) {
-                    printf("ftcpclient: write: fail (%d). tried to write %d bytes\n", res, max);
+                    printf("ftcpclient: write: fail (%d). tried to write %d bytes. exiting\n", res, max);
+                    continue;
                 }
             }
-
-            RSBClear_pchar(client->requested_messages);
         } else {
-            _fSleep(250);
+            _fSleep(10);
         }
     }
 
@@ -114,12 +123,12 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
         }
 
         const char *reply = "$";
-        write(client->sockfd, reply, strlen(reply));
+        // write(client->sockfd, reply, strlen(reply));
 
-        // unsigned char res = _fTcpClientSendMsg(client, "$", 2);
-        // if (res == 0) {
-        //     printf("ftcpclient: cound not send read packet\n");
-        // }
+        unsigned char res = _fTcpClientSendMsg(client, reply, strlen(reply) + 1);
+        if (res == 0) {
+            printf("ftcpclient: cound not send read packet\n");
+        }
 
         _fCleanupSplittedString(message_container);
     }

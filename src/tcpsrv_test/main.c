@@ -9,7 +9,7 @@ void setDaemon(struct ftcp_server_delegate *self, struct ftcp_server_daemon *dae
     printf("* setting daemon ctx\n");
 }
 void processMessage(struct ftcp_server_delegate *self, struct ftcp_server_user *user, unsigned char *message, unsigned int len) {
-    printf("* received message from user with len %d\n", len);
+    printf("* received message from user with len %d: \"%s\"\n", len, message);
 }
 
 int main() {

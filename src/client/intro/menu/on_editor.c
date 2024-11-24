@@ -16,7 +16,9 @@ void _fIntroMenuOnEditorCallback() {
     __state.intro_can_continue = 1;
 
 #ifndef TARGET_ANDROID
-    SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
+    if (!IsWindowFullscreen()) {
+        SetWindowSize(__state.initial_game_size.x, __state.initial_game_size.y);
+    }
 #endif
 
     Vector2 dpi = GetWindowScaleDPI();
