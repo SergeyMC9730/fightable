@@ -111,7 +111,7 @@ void ftcp_server_daemon::_baseThread() {
 
         for (int descriptor : _socketInfo.acceptedConnections) {
             if (descriptor <= 0) {
-                printf("loop 2\n");
+                // printf("loop 2\n");
 
                 continue;
             }
@@ -122,7 +122,7 @@ void ftcp_server_daemon::_baseThread() {
                 maxSocketDescriptor = descriptor;
             }
 
-            printf("loop 4\n");
+            // printf("loop 4\n");
         }
 
         int status = select(maxSocketDescriptor + 1, &_socketInfo.socketDescriptors, NULL, NULL, NULL);
@@ -130,12 +130,12 @@ void ftcp_server_daemon::_baseThread() {
             continue;
         }
         else {
-            printf("loop 3\n");
+            // printf("loop 3\n");
         }
 
         status = FD_ISSET(_socketInfo.masterSocket, &_socketInfo.socketDescriptors);
         if (status) {
-            printf("loop 5\n");
+            // printf("loop 5\n");
             int accept_status = accept(_socketInfo.masterSocket, (struct sockaddr *)&_socketInfo.address, &addrLen);
             assert(accept_status >= 0 && "TcpServerDaemon: accept: fail");
 
@@ -143,10 +143,10 @@ void ftcp_server_daemon::_baseThread() {
             unsigned int conPort = ntohs(_socketInfo.address.sin_port);
 
             if (countIPAddress(conAddress) >= _maxClientsPerIP) {
-                printf("loop 6\n");
+                // printf("loop 6\n");
                 close(accept_status);
             } else {
-                printf("loop 7\n");
+                // printf("loop 7\n");
                 _ipAddresses.push_back(conAddress);
 
                 int old_status = accept_status;
@@ -177,23 +177,23 @@ void ftcp_server_daemon::_baseThread() {
             }
         }
         else {
-            printf("loop 8\n");
+            // printf("loop 8\n");
         }
 
         std::vector<int> descriptorsToRemove = {};
 
         for (int descriptor : _socketInfo.acceptedConnections) {
-            printf("loop 9\n");
+            // printf("loop 9\n");
             bool shouldExist = _processDescriptor(descriptor);
 
             if (!shouldExist) {
-                printf("loop 10\n");
+                // printf("loop 10\n");
                 descriptorsToRemove.push_back(descriptor);
             }
         }
 
         if (descriptorsToRemove.size() != 0) {
-            printf("loop 11\n");
+            // printf("loop 11\n");
             std::vector<int> new_descriptors = {};
 
             for (int descriptor : _socketInfo.acceptedConnections) {

@@ -202,7 +202,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 }
 
 #define RSB_ARRAY_FUNC_VALID_IMPL(type, funname) RSB_ARRAY_FUNC_VALID_DEF(type, funname) {  \
-    return !(!array || !array->objects || !array->len);                                     \
+    return !(!array || !array->objects);                                                    \
 }
 
 #define RSB_ARRAY_IMPL_GEN(type, funname)               \

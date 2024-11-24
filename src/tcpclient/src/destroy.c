@@ -1,4 +1,5 @@
 #include <fightable/tcpcln/client.h>
+#include <fightable/string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -20,12 +21,8 @@ void _fTcpClientDestroy(struct ftcpclient *client) {
         free(client->buf_w);
     }
 
-    if (client->received_headers) {
-        RSBDestroy_cstr(client->received_headers);
-    }
-    if (client->requested_messages) {
-        RSBDestroy_cstr(client->requested_messages);
-    }
+    _fCleanupSplittedString(client->received_headers);
+    _fCleanupSplittedString(client->requested_messages);
 
     free(client);
 

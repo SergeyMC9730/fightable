@@ -211,6 +211,7 @@ set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/create.c
     src/tcpclient/src/thread.c
     src/tcpclient/src/destroy.c
+    src/tcpclient/src/send_msg.c
 )
 
 if (ANDROID)
@@ -277,6 +278,14 @@ target_include_directories(ftcpsrv-test PRIVATE
 add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
 target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(ftcpclient PRIVATE
+    src/tcpclient/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
+add_executable(ftcpclient-test src/tcpclient_test/main.c)
+target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS} m)
+target_include_directories(ftcpclient-test PRIVATE
     src/tcpclient/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}

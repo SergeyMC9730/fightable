@@ -5,7 +5,7 @@ extern "C" {
 #endif
 
 #include <pthread.h>
-#include <rsb/rsb_array_cstr.h>
+#include <rsb/rsb_array_pchar.h>
 
 #ifdef TARGET_UNIX
 #include <sys/types.h>
@@ -23,8 +23,8 @@ struct ftcpclient {
 
     unsigned char thread_should_exit;
 
-    rsb_array__cstr *received_headers;
-    rsb_array__cstr *requested_messages;
+    rsb_array__pchar *received_headers;
+    rsb_array__pchar *requested_messages;
 
     int sockfd;
     struct sockaddr_in serveraddr;
