@@ -7,6 +7,12 @@ set(FIGHTABLE_SHARED_INC
 
 add_library(fshared STATIC
     src/shared/src/cstr.c
+    src/shared/src/uchar.c
+    src/shared/src/auchar.c
+    src/shared/src/time.c
+    src/shared/src/string.c
+    src/shared/src/char.c
+    src/shared/src/pchar.c
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
@@ -189,7 +195,6 @@ set(FIGHTABLE_SRC
     src/client/editor/place_block.cpp
     src/client/audio/volume.c
     src/client/etc/sanitizer.c
-    src/client/etc/time.c
     src/client/intro/menu/on_mp_create.c
     src/client/intro/menu/on_mp_join.c
     src/client/renderer/ui/slider.c
@@ -205,6 +210,7 @@ set(FIGHTABLE_TCP_SERVER_SRC
 set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/create.c
     src/tcpclient/src/thread.c
+    src/tcpclient/src/destroy.c
 )
 
 add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
@@ -217,8 +223,15 @@ target_include_directories(ftcpsrv-test PRIVATE
 )
 
 add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
-target_link_libraries(ftcpclient fshared)
+target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS} m)
 target_include_directories(ftcpclient PRIVATE
+    src/tcpclient/inc
+    ${FIGHTABLE_SHARED_INC}
+)
+
+add_executable(ftcpclient-test src/tcpclient_test/main.c)
+target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(ftcpclient-test PRIVATE
     src/tcpclient/inc
     ${FIGHTABLE_SHARED_INC}
 )
@@ -372,7 +385,7 @@ target_include_directories(fightable PRIVATE
 target_include_directories(physics-test PRIVATE ext/raylib/src ${FIGHTABLE_SHARED_INC})
 target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc ${FIGHTABLE_SHARED_INC})
 
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv)
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 

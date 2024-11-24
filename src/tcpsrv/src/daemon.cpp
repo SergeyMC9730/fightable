@@ -257,6 +257,10 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
         for (std::string &m : actualMessages) {
             auto vv = GenericTools::stringToVector<unsigned char>(m);
 
+            if (vv.size() != 0 && vv.data()[0] == '$') {
+                user.clearMessageQueue();
+            }
+
             _delegate->processMessage(_delegate, &user, vv.data(), vv.size());
         }
 
@@ -354,8 +358,6 @@ void ftcp_server_daemon::requestMessageForUser(int socket, const char *message) 
 ftcp_server_delegate *ftcp_server_daemon::getDelegate() {
     return _delegate;
 }
-
-// emerge --ask --verbose --update --deep --newuse @world wine firefox neofetch htop tmux cronie chrony dosfstools f2fs-tools bluez git
 
 void ftcp_server_daemon::sendGlobalMessage(const char *message) {
     for (auto &[k, v] : _socketInfo.users) {

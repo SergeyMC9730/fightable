@@ -27,6 +27,7 @@ extern "C" {
 #define RSB_ARRAY_FUNC_ADDELEMENTATINDEX_DEF(type, funname) void RSBAddElementAtIndex##funname(RSB_ARRAY_NAME(funname) *array, type object, unsigned int index)
 #define RSB_ARRAY_FUNC_POPELEMENTATINDEX_DEF(type, funname) void RSBPopElementAtIndex##funname(RSB_ARRAY_NAME(funname) *array, unsigned int index)
 #define RSB_ARRAY_FUNC_CLEAR_DEF(type, funname) void RSBClear##funname(RSB_ARRAY_NAME(funname) *array)
+#define RSB_ARRAY_FUNC_VALID_DEF(type, funname) unsigned char RSBIsValid##funname(RSB_ARRAY_NAME(funname) *array)
 
 #define RSB_ARRAY_DEF_GEN(type, funname) RSB_ARRAY_STRUCT(type, funname); \
 RSB_ARRAY_FUNC_CREATE_DEF(funname);                 \
@@ -42,7 +43,9 @@ RSB_ARRAY_FUNC_GETATINDEX_DEF(type, funname);       \
 RSB_ARRAY_FUNC_ADDELEMENTATINDEX_DEF(type, funname);\
 RSB_ARRAY_FUNC_POPELEMENTATINDEX_DEF(type, funname);\
                                                     \
-RSB_ARRAY_FUNC_CLEAR_DEF(type, funname);
+RSB_ARRAY_FUNC_CLEAR_DEF(type, funname);            \
+                                                    \
+RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 
 #include <stdlib.h>
 
@@ -198,6 +201,10 @@ RSB_ARRAY_FUNC_CLEAR_DEF(type, funname);
     array->added_elements = 0;                                                              \
 }
 
+#define RSB_ARRAY_FUNC_VALID_IMPL(type, funname) RSB_ARRAY_FUNC_VALID_DEF(type, funname) {  \
+    return !(!array || !array->objects || !array->len);                                     \
+}
+
 #define RSB_ARRAY_IMPL_GEN(type, funname)               \
 RSB_ARRAY_FUNC_CREATE_IMPL(funname);                    \
 RSB_ARRAY_FUNC_CREATEFL_IMPL(type, funname);            \
@@ -212,7 +219,9 @@ RSB_ARRAY_FUNC_GETATINDEX_IMPL(type, funname);          \
 RSB_ARRAY_FUNC_ADDELEMENTATINDEX_IMPL(type, funname);   \
 RSB_ARRAY_FUNC_POPELEMENTATINDEX_IMPL(type, funname);   \
                                                         \
-RSB_ARRAY_FUNC_CLEAR_IMPL(type, funname);
+RSB_ARRAY_FUNC_CLEAR_IMPL(type, funname);               \
+                                                        \
+RSB_ARRAY_FUNC_VALID_IMPL(type, funname);
 
 #pragma pack(pop)
 
