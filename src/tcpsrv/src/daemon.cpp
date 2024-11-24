@@ -3,15 +3,23 @@
 #include <fightable/tcpsrv/daemon.h>
 #include <fightable/tcpsrv/tools.hpp>
 
+
+#ifdef TARGET_UNIX
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <asm-generic/socket.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#elif defined(TARGET_WIN32)
+#include <windows.h>
+#include <winsock.h>
+#include <io.h>
+#endif
+
 #include <assert.h>
+#include <fcntl.h>
 
 #include <iostream>
 #include <algorithm>
@@ -24,14 +32,20 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate *
 
     _maxClients = maxClients;
 
+    int status = 0;
+
+#ifdef TARGET_UNIX
     struct rlimit rlim;
     rlim.rlim_cur = maxClients;
     rlim.rlim_max = maxClients;
 
     _baseSocketOffset = _nextSocketID;
 
-    int status = setrlimit(RLIMIT_NOFILE, &rlim);
+    status = setrlimit(RLIMIT_NOFILE, &rlim);
     assert(status >= 0 && "TcpServerDaemon: setrlimit: fail");
+#else
+    printf("TcpServerDaemon: client limit cannot be set on this platform\n");
+#endif
 
     // _socketInfo.acceptedConnections.reserve(maxClients);
 
@@ -96,22 +110,32 @@ void ftcp_server_daemon::_baseThread() {
         maxSocketDescriptor = _socketInfo.masterSocket;
 
         for (int descriptor : _socketInfo.acceptedConnections) {
-            if (descriptor <= 0) continue;
+            if (descriptor <= 0) {
+                printf("loop 2\n");
+
+                continue;
+            }
 
             FD_SET(descriptor, &_socketInfo.socketDescriptors);
 
             if (descriptor > maxSocketDescriptor) {
                 maxSocketDescriptor = descriptor;
             }
+
+            printf("loop 4\n");
         }
 
         int status = select(maxSocketDescriptor + 1, &_socketInfo.socketDescriptors, NULL, NULL, NULL);
         if (status < 0) {
             continue;
         }
+        else {
+            printf("loop 3\n");
+        }
 
         status = FD_ISSET(_socketInfo.masterSocket, &_socketInfo.socketDescriptors);
         if (status) {
+            printf("loop 5\n");
             int accept_status = accept(_socketInfo.masterSocket, (struct sockaddr *)&_socketInfo.address, &addrLen);
             assert(accept_status >= 0 && "TcpServerDaemon: accept: fail");
 
@@ -119,14 +143,17 @@ void ftcp_server_daemon::_baseThread() {
             unsigned int conPort = ntohs(_socketInfo.address.sin_port);
 
             if (countIPAddress(conAddress) >= _maxClientsPerIP) {
+                printf("loop 6\n");
                 close(accept_status);
             } else {
+                printf("loop 7\n");
                 _ipAddresses.push_back(conAddress);
 
                 int old_status = accept_status;
                 _nextSocketID = nextFreeSocketID();
 
-                dup3(accept_status, _nextSocketID, O_CLOEXEC);
+                dup2(accept_status, _nextSocketID);
+
                 close(old_status);
 
                 accept_status = _nextSocketID;
@@ -149,18 +176,24 @@ void ftcp_server_daemon::_baseThread() {
                 _socketInfo.users[accept_status].sendMessage(header.c_str());
             }
         }
+        else {
+            printf("loop 8\n");
+        }
 
         std::vector<int> descriptorsToRemove = {};
 
         for (int descriptor : _socketInfo.acceptedConnections) {
+            printf("loop 9\n");
             bool shouldExist = _processDescriptor(descriptor);
 
             if (!shouldExist) {
+                printf("loop 10\n");
                 descriptorsToRemove.push_back(descriptor);
             }
         }
 
         if (descriptorsToRemove.size() != 0) {
+            printf("loop 11\n");
             std::vector<int> new_descriptors = {};
 
             for (int descriptor : _socketInfo.acceptedConnections) {
@@ -182,9 +215,7 @@ void ftcp_server_daemon::_baseThread() {
 
                     int close_result = close(descriptor);
                     if (close_result < 0) {
-#ifndef _DURAK_SILENT_
                         printf("TcpServerDaemon: close: fail (%d)\n", close_result);
-#endif
                     }
 
                     continue;
@@ -196,17 +227,21 @@ void ftcp_server_daemon::_baseThread() {
             _socketInfo.acceptedConnections = new_descriptors;
 
             for (int ignoredDesc : descriptorsToRemove) {
-#ifndef _DURAK_SILENT_
                 std::cout << "TcpServerDaemon: user " << ignoredDesc << " (" << _socketInfo.users[ignoredDesc].getUserID() << ") has been disconnected\n";
-#endif
             }
         }
     }
 }
 
 bool ftcp_server_daemon::sendMessage(int socket, std::vector<unsigned char> &message) {
+#ifdef TARGET_UNIX
+    constexpr int flags = MSG_NOSIGNAL;
+#else
+    constexpr int flags = 0;
+#endif
+
     unsigned int sz = message.size();
-    int data_sent = send(socket, message.data(), sz, MSG_NOSIGNAL);
+    int data_sent = send(socket, (const char *)message.data(), sz, flags);
 
     return data_sent == sz;
 }
@@ -281,7 +316,18 @@ unsigned int ftcp_server_daemon::getClientsConnected() {
 }
 
 bool ftcp_server_daemon::descriptorExists(int fd) {
+#ifdef TARGET_UNIX
     return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+#elif defined(TARGET_WIN32)
+    char type = 0xFF;
+    int length = 0;
+
+    getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &length);
+
+    return type == SOCK_STREAM && length != 0;
+#else
+    assert(false && "descriptorExists is not implemented for this platform")
+#endif
 }
 
 unsigned int ftcp_server_daemon::countIPAddress(std::string address) {

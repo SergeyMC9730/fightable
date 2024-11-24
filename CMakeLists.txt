@@ -213,29 +213,6 @@ set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/destroy.c
 )
 
-add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
-
-add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
-target_link_libraries(ftcpsrv-test ftcpsrv)
-target_include_directories(ftcpsrv-test PRIVATE
-    src/tcpsrv/inc
-    ${FIGHTABLE_SHARED_INC}
-)
-
-add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
-target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS} m)
-target_include_directories(ftcpclient PRIVATE
-    src/tcpclient/inc
-    ${FIGHTABLE_SHARED_INC}
-)
-
-add_executable(ftcpclient-test src/tcpclient_test/main.c)
-target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS})
-target_include_directories(ftcpclient-test PRIVATE
-    src/tcpclient/inc
-    ${FIGHTABLE_SHARED_INC}
-)
-
 if (ANDROID)
     message(STATUS "Compiling for Android")
     set(FIGHTABLE_TARGET Android)
@@ -264,7 +241,7 @@ elseif(WIN32)
 	add_compile_definitions(TARGET_WIN32)
     add_compile_definitions(__MINGW32__)
 
-    set(FIGHTABLE_NATIVE_LIBS pthreadVC3)
+    set(FIGHTABLE_NATIVE_LIBS pthreadVC3 Ws2_32)
     set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
 elseif(UNIX)
     message(STATUS "Compiling for UNIX-like operating systems")
@@ -281,6 +258,29 @@ else()
 
     add_compile_definitions(TARGET_HOMEBREW_UNKNOWN)
 endif()
+
+add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
+target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(ftcpsrv PRIVATE
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
+add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
+target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(ftcpsrv-test PRIVATE
+    src/tcpsrv/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
+add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
+target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(ftcpclient PRIVATE
+    src/tcpclient/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 
 if (NOT DISABLE_MP_SERVER)
     if (WIN32)

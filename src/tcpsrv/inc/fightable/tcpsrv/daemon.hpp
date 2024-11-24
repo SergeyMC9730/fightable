@@ -4,7 +4,12 @@
 #include <thread>
 #include <vector>
 #include <map>
+#ifdef TARGET_UNIX
 #include <netinet/in.h>
+#elif defined(TARGET_WIN32)
+#include <winsock2.h>
+typedef int socklen_t;
+#endif
 
 #include <fightable/tcpsrv/user.hpp>
 
