@@ -109,3 +109,25 @@ void _fTcpSrvUserSendMessage(struct ftcp_server_user *user, const char *message)
 
     user->sendMessage(message);
 }
+
+const char *_fTcpSrvUserGetName(struct ftcp_server_user *user) {
+    if (!user) return NULL;
+
+    return user->getUsername();
+}
+int _fTcpSrvUserGetId(struct ftcp_server_user *user) {
+    if (!user) return -1;
+
+    return user->getUserID();
+}
+int _fTcpSrvUserGetDescriptor(struct ftcp_server_user *user) {
+    if (!user) return -1;
+
+    return user->getDescriptor();
+}
+
+void _fTcpSrvUserDisconnect(struct ftcp_server_user *user) {
+    if (!user) return;
+
+    user->disconnect();
+}
