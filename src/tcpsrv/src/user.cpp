@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fightable/tcpsrv/daemon.hpp>
 #include <base64.hpp>
+#include <fightable/tcpsrv/user.h>
 
 ftcp_server_user::ftcp_server_user(int d) {
     _descriptor = d;
@@ -101,4 +102,10 @@ void ftcp_server_user::clearMessageQueue() {
 
 int ftcp_server_user::getMessagesRequested() {
     return _requestedMessages.size();
+}
+
+void _fTcpSrvUserSendMessage(struct ftcp_server_user *user, const char *message) {
+    if (!user) return;
+
+    user->sendMessage(message);
 }

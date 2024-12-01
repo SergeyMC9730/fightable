@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <optional>
 #ifdef TARGET_UNIX
 #include <netinet/in.h>
 #elif defined(TARGET_WIN32)
@@ -75,4 +76,11 @@ public:
     ftcp_server_delegate *getDelegate();
     
     void sendGlobalMessage(const char *message);
+    void sendMessageToUser(int user_id, const char *message);
+
+    bool userExists(std::string username);
+    bool userExists(int user_id);
+
+    ftcp_server_user &getUser(std::string username);
+    ftcp_server_user &getUser(int user_id);
 };

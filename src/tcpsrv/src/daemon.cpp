@@ -2,6 +2,7 @@
 #include <fightable/tcpsrv/delegate.h>
 #include <fightable/tcpsrv/daemon.h>
 #include <fightable/tcpsrv/tools.hpp>
+#include <fightable/tcpsrv/user.h>
 
 
 #ifdef TARGET_UNIX
@@ -298,7 +299,7 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
 
             vv.push_back(0);
 
-            _delegate->processMessage(_delegate, &user, vv.data(), vv.size());
+            _delegate->processMessage(_delegate, std::addressof(user), vv.data(), vv.size());
         }
 
         _socketInfo.users[desc] = user;
@@ -425,4 +426,58 @@ struct ftcp_server_daemon *_fTcpSrvCreate(unsigned short port, ftcp_server_deleg
 void _fTcpSrvDestroy(struct ftcp_server_daemon *daemon) {
     if (!daemon) return;
     delete daemon;
+}
+
+void ftcp_server_daemon::sendMessageToUser(int user_id, const char *message) {
+    if (!userExists(user_id)) return;
+
+    ftcp_server_user &u = getUser(user_id);
+    u.sendMessage(message);
+}
+
+bool ftcp_server_daemon::userExists(std::string username) {
+    for (auto &[k, v] : _socketInfo.users) {
+        if (v.getUsername() == username) return true;
+    }
+
+    return false;
+}
+bool ftcp_server_daemon::userExists(int user_id) {
+    for (auto &[k, v] : _socketInfo.users) {
+        if (v.getUserID() == user_id) return true;
+    }
+
+    return false;
+}
+
+ftcp_server_user &ftcp_server_daemon::getUser(std::string username) {
+    for (auto &[k, v] : _socketInfo.users) {
+        if (v.getUsername() == username) return v;
+    }
+
+    assert(false);
+}
+ftcp_server_user &ftcp_server_daemon::getUser(int user_id) {
+    for (auto &[k, v] : _socketInfo.users) {
+        if (v.getUserID() == user_id) return v;
+    }
+
+    assert(false);
+}
+
+struct ftcp_server_user *_fTcpSrvGetUserByName(struct ftcp_server_daemon *daemon, const char *username) {
+    if (!daemon) return NULL;
+
+    return std::addressof(daemon->getUser(username));
+}
+struct ftcp_server_user *_fTcpSrvGetUserById(struct ftcp_server_daemon *daemon, int user_id) {
+    if (!daemon) return NULL;
+
+    return std::addressof(daemon->getUser(user_id));
+}
+
+void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon *daemon, const char *message) {
+    if (!daemon) return;
+
+    daemon->sendGlobalMessage(message);
 }
