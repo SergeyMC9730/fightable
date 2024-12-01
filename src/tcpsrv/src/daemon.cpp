@@ -296,6 +296,8 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
                 user.clearMessageQueue();
             }
 
+            vv.push_back(0);
+
             _delegate->processMessage(_delegate, &user, vv.data(), vv.size());
         }
 

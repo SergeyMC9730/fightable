@@ -15,48 +15,36 @@
 
 #include <math.h>
 
+#include <string>
+
 void *_fTcpClientWriteThread(struct ftcpclient *client) {
     if (!client) return NULL;
 
     while (!client->thread_should_exit) {
         if (client->requested_messages->len != 0) {
-            size_t total_len = 0;
+            std::string msg_to_send;
 
             for (int i = 0; i < client->requested_messages->len; i++) {
                 char *msg = RSBGetAtIndex_pchar(client->requested_messages, i);
                 size_t len = strlen(msg);
 
-                printf("%d -> message %s with length %d\n", i, msg, len);
-                
-                size_t sim = total_len + len;
-                if (sim >= client->buf_size) {
-                    break;
-                }
+                printf("%d -> message %s with length %ld\n", i, msg, len);
 
-                memcpy(client->buf_w + total_len, msg, len);
-                memset(client->buf_w + total_len + len + 1, '|', 1);
-
-                total_len += len + 1;
+                msg_to_send += std::string((const char *)msg) + "|";
 
                 free(msg);
             }
 
-            RSBClear_pchar(client->requested_messages);
+            RSBDestroy_pchar(client->requested_messages);
+            client->requested_messages = RSBCreateArray_pchar();
 
-            total_len++;
+            if (!msg_to_send.empty()) {
+                printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
 
-            memset(client->buf_w + total_len, 0, 1);
-
-            if (total_len != 0) {
-                int max = (int)fmin(client->buf_size, total_len);
-
-                printf("sending message %s (len=%d)\n", client->buf_w, max);
-
-                client->buf_w[max] = 0;
-                int res = write(client->sockfd, client->buf_w, max);
+                int res = write(client->sockfd, msg_to_send.data(), msg_to_send.size());
 
                 if (res < 0) {
-                    printf("ftcpclient: write: fail (%d). tried to write %d bytes. exiting\n", res, max);
+                    printf("ftcpclient: write: fail (%d). tried to write %ld bytes. exiting\n", res, msg_to_send.size());
                     continue;
                 }
             }
@@ -118,14 +106,14 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
             printf("ftcpclient: %d -> %s\n", i, data);
 
             if (client->delegate != NULL && client->delegate->processReceive != NULL) {
-                client->delegate->processReceive(client->delegate, client, data, strlen(data) + 1);
+                client->delegate->processReceive(client->delegate, client, (unsigned char *)data, strlen(data) + 1);
             }
         }
 
         const char *reply = "$";
         // write(client->sockfd, reply, strlen(reply));
 
-        unsigned char res = _fTcpClientSendMsg(client, reply, strlen(reply) + 1);
+        unsigned char res = _fTcpClientSendMsg(client, (unsigned char *)reply, strlen(reply) + 1);
         if (res == 0) {
             printf("ftcpclient: cound not send read packet\n");
         }

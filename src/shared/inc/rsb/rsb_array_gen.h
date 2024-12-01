@@ -154,7 +154,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
         RSBAddElement##funname(destination, obj);                                           \
     }                                                                                       \
                                                                                             \
-    destination->lock = 0;                                                                  \                                                                                     
+    destination->lock = 0;                                                                  \
     return;                                                                                 \
 }
 

@@ -209,7 +209,7 @@ set(FIGHTABLE_TCP_SERVER_SRC
 )
 set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/create.c
-    src/tcpclient/src/thread.c
+    src/tcpclient/src/thread.cpp
     src/tcpclient/src/destroy.c
     src/tcpclient/src/send_msg.c
 )
