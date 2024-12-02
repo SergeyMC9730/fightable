@@ -14,6 +14,8 @@ int _fTcpSrvUserGetDescriptor(struct ftcp_server_user *user);
 
 void _fTcpSrvUserDisconnect(struct ftcp_server_user *user);
 
+void _fTcpSrvUserSetName(struct ftcp_server_user *user, const char *message);
+
 #ifdef __cplusplus
 }
 #endif
