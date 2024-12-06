@@ -231,6 +231,7 @@ if (ANDROID)
 
 	add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
+    add_compile_definitions(TARGET_LINUX)
 elseif(WIN32)
     message(STATUS "Compiling for Windows")
     set(FIGHTABLE_TARGET Windows)
@@ -244,10 +245,18 @@ elseif(WIN32)
 
     set(FIGHTABLE_NATIVE_LIBS pthreadVC3 Ws2_32)
     set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
-elseif(UNIX)
-    message(STATUS "Compiling for UNIX-like operating systems")
+elseif(LINUX)
+    message(STATUS "Compiling for GNU/Linux")
 
-    set(FIGHTABLE_TARGET UNIX)
+    set(FIGHTABLE_TARGET Linux)
+
+    add_executable(fightable ${FIGHTABLE_SRC})
+    add_compile_definitions(TARGET_UNIX)
+    add_compile_definitions(TARGET_LINUX)
+elseif(UNIX)
+    message(STATUS "Compiling for Unix-like operating systems")
+
+    set(FIGHTABLE_TARGET Unix)
 
 	add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
@@ -391,13 +400,32 @@ target_include_directories(fightable PRIVATE
     ${FIGHTABLE_SHARED_INC}
 )
 
-target_include_directories(physics-test PRIVATE ext/raylib/src ${FIGHTABLE_SHARED_INC})
-target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc ${FIGHTABLE_SHARED_INC})
+target_include_directories(physics-test PRIVATE 
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+target_include_directories(collide-test PRIVATE 
+    ext/raylib/src
+    src/collide_test/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 
 target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 
+add_executable(mp-rect-test
+    src/mp_rect_test/src/client/main.c
+)
+target_include_directories(mp-rect-test PRIVATE 
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+    src/tcpclient/inc
+)
+target_link_libraries(mp-rect-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
 
 message(STATUS "")
 message(STATUS "")
