@@ -131,3 +131,14 @@ void _fTcpSrvUserDisconnect(struct ftcp_server_user *user) {
 
     user->disconnect();
 }
+
+void _fTcpSrvUserSetName(struct ftcp_server_user *user, const char *username) {
+    if (!user) return;
+
+    user->setUsername(username, false);
+}
+void _fTcpSrvUserSetNameEncrypted(struct ftcp_server_user *user, const char *username) {
+    if (!user) return;
+
+    user->setUsername(username, true);
+}
