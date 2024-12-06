@@ -13,6 +13,7 @@ add_library(fshared STATIC
     src/shared/src/string.c
     src/shared/src/char.c
     src/shared/src/pchar.c
+    src/shared/src/tools.cpp
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
@@ -205,7 +206,6 @@ set(FIGHTABLE_TCP_SERVER_SRC
     src/tcpsrv/src/daemon.cpp
     src/tcpsrv/src/message.cpp
     src/tcpsrv/src/user.cpp
-    src/tcpsrv/src/tools.cpp
 )
 set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/create.c
@@ -268,7 +268,7 @@ target_include_directories(ftcpsrv PRIVATE
 )
 
 add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
-target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
 target_include_directories(ftcpsrv-test PRIVATE
     src/tcpsrv/inc
     ${FIGHTABLE_SHARED_INC}

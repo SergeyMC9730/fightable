@@ -1,7 +1,7 @@
 #include <fightable/tcpsrv/daemon.hpp>
 #include <fightable/tcpsrv/delegate.h>
 #include <fightable/tcpsrv/daemon.h>
-#include <fightable/tcpsrv/tools.hpp>
+#include <fightable/generic_tools.hpp>
 #include <fightable/tcpsrv/user.h>
 
 

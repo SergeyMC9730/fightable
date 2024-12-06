@@ -1,4 +1,4 @@
-#include <fightable/tcpsrv/tools.hpp>
+#include <fightable/generic_tools.hpp>
 
 std::vector<std::string> GenericTools::splitString(const char* str, char d, unsigned int max_entries) {
     std::vector<std::string> result;
@@ -24,10 +24,16 @@ std::vector<std::string> GenericTools::splitString(const char* str, char d, unsi
     int sz = result.size();
 
     if (sz != 0) {
-        if (result[sz - 1].ends_with(delim_str)) {
+        if (stringEndsWith(result[sz - 1], delim_str)) {
             result[sz - 1].pop_back();
         }
     }
 
     return result;
+}
+
+#include <cstring>
+
+bool GenericTools::stringEndsWith(const std::string &input, const std::string &substring) {
+    return !std::strncmp(input.c_str() + input.size() - substring.size(), substring.c_str(), substring.size());
 }
