@@ -28,11 +28,11 @@ std::shared_ptr<http_response> LevelAPI::v1::HelloWorldRequest::render(const htt
     if (!dp) {
         res += "\n Directory listing\ncannot be created";
     } else {
-        dirent64 *ep;
+        dirent *ep;
 
         res += "\n Directory listing:";
 
-        while ((ep = readdir64(dp)) != nullptr) {
+        while ((ep = readdir(dp)) != nullptr) {
             res += "- " + std::string(ep->d_name);
         }
 

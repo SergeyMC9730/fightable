@@ -258,8 +258,9 @@ elseif(UNIX)
 
     set(FIGHTABLE_TARGET Unix)
 
-	add_executable(fightable ${FIGHTABLE_SRC})
+    add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
+    set(FIGHTABLE_NATIVE_LIBS pthread)
 else()
     message(STATUS "Compiling for console homebrews")
     set(FIGHTABLE_TARGET Unknown homebrew)
