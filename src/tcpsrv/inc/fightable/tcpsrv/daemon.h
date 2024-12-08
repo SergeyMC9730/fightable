@@ -16,6 +16,8 @@ struct ftcp_server_user *_fTcpSrvGetUserById(struct ftcp_server_daemon *daemon, 
 
 void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon *daemon, const char *message);
 
+unsigned int _fTcpSrvGetConnectedUsers(struct ftcp_server_daemon *daemon);
+
 #ifdef __cplusplus
 }
 #endif

@@ -20,10 +20,26 @@ struct ftcpclient_delegate __client_delegate;
 
 int tryToConnect();
 
+#include <raylib.h>
+
 int main() {
     int status = tryToConnect();
     
     if (status < 0) return status;
+    
+    InitWindow(800, 600, "Multiplayer Test");
+    SetTargetFPS(60);
+    
+    while (!WindowShouldClose()) {
+	BeginDrawing();
+	ClearBackground(WHITE);
+	EndDrawing();
+    }
+    
+    _fTcpClientDestroy(__client);
+#ifndef DISABLE_MP_SERVER
+    _fTcpSrvDestroy(__server);
+#endif
     
     return 0;
 }

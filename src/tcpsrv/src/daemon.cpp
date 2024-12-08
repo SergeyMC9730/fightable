@@ -487,3 +487,9 @@ void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon *daemon, const char *messag
 
     daemon->sendGlobalMessage(message);
 }
+
+unsigned int _fTcpSrvGetConnectedUsers(struct ftcp_server_daemon *daemon) {
+    if (!daemon) return 0;
+    
+    return daemon->getClientsConnected();
+}

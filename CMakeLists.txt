@@ -434,7 +434,7 @@ target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 
 add_executable(mp-rect-test
-    src/mp_rect_test/src/client/main.c
+    src/mp_rect_test/src/main.c
 )
 target_include_directories(mp-rect-test PRIVATE 
     ext/raylib/src
