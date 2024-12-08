@@ -36,7 +36,6 @@ struct ftcpclient {
     unsigned int buf_size;
 
     char *buf_r;
-    char *buf_w;
 
     struct ftcpclient_delegate *delegate;
 };

@@ -59,8 +59,7 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
 
 
     client->buf_size = 65536;
-    client->buf_r = (char *)malloc(client->buf_size);
-    client->buf_w = (char *)malloc(client->buf_size);
+    client->buf_r = (char *)malloc(client->buf_size);;
 
     client->received_headers = RSBCreateArray_pchar();
     client->requested_messages = RSBCreateArray_pchar();

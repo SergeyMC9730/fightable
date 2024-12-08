@@ -3,15 +3,16 @@
 #include <vector>
 #include <string>
 #include <cstdio>
-
 namespace GenericTools {
     template<typename T>
-    inline void addVectors(std::vector<T> *output, std::vector<T> input) {
+    inline void addVectors(std::vector<T> *output, const std::vector<T> &input) {
         for (T &obj : input) {
             output->push_back(obj);
         }
     }
 
+    #pragma message("should we handle cpu endianess?")
+    
     template<typename T>
     inline std::vector<unsigned char> valueToVector(T* value) {
         unsigned int val_size = sizeof(T);
@@ -27,7 +28,7 @@ namespace GenericTools {
     }
 
     template<typename T = char>
-    inline std::vector<T> stringToVector(std::string &str) {
+    inline std::vector<T> stringToVector(const std::string &str) {
         std::vector<T> v;
 
         for (char c : str) {
@@ -38,7 +39,7 @@ namespace GenericTools {
     }
 
     template<typename T>
-    inline std::string valueToHex(T &v) {
+    inline std::string valueToHex(const T &v) {
         char buffer[sizeof(T) * 2 + 1] = {};
 
         std::string format = "%0" + std::to_string(sizeof(T) * 2) + "X";
@@ -50,7 +51,7 @@ namespace GenericTools {
     }
 
     template<typename T>
-    inline std::string vectorToString(std::vector<T> &v) {
+    inline std::string vectorToString(const std::vector<T> &v) {
         std::string res = "";
 
         for (T &el : v) {
@@ -65,14 +66,14 @@ namespace GenericTools {
     }
 
     template<typename T>
-    inline void deleteVec(std::vector<T *> &vec) {
+    inline void deleteVec(const std::vector<T *> &vec) {
         for (T *el : vec) {
             delete el;
         }
     }
 
     template<typename T>
-    inline T vectorToValue(std::vector<unsigned char> &vec, unsigned int offset = 0) {
+    inline T vectorToValue(const std::vector<unsigned char> &vec, unsigned int offset = 0) {
         T v;
         unsigned char *raw_ref = (unsigned char *)(&v);
 
@@ -84,4 +85,6 @@ namespace GenericTools {
     }
 
     std::vector<std::string> splitString(const char* str, char d, unsigned int max_entries = 0);
+
+    bool stringEndsWith(const std::string &input, const std::string &substring);
 };

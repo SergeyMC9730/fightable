@@ -1,7 +1,7 @@
 #include <fightable/tcpsrv/daemon.hpp>
 #include <fightable/tcpsrv/delegate.h>
 #include <fightable/tcpsrv/daemon.h>
-#include <fightable/tcpsrv/tools.hpp>
+#include <fightable/generic_tools.hpp>
 #include <fightable/tcpsrv/user.h>
 
 
@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <asm-generic/socket.h>
+// #include <asm-generic/socket.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -17,6 +17,12 @@
 #include <windows.h>
 #include <winsock.h>
 #include <io.h>
+#endif
+
+#if defined(TARGET_UNIX) && !defined(TARGET_LINUX)
+#include <sys/socket.h>
+#elif defined(TARGET_UNIX) && defined(TARGET_LINUX)
+#include <asm-generic/socket.h>
 #endif
 
 #include <assert.h>
