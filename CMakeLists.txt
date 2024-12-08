@@ -425,15 +425,20 @@ target_include_directories(mp-rect-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
     src/tcpclient/inc
+    src/tcpsrv/inc
 )
 target_link_libraries(mp-rect-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
+
+if (NOT DISABLE_MP_SERVER)
+    target_link_libraries(mp-rect-test ftcpsrv)
+endif()
 
 message(STATUS "")
 message(STATUS "")
 
 message(STATUS "           Fightable Compile Settings")
 if (DISABLE_MP_SERVER)
-    message(STATUS "  MP server IS disabled")
+    message(STATUS "  MP server is disabled")
 endif()
 message(STATUS "  CXX standard: ${OVERRIDE_CXX_STD}")
 message(STATUS "  Platform: ${FIGHTABLE_TARGET}")
