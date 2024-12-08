@@ -275,6 +275,14 @@ target_include_directories(ftcpsrv-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
+add_executable(tcpserver-raylib-test src/tcpserver_raylib/main.c)
+target_link_libraries(tcpserver-raylib-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(tcpserver-raylib-test PRIVATE
+    src/tcpsrv/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
 add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
 target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(ftcpclient PRIVATE
@@ -291,6 +299,14 @@ target_include_directories(ftcpclient-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
+add_executable(tcpclient-raylib-test src/tcpclient_raylib/main.c)
+target_link_libraries(tcpclient-raylib-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} m)
+target_include_directories(tcpclient-raylib-test PRIVATE
+    src/tcpclient/inc
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 if (NOT DISABLE_MP_SERVER)
     if (WIN32)
         set(HTTPSERVER_NAME libhttpserver-win32)
