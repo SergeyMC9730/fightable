@@ -286,7 +286,7 @@ target_include_directories(ftcpsrv-test PRIVATE
 )
 
 add_executable(tcpserver-raylib-test src/tcpserver_raylib/main.c)
-target_link_libraries(tcpserver-raylib-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(tcpserver-raylib-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
 target_include_directories(tcpserver-raylib-test PRIVATE
     src/tcpsrv/inc
     ${FIGHTABLE_SHARED_INC}

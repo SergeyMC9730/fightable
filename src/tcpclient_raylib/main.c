@@ -16,7 +16,7 @@ struct PlayersArr {
     Vector2 player;
 } PlayersArr;
 
-struct PlayersArr arrPlayer[];
+struct PlayersArr arrPlayer[16];
 
 void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
     printf("* received %d bytes\n", len);
