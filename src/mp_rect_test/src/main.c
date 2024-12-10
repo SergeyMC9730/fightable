@@ -11,8 +11,29 @@ struct ftcp_server_daemon *__server;
 struct ftcp_server_delegate __server_delegate;
 #endif
 
+#include <raylib.h>
+
+Rectangle __remotePlayers[0x0f] = {};
+Rectangle __localPlayer = {};
+
+int __userId = -1;
+
 void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
-    printf("[CLIENT] received %d bytes\n", len);
+    printf("[CLIENT] received %d bytes: %s\n", len, (const char *)message);
+    
+    char response_cmd = message[0];
+    
+    switch (response_cmd) {
+	case '0': {
+	    char *value = (char *)message + 1;
+	    __userId = atoi(value);
+	    break;
+	}
+	default: {
+	    printf("[CLIENT] unknown response command %c\n", response_cmd);
+	    break;
+	}
+    }
 }
 
 struct ftcpclient *__client = NULL;
@@ -22,6 +43,15 @@ int tryToConnect();
 
 #include <raylib.h>
 
+void initLocalPlayer() {
+    Rectangle r = {0, 0, 32, 32};
+    __localPlayer = r;
+}
+
+void getUserId() {
+    _fTcpClientSendMsg(__client, (unsigned char *)"0", 2);
+}
+
 int main() {
     int status = tryToConnect();
     
@@ -30,9 +60,28 @@ int main() {
     InitWindow(800, 600, "Multiplayer Test");
     SetTargetFPS(60);
     
+    initLocalPlayer();
+    getUserId();
+    
     while (!WindowShouldClose()) {
+	if (IsKeyPressed(KEY_I)) {
+	    getUserId();
+	}
+    
 	BeginDrawing();
-	ClearBackground(WHITE);
+	ClearBackground(RAYWHITE);
+	
+	char buffer[20] = {};
+	
+#ifndef DISABLE_MP_SERVER
+	int clients = _fTcpSrvGetConnectedUsers(__server);
+	
+	snprintf(buffer, 16, "clients: %d", clients);
+	DrawText(buffer, 4, 600 - 20, 20, GREEN);
+#endif
+	snprintf(buffer, 16, "uid: %d", __userId);
+	DrawText(buffer, 4, 4, 20, GREEN);
+	
 	EndDrawing();
     }
     
@@ -40,6 +89,8 @@ int main() {
 #ifndef DISABLE_MP_SERVER
     _fTcpSrvDestroy(__server);
 #endif
+
+    CloseWindow();
     
     return 0;
 }
@@ -53,6 +104,24 @@ void processSrvDisconnect(struct ftcp_server_delegate *self, struct ftcp_server_
 }
 void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_user *user, unsigned char *message, unsigned int len) {
     printf("[SERVER] received message from user with len %d: \"%s\"\n", len, message);
+    
+    char command = message[0];
+    if (command == '$') return;
+    
+    switch (command) {
+	case '0': {
+	    char buffer[16] = {};
+	    snprintf(buffer, 16, "0%d", _fTcpSrvUserGetId(user));
+	
+	    _fTcpSrvUserSendMessage(user, buffer);
+	    
+	    break;
+	}
+	default: {
+	    printf("[SERVER] unknown command %c\n", command);
+	    break;
+	}
+    }
 }
 void setSrvDaemon(struct ftcp_server_delegate *self, struct ftcp_server_daemon *daemon) {
 
