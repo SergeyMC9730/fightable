@@ -18,7 +18,7 @@ private:
 
     std::vector<ftcp_server_message> _requestedMessages;
 
-    bool _sendMessage(const char *msg);
+    bool _sendMessage(const std::string &message);
 public:
     ftcp_server_user();
     ftcp_server_user(int descriptor);
@@ -37,7 +37,7 @@ public:
     ftcp_server_daemon *getDaemon() const;
     void setDaemon(ftcp_server_daemon *daemon);
 
-    bool sendMessage(const char *msg);
+    bool sendMessage(const std::string &message);
 
     std::string encryptUsername();
 

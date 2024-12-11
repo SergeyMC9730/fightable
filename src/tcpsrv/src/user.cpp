@@ -61,22 +61,20 @@ void ftcp_server_user::setDaemon(ftcp_server_daemon *daemon) {
     _daemon = daemon;
 }
 
-bool ftcp_server_user::_sendMessage(const char *msg) {
-    std::string mStr = msg;
-
-    _requestedMessages.push_back(mStr);
+bool ftcp_server_user::_sendMessage(const std::string &message) {
+    _requestedMessages.push_back(message);
 
     return true;
 }
 
-bool ftcp_server_user::sendMessage(const char *msg) {
-    getDaemon()->requestMessageForUser(getDescriptor(), msg);
+bool ftcp_server_user::sendMessage(const std::string &message) {
+    getDaemon()->requestMessageForUser(getDescriptor(), message);
 
     return true;
 }
 
 std::string ftcp_server_user::encryptUsername() {
-    std::string encoded_str =  base64::to_base64(_username);
+    std::string encoded_str = base64::to_base64(_username);
 
     return encoded_str;
 }
@@ -106,8 +104,10 @@ int ftcp_server_user::getMessagesRequested() {
 
 void _fTcpSrvUserSendMessage(struct ftcp_server_user *user, const char *message) {
     if (!user) return;
+    
+    std::string msg = message;
 
-    user->sendMessage(message);
+    user->sendMessage(msg);
 }
 
 const char *_fTcpSrvUserGetName(struct ftcp_server_user *user) {

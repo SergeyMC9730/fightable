@@ -18,8 +18,8 @@ struct PlayersArr {
 
 struct PlayersArr arrPlayer[16];
 
-void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
-    printf("* received %d bytes\n", len);
+void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message) {
+    printf("* received %d bytes\n", strlen(message) + 1);
     switch(message[0]) {
         case PLAYERS:
             

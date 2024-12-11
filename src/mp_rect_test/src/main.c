@@ -18,8 +18,8 @@ Rectangle __localPlayer = {};
 
 int __userId = -1;
 
-void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
-    printf("[CLIENT] received %d bytes: %s\n", len, (const char *)message);
+void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message) {
+    printf("[CLIENT] received %d bytes: %s\n", strlen(message) + 1, message);
     
     char response_cmd = message[0];
     
@@ -49,7 +49,7 @@ void initLocalPlayer() {
 }
 
 void getUserId() {
-    _fTcpClientSendMsg(__client, (unsigned char *)"0", 2);
+    _fTcpClientSendMsg(__client, "0");
 }
 
 int main() {
@@ -82,6 +82,7 @@ int main() {
 	snprintf(buffer, 16, "uid: %d", __userId);
 	DrawText(buffer, 4, 4, 20, GREEN);
 	
+
 	EndDrawing();
     }
     

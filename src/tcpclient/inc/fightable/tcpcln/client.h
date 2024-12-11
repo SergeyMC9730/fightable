@@ -47,7 +47,7 @@ void *_fTcpClientWriteThread(struct ftcpclient *client);
 void *_fTcpClientReadThread(struct ftcpclient *client);
 
 // returns success of message sending
-unsigned char _fTcpClientSendMsg(struct ftcpclient *client, unsigned char *data, unsigned int len);
+unsigned char _fTcpClientSendMsg(struct ftcpclient *client, const char *message);
 
 #ifdef __cplusplus
 }

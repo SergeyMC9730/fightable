@@ -22,7 +22,7 @@ void *_fTcpClientWriteThread(struct ftcpclient *client) {
 
     while (!client->thread_should_exit) {
         if (client->requested_messages->len != 0) {
-            std::string msg_to_send;
+            std::string msg_to_send = "";
 
             for (int i = 0; i < client->requested_messages->len; i++) {
                 char *msg = RSBGetAtIndex_pchar(client->requested_messages, i);
@@ -39,6 +39,8 @@ void *_fTcpClientWriteThread(struct ftcpclient *client) {
             client->requested_messages = RSBCreateArray_pchar();
 
             if (!msg_to_send.empty()) {
+        	msg_to_send.pop_back();
+            
                 printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
 
                 int res = write(client->sockfd, msg_to_send.data(), msg_to_send.size());
@@ -106,16 +108,16 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
             printf("ftcpclient: %d -> %s\n", i, data);
 
             if (client->delegate != NULL && client->delegate->processReceive != NULL) {
-                client->delegate->processReceive(client->delegate, client, (unsigned char *)data, strlen(data) + 1);
+                client->delegate->processReceive(client->delegate, client, data);
             }
         }
 
         const char *reply = "$";
         // write(client->sockfd, reply, strlen(reply));
 
-        unsigned char res = _fTcpClientSendMsg(client, (unsigned char *)reply, strlen(reply) + 1);
+        unsigned char res = _fTcpClientSendMsg(client, reply);
         if (res == 0) {
-            printf("ftcpclient: cound not send read packet\n");
+            printf("ftcpclient: cound not send examination packet\n");
         }
 
         _fCleanupSplittedString(message_container);
