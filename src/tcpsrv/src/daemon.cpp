@@ -256,7 +256,7 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
 #include <cstring>
 
 bool ftcp_server_daemon::sendMessage(int socket, const std::string &message) {
-    printf("TcpServerDaemon: sending \"%s\" for socket %d\n", message.c_str(), socket);
+    // printf("TcpServerDaemon: sending \"%s\" for socket %d\n", message.c_str(), socket);
 
     std::vector<unsigned char> c;
     for (char cc : message) {

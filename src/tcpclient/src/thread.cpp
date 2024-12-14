@@ -106,6 +106,7 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
             memset(data + strlen(data) - 4, 0, 4);
 
             printf("ftcpclient: %d -> %s\n", i, data);
+            
 
             if (client->delegate != NULL && client->delegate->processReceive != NULL) {
                 client->delegate->processReceive(client->delegate, client, data);
@@ -117,7 +118,7 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
 
         unsigned char res = _fTcpClientSendMsg(client, reply);
         if (res == 0) {
-            printf("ftcpclient: cound not send examination packet\n");
+            printf("ftcpclient: cound not send acknowledge packet\n");
         }
 
         _fCleanupSplittedString(message_container);
