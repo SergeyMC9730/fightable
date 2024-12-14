@@ -7,12 +7,14 @@
 #include <fightable/tcpsrv/user.h>
 
 ftcp_server_user::ftcp_server_user(int d) {
+    srand(time(0));
     _descriptor = d;
     _userID = rand() % 0xFFFF;
 
     setUsername("?");
 }
 ftcp_server_user::ftcp_server_user(const ftcp_server_user &ref) {
+    srand(time(0));
     _descriptor = ref.getDescriptor();
     _userID = ref.getUserID();
     setUsername(ref.getUsername());
@@ -20,6 +22,7 @@ ftcp_server_user::ftcp_server_user(const ftcp_server_user &ref) {
     _daemon = ref.getDaemon();
 }
 ftcp_server_user::ftcp_server_user() {
+    srand(time(0));
     _userID = rand() % 0xFFFF;
     setUsername("?");
 }
@@ -32,6 +35,7 @@ bool ftcp_server_user::shouldDisconnect() const {
 }
 
 ftcp_server_user::ftcp_server_user(int descriptor, int userID) {
+    srand(time(0));
     _descriptor = descriptor;
     _userID = userID;
     memset(_username, 0, 64);
