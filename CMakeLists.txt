@@ -271,7 +271,7 @@ else()
 endif()
 
 add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
-target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
 target_include_directories(ftcpsrv PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
