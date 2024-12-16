@@ -16,7 +16,7 @@ extern "C" {
     unsigned int added_elements;\
     type *objects;              \
     unsigned char lock;         \
-} RSB_ARRAY_NAME(funname)
+} RSB_ARRAY_NAME(funname);
 
 #define RSB_ARRAY_FUNC_CREATE_DEF(funname) RSB_ARRAY_NAME(funname) *RSBCreateArray##funname()
 #define RSB_ARRAY_FUNC_CREATEFL_DEF(type, funname) RSB_ARRAY_NAME(funname) *RSBCreateArrayFromList##funname(type *object_list, unsigned int size)
