@@ -14,16 +14,14 @@
 #include <fightable/storage.h>
 #include <cJSON.h>
 #include <fightable/flags.h>
+#include <time.h>
+#include <pthread.h>
 int flags = 0;
 bool v_sync_flag = 1;
 struct flevel __level;
 struct ftilemap __tilemap;
 
-#ifdef TARGET_UNIX
 void *main_thr0(void *user) {
-#else
-void main_thr0(void *user) {
-#endif
     _fAudioBegin(&__state.sound_engine);
 
     return 0;
@@ -353,9 +351,7 @@ int main(int argc, char **argv) {
     }
 
     __state.sound_engine.should_stop = 1;
-#ifndef _WIN32
     pthread_join(__state.sound_thread, NULL);
-#endif
 
 #ifndef _DISABLE_MP_SERVER_
     if (__state.webserver != NULL) {

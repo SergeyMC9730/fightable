@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include <pthread.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,11 +65,8 @@ struct fightable_state {
 
     unsigned char intro_can_continue;
 
-#ifdef _WIN32
-    HANDLE sound_thread;
-#else
     pthread_t sound_thread;
-#endif
+
     struct faudio_engine sound_engine;
 
     Texture2D raylib_logo;

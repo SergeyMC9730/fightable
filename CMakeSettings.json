@@ -22,7 +22,7 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ]
     },
-	{
+    {
       "name": "x64-RelWithDebInfo-Win-Clang",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
@@ -31,7 +31,7 @@
       "cmakeCommandArgs": "-DOPENMPT_LIB=${projectDir}/extlib/lib/libopenmpt.lib -DMICROHTTPD_LIB=${projectDir}/extlib/lib/libmicrohttpd.lib -DOPENMPT_INC=${projectDir}/extlib/inc -DMICROHTTPD_INC=${projectDir}/extlib/inc",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "clang_x64_x64" ]
+      "inheritEnvironments": [ "clang_cl_x64_x64" ]
     }
   ]
 }
