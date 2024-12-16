@@ -2,13 +2,13 @@
 #include <string.h>
 #include <stdio.h>
 
-unsigned char _fTcpClientSendMsg(struct ftcpclient *client, unsigned char *data, unsigned int len) {
-    if (!client || !client->requested_messages || !data || !len || len >= client->buf_size) return 0;
+unsigned char _fTcpClientSendMsg(struct ftcpclient *client, const char *message) {
+    if (!client || !client->requested_messages || !message) return 0;
+
+    unsigned int len = strlen(message) + 1;
 
     unsigned char *dup = (unsigned char *)malloc(len);
-    memcpy(dup, data, len);
-
-    dup[len - 1] = 0;
+    memcpy(dup, message, len);
 
     RSBAddElement_pchar(client->requested_messages, dup);
 

@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, unsigned char *message, unsigned int len) {
-    printf("* received %d bytes\n", len);
+void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message) {
+    printf("* received %d bytes: %s\n", strlen(message) + 1, message);
 }
 
 int main() {
@@ -26,14 +26,9 @@ int main() {
 
     printf("* sending test messages\n");
 
-    const char *msg = "Hello";
-    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
-
-    msg = ", fricking";
-    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
-
-    msg = " world!";
-    _fTcpClientSendMsg(client, msg, strlen(msg) + 1);
+    _fTcpClientSendMsg(client, "Hello");
+    _fTcpClientSendMsg(client, ", fricking");
+    _fTcpClientSendMsg(client, " world!");
 
     char buffer[16] = {0};
     fgets(buffer, 16, stdin);

@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <optional>
 #ifdef TARGET_UNIX
 #include <netinet/in.h>
 #elif defined(TARGET_WIN32)
@@ -17,7 +18,7 @@ struct ftcp_server_delegate;
 
 struct ftcp_server_daemon {
 private:
-    std::array<char, 1024> _connectionBuffer;
+    std::array<char, 4096> _connectionBuffer;
 
     std::thread _baseThreadValue;
     std::thread _queueThreadValue;
@@ -61,12 +62,11 @@ private:
     unsigned int countIPAddress(std::string address);
     void removeIPAddress(std::string address);
 public:
-    ftcp_server_daemon(unsigned int port, ftcp_server_delegate *delegate = nullptr);
-
-    bool sendMessage(int socket, std::vector<unsigned char> &message);
-    bool sendMessage(int socket, const char *message);
+    ftcp_server_daemon(unsigned int port, ftcp_server_delegate *delegate);
     
-    void requestMessageForUser(int socket, const char *message);
+    bool sendMessage(int socket, const std::vector<unsigned char> &message);
+    bool sendMessage(int socket, const std::string &message);
+    void requestMessageForUser(int socket, const std::string &message);
 
     unsigned int getClientsConnected();
 
@@ -74,5 +74,12 @@ public:
 
     ftcp_server_delegate *getDelegate();
     
-    void sendGlobalMessage(const char *message);
+    void sendGlobalMessage(const std::string &message);
+    void sendMessageToUser(int user_id, const std::string &message);
+
+    bool userExists(std::string username);
+    bool userExists(int user_id);
+
+    ftcp_server_user &getUser(std::string username);
+    ftcp_server_user &getUser(int user_id);
 };

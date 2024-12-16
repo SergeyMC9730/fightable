@@ -17,9 +17,6 @@ void _fTcpClientDestroy(struct ftcpclient *client) {
     if (client->buf_r) {
         free(client->buf_r);
     }
-    if (client->buf_w) {
-        free(client->buf_w);
-    }
 
     _fCleanupSplittedString(client->received_headers);
     _fCleanupSplittedString(client->requested_messages);

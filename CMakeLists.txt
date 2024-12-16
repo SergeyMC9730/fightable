@@ -13,6 +13,7 @@ add_library(fshared STATIC
     src/shared/src/string.c
     src/shared/src/char.c
     src/shared/src/pchar.c
+    src/shared/src/tools.cpp
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
@@ -205,11 +206,10 @@ set(FIGHTABLE_TCP_SERVER_SRC
     src/tcpsrv/src/daemon.cpp
     src/tcpsrv/src/message.cpp
     src/tcpsrv/src/user.cpp
-    src/tcpsrv/src/tools.cpp
 )
 set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/create.c
-    src/tcpclient/src/thread.c
+    src/tcpclient/src/thread.cpp
     src/tcpclient/src/destroy.c
     src/tcpclient/src/send_msg.c
 )
@@ -231,6 +231,7 @@ if (ANDROID)
 
 	add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
+    add_compile_definitions(TARGET_LINUX)
 elseif(WIN32)
     message(STATUS "Compiling for Windows")
     set(FIGHTABLE_TARGET Windows)
@@ -244,13 +245,22 @@ elseif(WIN32)
 
     set(FIGHTABLE_NATIVE_LIBS pthreadVC3 Ws2_32)
     set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
-elseif(UNIX)
-    message(STATUS "Compiling for UNIX-like operating systems")
+elseif(LINUX)
+    message(STATUS "Compiling for GNU/Linux")
 
-    set(FIGHTABLE_TARGET UNIX)
+    set(FIGHTABLE_TARGET Linux)
 
-	add_executable(fightable ${FIGHTABLE_SRC})
+    add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
+    add_compile_definitions(TARGET_LINUX)
+elseif(UNIX)
+    message(STATUS "Compiling for Unix-like operating systems")
+
+    set(FIGHTABLE_TARGET Unix)
+
+    add_executable(fightable ${FIGHTABLE_SRC})
+    add_compile_definitions(TARGET_UNIX)
+    set(FIGHTABLE_NATIVE_LIBS pthread)
 else()
     message(STATUS "Compiling for console homebrews")
     set(FIGHTABLE_TARGET Unknown homebrew)
@@ -261,15 +271,23 @@ else()
 endif()
 
 add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
-target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
 target_include_directories(ftcpsrv PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
 add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
-target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
 target_include_directories(ftcpsrv-test PRIVATE
+    src/tcpsrv/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
+add_executable(tcpserver-raylib-test src/tcpserver_raylib/main.c)
+target_link_libraries(tcpserver-raylib-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
+target_include_directories(tcpserver-raylib-test PRIVATE
     src/tcpsrv/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -291,6 +309,14 @@ target_include_directories(ftcpclient-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
+add_executable(tcpclient-raylib-test src/tcpclient_raylib/main.c)
+target_link_libraries(tcpclient-raylib-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} m)
+target_include_directories(tcpclient-raylib-test PRIVATE
+    src/tcpclient/inc
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 if (NOT DISABLE_MP_SERVER)
     if (WIN32)
         set(HTTPSERVER_NAME libhttpserver-win32)
@@ -391,20 +417,44 @@ target_include_directories(fightable PRIVATE
     ${FIGHTABLE_SHARED_INC}
 )
 
-target_include_directories(physics-test PRIVATE ext/raylib/src ${FIGHTABLE_SHARED_INC})
-target_include_directories(collide-test PRIVATE ext/raylib/src src/collide_test/inc ${FIGHTABLE_SHARED_INC})
+target_include_directories(physics-test PRIVATE 
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+target_include_directories(collide-test PRIVATE 
+    ext/raylib/src
+    src/collide_test/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 
 target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 
+add_executable(mp-rect-test
+    src/mp_rect_test/src/main.c
+)
+target_include_directories(mp-rect-test PRIVATE 
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+    src/tcpclient/inc
+    src/tcpsrv/inc
+)
+target_link_libraries(mp-rect-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
+
+if (NOT DISABLE_MP_SERVER)
+    target_link_libraries(mp-rect-test ftcpsrv)
+endif()
 
 message(STATUS "")
 message(STATUS "")
 
 message(STATUS "           Fightable Compile Settings")
 if (DISABLE_MP_SERVER)
-    message(STATUS "  MP server IS disabled")
+    message(STATUS "  MP server is disabled")
 endif()
 message(STATUS "  CXX standard: ${OVERRIDE_CXX_STD}")
 message(STATUS "  Platform: ${FIGHTABLE_TARGET}")

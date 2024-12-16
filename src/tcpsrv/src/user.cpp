@@ -4,14 +4,17 @@
 #include <cstring>
 #include <fightable/tcpsrv/daemon.hpp>
 #include <base64.hpp>
+#include <fightable/tcpsrv/user.h>
 
 ftcp_server_user::ftcp_server_user(int d) {
+    srand(time(0));
     _descriptor = d;
     _userID = rand() % 0xFFFF;
 
     setUsername("?");
 }
 ftcp_server_user::ftcp_server_user(const ftcp_server_user &ref) {
+    srand(time(0));
     _descriptor = ref.getDescriptor();
     _userID = ref.getUserID();
     setUsername(ref.getUsername());
@@ -19,6 +22,7 @@ ftcp_server_user::ftcp_server_user(const ftcp_server_user &ref) {
     _daemon = ref.getDaemon();
 }
 ftcp_server_user::ftcp_server_user() {
+    srand(time(0));
     _userID = rand() % 0xFFFF;
     setUsername("?");
 }
@@ -31,6 +35,7 @@ bool ftcp_server_user::shouldDisconnect() const {
 }
 
 ftcp_server_user::ftcp_server_user(int descriptor, int userID) {
+    srand(time(0));
     _descriptor = descriptor;
     _userID = userID;
     memset(_username, 0, 64);
@@ -60,22 +65,20 @@ void ftcp_server_user::setDaemon(ftcp_server_daemon *daemon) {
     _daemon = daemon;
 }
 
-bool ftcp_server_user::_sendMessage(const char *msg) {
-    std::string mStr = msg;
-
-    _requestedMessages.push_back(mStr);
+bool ftcp_server_user::_sendMessage(const std::string &message) {
+    _requestedMessages.push_back(message);
 
     return true;
 }
 
-bool ftcp_server_user::sendMessage(const char *msg) {
-    getDaemon()->requestMessageForUser(getDescriptor(), msg);
+bool ftcp_server_user::sendMessage(const std::string &message) {
+    getDaemon()->requestMessageForUser(getDescriptor(), message);
 
     return true;
 }
 
 std::string ftcp_server_user::encryptUsername() {
-    std::string encoded_str =  base64::to_base64(_username);
+    std::string encoded_str = base64::to_base64(_username);
 
     return encoded_str;
 }
@@ -101,4 +104,45 @@ void ftcp_server_user::clearMessageQueue() {
 
 int ftcp_server_user::getMessagesRequested() {
     return _requestedMessages.size();
+}
+
+void _fTcpSrvUserSendMessage(struct ftcp_server_user *user, const char *message) {
+    if (!user) return;
+    
+    std::string msg = message;
+
+    user->sendMessage(msg);
+}
+
+const char *_fTcpSrvUserGetName(struct ftcp_server_user *user) {
+    if (!user) return NULL;
+
+    return user->getUsername();
+}
+int _fTcpSrvUserGetId(struct ftcp_server_user *user) {
+    if (!user) return -1;
+
+    return user->getUserID();
+}
+int _fTcpSrvUserGetDescriptor(struct ftcp_server_user *user) {
+    if (!user) return -1;
+
+    return user->getDescriptor();
+}
+
+void _fTcpSrvUserDisconnect(struct ftcp_server_user *user) {
+    if (!user) return;
+
+    user->disconnect();
+}
+
+void _fTcpSrvUserSetName(struct ftcp_server_user *user, const char *username) {
+    if (!user) return;
+
+    user->setUsername(username, false);
+}
+void _fTcpSrvUserSetNameEncrypted(struct ftcp_server_user *user, const char *username) {
+    if (!user) return;
+
+    user->setUsername(username, true);
 }
