@@ -20,17 +20,17 @@ struct fentity {
     unsigned char touching_ceiling : 1;
     unsigned char standing : 1;
 
-    Rectangle hitbox;
-    Rectangle *obstacles;
+    RLRectangle hitbox;
+    RLRectangle *obstacles;
     unsigned int obstacles_length;
 
-    Rectangle hitbox_r;
-    Rectangle hitbox_l;
-    Rectangle hitbox_u;
-    Rectangle hitbox_d;
+    RLRectangle hitbox_r;
+    RLRectangle hitbox_l;
+    RLRectangle hitbox_u;
+    RLRectangle hitbox_d;
 
-    Rectangle standing_surface;
-    Rectangle ceiling_surface;
+    RLRectangle standing_surface;
+    RLRectangle ceiling_surface;
 
     unsigned char ccheck0 : 1;
     unsigned char ccheck1 : 1;
@@ -40,8 +40,8 @@ struct fentity {
 
 #include <stdio.h>
 
-Rectangle to_int_rect(Rectangle r) {
-    Rectangle _r = {.x = (int)r.x, .y = (int)r.y, .width = (int)r.width, .height = (int)r.height};
+RLRectangle to_int_rect(RLRectangle r) {
+    RLRectangle _r = {.x = (int)r.x, .y = (int)r.y, .width = (int)r.width, .height = (int)r.height};
 
     return _r;
 }
@@ -63,11 +63,11 @@ void update_entity(struct fentity *entity) {
     entity->touching_wall_l = 0;
     entity->touching_wall_r = 0;
     entity->standing = 0;
-    entity->standing_surface = (Rectangle){ 0 };
-    entity->ceiling_surface = (Rectangle){ 0 };
+    entity->standing_surface = (RLRectangle){ 0 };
+    entity->ceiling_surface = (RLRectangle){ 0 };
 
     for (int i = 0; i < entity->obstacles_length; i++) {
-        Rectangle r = entity->obstacles[i];
+        RLRectangle r = entity->obstacles[i];
 
         unsigned char checks[4] = {
             CheckCollisionRecs(entity->hitbox_l, r),
@@ -82,8 +82,8 @@ void update_entity(struct fentity *entity) {
             entity->hitbox.y = entity->ceiling_surface.y + (entity->ceiling_surface.height + 1);
             entity->accel_y = 0;
 
-            entity->hitbox_r = (Rectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x + (entity->hitbox.width - 1), .y = entity->hitbox.y};
-            entity->hitbox_l = (Rectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x, .y = entity->hitbox.y};
+            entity->hitbox_r = (RLRectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x + (entity->hitbox.width - 1), .y = entity->hitbox.y};
+            entity->hitbox_l = (RLRectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x, .y = entity->hitbox.y};
         
             checks[0] = CheckCollisionRecs(entity->hitbox_l, r);
             checks[1] = CheckCollisionRecs(entity->hitbox_r, r);
@@ -169,14 +169,14 @@ void update_entity(struct fentity *entity) {
     entity->hitbox.x += entity->accel_x * delta;
     entity->hitbox.y += entity->accel_y * delta;
 
-    entity->hitbox_r = (Rectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x + (entity->hitbox.width - 1), .y = entity->hitbox.y};
-    entity->hitbox_l = (Rectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x, .y = entity->hitbox.y};
-    entity->hitbox_u = (Rectangle){.width = entity->hitbox.width - 2, .height = 1, .x = entity->hitbox.x + 1, .y = entity->hitbox.y};
-    entity->hitbox_d = (Rectangle){.width = entity->hitbox.width - 2, .height = 1, .x = entity->hitbox.x + 1, .y = entity->hitbox.y + (entity->hitbox.height - 1)};
+    entity->hitbox_r = (RLRectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x + (entity->hitbox.width - 1), .y = entity->hitbox.y};
+    entity->hitbox_l = (RLRectangle){.width = 1, .height = entity->hitbox.height - 1, .x = entity->hitbox.x, .y = entity->hitbox.y};
+    entity->hitbox_u = (RLRectangle){.width = entity->hitbox.width - 2, .height = 1, .x = entity->hitbox.x + 1, .y = entity->hitbox.y};
+    entity->hitbox_d = (RLRectangle){.width = entity->hitbox.width - 2, .height = 1, .x = entity->hitbox.x + 1, .y = entity->hitbox.y + (entity->hitbox.height - 1)};
 }
 
 void draw_entity(struct fentity *entity) {
-    Rectangle hitbox = entity->hitbox;
+    RLRectangle hitbox = entity->hitbox;
     if (entity->standing) {
         hitbox.y -= 1;
     }
@@ -201,7 +201,7 @@ int main() {
     struct fentity player = {.hitbox = {.width = 8, .height = 8}};
     RenderTexture2D txt = LoadRenderTexture(800 / 5, 600 / 5);
 
-    Rectangle obstacles[] = {
+    RLRectangle obstacles[] = {
         {.width = 8, .height = 32, .x = 60},
         {.width = 8, .height = 8, .x = 0, .y = 64},
         {.width = 8, .height = 8, .x = 8, .y = 64},
@@ -212,7 +212,7 @@ int main() {
     };
 
     player.obstacles = obstacles;
-    player.obstacles_length = sizeof(obstacles) / sizeof(Rectangle);
+    player.obstacles_length = sizeof(obstacles) / sizeof(RLRectangle);
 
     Camera2D cam = { 0 };
     cam.zoom = 1.f;
@@ -263,7 +263,7 @@ int main() {
         draw_entity(&player);
 
         for (int i = 0; i < player.obstacles_length; i++) {
-            Rectangle r = player.obstacles[i];
+            RLRectangle r = player.obstacles[i];
 
             DrawRectangleRec(r, RED);
         }
@@ -271,17 +271,17 @@ int main() {
         EndMode2D();
         EndTextureMode();
 
-        Rectangle source = (Rectangle){ 0, 0, (float)txt.texture.width, (float)-txt.texture.height };
-        Rectangle dest = (Rectangle){ 0, 0, 800, 600 };
+        RLRectangle source = (RLRectangle){ 0, 0, (float)txt.texture.width, (float)-txt.texture.height };
+        RLRectangle dest = (RLRectangle){ 0, 0, 800, 600 };
 
         DrawTexturePro(txt.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
-        DrawText(buf, 2, 2, 10, RED);
+        RlDrawText(buf, 2, 2, 10, RED);
 
         EndDrawing();
     }
 
-    CloseWindow();
+    RlCloseWindow();
 
     return 0;
 }

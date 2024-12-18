@@ -21,7 +21,7 @@ void _fIntroMenuOnOptions() {
     Texture2D v_sync = _fTextRenderGradientV(&__state.text_manager, "V-Sync", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
     Texture2D fullscreen = _fTextRenderGradientV(&__state.text_manager, "FullScreen", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
 
-    Rectangle area = (Rectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
+    RLRectangle area = (RLRectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 
     BeginTextureModeStacked(rt2d);
 
@@ -54,7 +54,7 @@ void _fIntroMenuOnOptions() {
     struct fslider slider = {0};
     slider.tint = BLUE;
     slider.scaling = 1.f;
-    slider.rect = (Rectangle){10, 10, 30, 4};
+    slider.rect = (RLRectangle){10, 10, 30, 4};
     slider.movable_width = 4.f;
     slider.progress = __state.sound_engine.volume;
 

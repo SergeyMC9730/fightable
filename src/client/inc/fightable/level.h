@@ -44,19 +44,19 @@ struct flevel {
     int old_block_amount;
 #endif
 
-    Rectangle render_crop_area;
+    RLRectangle render_crop_area;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
 struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
-Rectangle *_fLevelGetHitboxes(struct flevel *level);
+RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
 fserializable _fLevelSerialize(struct flevel *level);
 struct flevel _fLevelLoad(fserializable *serializable);
 
 #ifdef COTARGET_PTX
 void _fLevelReloadCudaCtx(struct flevel *level);
-void _fLevelPrepareCudaRender(struct flevel *level, Rectangle area);
+void _fLevelPrepareCudaRender(struct flevel *level, RLRectangle area);
 #endif
 
 #ifdef __cplusplus

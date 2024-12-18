@@ -2,7 +2,7 @@
 #include <fightable/intvec.h>
 
 void _fTilemapDrawScaled(struct ftilemap *tilemap, IVector2 render_pos, IVector2 tile_pos, unsigned char fliped_x, unsigned char fliped_y, Color tint, float scale) {
-    Rectangle r;
+    RLRectangle r;
 
     r.width = tilemap->tile_size.x;
     r.height = tilemap->tile_size.y;
@@ -16,7 +16,7 @@ void _fTilemapDrawScaled(struct ftilemap *tilemap, IVector2 render_pos, IVector2
         r.height *= -1.f;
     }
 
-    Rectangle dest = r;
+    RLRectangle dest = r;
     dest.width *= scale;
     dest.height *= scale;
     dest.x = render_pos.x;
@@ -77,12 +77,12 @@ Texture2D _fTilemapExportTile(struct ftilemap *tilemap, IVector2 tile_pos) {
     return tile_texture;
 }
 
-Rectangle _fTilemapGetTileRect(struct ftilemap *tilemap, IVector2 tile_pos) {
-    return (Rectangle){tile_pos.x * tilemap->tile_size.x, tile_pos.y * tilemap->tile_size.y, tilemap->tile_size.x, tilemap->tile_size.y};
+RLRectangle _fTilemapGetTileRect(struct ftilemap *tilemap, IVector2 tile_pos) {
+    return (RLRectangle){tile_pos.x * tilemap->tile_size.x, tile_pos.y * tilemap->tile_size.y, tilemap->tile_size.x, tilemap->tile_size.y};
 }
 
 Image _fTilemapExportTileAsImage(struct ftilemap *tilemap, IVector2 tile_pos) {
-    Rectangle r = _fTilemapGetTileRect(tilemap, tile_pos);
+    RLRectangle r = _fTilemapGetTileRect(tilemap, tile_pos);
 
     Image mapimg = LoadImageFromTexture(tilemap->texture);
     ImageCrop(&mapimg, r);

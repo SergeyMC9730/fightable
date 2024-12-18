@@ -6,6 +6,7 @@ extern "C" {
 
 const char *_fStorageGetWritable();
 void _fStoragePrepareWritable();
+int _fStorageMakeDirectory(const char* dirPath);
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,7 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
         additional_size = (int)ceil(((float)text_sz.x / 22.f) - 1.f);
     }
 
-    Rectangle r = {
+    RLRectangle r = {
         .x = btn->position.x,
         .y = btn->position.y,
         .width = 0,
@@ -43,7 +43,7 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
     int size = cur_pos.x - btn->position.x;
     int center_x = (size - text_sz.x) / 2;
 
-    Rectangle btn_rect = {btn->position.x, btn->position.y + 1, size, 7};
+    RLRectangle btn_rect = {btn->position.x, btn->position.y + 1, size, 7};
 
     unsigned char ret = 0;
 

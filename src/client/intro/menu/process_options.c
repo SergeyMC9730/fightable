@@ -19,14 +19,10 @@ void _fIntroMenuProcessOptions() {
 
     Color tint = WHITE;
 
-    Rectangle area = (Rectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
+    RLRectangle area = (RLRectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 
     unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint);
 
-    // тебе надо сначала инициализировать кнопку в глобальном __state.config,
-    // чтобы значения не ресетались каждый кадр
-// f а у тебя где инзаполняется структ кнопки vsync
-    // пробуй запустить тогда
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
         __state.menu_state = INTRO_MENU_BASE_SELECTOR;
         UnloadTexture(__state.playbtn_container);

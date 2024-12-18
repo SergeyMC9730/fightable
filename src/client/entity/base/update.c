@@ -73,13 +73,13 @@ void _fEntityUpdate(struct fentity* entity) {
     entity->ground_hitbox.x = entity->hitbox.x;
     entity->ground_hitbox.y = entity->hitbox.y + (entity->hitbox.height - entity->ground_hitbox.height) + 1;
 
-    Rectangle r1 = *(Rectangle*)(&entity->ground_hitbox);
+    RLRectangle r1 = *(RLRectangle*)(&entity->ground_hitbox);
 
     entity->on_ground = 0;
     entity->standing_object = (fhitbox){ 0 };
 
     for (unsigned int i = 0; i < entity->obstacles_length; i++) {
-        Rectangle r2 = *(Rectangle*)(entity->obstacles + i);
+        RLRectangle r2 = *(RLRectangle*)(entity->obstacles + i);
 
         if (CheckCollisionRecs(r1, r2)) {
             entity->on_ground = 1;

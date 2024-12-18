@@ -113,12 +113,12 @@ void _fEntityUpdate(struct fentity *entity) {
     entity->ground_hitbox.x = entity->hitbox.x;
     entity->ground_hitbox.y = entity->hitbox.y + (entity->hitbox.height - entity->ground_hitbox.height) + 1;
 
-    Rectangle r1 = *(Rectangle*)(&entity->ground_hitbox);
+    RLRectangle r1 = *(RLRectangle*)(&entity->ground_hitbox);
 
     entity->on_ground = 0;
 
     for (unsigned int i = 0; i < entity->obstacles_length; i++) {
-        Rectangle r2 = *(Rectangle*)(entity->obstacles + i);
+        RLRectangle r2 = *(RLRectangle*)(entity->obstacles + i);
 
         if (CheckCollisionRecs(r1, r2)) {
             entity->on_ground = 1;
@@ -203,13 +203,13 @@ int main() {
         DrawRectangle(0, GetRenderHeight() - 24, GetRenderWidth(), 24, RED);
         
         fhitbox h = test_entity.hitbox;
-        Rectangle r = { h.x, h.y, h.width, h.height };
+        RLRectangle r = { h.x, h.y, h.width, h.height };
 
         DrawRectangleRec(r, GREEN);
 
         for (int i = 0; i < test_entity.obstacles_length; i++) {
             h = test_entity.obstacles[i];
-            r = (Rectangle){ h.x, h.y, h.width, h.height };
+            r = (RLRectangle){ h.x, h.y, h.width, h.height };
 
             DrawRectangleRec(r, RED);
         }
@@ -217,15 +217,15 @@ int main() {
         EndMode2D();
         EndTextureMode();
 
-        Rectangle source = (Rectangle){ 0, 0, (double)txt.texture.width, (double)-txt.texture.height };
-        Rectangle dest = (Rectangle){ 0, 0, 800, 600 };
+        RLRectangle source = (RLRectangle){ 0, 0, (double)txt.texture.width, (double)-txt.texture.height };
+        RLRectangle dest = (RLRectangle){ 0, 0, 800, 600 };
 
         DrawTexturePro(txt.texture, source, dest, (Vector2) { 0, 0 }, 0.f, WHITE);
 
-        DrawText(buf, 2, 2, 20, BLUE);
+        RlDrawText(buf, 2, 2, 20, BLUE);
 
         EndDrawing();
     }
-    CloseWindow();
+    RlCloseWindow();
     return 0;
 }

@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
     ChangeDirectory("assets");
 #endif
 
-    SetWindowIcon(LoadImage("icon.png"));
+    SetWindowIcon(RlLoadImage("icon.png"));
 
     InitAudioDevice();
 
@@ -299,8 +299,8 @@ int main(int argc, char **argv) {
         __state.window_scale = scaling_y;
 
         {
-            Rectangle source = (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width, (float)-__state.framebuffer.texture.height };
-            Rectangle dest = (Rectangle){ align_x, 0, (float)__state.framebuffer.texture.width * scaling_y, (float)__state.framebuffer.texture.height * scaling_y };
+            RLRectangle source = (RLRectangle){ 0, 0, (float)__state.framebuffer.texture.width, (float)-__state.framebuffer.texture.height };
+            RLRectangle dest = (RLRectangle){ align_x, 0, (float)__state.framebuffer.texture.width * scaling_y, (float)__state.framebuffer.texture.height * scaling_y };
 
             DrawTexturePro(__state.framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
         }
@@ -309,8 +309,8 @@ int main(int argc, char **argv) {
             double scaling_y = (double)actual_sz.y / (double)__state.overlay_framebuffer.texture.height; 
             int align_x = (actual_sz.x - (__state.overlay_framebuffer.texture.width * scaling_y)) / 2;
 
-            Rectangle source = (Rectangle){ 0, 0, (float)__state.overlay_framebuffer.texture.width, (float)-__state.overlay_framebuffer.texture.height };
-            Rectangle dest = (Rectangle){ align_x, 0, (float)__state.overlay_framebuffer.texture.width * scaling_y, (float)__state.overlay_framebuffer.texture.height * scaling_y };
+            RLRectangle source = (RLRectangle){ 0, 0, (float)__state.overlay_framebuffer.texture.width, (float)-__state.overlay_framebuffer.texture.height };
+            RLRectangle dest = (RLRectangle){ align_x, 0, (float)__state.overlay_framebuffer.texture.width * scaling_y, (float)__state.overlay_framebuffer.texture.height * scaling_y };
 
             DrawTexturePro(__state.overlay_framebuffer.texture, source, dest, (Vector2){0, 0}, 0.f, WHITE);
         }
@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
                 __state.cuda_time
             );
 
-            DrawText(dbg_buffer, 8, 32, 20, RED);
+            RlDrawText(dbg_buffer, 8, 32, 20, RED);
         }
 
         EndDrawing();

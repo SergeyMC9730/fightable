@@ -1,6 +1,6 @@
 #include <fightable/rect.h>
 
-void _fRectDraw(Rectangle r, Color grad_top, Color grad_bottom, Color container) {
+void _fRectDraw(RLRectangle r, Color grad_top, Color grad_bottom, Color container) {
     if (container.a != 0) {
         DrawRectangleRec(r, container);
     }

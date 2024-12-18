@@ -13,7 +13,7 @@ extern "C" {
 //    float height;
 //} fhitbox;
 
-typedef Rectangle fhitbox;
+typedef RLRectangle fhitbox;
 
 float _fHitboxClipXCollide(fhitbox *h1, fhitbox *h2, float x);
 float _fHitboxClipYCollide(fhitbox *h1, fhitbox *h2, float x);

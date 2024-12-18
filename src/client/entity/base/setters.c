@@ -1,6 +1,6 @@
 #include <fightable/entity.h>
 
-void _fEntitySetHitbox(struct fentity* entity, Rectangle rec) {
+void _fEntitySetHitbox(struct fentity* entity, RLRectangle rec) {
 	if (!entity) return;
 
 	entity->hitbox = rec;

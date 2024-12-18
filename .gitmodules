@@ -19,3 +19,6 @@
 [submodule "ext/base64"]
 	path = ext/base64
 	url = https://github.com/tobiaslocker/base64.git
+[submodule "ext/raylib"]
+	path = ext/raylib
+	url = https://github.com/sergeymc9730/raylib.git

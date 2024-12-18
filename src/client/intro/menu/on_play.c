@@ -15,30 +15,30 @@ void _fIntroMenuOnPlay() {
     int wy = __state.framebuffer.texture.height;
 
     int w = 80;
-    Rectangle area = (Rectangle){(wx - w) / 2, 45, w, 50};
+    RLRectangle area = (RLRectangle){(wx - w) / 2, 45, w, 50};
 
     RenderTexture2D rt2d = LoadRenderTexture(area.width, area.height);
     BeginTextureModeStacked(rt2d);
     ClearBackground((Color){0, 0, 0, 64}); // (Color){0, 0, 0, 160}
 
-    _fRectDraw((Rectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 0});
+    _fRectDraw((RLRectangle){0, 0, area.width - 1, area.height - 1}, WHITE, (Color){0x71, 0xaf, 0xfb, 0xff}, (Color){0, 0, 0, 0});
 
     int offset = 3;
 
     // BeginScissorMode(1, 1, area.width - 1, area.height - 1);
 
-    // DrawRectanglePro((Rectangle){-10 + area.x, 15 + area.y, 15, 15}, (Vector2){}, 45.f, GREEN);
+    // DrawRectanglePro((RLRectangle){-10 + area.x, 15 + area.y, 15, 15}, (Vector2){}, 45.f, GREEN);
     // DrawRectangle(0, offset, 15, 15, RED);
-    // DrawRectanglePro((Rectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
-    // DrawRectanglePro((Rectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
-    // DrawRectanglePro((Rectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
+    // DrawRectanglePro((RLRectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+    // DrawRectanglePro((RLRectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
+    // DrawRectanglePro((RLRectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
     DrawTexture(multiplayer_label, 27, 6 + offset, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     offset -= 2;
 
-    // DrawRectanglePro((Rectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
+    // DrawRectanglePro((RLRectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
     DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){33, 4}, (IVector2){2, 2}, 0, 0, WHITE);

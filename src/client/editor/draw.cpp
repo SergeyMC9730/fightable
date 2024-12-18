@@ -28,7 +28,7 @@ void _fEditorDraw(struct feditor *editor) {
     }
 
     float speed = 1.f;
-    Rectangle mobile_swipe_area = {};
+    RLRectangle mobile_swipe_area = {};
 
     mobile_swipe_area.width = 8;
     mobile_swipe_area.height = 32;
@@ -364,9 +364,9 @@ void _fEditorDraw(struct feditor *editor) {
             constexpr float offset_x = 50;
             constexpr float offset_y = 50;
 
-            Rectangle BG = { offset_x, offset_y, __state.overlay_framebuffer.texture.width - (offset_x * 2), __state.overlay_framebuffer.texture.height - (offset_y * 2) };
-            Rectangle blocks_check = { 0 };
-            Rectangle back = {60, 60, 50, 50};
+            RLRectangle BG = { offset_x, offset_y, __state.overlay_framebuffer.texture.width - (offset_x * 2), __state.overlay_framebuffer.texture.height - (offset_y * 2) };
+            RLRectangle blocks_check = { 0 };
+            RLRectangle back = {60, 60, 50, 50};
 
             int blocks_count = 0;
             int layer = 1;

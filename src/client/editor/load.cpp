@@ -31,7 +31,7 @@ struct feditor *_fEditorCreate() {
     struct fslider slider = {0};
     slider.tint = BLUE;
     slider.scaling = UI_SCALE;
-    slider.rect = Rectangle{10, 10, 30, 4};
+    slider.rect = RLRectangle{10, 10, 30, 4};
     slider.movable_width = 4.f;
 
     editor->test_slider = slider;

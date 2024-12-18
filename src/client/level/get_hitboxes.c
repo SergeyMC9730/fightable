@@ -3,13 +3,13 @@
 #include <fightable/block.h>
 #include <stdlib.h>
 
-Rectangle *_fLevelGetHitboxes(struct flevel *level) {
+RLRectangle *_fLevelGetHitboxes(struct flevel *level) {
     if (!level) return 0;
 
-    Rectangle *array = (Rectangle *)MemAlloc(level->data_size * sizeof(Rectangle));
+    RLRectangle *array = (RLRectangle *)MemAlloc(level->data_size * sizeof(RLRectangle));
     
     for (unsigned int i = 0; i < level->data_size; i++) {
-        Rectangle *ref = array + i;
+        RLRectangle *ref = array + i;
         struct fblock *bref = level->objects + i;
 
         if (bref->passable) {

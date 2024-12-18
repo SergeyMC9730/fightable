@@ -17,7 +17,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 #endif
 
-    Rectangle *rects = 0;
+    RLRectangle *rects = 0;
     struct fentity *player = 0;
 
     if (level->entities && level->entity_data_size != 0) {
@@ -39,13 +39,13 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     BeginMode2D(actual_cam);
     
-    Rectangle source = {0};
+    RLRectangle source = {0};
     source.width = __state.framebuffer.texture.width;
     source.height = __state.framebuffer.texture.height;
     source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
     source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
 
-    Rectangle dest = source;
+    RLRectangle dest = source;
     dest.x = actual_cam.target.x;
     dest.y = actual_cam.target.y;
     
@@ -58,7 +58,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     //     actual_cam.target.y += (__state.framebuffer.texture.height / 2);
     // }
 
-    Rectangle area = (Rectangle){
+    RLRectangle area = (RLRectangle){
         actual_cam.target.x - tx,
         actual_cam.target.y - tx,
         level->camera_size.x + tx,

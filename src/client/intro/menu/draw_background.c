@@ -9,14 +9,14 @@ void _fIntroMenuDrawBackground() {
     int wx = __state.framebuffer.texture.width;
     int wy = __state.framebuffer.texture.height;
 
-    Rectangle source = {0};
+    RLRectangle source = {0};
     source.width = wx;
     source.height = wy;
 
     source.x -= ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.width);
     source.y += ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.height);
 
-    Rectangle dest = source;
+    RLRectangle dest = source;
     dest.x = 0;
     dest.y = 0;
 

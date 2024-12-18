@@ -15,10 +15,10 @@ typedef struct fhitbox {
 
 float _fHitboxClipXCollide(struct fhitbox *h1, struct fhitbox *h2, float x);
 float _fHitboxClipYCollide(struct fhitbox *h1, struct fhitbox *h2, float x);
-unsigned char _fHitboxIntersects(Rectangle *h1, Rectangle *h2);
+unsigned char _fHitboxIntersects(RLRectangle *h1, RLRectangle *h2);
 
-void _fHitboxMove(Rectangle *h1, float x, float y);
-Rectangle _fHitboxExpand(Rectangle *h, float x, float y);
+void _fHitboxMove(RLRectangle *h1, float x, float y);
+RLRectangle _fHitboxExpand(RLRectangle *h, float x, float y);
 
 #ifdef __cplusplus
 }

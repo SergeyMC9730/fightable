@@ -13,8 +13,8 @@ struct ftcp_server_delegate __server_delegate;
 
 #include <raylib.h>
 
-Rectangle __remotePlayers[0x0f] = {};
-Rectangle __localPlayer = {};
+RLRectangle __remotePlayers[0x0f] = {};
+RLRectangle __localPlayer = {};
 
 int __userId = -1;
 
@@ -44,7 +44,7 @@ int tryToConnect();
 #include <raylib.h>
 
 void initLocalPlayer() {
-    Rectangle r = {0, 0, 32, 32};
+    RLRectangle r = {0, 0, 32, 32};
     __localPlayer = r;
 }
 
@@ -77,10 +77,10 @@ int main() {
 	int clients = _fTcpSrvGetConnectedUsers(__server);
 	
 	snprintf(buffer, 16, "clients: %d", clients);
-	DrawText(buffer, 4, 600 - 20, 20, GREEN);
+	RlDrawText(buffer, 4, 600 - 20, 20, GREEN);
 #endif
 	snprintf(buffer, 16, "uid: %d", __userId);
-	DrawText(buffer, 4, 4, 20, GREEN);
+	RlDrawText(buffer, 4, 4, 20, GREEN);
 	
 
 	EndDrawing();
@@ -91,7 +91,7 @@ int main() {
     _fTcpSrvDestroy(__server);
 #endif
 
-    CloseWindow();
+    RlCloseWindow();
     
     return 0;
 }

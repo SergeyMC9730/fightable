@@ -9,7 +9,7 @@
 unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
     Vector2 mpos = _fGetMousePosPix();
 
-    Rectangle r = {
+    RLRectangle r = {
         .x = btn->position.x,
         .y = btn->position.y,
         .width = 0,
@@ -29,7 +29,7 @@ unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
     int size = 10;
     int center_x = (size - 8) / 2;
 
-    Rectangle btn_rect = {btn->position.x + 3, btn->position.y + 3, 10, 10};
+    RLRectangle btn_rect = {btn->position.x + 3, btn->position.y + 3, 10, 10};
     unsigned char ret = 0;
 
     if (CheckCollisionPointRec(mpos, btn_rect) ){ 

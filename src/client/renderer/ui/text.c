@@ -176,11 +176,11 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     BeginTextureModeStacked(helper_txt);
     ClearBackground(BLANK);
 
-    Rectangle source = (Rectangle){ 0, 0, (float)txt.width, (float)-txt.height };
-    Rectangle dest = (Rectangle){ 1, -1, txt.width, txt.height };
+    RLRectangle source = (RLRectangle){ 0, 0, (float)txt.width, (float)-txt.height };
+    RLRectangle dest = (RLRectangle){ 1, -1, txt.width, txt.height };
     DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, (Color){255, 255, 255, 128});
 
-    dest = (Rectangle){ 0, 0, txt.width, txt.height };
+    dest = (RLRectangle){ 0, 0, txt.width, txt.height };
     DrawTexturePro(txt, source, dest, (Vector2){0, 0}, 0.f, WHITE);
 
     EndTextureModeStacked();

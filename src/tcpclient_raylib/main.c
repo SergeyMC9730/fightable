@@ -48,7 +48,7 @@ int main() {
 
     InitWindow(640, 480, "TCP Client");
     
-    Rectangle player = {0, 0, PLAYER_WIDTH, PLAYER_HEIGHT};
+    RLRectangle player = {0, 0, PLAYER_WIDTH, PLAYER_HEIGHT};
     while (!WindowShouldClose()) {
         
         BeginDrawing();
@@ -58,7 +58,7 @@ int main() {
             for(int i = 0; i < MAX_PLAYERS; i++) {
                 DrawRectangle(arrPlayer[i].player.x, arrPlayer[i].player.y, PLAYER_WIDTH, PLAYER_HEIGHT, BLUE);
             }
-            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+            RlDrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
         EndDrawing();
     }

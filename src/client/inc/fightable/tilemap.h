@@ -25,7 +25,7 @@ void _fTilemapUnload(struct ftilemap *tilemap);
 
 Texture2D _fTilemapExportTile(struct ftilemap *tilemap, IVector2 tile_pos);
 Image _fTilemapExportTileAsImage(struct ftilemap *tilemap, IVector2 tile_pos);
-Rectangle _fTilemapGetTileRect(struct ftilemap *tilemap, IVector2 tile_pos);
+RLRectangle _fTilemapGetTileRect(struct ftilemap *tilemap, IVector2 tile_pos);
 
 struct cJSON *_fTilemapCreateJson(struct ftilemap *tilemap);
 void _fTilemapFromJson(struct ftilemap *tilemap, struct cJSON *j);

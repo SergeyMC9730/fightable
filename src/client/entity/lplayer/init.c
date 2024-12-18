@@ -10,5 +10,5 @@ void _flPlayerInit(struct felplayer* instance) {
 	instance->base.draw = (void(*)(struct fentity *))_flPlayerDraw;
 	instance->base.update = (void(*)(struct fentity *))_flPlayerUpdate;
 
-	_fEntitySetHitbox(&instance->base, (Rectangle) { 0, 0, 8, 8 });
+	_fEntitySetHitbox(&instance->base, (RLRectangle) { 0, 0, 8, 8 });
 }

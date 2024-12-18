@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable LANGUAGES C CXX)
 
+set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
+
 set(FIGHTABLE_SHARED_INC
     src/shared/inc
 )
@@ -110,6 +112,12 @@ add_subdirectory(ext/portaudio_opensles)
 
 set(BUILD_SHARED_LIBS OFF)
 set(ENABLE_CJSON_UNINSTALL OFF)
+set(ENABLE_CJSON_TEST OFF)
+set(ENABLE_TARGET_EXPORT OFF)
+
+if (FIGHTABLE_COMPILER STREQUAL "Clang" AND WIN32)
+    set(ENABLE_CUSTOM_COMPILER_FLAGS OFF)
+endif()
 
 add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
@@ -227,7 +235,7 @@ if (ANDROID)
 
 	add_library(fightable SHARED ${FIGHTABLE_SRC})
 
-	set(FIGHTABLE_NATIVE_LIBS android log)
+	set(FIGHTABLE_NATIVE_LIBS android log m)
 
 	add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
@@ -245,6 +253,17 @@ elseif(WIN32)
 
     set(FIGHTABLE_NATIVE_LIBS pthreadVC3 Ws2_32)
     set(FIGHTABLE_NATIVE_INCLUDES ext/pthread-win32 ext/strings_h)
+
+    if (FIGHTABLE_COMPILER STREQUAL "Clang")
+        set(FIGHTABLE_COPTS -Wreserved-macro-identifier -Wunsafe-buffer-usage)
+        message(STATUS "Applying Clang patches for Windows target")
+    elseif (FIGHTABLE_COMPILER STREQUAL "MSVC")
+        if (NOT FIGHTABLE_ALLOW_MSVC)
+            message(FATAL_ERROR "Fightable cannot be built using MSVC. Use -DFIGHTABLE_ALLOW_MSVC=TRUE to continue configuring")
+        else()
+            message(STATUS "Allowing MSVC to build this source. Expect issues to come out after configuring")
+        endif()
+    endif()
 elseif(LINUX)
     message(STATUS "Compiling for GNU/Linux")
 
@@ -253,6 +272,8 @@ elseif(LINUX)
     add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
     add_compile_definitions(TARGET_LINUX)
+
+    set(FIGHTABLE_NATIVE_LIBS pthread m)
 elseif(UNIX)
     message(STATUS "Compiling for Unix-like operating systems")
 
@@ -260,15 +281,17 @@ elseif(UNIX)
 
     add_executable(fightable ${FIGHTABLE_SRC})
     add_compile_definitions(TARGET_UNIX)
-    set(FIGHTABLE_NATIVE_LIBS pthread)
+    set(FIGHTABLE_NATIVE_LIBS pthread m)
 else()
-    message(STATUS "Compiling for console homebrews")
-    set(FIGHTABLE_TARGET Unknown homebrew)
+    message(STATUS "Compiling for unknown platform")
+    set(FIGHTABLE_TARGET Unknown platform)
+    add_compile_definitions(TARGET_UNKNOWN_PLATFORM)
 	
-    message(FATAL_ERROR "Support for platforms other than UNIX and NT is not implemented yet!")
-
-    add_compile_definitions(TARGET_HOMEBREW_UNKNOWN)
+    message(FATAL_ERROR "Fightable does not support targets beyond Unix and Windows")
 endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FIGHTABLE_COPTS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")
 
 add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
 target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
@@ -302,7 +325,7 @@ target_include_directories(ftcpclient PRIVATE
 )
 
 add_executable(ftcpclient-test src/tcpclient_test/main.c)
-target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS} m)
+target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(ftcpclient-test PRIVATE
     src/tcpclient/inc
     ${FIGHTABLE_SHARED_INC}
@@ -310,7 +333,7 @@ target_include_directories(ftcpclient-test PRIVATE
 )
 
 add_executable(tcpclient-raylib-test src/tcpclient_raylib/main.c)
-target_link_libraries(tcpclient-raylib-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} m)
+target_link_libraries(tcpclient-raylib-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(tcpclient-raylib-test PRIVATE
     src/tcpclient/inc
     ext/raylib/src
@@ -476,6 +499,8 @@ endif()
 if (FIGHTABLE_CUDA)
     message(STATUS "  CUDA support: ${FIGHTABLE_CUDA}")
 endif()
+
+message(STATUS "  Compiler: ${FIGHTABLE_COMPILER}")
 
 message(STATUS "")
 message(STATUS "")

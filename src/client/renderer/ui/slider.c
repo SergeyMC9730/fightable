@@ -7,12 +7,12 @@
 void _fSliderDraw(struct fslider *slider) {
     if (!slider || slider->scaling <= 0.f) return;
 
-    Rectangle movable_rect = {.x = slider->rect.x + (slider->rect.width * slider->progress), .y = slider->rect.y, .width = slider->movable_width * slider->scaling, .height = slider->rect.height * slider->scaling};
+    RLRectangle movable_rect = {.x = slider->rect.x + (slider->rect.width * slider->progress), .y = slider->rect.y, .width = slider->movable_width * slider->scaling, .height = slider->rect.height * slider->scaling};
 
     Vector2 mouse = _fGetMousePosPix();
     mouse.x *= slider->scaling; mouse.y *= slider->scaling;
 
-    Rectangle static_rect = slider->rect;
+    RLRectangle static_rect = slider->rect;
     static_rect.width *= slider->scaling; static_rect.height *= slider->scaling;
 
     FColor fc = _fColorToFloat(slider->tint);
@@ -66,7 +66,7 @@ void _fSliderDraw(struct fslider *slider) {
         slider->moving = 0;
     }
 
-    Rectangle movable_shadow_rect = movable_rect;
+    RLRectangle movable_shadow_rect = movable_rect;
     movable_shadow_rect.x -= (slider->movable_width / 2.f) * slider->scaling;
     movable_shadow_rect.width += slider->movable_width * slider->scaling;
 

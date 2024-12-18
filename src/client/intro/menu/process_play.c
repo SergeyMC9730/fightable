@@ -9,7 +9,7 @@ void _fIntroMenuProcessPlay() {
 
     int w = 80;
 
-    Rectangle area = (Rectangle){(wx - w) / 2 + __state.menu_cur_x, 42, w, 50};
+    RLRectangle area = (RLRectangle){(wx - w) / 2 + __state.menu_cur_x, 42, w, 50};
     Color tint = WHITE;
 
     unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height + 2 }, tint);
@@ -27,7 +27,7 @@ void _fIntroMenuProcessPlay() {
     DrawTexture(__state.playbtn_container, area.x, area.y, tint);
 
     {
-        Rectangle r = area;
+        RLRectangle r = area;
         Vector2 mpos = _fGetMousePosPix();
 
         r.height /= 2;

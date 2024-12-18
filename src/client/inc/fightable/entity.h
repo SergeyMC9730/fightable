@@ -70,7 +70,7 @@ void _fEntityJump(struct fentity* entity, unsigned char holding);
 
 IVector2 _fEntityGetDrawingPos(struct fentity* entity);
 
-void _fEntitySetHitbox(struct fentity* entity, Rectangle rec);
+void _fEntitySetHitbox(struct fentity* entity, RLRectangle rec);
 void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
 fserializable _fEntitySerialize(struct fentity* entity);
 struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version);

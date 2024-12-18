@@ -3,7 +3,7 @@
 #include <raylib.h>
 
 struct fslider {
-    Rectangle rect;
+    RLRectangle rect;
     float btn_relative_pos;
     
     float progress;
