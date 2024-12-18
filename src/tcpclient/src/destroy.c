@@ -1,25 +1,28 @@
 #include <fightable/tcpcln/client.h>
+#include <fightable/sockcompat.h>
 #include <fightable/string.h>
 #include <stdlib.h>
 #ifdef TARGET_UNIX
 #include <unistd.h>
-#define NPD_CLOSE close
-#define NPD_SHUTDOWN(fd, mode) shutdown(fd, mode)
+#define SHUT_REASON SHUT_RDWR
 #elif defined(TARGET_WIN32)
 #include <windows.h>
 #include <winsock.h>
 #include <io.h>
-#define NPD_CLOSE _close
-#define NPD_SHUTDOWN(fd, mode)
-#define SHUT_RDWR 0
+#define SD_BOTH 2
+#define SHUT_REASON SD_BOTH
 #endif
 #include <stdio.h>
 
 void _fTcpClientDestroy(struct ftcpclient *client) {
     if (!client) return;
 
+#ifndef TARGET_WIN32
     NPD_CLOSE(client->sockfd);
-    NPD_SHUTDOWN(client->sockfd, SHUT_RDWR);
+#else
+    closesocket(client->sockfd);
+#endif
+    shutdown(client->sockfd, SHUT_REASON);
 
     client->thread_should_exit = 1;
     pthread_cancel(client->read_thread);

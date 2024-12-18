@@ -9,6 +9,8 @@
 #include <netinet/in.h>
 #elif defined(TARGET_WIN32)
 #include <winsock2.h>
+#include <ws2tcpip.h>
+#include <io.h>
 typedef int socklen_t;
 #endif
 

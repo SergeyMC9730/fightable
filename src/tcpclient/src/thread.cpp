@@ -2,6 +2,7 @@
 #include <fightable/time.h>
 #include <fightable/string.h>
 #include <fightable/tcpcln/delegate.h>
+#include <fightable/sockcompat.h>
 
 #include <string.h>
 #include <strings.h>
@@ -43,10 +44,17 @@ void *_fTcpClientWriteThread(struct ftcpclient *client) {
             
                 printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
 
-                int res = write(client->sockfd, msg_to_send.data(), msg_to_send.size());
+#ifndef TARGET_WIN32
+                int res = NPD_WRITE(client->sockfd, msg_to_send.data(), msg_to_send.size());
+#else
+                int res = send(client->sockfd, msg_to_send.data(), msg_to_send.size(), 0);
+#endif
 
                 if (res < 0) {
                     printf("ftcpclient: write: fail (%d). tried to write %ld bytes. exiting\n", res, msg_to_send.size());
+#ifdef TARGET_WIN32
+                    printf("ftcpclient: send: winsock returned %d\n", WSAGetLastError());
+#endif
                     continue;
                 }
             }
@@ -63,11 +71,18 @@ void *_fTcpClientReadThread(struct ftcpclient *client) {
 
     while (!client->thread_should_exit) {
         memset(client->buf_r, 0, client->buf_size);
-        int n = read(client->sockfd, client->buf_r, client->buf_size);
+#ifndef TARGET_WIN32
+        int n = NPD_READ(client->sockfd, client->buf_r, client->buf_size);
+#else
+        int n = recv(client->sockfd, client->buf_r, client->buf_size, 0);
+#endif
 
         if (n < 0 || n == 0) {
             printf("ftcpclient: read: client read less than zero bytes (%d). closing thread\n", n);
-        
+#ifdef TARGET_WIN32
+            printf("ftcpclient: recv: winsock returns %d\n", WSAGetLastError());
+#endif
+
             return NULL;
         }
         printf("ftcpclient: received %d bytes: splitting got ", n);

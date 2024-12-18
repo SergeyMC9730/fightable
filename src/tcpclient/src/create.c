@@ -11,6 +11,8 @@
 #include <io.h>
 #endif
 
+#include <fightable/sockcompat.h>
+
 struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, struct ftcpclient_delegate *delegate) {
     if (delegate == NULL) {
         printf("ftcpclient: delegate cannot be NULL\n");
@@ -22,6 +24,17 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
 
     client->hostname = address;
     client->port = port;
+
+    int res = 0;
+
+#ifdef TARGET_WIN32
+    WSADATA wsaData;
+
+    res = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+    printf("ftcpclient: WSAStartup returned %d\n", res);
+    assert(res == 0 && "ftcpclient: WSAStartup: fail");
+#endif
 
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     
@@ -36,7 +49,11 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
     if (client->server == NULL) {
         printf("ftcpclient: gethostbyname: fail (%s)\n", client->hostname);
         
-        close(client->sockfd);
+#ifdef TARGET_WIN32
+        closesocket(client->sockfd);
+#else
+        NPD_CLOSE(client->sockfd);
+#endif
         free(client);
 
         return NULL;
@@ -47,11 +64,15 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
     bcopy((char *)client->server->h_addr_list[0], (char *)&client->serveraddr.sin_addr.s_addr, client->server->h_length);
     client->serveraddr.sin_port = htons(port);
 
-    int res = connect(client->sockfd, (const struct sockaddr *)&client->serveraddr, sizeof(client->serveraddr));
+    res = connect(client->sockfd, (const struct sockaddr *)&client->serveraddr, sizeof(client->serveraddr));
     if (res < 0) {
         printf("ftcpclient: connect: fail (%d)\n", res);
 
-        close(client->sockfd);
+#ifdef TARGET_WIN32
+        closesocket(client->sockfd);
+#else
+        NPD_CLOSE(client->sockfd);
+#endif
         free(client);
 
         return NULL;
