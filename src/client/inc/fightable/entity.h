@@ -30,11 +30,11 @@ struct fentity_accessory {
 RSB_ARRAY_DEF_GEN(struct fentity_accessory, _fentity_accessory);
 
 enum fentity_accessory_obj {
-    ENTITY_ACC_NONE = 0,
-    ENTITY_ACC_HAT_1 = 1,
-    ENTITY_ACC_HAT_2 = 2,
-    ENTITY_ACC_HAT_3 = 3,
-    ENTITY_ACC_GLASSES = 4
+    ENTITY_ACC_NONE         = 0,
+    ENTITY_ACC_HAT_1        = 1,
+    ENTITY_ACC_HAT_2        = 2,
+    ENTITY_ACC_HAT_3        = 3,
+    ENTITY_ACC_GLASSES_1    = 4
 };
 
 struct fentity {

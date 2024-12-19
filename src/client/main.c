@@ -225,6 +225,8 @@ int main(int argc, char **argv) {
     _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
+    _fConfigInit(&__state.config);
+
     {
         cJSON *data = _fTilemapCreateJson(__state.tilemap);
         if (data) {
@@ -341,7 +343,7 @@ int main(int argc, char **argv) {
         EndDrawing();
 
         __state.frames_rendered++;
-        __state.time += (double)GetFrameTime();
+        __state.time = GetTime();
     }
 
     _fTilemapUnload(&__tilemap);
@@ -360,6 +362,8 @@ int main(int argc, char **argv) {
         _fHttpServerDestroy(__state.webserver);
     }
 #endif
+
+    _fConfigSave(&__state.config);
 
     return 0;
 }

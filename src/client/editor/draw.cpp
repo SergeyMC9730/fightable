@@ -298,11 +298,7 @@ void _fEditorDraw(struct feditor *editor) {
 
                 _flPlayerInit(player);
                 _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
-
-                // _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_1);
-                // _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_2);
-                // _fEntityAddAccessory(&player->base, ENTITY_ACC_GLASSES);
-                _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_3);
+                _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_1);
 
                 editor->entities.push_back((fentity *)player);
 

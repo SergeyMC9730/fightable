@@ -42,29 +42,5 @@ void _fIntroMenuOnOptions() {
     UnloadImage(img);
     UnloadRenderTexture(rt2d);
 
-    struct fsquare_button btn = {0};
-
-    btn.position = (IVector2){10, area.y + 5};
-    btn.tint = WHITE;
-    btn.flag = __state.config.vsync_flag;
-    btn.type = SQRBTN_REVCHECKBOX;
-
-    __state.config.vsync_btn = btn;
-
-    struct fslider slider = {0};
-    slider.tint = BLUE;
-    slider.scaling = 1.f;
-    slider.rect = (RLRectangle){10, 10, 30, 4};
-    slider.movable_width = 4.f;
-    slider.progress = __state.sound_engine.volume;
-
-    __state.config.volume_slider = slider;
-
-    struct fsquare_button btn_fullscreen = {0};
-    btn_fullscreen.tint = WHITE;
-    btn_fullscreen.position = (IVector2){10, area.y + 20};
-    btn_fullscreen.type = SQRBTN_CHECKBOX;
-    btn_fullscreen.flag = __state.config.fullscreen_flag;
-
-    __state.config.fullscreen_btn = btn_fullscreen;
+    _fConfigInit(&__state.config);
 }

@@ -22,6 +22,7 @@ void _fIntroMenuProcessBase() {
         _fIntroMenuOnEditor();
     }
     if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 80}, WHITE)) {
+        _fConfigSave(&__state.config);
         exit(0);
     }
 }

@@ -47,7 +47,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 
 			break;
 		}
-		case ENTITY_ACC_GLASSES: {
+		case ENTITY_ACC_GLASSES_1: {
 			IVector2 pos = {
 				.x = basepos.x,
 				.y = basepos.y

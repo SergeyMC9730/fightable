@@ -218,6 +218,7 @@ set(FIGHTABLE_SRC
     src/client/renderer/ui/slider.c
     src/client/entity/base/accessory.c
     src/client/entity/base/cleanup.c
+    src/client/etc/config.c
     ${FIGHTABLE_GPU_SRC}
 )
 

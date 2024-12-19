@@ -1,13 +1,14 @@
 #pragma once
 
-#include <map>
 #include <fightable/intvec.h>
-#include <raylib.h>
 #include <fightable/level.h>
-#include <vector>
 #include <fightable/block.h>
 #include <fightable/entity.h>
 #include <fightable/slider.h>
+
+#include <map>
+#include <vector>
+
 struct feditor {
     std::map<int, std::map<int, fblock>> objects;
     std::vector<fblock> render_objects;

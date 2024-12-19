@@ -12,3 +12,7 @@ struct fconfig {
     
     struct fslider volume_slider;
 };
+
+void _fConfigSave(struct fconfig *config);
+void _fConfigRead(struct fconfig* config);
+void _fConfigInit(struct fconfig* config);
