@@ -62,28 +62,30 @@ int main() {
     
     initLocalPlayer();
     getUserId();
+
+    SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
     
     while (!WindowShouldClose()) {
-	if (IsKeyPressed(KEY_I)) {
-	    getUserId();
-	}
+	    if (IsKeyPressed(KEY_I)) {
+	        getUserId();
+	    }
     
-	BeginDrawing();
-	ClearBackground(RAYWHITE);
+	    BeginDrawing();
+	    ClearBackground(RAYWHITE);
 	
-	char buffer[20] = {};
+	    char buffer[20] = {};
 	
 #ifndef DISABLE_MP_SERVER
-	int clients = _fTcpSrvGetConnectedUsers(__server);
+	    int clients = _fTcpSrvGetConnectedUsers(__server);
 	
-	snprintf(buffer, 16, "clients: %d", clients);
-	RlDrawText(buffer, 4, 600 - 20, 20, GREEN);
+	    snprintf(buffer, 16, "clients: %d", clients);
+	    RlDrawText(buffer, 4, 600 - 20, 20, GREEN);
 #endif
-	snprintf(buffer, 16, "uid: %d", __userId);
-	RlDrawText(buffer, 4, 4, 20, GREEN);
+	    snprintf(buffer, 16, "uid: %d", __userId);
+	    RlDrawText(buffer, 4, 4, 20, GREEN);
 	
 
-	EndDrawing();
+	    EndDrawing();
     }
     
     _fTcpClientDestroy(__client);

@@ -217,6 +217,8 @@ int main() {
     Camera2D cam = { 0 };
     cam.zoom = 1.f;
 
+    SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
+
     while (!WindowShouldClose()) {
         player.walking = 0;
         player.jumping = 0;

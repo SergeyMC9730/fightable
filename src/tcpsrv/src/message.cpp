@@ -28,7 +28,7 @@ void ftcp_server_message::generateHeader() {
 
     for (int i = 0; i < signatureSize; i++) {
         char c = (rand() % 255) + 1;
-        if (c == '|') c = 'a';
+        if (c == '|' || c == 0) c = 'a';
         _header[i] = c;
     }
 }

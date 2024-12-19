@@ -10,4 +10,6 @@ void _fEntityDraw(struct fentity *entity) {
     }
 
     DrawRectangle((int)hitbox.x, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, BLUE);
+
+    _fEntityDrawAccessory(entity);
 }

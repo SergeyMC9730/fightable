@@ -21,6 +21,22 @@ enum fentity_direction {
 #include <fightable/hitbox.h>
 #include <fightable/serializable.h>
 
+struct fentity_accessory {
+    unsigned char type;
+};
+
+#include <rsb/rsb_array_gen.h>
+
+RSB_ARRAY_DEF_GEN(struct fentity_accessory, _fentity_accessory);
+
+enum fentity_accessory_obj {
+    ENTITY_ACC_NONE = 0,
+    ENTITY_ACC_HAT_1 = 1,
+    ENTITY_ACC_HAT_2 = 2,
+    ENTITY_ACC_HAT_3 = 3,
+    ENTITY_ACC_GLASSES = 4
+};
+
 struct fentity {
     Vector2 speed;
 
@@ -48,8 +64,11 @@ struct fentity {
 
     fhitbox standing_object;
 
+    rsb_array__fentity_accessory* accessories;
+
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
+    void (*cleanup)(struct fentity* entity);
 };
 
 #pragma pack(pop)
@@ -60,6 +79,7 @@ struct fentity {
 #ifdef WITH_PLACEHOLDERS
 void _fEntityUpdate(struct fentity *entity);
 void _fEntityDraw(struct fentity *entity);
+void _fEntityCleanup(struct fentity* entity);
 #endif
 
 void _fEntityMove(struct fentity* entity, Vector2 pos);
@@ -74,6 +94,9 @@ void _fEntitySetHitbox(struct fentity* entity, RLRectangle rec);
 void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
 fserializable _fEntitySerialize(struct fentity* entity);
 struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version);
+
+void _fEntityDrawAccessory(struct fentity* entity);
+void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);
 
 #ifdef __cplusplus
 }

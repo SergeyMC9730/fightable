@@ -47,6 +47,8 @@ int main() {
     }
 
     InitWindow(640, 480, "TCP Client");
+
+    SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
     
     RLRectangle player = {0, 0, PLAYER_WIDTH, PLAYER_HEIGHT};
     while (!WindowShouldClose()) {

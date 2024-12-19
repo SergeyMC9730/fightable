@@ -1,3 +1,5 @@
+#define WITH_PLACEHOLDERS
+
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
 #include <fightable/state.h>
@@ -11,7 +13,7 @@
 #include <fightable/renderer.h>
 #include <fightable/intvec.h>
 #include <fightable/player.h>
-bool block_select = false;
+
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
     bool mouse_out_of_bounds = false;
@@ -283,7 +285,7 @@ void _fEditorDraw(struct feditor *editor) {
             
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                 printf("click\n");
-                block_select = false;
+
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
                 editor->should_display_sidebar = false;
@@ -292,8 +294,15 @@ void _fEditorDraw(struct feditor *editor) {
 
                 felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 
+                player->base.level = &editor->level;
+
                 _flPlayerInit(player);
                 _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
+
+                // _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_1);
+                // _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_2);
+                // _fEntityAddAccessory(&player->base, ENTITY_ACC_GLASSES);
+                _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_3);
 
                 editor->entities.push_back((fentity *)player);
 
@@ -339,6 +348,13 @@ void _fEditorDraw(struct feditor *editor) {
             __state.overlay_framebuffer = LoadRenderTexture(800 + 255, 600);
 
             for (fentity* e : editor->entities) {
+                if (e->cleanup) {
+                    e->cleanup(e);
+                }
+                else {
+                    _fEntityCleanup(e);
+                }
+
                 MemFree(e);
             }
             editor->entities.clear();

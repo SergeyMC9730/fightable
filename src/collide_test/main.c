@@ -100,7 +100,7 @@ void _fEntityUpdate(struct fentity *entity) {
         float s = entity->speed.y;
 
         if (entity->speed.y > 0.f) {
-            s *= 1.25f;
+            s *= 1.37f;
         }
 
         _fEntityMove(entity, (Vector2){0, s * 3.f});
@@ -164,6 +164,8 @@ int main() {
 
     Camera2D cam = { 0 };
     cam.zoom = 1.f;
+
+    SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
     while(!WindowShouldClose()) {
         double deltaTime = GetFrameTime();

@@ -21,6 +21,11 @@ target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
 )
 
+if (LIBC_FD_SIZE)
+    message(STATUS "Setting MP stack definition, FD_SETSIZE, to ${LIBC_FD_SIZE}")
+    add_compile_definitions(FD_SETSIZE=${LIBC_FD_SIZE})
+endif()
+
 if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     message(STATUS "Enabling PTX co-target")
     if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
@@ -35,8 +40,12 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(STATUS "Enabling PTX debugger")
-        set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
+        if (FIGHTABLE_MASK_PTX_DBG)
+            message(STATUS "PTX debugger is masked")
+        else()
+            message(STATUS "Enabling PTX debugger")
+            set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
+        endif()
     endif()
 
     add_compile_definitions(COTARGET_PTX)
@@ -207,6 +216,8 @@ set(FIGHTABLE_SRC
     src/client/intro/menu/on_mp_create.c
     src/client/intro/menu/on_mp_join.c
     src/client/renderer/ui/slider.c
+    src/client/entity/base/accessory.c
+    src/client/entity/base/cleanup.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -259,7 +270,7 @@ elseif(WIN32)
         message(STATUS "Applying Clang patches for NT target")
     elseif (FIGHTABLE_COMPILER STREQUAL "MSVC")
         if (NOT FIGHTABLE_ALLOW_MSVC)
-            message(FATAL_ERROR "Fightable cannot be built using MSVC. Use -DFIGHTABLE_ALLOW_MSVC=TRUE to continue configuring")
+            message(FATAL_ERROR "Fightable cannot be built using MSVC. Use -DFIGHTABLE_ALLOW_MSVC=1 to continue configuring")
         else()
             message(STATUS "Allowing MSVC to build this source. Expect issues to come out after configuring")
         endif()

@@ -263,6 +263,8 @@ int main(int argc, char **argv) {
     _fKeyboardRegister(&__state.kbd, KEY_RIGHT);
     _fKeyboardRegister(&__state.kbd, KEY_SPACE);
 
+    SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
