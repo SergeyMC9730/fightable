@@ -162,20 +162,31 @@ void ftcp_server_daemon::_baseThread() {
 
             if (countIPAddress(conAddress) >= _maxClientsPerIP) {
                 // printf("loop 6\n");
-                NPD_CLOSE(accept_status);
+                printf("ftcp_server_daemon: accept: user %s connected too much times\n", conAddress);
+                closeSocket(accept_status);
             }
             else {
-                // printf("loop 7\n");
+                printf("ftcp_server_daemon: accept: attempting to configure user %s\n", conAddress);
+
                 _ipAddresses.push_back(conAddress);
-
                 int old_status = accept_status;
+
+#ifndef TARGET_UNIX
+                printf("ftcp_server_daemon: socket %d cannot be duplicated on this platform\n", old_status);
+
+                // while you  can use  _open_osfhandle on  NT platforms 
+                // this function doesn't guarantee it will return valid 
+                // handle
+#else
                 _nextSocketID = nextFreeSocketID();
-
                 NPD_DUP2(accept_status, _nextSocketID);
-
-                NPD_CLOSE(old_status);
-
+                closeSocket(old_status);
                 accept_status = _nextSocketID;
+#endif
+
+#ifdef TARGET_WIN32
+                FD_SET(accept_status, &_socketInfo.socketDescriptors);
+#endif
 
                 _ipMap[accept_status] = conAddress;
 
@@ -193,6 +204,10 @@ void ftcp_server_daemon::_baseThread() {
                 _socketInfo.users[accept_status].setDaemon(this);
 
                 _socketInfo.users[accept_status].sendMessage(header.c_str());
+
+                if (_delegate->processConnect) {
+                    _delegate->processConnect(_delegate, std::addressof(_socketInfo.users.at(accept_status)));
+                }
             }
         }
         else {
@@ -229,12 +244,11 @@ void ftcp_server_daemon::_baseThread() {
                     auto& user = _socketInfo.users[descriptor];
 
                     removeIPAddress(_ipMap[descriptor]);
-
                     _delegate->processDisconnect(_delegate, &user);
 
-                    int close_result = NPD_CLOSE(descriptor);
+                    int close_result = closeSocket(descriptor);
                     if (close_result < 0) {
-                        printf("ftcp_server_daemon: close: fail (%d)\n", close_result);
+                        printf("ftcp_server_daemon: closeSocket: fail (%d)\n", close_result);
                     }
 
                     continue;
@@ -256,11 +270,15 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
 #ifdef TARGET_UNIX
     constexpr int flags = MSG_NOSIGNAL;
 #else
-    constexpr int flags = 0;
+    constexpr int flags = MSG_OOB;
 #endif
 
     unsigned int sz = message.size();
     int data_sent = send(socket, (const char*)message.data(), sz, flags);
+
+#ifdef TARGET_WIN32
+    printf("ftcp_server_daemon: send: tried to send %d bytes. sent %d bytes total\n", sz, data_sent);
+#endif
 
     return data_sent == sz;
 }
@@ -282,11 +300,16 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::string& message) {
 
 bool ftcp_server_daemon::_processDescriptor(int desc) {
     if (FD_ISSET(desc, &_socketInfo.socketDescriptors)) {
+#ifndef TARGET_WIN32
         int valread = NPD_READ(desc, _connectionBuffer.data(), _connectionBuffer.size());
+#else 
+        int valread = recv(desc, _connectionBuffer.data(), _connectionBuffer.size(), 0);
+#endif
 
         // assert(valread != -1 && "ftcp_server_daemon: read: fail");
 
         if (valread == 0 || valread == -1) {
+            printf("ftcp_server_daemon: read: fail (%d)\n", valread);
             return false;
         }
 
@@ -323,11 +346,16 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
         _connectionBuffer.fill(0);
 
         if (user.shouldDisconnect()) {
+            printf("ftcp_server_daemon: read: force disconnect (%d bytes read)\n", valread);
             return false;
         }
-    }
 
-    return true;
+        return true;
+    }
+    else {
+        printf("ftcp_server_daemon: FD_ISSET: descriptor %d not set\n", desc);
+        return false;
+    }
 }
 
 unsigned int ftcp_server_daemon::getClientsConnected() {
@@ -340,9 +368,9 @@ bool ftcp_server_daemon::descriptorExists(int fd) {
 #elif defined(TARGET_WIN32)
     int r = recv(fd, NULL, 0, 0);
     if (r == SOCKET_ERROR && WSAGetLastError() == WSAECONNRESET) {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 #else
     assert(false && "descriptorExists is not implemented for this platform")
 #endif
@@ -379,7 +407,10 @@ int ftcp_server_daemon::nextFreeSocketID() {
     int id = 0;
 
     for (int i = _baseSocketOffset; i < _maxClients; i++) {
+        printf("ftcp_server_daemon: nextFreeSocketID: trying %d\n", i);
+
         if (!descriptorExists(i)) {
+            printf("ftcp_server_daemon: nextFreeSocketID: %d is available for use\n", i);
             selected = true;
             id = i;
             break;
@@ -398,8 +429,17 @@ void ftcp_server_daemon::_queueThread() {
                 std::string msg = v.generateMultiMessage();
 
                 bool succeded = sendMessage(v.getDescriptor(), msg.c_str());
+#ifndef TARGET_WIN32
+                bool desc_exists = descriptorExists(v.getDescriptor());
+#else 
+                bool desc_exists = true;
+#endif
 
-                if (!succeded || !descriptorExists(v.getDescriptor())) {
+                if (!succeded || !desc_exists) {
+#ifdef TARGET_WIN32
+                    printf("ftcp_server_daemon: _queueThread: one of conditions failed: %d,%d. disconnecting user\n", succeded, desc_exists);
+#endif
+
                     v.disconnect();
                 }
             }
@@ -502,4 +542,14 @@ unsigned int _fTcpSrvGetConnectedUsers(struct ftcp_server_daemon* daemon) {
     if (!daemon) return 0;
 
     return daemon->getClientsConnected();
+}
+
+int ftcp_server_daemon::closeSocket(int fd) {
+    printf("ftcp_server_daemon: disconnecting socket %d\n", fd);
+
+#ifndef TARGET_WIN32
+    return NPD_CLOSE(old_status);
+#else
+    return closesocket(fd);
+#endif
 }

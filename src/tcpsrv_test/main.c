@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <fightable/tcpsrv/daemon.h>
 #include <fightable/tcpsrv/delegate.h>
+#include <fightable/tcpsrv/user.h>
 
 void processDisconnect(struct ftcp_server_delegate *self, struct ftcp_server_user *user) {
-    printf("* disconnect happened\n");
+    printf("* disconnect happened. userid=%d\n", _fTcpSrvUserGetId(user));
+}
+void processConnect(struct ftcp_server_delegate* self, struct ftcp_server_user* user) {
+    printf("* connect happened. userid=%d\n", _fTcpSrvUserGetId(user));
 }
 void setDaemon(struct ftcp_server_delegate *self, struct ftcp_server_daemon *daemon) {
     printf("* setting daemon ctx\n");
@@ -18,6 +22,7 @@ int main() {
     struct ftcp_server_delegate delegate = {
         .processDisconnect = processDisconnect,
         .processMessage = processMessage,
+        .processConnect = processConnect,
         .setDaemon = setDaemon
     };
 

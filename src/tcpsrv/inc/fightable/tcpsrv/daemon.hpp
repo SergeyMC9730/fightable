@@ -63,6 +63,8 @@ private:
     
     unsigned int countIPAddress(std::string address);
     void removeIPAddress(std::string address);
+
+    int closeSocket(int fd);
 public:
     ftcp_server_daemon(unsigned int port, ftcp_server_delegate *delegate);
     
