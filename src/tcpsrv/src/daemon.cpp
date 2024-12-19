@@ -48,7 +48,7 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
 #ifdef TARGET_UNIX
     struct rlimit rlim;
     rlim.rlim_cur = maxClients;
-    rlim.rlim_max = maxClients
+    rlim.rlim_max = maxClients;
 
     status = setrlimit(RLIMIT_NOFILE, &rlim);
     assert(status >= 0 && "ftcp_server_daemon: setrlimit: fail");
@@ -548,7 +548,7 @@ int ftcp_server_daemon::closeSocket(int fd) {
     printf("ftcp_server_daemon: disconnecting socket %d\n", fd);
 
 #ifndef TARGET_WIN32
-    return NPD_CLOSE(old_status);
+    return NPD_CLOSE(fd);
 #else
     return closesocket(fd);
 #endif
