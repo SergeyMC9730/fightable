@@ -8,7 +8,8 @@ unsigned char _fTcpClientSendMsg(struct ftcpclient *client, const char *message)
     unsigned int len = strlen(message) + 1;
 
     unsigned char *dup = (unsigned char *)malloc(len);
-    memcpy(dup, message, len);
+    memset(dup, 0, len);
+    memcpy(dup, message, len - 1);
 
     RSBAddElement_pchar(client->requested_messages, dup);
 

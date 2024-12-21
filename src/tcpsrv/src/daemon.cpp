@@ -203,7 +203,7 @@ void ftcp_server_daemon::_baseThread() {
                 _socketInfo.users[accept_status] = accept_status;
                 _socketInfo.users[accept_status].setDaemon(this);
 
-                _socketInfo.users[accept_status].sendMessage(header.c_str());
+                _socketInfo.users[accept_status].sendMessage(header);
 
                 if (_delegate->processConnect) {
                     _delegate->processConnect(_delegate, std::addressof(_socketInfo.users.at(accept_status)));
@@ -245,6 +245,7 @@ void ftcp_server_daemon::_baseThread() {
 
                     removeIPAddress(_ipMap[descriptor]);
                     _delegate->processDisconnect(_delegate, &user);
+                    user.clearMessageQueue();
 
                     int close_result = closeSocket(descriptor);
                     if (close_result < 0) {
@@ -261,6 +262,7 @@ void ftcp_server_daemon::_baseThread() {
 
             for (int ignoredDesc : descriptorsToRemove) {
                 std::cout << "ftcp_server_daemon: user " << ignoredDesc << " (" << _socketInfo.users[ignoredDesc].getUserID() << ") has been disconnected\n";
+                _socketInfo.users.erase(ignoredDesc);
             }
         }
     }
@@ -270,23 +272,23 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
 #ifdef TARGET_UNIX
     constexpr int flags = MSG_NOSIGNAL;
 #else
-    constexpr int flags = MSG_OOB;
+    constexpr int flags = 0;
 #endif
 
     unsigned int sz = message.size();
-    int data_sent = send(socket, (const char*)message.data(), sz, flags);
+    int data_sent = send(socket, (const char*)message.data(), sz - 1, flags);
 
 #ifdef TARGET_WIN32
     printf("ftcp_server_daemon: send: tried to send %d bytes. sent %d bytes total\n", sz, data_sent);
 #endif
 
-    return data_sent == sz;
+    return (data_sent + 1) == sz;
 }
 
 #include <cstring>
 
 bool ftcp_server_daemon::sendMessage(int socket, const std::string& message) {
-    // printf("ftcp_server_daemon: sending \"%s\" for socket %d\n", message.c_str(), socket);
+    printf("ftcp_server_daemon: sending \"%s\" for socket %d\n", message.c_str() + 4, socket);
 
     std::vector<unsigned char> c;
     for (char cc : message) {
@@ -310,6 +312,9 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
 
         if (valread == 0 || valread == -1) {
             printf("ftcp_server_daemon: read: fail (%d)\n", valread);
+#ifdef TARGET_WIN32
+            printf("ftcp_server_daemon: WSAGetLastError: %d\n", WSAGetLastError());
+#endif
             return false;
         }
 
@@ -439,7 +444,6 @@ void ftcp_server_daemon::_queueThread() {
 #ifdef TARGET_WIN32
                     printf("ftcp_server_daemon: _queueThread: one of conditions failed: %d,%d. disconnecting user\n", succeded, desc_exists);
 #endif
-
                     v.disconnect();
                 }
             }

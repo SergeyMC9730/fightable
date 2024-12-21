@@ -75,7 +75,7 @@ double _rendererOutQuint(double x) {
     return 1.f - powl(1.f - x, 5.f);
 }
 double _rendererInOutQuint(double x) {
-    return x < 0.5f ? 16.f * x * x * x * x * x : 1.f - powl(-2.f * x + 2.f, 5.f) / 2;
+    return x < 0.5f ? 16.f * powl(x, 5.f) : 1.f - powl(-2.f * x + 2.f, 5.f) / 2;
 }
 
 double _rendererInExpo(double x) {

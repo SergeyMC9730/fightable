@@ -1,4 +1,5 @@
 #include <fightable/tcpcln/client.h>
+#include <fightable/tcpcln/delegate.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,14 +14,16 @@
 
 #include <fightable/sockcompat.h>
 
-struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, struct ftcpclient_delegate *delegate) {
+struct ftcpclient* _fTcpClientCreate(const char* address, unsigned short port, struct ftcpclient_delegate* delegate) {
     if (delegate == NULL) {
         printf("ftcpclient: delegate cannot be NULL\n");
         return NULL;
     }
-    
-    struct ftcpclient *client = malloc(sizeof(struct ftcpclient));
+
+    struct ftcpclient* client = malloc(sizeof(struct ftcpclient));
     memset(client, 0, sizeof(struct ftcpclient));
+
+    delegate->client = client;
 
     client->hostname = address;
     client->port = port;
@@ -37,9 +40,11 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
 #endif
 
     client->sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     if (client->sockfd < 0) {
         printf("ftcpclient: socket: fail (%d)\n", client->sockfd);
+
+        if (delegate->onError) delegate->onError(delegate, "socket() failed", 1);
 
         free(client);
         return NULL;
@@ -48,7 +53,9 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
     client->server = gethostbyname(client->hostname);
     if (client->server == NULL) {
         printf("ftcpclient: gethostbyname: fail (%s)\n", client->hostname);
-        
+
+        if (delegate->onError) delegate->onError(delegate, "gethostbyname() failed", 2);
+
 #ifdef TARGET_WIN32
         closesocket(client->sockfd);
 #else
@@ -59,15 +66,17 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
         return NULL;
     }
 
-    bzero((char *)&client->serveraddr, sizeof(client->serveraddr));
+    bzero((char*)&client->serveraddr, sizeof(client->serveraddr));
     client->serveraddr.sin_family = AF_INET;
-    bcopy((char *)client->server->h_addr_list[0], (char *)&client->serveraddr.sin_addr.s_addr, client->server->h_length);
+    bcopy((char*)client->server->h_addr_list[0], (char*)&client->serveraddr.sin_addr.s_addr, client->server->h_length);
     client->serveraddr.sin_port = htons(port);
 
-    res = connect(client->sockfd, (const struct sockaddr *)&client->serveraddr, sizeof(client->serveraddr));
+    res = connect(client->sockfd, (const struct sockaddr*)&client->serveraddr, sizeof(client->serveraddr));
     if (res < 0) {
         printf("ftcpclient: connect: fail (%d)\n", res);
 
+        if (delegate->onError) delegate->onError(delegate, "connect() failed", 3);
+
 #ifdef TARGET_WIN32
         closesocket(client->sockfd);
 #else
@@ -78,17 +87,18 @@ struct ftcpclient *_fTcpClientCreate(const char *address, unsigned short port, s
         return NULL;
     }
 
-
     client->buf_size = 65536;
-    client->buf_r = (char *)malloc(client->buf_size);;
+    client->buf_r = (char*)malloc(client->buf_size);;
 
     client->received_headers = RSBCreateArray_pchar();
     client->requested_messages = RSBCreateArray_pchar();
 
     client->delegate = delegate;
 
-    pthread_create(&client->read_thread, NULL, (void*(*)(void *))_fTcpClientReadThread, client);
-    pthread_create(&client->write_thread, NULL, (void*(*)(void *))_fTcpClientWriteThread, client);
+    pthread_create(&client->read_thread, NULL, (void* (*)(void*))_fTcpClientReadThread, client);
+    pthread_create(&client->write_thread, NULL, (void* (*)(void*))_fTcpClientWriteThread, client);
+
+    if (delegate->onConnect) delegate->onConnect(delegate);
 
     return client;
 }

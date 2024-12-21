@@ -14,7 +14,7 @@
 #endif
 #include <stdio.h>
 
-void _fTcpClientDestroy(struct ftcpclient *client) {
+void _fTcpClientDestroy(struct ftcpclient* client) {
     if (!client) return;
 
 #ifndef TARGET_WIN32
@@ -25,7 +25,9 @@ void _fTcpClientDestroy(struct ftcpclient *client) {
     shutdown(client->sockfd, SHUT_REASON);
 
     client->thread_should_exit = 1;
+#ifndef TARGET_ANDROID
     pthread_cancel(client->read_thread);
+#endif
     pthread_join(client->write_thread, NULL);
 
     if (client->buf_r) {

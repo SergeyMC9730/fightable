@@ -18,7 +18,7 @@ RLRectangle __localPlayer = {};
 
 int __userId = -1;
 
-void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message) {
+void processReceive(struct ftcpclient_delegate *self, const char *message) {
     printf("[CLIENT] received %d bytes: %s\n", strlen(message) + 1, message);
     
     char response_cmd = message[0];

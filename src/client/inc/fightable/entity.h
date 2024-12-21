@@ -36,6 +36,11 @@ enum fentity_accessory_obj {
     ENTITY_ACC_HAT_3        = 3,
     ENTITY_ACC_GLASSES_1    = 4
 };
+enum fentity_accessory_type {
+    ENTITY_ACCT_NONE = 0,
+    ENTITY_ACCT_HAT = 1,
+    ENTITY_ACCT_GLASSES = 2
+};
 
 struct fentity {
     Vector2 speed;
@@ -97,6 +102,8 @@ struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version
 
 void _fEntityDrawAccessory(struct fentity* entity);
 void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);
+
+enum fentity_accessory_type _fAccessoryGetType(enum fentity_accessory_obj accessory);
 
 #ifdef __cplusplus
 }

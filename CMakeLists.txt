@@ -253,7 +253,7 @@ if (ANDROID)
     add_compile_definitions(TARGET_UNIX)
     add_compile_definitions(TARGET_LINUX)
 elseif(WIN32)
-    message(STATUS "Compiling for NT")
+    message(STATUS "Compiling for NT-like operating systems")
     set(FIGHTABLE_TARGET NT)
 
     set(BUILD_SHARED_LIBS OFF)

@@ -7,7 +7,11 @@ extern "C" {
 struct ftcpclient;
 
 struct ftcpclient_delegate {
-    void (*processReceive)(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message);
+    struct ftcpclient *client;
+
+    void (*processReceive)(struct ftcpclient_delegate *self, const char *message);
+    void (*onError)(struct ftcpclient_delegate *self, const char *message, int error_id);
+    void (*onConnect)(struct ftcpclient_delegate *self);
 };
 
 #ifdef __cplusplus

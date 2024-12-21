@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void processReceive(struct ftcpclient_delegate *self, struct ftcpclient *client, const char *message) {
+void processReceive(struct ftcpclient_delegate *self, const char *message) {
     printf("* received %d bytes: %s\n", strlen(message) + 1, message);
 }
 
