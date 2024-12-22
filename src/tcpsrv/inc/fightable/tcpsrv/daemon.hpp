@@ -18,6 +18,12 @@ typedef int socklen_t;
 
 struct ftcp_server_delegate;
 
+struct ftcp_server_daemon_user_context {
+    std::thread thread;
+    int desc;
+    bool should_exit;
+};
+
 struct ftcp_server_daemon {
 private:
     std::array<char, 4096> _connectionBuffer;
@@ -37,12 +43,16 @@ private:
     std::vector<std::string> _ipAddresses;
     std::map<int, std::string> _ipMap;
 
+    std::map<int, ftcp_server_daemon_user_context*> _userThreads;
+
     struct SocketInfo {
         int masterSocket;
         socklen_t addrLen;
         int newSocket;
 
         std::vector<int> acceptedConnections;
+        std::vector<int> descriptorsToRemove;
+
         std::map<int, ftcp_server_user> users;
 
         struct sockaddr_in address;

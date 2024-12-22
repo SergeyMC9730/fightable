@@ -6,6 +6,7 @@
 #include <fightable/sockcompat.h>
 
 #ifdef TARGET_UNIX
+#include <fightable/time.h>
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -208,32 +209,51 @@ void ftcp_server_daemon::_baseThread() {
                 if (_delegate->processConnect) {
                     _delegate->processConnect(_delegate, std::addressof(_socketInfo.users.at(accept_status)));
                 }
+
+                printf("ftcp_server_daemon: opening new thread for this connection\n");
+
+                ftcp_server_daemon_user_context* ctx = new ftcp_server_daemon_user_context;
+                ctx->should_exit = false;
+                ctx->desc = accept_status;
+                ctx->thread = std::thread([this, ctx]() {
+                    while (!ctx->should_exit) {
+                        if (!_processDescriptor(ctx->desc)) {
+                            _socketInfo.descriptorsToRemove.push_back(ctx->desc);
+#ifdef TARGET_UNIX
+                            _fSleep(10);
+#endif
+                            return;
+                        }
+                    }
+                });
+
+                _userThreads[accept_status] = ctx;
             }
         }
         else {
             // printf("loop 8\n");
         }
 
-        std::vector<int> descriptorsToRemove = {};
+        //std::vector<int> descriptorsToRemove = {};
 
-        for (int descriptor : _socketInfo.acceptedConnections) {
-            // printf("loop 9\n");
-            bool shouldExist = _processDescriptor(descriptor);
+        //for (int descriptor : _socketInfo.acceptedConnections) {
+        //    // printf("loop 9\n");
+        //    bool shouldExist = _processDescriptor(descriptor);
 
-            if (!shouldExist) {
-                // printf("loop 10\n");
-                descriptorsToRemove.push_back(descriptor);
-            }
-        }
+        //    if (!shouldExist) {
+        //        // printf("loop 10\n");
+        //        descriptorsToRemove.push_back(descriptor);
+        //    }
+        //}
 
-        if (descriptorsToRemove.size() != 0) {
+        if (_socketInfo.descriptorsToRemove.size() != 0) {
             // printf("loop 11\n");
             std::vector<int> new_descriptors = {};
 
             for (int descriptor : _socketInfo.acceptedConnections) {
                 bool contains = false;
 
-                for (int ignoredDesc : descriptorsToRemove) {
+                for (int ignoredDesc : _socketInfo.descriptorsToRemove) {
                     if (descriptor == ignoredDesc) {
                         contains = true;
                         break;
@@ -249,7 +269,7 @@ void ftcp_server_daemon::_baseThread() {
 
                     int close_result = closeSocket(descriptor);
                     if (close_result < 0) {
-                        printf("ftcp_server_daemon: closeSocket: fail (%d)\n", close_result);
+                        printf("ftcp_server_daemon: ::closeSocket: fail (%d)\n", close_result);
                     }
 
                     continue;
@@ -260,10 +280,22 @@ void ftcp_server_daemon::_baseThread() {
 
             _socketInfo.acceptedConnections = new_descriptors;
 
-            for (int ignoredDesc : descriptorsToRemove) {
+            for (int ignoredDesc : _socketInfo.descriptorsToRemove) {
+                printf("ftcp_server_daemon: waiting for %d's thread to finish\n", ignoredDesc);
+
+                ftcp_server_daemon_user_context* ctx = _userThreads[ignoredDesc];
+                ctx->should_exit = true;
+                ctx->thread.join();
+
+                delete ctx;
+
                 std::cout << "ftcp_server_daemon: user " << ignoredDesc << " (" << _socketInfo.users[ignoredDesc].getUserID() << ") has been disconnected\n";
+                
                 _socketInfo.users.erase(ignoredDesc);
+                _userThreads.erase(ignoredDesc);
             }
+
+            _socketInfo.descriptorsToRemove.clear();
         }
     }
 }
@@ -276,13 +308,13 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
 #endif
 
     unsigned int sz = message.size();
-    int data_sent = send(socket, (const char*)message.data(), sz - 1, flags);
+    int data_sent = send(socket, (const char*)message.data(), sz, flags);
 
 #ifdef TARGET_WIN32
     printf("ftcp_server_daemon: send: tried to send %d bytes. sent %d bytes total\n", sz, data_sent);
 #endif
 
-    return (data_sent + 1) == sz;
+    return data_sent == sz;
 }
 
 #include <cstring>
