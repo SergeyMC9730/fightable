@@ -1,5 +1,6 @@
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
+#include <fightable/shared_config.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +36,7 @@ struct ftcpclient* _fTcpClientCreate(const char* address, unsigned short port, s
 
     res = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    printf("ftcpclient: WSAStartup returned %d\n", res);
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcpclient: WSAStartup returned %d\n", res);
     assert(res == 0 && "ftcpclient: WSAStartup: fail");
 #endif
 

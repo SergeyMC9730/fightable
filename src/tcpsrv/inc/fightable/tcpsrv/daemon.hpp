@@ -96,6 +96,7 @@ public:
 
     std::optional<std::reference_wrapper<ftcp_server_user>> getUser(std::string username);
     std::optional<std::reference_wrapper<ftcp_server_user>> getUser(int user_id);
+    std::optional<std::reference_wrapper<ftcp_server_user>> getUser(long descriptor);
 
     void setMaxClientsPerIp(unsigned int amount);
     unsigned int getMaxClientsPerIp();

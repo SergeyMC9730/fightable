@@ -5,6 +5,7 @@
 #include <fightable/tcpsrv/daemon.hpp>
 #include <base64.hpp>
 #include <fightable/tcpsrv/user.h>
+#include <fightable/shared_config.h>
 
 ftcp_server_user::ftcp_server_user(int d) {
     srand(time(0));
@@ -72,6 +73,7 @@ bool ftcp_server_user::_sendMessage(const std::string &message) {
 }
 
 bool ftcp_server_user::sendMessage(const std::string &message) {
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon(u): requesting message \"%s\" for %d\n", message.c_str(), getUserID());
     getDaemon()->requestMessageForUser(getDescriptor(), message);
 
     return true;

@@ -514,6 +514,7 @@ if (FIGHTABLE_CUDA)
 endif()
 
 message(STATUS "  Compiler: ${FIGHTABLE_COMPILER}")
+message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
 
 message(STATUS "")
 message(STATUS "")

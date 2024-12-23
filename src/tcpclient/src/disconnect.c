@@ -1,4 +1,5 @@
 #include <fightable/tcpcln/client.h>
+#include <fightable/shared_config.h>
 
 #ifdef TARGET_UNIX
 #include <unistd.h>
@@ -14,7 +15,7 @@
 #include <stdio.h>
 
 void _fTcpClientDisconnect(struct ftcpclient* client) {
-    printf("ftcpclient: disconnecting\n");
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcpclient: disconnecting\n");
 
 #ifndef TARGET_WIN32
     NPD_CLOSE(client->sockfd);

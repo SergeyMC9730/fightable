@@ -3,6 +3,7 @@
 #include <fightable/string.h>
 #include <fightable/tcpcln/delegate.h>
 #include <fightable/sockcompat.h>
+#include <fightable/shared_config.h>
 
 #include <string.h>
 #include <strings.h>
@@ -18,6 +19,8 @@
 
 #include <string>
 
+#define BASE_COMMAND_ACK '$'
+
 void* _fTcpClientWriteThread(struct ftcpclient* client) {
     if (!client) return NULL;
 
@@ -29,7 +32,7 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
                 char* msg = RSBGetAtIndex_pchar(client->requested_messages, i);
                 size_t len = strlen(msg);
 
-                printf("%d -> message %s with length %ld\n", i, msg, len);
+                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d -> message %s with length %ld\n", i, msg, len);
 
                 msg_to_send += std::string((const char*)msg) + "|";
 
@@ -42,7 +45,7 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
             if (!msg_to_send.empty()) {
                 msg_to_send.pop_back();
 
-                printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
+                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
 
 #ifndef TARGET_WIN32
                 int res = NPD_WRITE(client->sockfd, msg_to_send.data(), msg_to_send.size());
@@ -86,14 +89,11 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
 
             return NULL;
         }
-        n++;
-        printf("ftcpclient: received %d bytes: splitting got ", n);
 
-        // client->buf_r[n] = 0;
-        // client->buf_r[n + 1] = 0;
+        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcpclient: received %d bytes: splitting got ", n);
 
         rsb_array__pchar* message_container = _fSplitString(client->buf_r, '|');
-        printf("%d entries\n", message_container->len);
+        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d entries\n", message_container->len);
 
         for (unsigned int i = 0; i < message_container->len; i++) {
             char* data = RSBGetAtIndex_pchar(message_container, i);
@@ -126,8 +126,7 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
             memmove(data, data + 4, strlen(data) - 4);
             memset(data + strlen(data) - 4, 0, 4);
 
-            printf("ftcpclient: %d -> %s\n", i, data);
-
+            if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcpclient: %d -> %s\n", i, data);
 
             if (client->delegate != NULL && client->delegate->processReceive != NULL) {
                 client->delegate->client = client;
@@ -135,10 +134,7 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
             }
         }
 
-        const char* reply = "$";
-        // write(client->sockfd, reply, strlen(reply));
-
-        unsigned char res = _fTcpClientSendMsg(client, reply);
+        unsigned char res = _fTcpClientSendMsgChar(client, BASE_COMMAND_ACK);
         if (res == 0) {
             printf("ftcpclient: cound not send acknowledge packet\n");
             if (client->delegate->onError) {

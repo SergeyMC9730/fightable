@@ -4,6 +4,7 @@
 #include <fightable/generic_tools.hpp>
 #include <fightable/tcpsrv/user.h>
 #include <fightable/sockcompat.h>
+#include <fightable/shared_config.h>
 
 #ifdef TARGET_UNIX
 #include <fightable/time.h>
@@ -67,7 +68,7 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
 
     status = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    printf("ftcp_server_daemon: WSAStartup returned %d\n", status);
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: WSAStartup returned %d\n", status);
     assert(status == 0 && "ftcp_server_daemon: WSAStartup: fail");
 #endif
 
@@ -167,7 +168,7 @@ void ftcp_server_daemon::_baseThread() {
                 closeSocket(accept_status);
             }
             else {
-                printf("ftcp_server_daemon: accept: attempting to configure user %s\n", conAddress);
+                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: accept: attempting to configure user %s\n", conAddress);
 
                 _ipAddresses.push_back(conAddress);
                 int old_status = accept_status;
@@ -210,7 +211,7 @@ void ftcp_server_daemon::_baseThread() {
                     _delegate->processConnect(_delegate, std::addressof(_socketInfo.users.at(accept_status)));
                 }
 
-                printf("ftcp_server_daemon: opening new thread for this connection\n");
+                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: opening new thread for this connection\n");
 
                 ftcp_server_daemon_user_context* ctx = new ftcp_server_daemon_user_context;
                 ctx->should_exit = false;
@@ -281,7 +282,7 @@ void ftcp_server_daemon::_baseThread() {
             _socketInfo.acceptedConnections = new_descriptors;
 
             for (int ignoredDesc : _socketInfo.descriptorsToRemove) {
-                printf("ftcp_server_daemon: waiting for %d's thread to finish\n", ignoredDesc);
+                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: waiting for %d's thread to finish\n", ignoredDesc);
 
                 ftcp_server_daemon_user_context* ctx = _userThreads[ignoredDesc];
                 ctx->should_exit = true;
@@ -311,7 +312,7 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
     int data_sent = send(socket, (const char*)message.data(), sz, flags);
 
 #ifdef TARGET_WIN32
-    printf("ftcp_server_daemon: send: tried to send %d bytes. sent %d bytes total\n", sz, data_sent);
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: send: tried to send %d bytes. sent %d bytes total\n", sz, data_sent);
 #endif
 
     return data_sent == sz;
@@ -320,7 +321,7 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::vector<unsigned char
 #include <cstring>
 
 bool ftcp_server_daemon::sendMessage(int socket, const std::string& message) {
-    printf("ftcp_server_daemon: sending \"%s\" for socket %d\n", message.c_str() + 4, socket);
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: sending \"%s\" for socket %d\n", message.c_str() + 4, socket);
 
     std::vector<unsigned char> c;
     for (char cc : message) {
@@ -333,7 +334,7 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::string& message) {
 }
 
 bool ftcp_server_daemon::_processDescriptor(int desc) {
-    if (FD_ISSET(desc, &_socketInfo.socketDescriptors)) {
+    // if (FD_ISSET(desc, &_socketInfo.socketDescriptors)) {
 #ifndef TARGET_WIN32
         int valread = NPD_READ(desc, _connectionBuffer.data(), _connectionBuffer.size());
 #else 
@@ -388,11 +389,11 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
         }
 
         return true;
-    }
-    else {
-        printf("ftcp_server_daemon: FD_ISSET: descriptor %d not set\n", desc);
-        return false;
-    }
+    // }
+    // else {
+        // printf("ftcp_server_daemon: FD_ISSET: descriptor %d not set\n", desc);
+        // return false;
+    // }
 }
 
 unsigned int ftcp_server_daemon::getClientsConnected() {
@@ -426,7 +427,7 @@ unsigned int ftcp_server_daemon::countIPAddress(std::string address) {
 }
 
 void ftcp_server_daemon::removeIPAddress(std::string address) {
-    printf("ftcp_server_daemon: removing ip address %s (%d)\n", address.c_str(), countIPAddress(address));
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: removing ip address %s (%d)\n", address.c_str(), countIPAddress(address));
 
     int count = (int)countIPAddress(address) - 1;
     if (count < 0) return;
@@ -444,10 +445,10 @@ int ftcp_server_daemon::nextFreeSocketID() {
     int id = 0;
 
     for (int i = _baseSocketOffset; i < _maxClients; i++) {
-        printf("ftcp_server_daemon: nextFreeSocketID: trying %d\n", i);
+        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: nextFreeSocketID: trying %d\n", i);
 
         if (!descriptorExists(i)) {
-            printf("ftcp_server_daemon: nextFreeSocketID: %d is available for use\n", i);
+            if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: nextFreeSocketID: %d is available for use\n", i);
             selected = true;
             id = i;
             break;
@@ -523,6 +524,8 @@ void ftcp_server_daemon::sendMessageToUser(int user_id, const std::string& messa
     auto u = getUser(user_id);
     if (!u.has_value()) return;
 
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon(d): requesting message \"%s\" for %d\n", message.c_str(), u.value().get().getUserID());
+
     u.value().get().sendMessage(message);
 }
 
@@ -551,6 +554,13 @@ std::optional<std::reference_wrapper<ftcp_server_user>> ftcp_server_daemon::getU
 std::optional<std::reference_wrapper<ftcp_server_user>> ftcp_server_daemon::getUser(int user_id) {
     for (auto& [k, v] : _socketInfo.users) {
         if (v.getUserID() == user_id) return v;
+    }
+
+    return std::nullopt;
+}
+std::optional<std::reference_wrapper<ftcp_server_user>> ftcp_server_daemon::getUser(long descriptor) {
+    for (auto& [k, v] : _socketInfo.users) {
+        if (v.getDescriptor() == descriptor) return v;
     }
 
     return std::nullopt;
@@ -615,11 +625,20 @@ unsigned int _fTcpSrvGetMaxClientsPerIp(struct ftcp_server_daemon* daemon) {
 }
 
 struct ftcp_server_user* _fTcpSrvGetUserByIndex(struct ftcp_server_daemon* daemon, unsigned int idx) {
-    if (!daemon || _fTcpSrvGetConnectedUsers(daemon) >= idx) return nullptr;
+    if (!daemon || _fTcpSrvGetConnectedUsers(daemon) <= idx) return nullptr;
 
-    return _fTcpSrvGetUserById(daemon, daemon->getConnections().at(idx));
+    return _fTcpSrvGetUserByDescriptor(daemon, daemon->getConnections().at(idx));
 }
 
 const std::vector<int>& ftcp_server_daemon::getConnections() {
     return _socketInfo.acceptedConnections;
+}
+
+struct ftcp_server_user* _fTcpSrvGetUserByDescriptor(struct ftcp_server_daemon* daemon, int descriptor) {
+    if (!daemon) return nullptr;
+
+    auto user = daemon->getUser((long)descriptor);
+    if (!user.has_value()) return nullptr;
+
+    return std::addressof(user.value().get());
 }

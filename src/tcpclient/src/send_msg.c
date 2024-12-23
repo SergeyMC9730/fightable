@@ -15,3 +15,10 @@ unsigned char _fTcpClientSendMsg(struct ftcpclient *client, const char *message)
 
     return 1;
 }
+
+unsigned char _fTcpClientSendMsgChar(struct ftcpclient* client, char c) {
+    if (c == 0) return 0;
+
+    const char _c[2] = { c, 0 };
+    return _fTcpClientSendMsg(client, _c);
+}

@@ -18,7 +18,8 @@ rsb_array__pchar *_fSplitString(const char *string, const char delimiter) {
             char *str = _fCopyString((const char *)temp->objects);
             RSBAddElement_pchar(array, str);
 
-            RSBClear_char(temp);
+            RSBDestroy_char(temp);
+            temp = RSBCreateArray_char();
         } else {
             RSBAddElement_char(temp, c);
         }

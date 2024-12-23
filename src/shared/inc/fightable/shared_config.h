@@ -1,0 +1,3 @@
+#pragma once
+
+#define FIGHTABLE_OUTPUT_ONLY_WARNINGS 0
