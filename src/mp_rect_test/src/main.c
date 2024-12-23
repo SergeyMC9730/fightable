@@ -18,6 +18,8 @@ RLRectangle __localPlayer = {};
 
 int __userId = -1;
 
+#define CURRENT_PROTOCOL_VERSION "fightable-1"
+
 void processReceive(struct ftcpclient_delegate *self, const char *message) {
     printf("[CLIENT] received %d bytes: %s\n", strlen(message) + 1, message);
     
@@ -25,10 +27,20 @@ void processReceive(struct ftcpclient_delegate *self, const char *message) {
     
     switch (response_cmd) {
 	case '0': {
-	    char *value = (char *)message + 1;
+	    const char *value = message + 1;
 	    __userId = atoi(value);
 	    break;
 	}
+    case 'b': {
+        const char* value = message + 2;
+
+        if (strcmp(value, CURRENT_PROTOCOL_VERSION)) {
+            printf("[CLIENT] fatal error: incorrent protocol version. expected %s; got: %s\n", CURRENT_PROTOCOL_VERSION, value);
+            _fTcpClientDisconnect(self->client);
+        }
+
+        break;
+    }
 	default: {
 	    printf("[CLIENT] unknown response command %c\n", response_cmd);
 	    break;

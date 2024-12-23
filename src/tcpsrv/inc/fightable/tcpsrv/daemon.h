@@ -18,6 +18,9 @@ void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon *daemon, const char *messag
 
 unsigned int _fTcpSrvGetConnectedUsers(struct ftcp_server_daemon *daemon);
 
+void _fTcpSrvSetMaxClientsPerIp(struct ftcp_server_daemon* daemon, unsigned int amount);
+unsigned int _fTcpSrvGetMaxClientsPerIp(struct ftcp_server_daemon* daemon);
+
 #ifdef __cplusplus
 }
 #endif

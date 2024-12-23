@@ -24,7 +24,7 @@ std::string ftcp_server_message::getBaseMessage() {
 }
 
 void ftcp_server_message::generateHeader() {
-    int signatureSize = 4;
+    constexpr int signatureSize = 4;
 
     for (int i = 0; i < signatureSize; i++) {
         char c = (rand() % 255) + 1;

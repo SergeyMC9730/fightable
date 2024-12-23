@@ -232,6 +232,7 @@ set(FIGHTABLE_TCP_CLIENT_SRC
     src/tcpclient/src/thread.cpp
     src/tcpclient/src/destroy.c
     src/tcpclient/src/send_msg.c
+    src/tcpclient/src/disconnect.c
 )
 
 if (ANDROID)

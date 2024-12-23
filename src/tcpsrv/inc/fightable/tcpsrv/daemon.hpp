@@ -38,7 +38,7 @@ private:
     unsigned int _baseSocketOffset;
 
     unsigned int _maxClients;
-    unsigned int _maxClientsPerIP = 3;
+    unsigned int _maxClientsPerIP = 4;
 
     std::vector<std::string> _ipAddresses;
     std::map<int, std::string> _ipMap;
@@ -96,4 +96,7 @@ public:
 
     ftcp_server_user &getUser(std::string username);
     ftcp_server_user &getUser(int user_id);
+
+    void setMaxClientsPerIp(unsigned int amount);
+    unsigned int getMaxClientsPerIp();
 };

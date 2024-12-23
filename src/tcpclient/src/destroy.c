@@ -17,12 +17,7 @@
 void _fTcpClientDestroy(struct ftcpclient* client) {
     if (!client) return;
 
-#ifndef TARGET_WIN32
-    NPD_CLOSE(client->sockfd);
-#else
-    closesocket(client->sockfd);
-#endif
-    shutdown(client->sockfd, SHUT_REASON);
+    _fTcpClientDisconnect(client);
 
     client->thread_should_exit = 1;
 #ifndef TARGET_ANDROID

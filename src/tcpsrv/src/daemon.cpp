@@ -589,3 +589,21 @@ int ftcp_server_daemon::closeSocket(int fd) {
     return closesocket(fd);
 #endif
 }
+
+void ftcp_server_daemon::setMaxClientsPerIp(unsigned int amount) {
+    _maxClientsPerIP = amount;
+}
+unsigned int ftcp_server_daemon::getMaxClientsPerIp() {
+    return _maxClientsPerIP;
+}
+
+void _fTcpSrvSetMaxClientsPerIp(struct ftcp_server_daemon* daemon, unsigned int amount) {
+    if (!daemon) return;
+
+    daemon->setMaxClientsPerIp(amount);
+}
+unsigned int _fTcpSrvGetMaxClientsPerIp(struct ftcp_server_daemon* daemon) {
+    if (!daemon) return 0;
+
+    return daemon->getMaxClientsPerIp();
+}

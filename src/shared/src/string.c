@@ -24,6 +24,8 @@ rsb_array__pchar *_fSplitString(const char *string, const char delimiter) {
         }
     }
 
+    RSBAddElement_char(temp, 0);
+
     char *str = _fCopyString((const char *)temp->objects);
     RSBAddElement_pchar(array, str);
 

@@ -89,6 +89,9 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
         n++;
         printf("ftcpclient: received %d bytes: splitting got ", n);
 
+        // client->buf_r[n] = 0;
+        // client->buf_r[n + 1] = 0;
+
         rsb_array__pchar* message_container = _fSplitString(client->buf_r, '|');
         printf("%d entries\n", message_container->len);
 
