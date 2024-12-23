@@ -11,7 +11,7 @@ add_library(fshared STATIC
     src/shared/src/cstr.c
     src/shared/src/uchar.c
     src/shared/src/auchar.c
-    src/shared/src/time.c
+    "src/shared/src/time.cpp"
     src/shared/src/string.c
     src/shared/src/char.c
     src/shared/src/pchar.c

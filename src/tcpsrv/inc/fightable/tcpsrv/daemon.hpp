@@ -28,11 +28,13 @@ struct ftcp_server_daemon {
 private:
     std::array<char, 4096> _connectionBuffer;
 
+    bool _stopThreads = false;
+
     std::thread _baseThreadValue;
     std::thread _queueThreadValue;
     std::thread _eventThreadValue;
 
-    ftcp_server_delegate *_delegate;
+    ftcp_server_delegate* _delegate;
 
     unsigned int _nextSocketID = 5;
     unsigned int _baseSocketOffset;
@@ -60,7 +62,7 @@ private:
         fd_set socketDescriptors;
     } _socketInfo;
 
-    const char * _getConnectionHeader();
+    const char* _getConnectionHeader();
 
     void _baseThread();
     void _queueThread();
@@ -70,26 +72,27 @@ private:
     bool _processDescriptor(int desc);
 
     bool descriptorExists(int fd);
-    
+
     unsigned int countIPAddress(std::string address);
     void removeIPAddress(std::string address);
 
     int closeSocket(int fd);
+    void finishSocket(int fd);
 public:
-    ftcp_server_daemon(unsigned int port, ftcp_server_delegate *delegate);
-    
-    bool sendMessage(int socket, const std::vector<unsigned char> &message);
-    bool sendMessage(int socket, const std::string &message);
-    void requestMessageForUser(int socket, const std::string &message);
+    ftcp_server_daemon(unsigned int port, ftcp_server_delegate* delegate);
+
+    bool sendMessage(int socket, const std::vector<unsigned char>& message);
+    bool sendMessage(int socket, const std::string& message);
+    void requestMessageForUser(int socket, const std::string& message);
 
     unsigned int getClientsConnected();
 
     int nextFreeSocketID();
 
-    ftcp_server_delegate *getDelegate();
-    
-    void sendGlobalMessage(const std::string &message);
-    void sendMessageToUser(int user_id, const std::string &message);
+    ftcp_server_delegate* getDelegate();
+
+    void sendGlobalMessage(const std::string& message);
+    void sendMessageToUser(int user_id, const std::string& message);
 
     bool userExists(std::string username);
     bool userExists(int user_id);
@@ -102,4 +105,6 @@ public:
     unsigned int getMaxClientsPerIp();
 
     const std::vector<int>& getConnections();
+
+    ~ftcp_server_daemon();
 };

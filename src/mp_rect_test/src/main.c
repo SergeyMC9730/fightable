@@ -131,6 +131,8 @@ void processReceive(struct ftcpclient_delegate *self, const char *message) {
 struct ftcpclient *__client = NULL;
 struct ftcpclient_delegate __client_delegate;
 
+bool __stop_thread = false;
+
 int tryToConnect();
 
 #include <raylib.h>
@@ -145,7 +147,7 @@ void sendPlayerInfo(Vector2 pos) {
     char* buffer = (char*)MemAlloc(64);
     snprintf(buffer, 64, "%c%d,%d", COMMAND_SET_POS, (int)pos.x, (int)pos.y);
 
-    _fTcpClientSendMsg(__client, buffer);
+    // _fTcpClientSendMsg(__client, buffer);
 
     MemFree(buffer);
 }
@@ -154,10 +156,8 @@ void sendPlayerInfo(Vector2 pos) {
 #include <pthread.h>
 
 void *ClnThread(void *ctx) {
-    while (true) {
+    while (__client != NULL && !__stop_thread) {
         struct example_player* ref = (struct example_player*)ctx;
-
-        printf("%f %f\n", ref->pos.x, ref->pos.y);
 
         if (memcmp(&ref->old_pos, &ref->pos, sizeof(Vector2)) != 0) {
             if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("PLAYER POS UPDATED\n");
@@ -166,15 +166,13 @@ void *ClnThread(void *ctx) {
 
         ref->old_pos = ref->pos;
 
-        getOtherUsers();
+        // getOtherUsers();
         
-        _fSleep(100);
+        _fSleep(1000);
     }
 }
 
 int main() {
-    _fSleep(5000);
-
 #ifndef DISABLE_MP_SERVER
     __server_players = RSBCreateArray_example_player();
 #endif
@@ -185,7 +183,7 @@ int main() {
     if (status < 0) return status;
     
     InitWindow(800, 600, "Multiplayer Test");
-    SetTargetFPS(5);
+    SetTargetFPS(GetMonitorRefreshRate(0));
 
     getUserId();
     getOtherUsers();
@@ -257,10 +255,15 @@ int main() {
 	    EndDrawing();
     }
     
+    __stop_thread = true;
+    pthread_join(network_thread, NULL);
+
     _fTcpClientDestroy(__client);
 #ifndef DISABLE_MP_SERVER
     _fTcpSrvDestroy(__server);
 #endif
+
+    __client = NULL;
 
     RlCloseWindow();
     

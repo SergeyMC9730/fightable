@@ -108,10 +108,6 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
         daemon->_eventThread();
         }, this);
 
-    _baseThreadValue.detach();
-    _queueThreadValue.detach();
-    _eventThreadValue.detach();
-
     std::cout << "ftcp_server_daemon: listening on 0.0.0.0:" << port << std::endl;
 }
 
@@ -123,7 +119,7 @@ void ftcp_server_daemon::_baseThread() {
     int maxSocketDescriptor;
     socklen_t addrLen = _socketInfo.addrLen;
 
-    while (true) {
+    while (!_stopThreads) {
         FD_ZERO(&_socketInfo.socketDescriptors);
 
         FD_SET(_socketInfo.masterSocket, &_socketInfo.socketDescriptors);
@@ -157,7 +153,11 @@ void ftcp_server_daemon::_baseThread() {
         if (status) {
             // printf("loop 5\n");
             int accept_status = accept(_socketInfo.masterSocket, (struct sockaddr*)&_socketInfo.address, &addrLen);
-            assert(accept_status >= 0 && "ftcp_server_daemon: accept: fail");
+           /* assert(accept_status >= 0 && "ftcp_server_daemon: accept: fail");*/
+            if (accept_status < 0) {
+                printf("ftcp_server_daemon: accept: fail (%d)\n", accept_status);
+                return;
+            }
 
             char* conAddress = inet_ntoa(_socketInfo.address.sin_addr);
             unsigned int conPort = ntohs(_socketInfo.address.sin_port);
@@ -282,18 +282,11 @@ void ftcp_server_daemon::_baseThread() {
             _socketInfo.acceptedConnections = new_descriptors;
 
             for (int ignoredDesc : _socketInfo.descriptorsToRemove) {
-                if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: waiting for %d's thread to finish\n", ignoredDesc);
-
-                ftcp_server_daemon_user_context* ctx = _userThreads[ignoredDesc];
-                ctx->should_exit = true;
-                ctx->thread.join();
-
-                delete ctx;
+                finishSocket(ignoredDesc);
 
                 std::cout << "ftcp_server_daemon: user " << ignoredDesc << " (" << _socketInfo.users[ignoredDesc].getUserID() << ") has been disconnected\n";
                 
                 _socketInfo.users.erase(ignoredDesc);
-                _userThreads.erase(ignoredDesc);
             }
 
             _socketInfo.descriptorsToRemove.clear();
@@ -461,7 +454,7 @@ int ftcp_server_daemon::nextFreeSocketID() {
 }
 
 void ftcp_server_daemon::_queueThread() {
-    while (true) {
+    while (!_stopThreads) {
         for (auto& [k, v] : _socketInfo.users) {
             if (v.getMessagesRequested() != 0) {
                 std::string msg = v.generateMultiMessage();
@@ -507,7 +500,7 @@ void ftcp_server_daemon::sendGlobalMessage(const std::string& message) {
 }
 
 void ftcp_server_daemon::_eventThread() {
-    for (;;) {
+    while (!_stopThreads) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
@@ -641,4 +634,35 @@ struct ftcp_server_user* _fTcpSrvGetUserByDescriptor(struct ftcp_server_daemon* 
     if (!user.has_value()) return nullptr;
 
     return std::addressof(user.value().get());
+}
+
+ftcp_server_daemon::~ftcp_server_daemon() {
+    for (int desc : _socketInfo.acceptedConnections) {
+        closeSocket(desc);
+        finishSocket(desc);
+    }
+    closeSocket(_socketInfo.masterSocket);
+
+    _stopThreads = true;
+    
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: waiting for worker threads to finish\n");
+
+    _baseThreadValue.join();
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: _baseThread is done\n");
+    _eventThreadValue.join();
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: _eventThread is done\n");
+    _queueThreadValue.join();
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: _queueThread is done\n");
+}
+
+void ftcp_server_daemon::finishSocket(int fd) {
+    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcp_server_daemon: waiting for descriptor %d's thread to finish\n", fd);
+
+    ftcp_server_daemon_user_context* ctx = _userThreads[fd];
+    ctx->should_exit = true;
+    ctx->thread.join();
+
+    delete ctx;
+
+    _userThreads.erase(fd);
 }
