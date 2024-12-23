@@ -21,7 +21,7 @@ int __userId = -1;
 #define CURRENT_PROTOCOL_VERSION "fightable-1"
 
 void processReceive(struct ftcpclient_delegate *self, const char *message) {
-    printf("[CLIENT] received %d bytes: %s\n", strlen(message) + 1, message);
+    printf("[CLIENT] received %ld bytes: %s\n", strlen(message) + 1, message);
     
     char response_cmd = message[0];
     
@@ -63,6 +63,9 @@ void initLocalPlayer() {
 void getUserId() {
     _fTcpClientSendMsg(__client, "0");
 }
+void getOtherUsers() {
+    _fTcpClientSendMsg(__client, "1");
+}
 
 int main() {
     int status = tryToConnect();
@@ -79,7 +82,7 @@ int main() {
     
     while (!WindowShouldClose()) {
 	    if (IsKeyPressed(KEY_I)) {
-	        getUserId();
+            getOtherUsers();
 	    }
     
 	    BeginDrawing();
@@ -132,23 +135,53 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
 	    
 	    break;
 	}
+    case '1': {
+        int i = 0;
+        struct ftcp_server_user* remuser = _fTcpSrvGetUserByIndex(self->daemon, i);
+
+        size_t min_alloc_size = 64;
+        size_t cur_alloc_size = min_alloc_size;
+
+        char* result = (char*)MemAlloc(cur_alloc_size);
+        result[0] = '1';
+
+        while (remuser != NULL) {
+            if (_fTcpSrvUserGetId(user) != _fTcpSrvUserGetDescriptor(remuser)) {
+                char* buf = (char*)MemAlloc(256);
+                snprintf(buf, 256, "%d,%s;", _fTcpSrvUserGetId(remuser), _fTcpSrvUserGetNameEncrypted(remuser));
+
+                while (strlen(buf) >= cur_alloc_size) {
+                    cur_alloc_size += min_alloc_size;
+                    result = (char*)MemRealloc(result, cur_alloc_size);
+                }
+
+                strncat_s(result, cur_alloc_size, buf, 256);
+
+                MemFree(buf);
+            }
+
+            remuser = _fTcpSrvGetUserByIndex(self->daemon, ++i);
+        }
+
+        _fTcpSrvUserSendMessage(user, result);
+
+        MemFree(result);
+
+        break;
+    }
 	default: {
 	    printf("[SERVER] unknown command %c\n", command);
 	    break;
 	}
     }
 }
-void setSrvDaemon(struct ftcp_server_delegate *self, struct ftcp_server_daemon *daemon) {
-
-}
 
 void createLocalServer() {
     printf("* starting tcp server on 0.0.0.0:8000\n");
     
     struct ftcp_server_delegate delegate = {
-	.processDisconnect = processSrvDisconnect,
-	.processMessage = processSrvMessage,
-	.setDaemon = setSrvDaemon
+	    .processDisconnect = processSrvDisconnect,
+	    .processMessage = processSrvMessage,
     };
     __server_delegate = delegate;
     

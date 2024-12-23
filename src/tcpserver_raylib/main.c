@@ -35,8 +35,7 @@ int main() {
 
     struct ftcp_server_delegate delegate = {
         .processDisconnect = processDisconnect,
-        .processMessage = processMessage,
-        .setDaemon = setDaemon
+        .processMessage = processMessage
     };
     
     struct ftcp_server_daemon *daemon = _fTcpSrvCreate(8000, &delegate);

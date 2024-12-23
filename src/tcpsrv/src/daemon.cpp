@@ -350,7 +350,7 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
             return false;
         }
 
-        _delegate->setDaemon(_delegate, this);
+        _delegate->daemon = this;
 
         std::vector<unsigned char> v = {};
 
@@ -520,10 +520,10 @@ void _fTcpSrvDestroy(struct ftcp_server_daemon* daemon) {
 }
 
 void ftcp_server_daemon::sendMessageToUser(int user_id, const std::string& message) {
-    if (!userExists(user_id)) return;
+    auto u = getUser(user_id);
+    if (!u.has_value()) return;
 
-    ftcp_server_user& u = getUser(user_id);
-    u.sendMessage(message);
+    u.value().get().sendMessage(message);
 }
 
 bool ftcp_server_daemon::userExists(std::string username) {
@@ -541,30 +541,36 @@ bool ftcp_server_daemon::userExists(int user_id) {
     return false;
 }
 
-ftcp_server_user& ftcp_server_daemon::getUser(std::string username) {
+std::optional<std::reference_wrapper<ftcp_server_user>> ftcp_server_daemon::getUser(std::string username) {
     for (auto& [k, v] : _socketInfo.users) {
         if (v.getUsername() == username) return v;
     }
 
-    assert(false);
+    return std::nullopt;
 }
-ftcp_server_user& ftcp_server_daemon::getUser(int user_id) {
+std::optional<std::reference_wrapper<ftcp_server_user>> ftcp_server_daemon::getUser(int user_id) {
     for (auto& [k, v] : _socketInfo.users) {
         if (v.getUserID() == user_id) return v;
     }
 
-    assert(false);
+    return std::nullopt;
 }
 
 struct ftcp_server_user* _fTcpSrvGetUserByName(struct ftcp_server_daemon* daemon, const char* username) {
     if (!daemon) return NULL;
 
-    return std::addressof(daemon->getUser(username));
+    auto user = daemon->getUser(username);
+    if (!user.has_value()) return NULL;
+
+    return std::addressof(user.value().get());
 }
 struct ftcp_server_user* _fTcpSrvGetUserById(struct ftcp_server_daemon* daemon, int user_id) {
     if (!daemon) return NULL;
 
-    return std::addressof(daemon->getUser(user_id));
+    auto user = daemon->getUser(user_id);
+    if (!user.has_value()) return NULL;
+
+    return std::addressof(user.value().get());
 }
 
 void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon* daemon, const char* message) {
@@ -606,4 +612,14 @@ unsigned int _fTcpSrvGetMaxClientsPerIp(struct ftcp_server_daemon* daemon) {
     if (!daemon) return 0;
 
     return daemon->getMaxClientsPerIp();
+}
+
+struct ftcp_server_user* _fTcpSrvGetUserByIndex(struct ftcp_server_daemon* daemon, unsigned int idx) {
+    if (!daemon || _fTcpSrvGetConnectedUsers(daemon) >= idx) return nullptr;
+
+    return _fTcpSrvGetUserById(daemon, daemon->getConnections().at(idx));
+}
+
+const std::vector<int>& ftcp_server_daemon::getConnections() {
+    return _socketInfo.acceptedConnections;
 }

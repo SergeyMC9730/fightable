@@ -13,6 +13,7 @@ private:
     bool _disconnect = false;
 
     char _username[64];
+    std::string _base64username = "";
     
     ftcp_server_daemon *_daemon = nullptr;
 
@@ -40,6 +41,7 @@ public:
     bool sendMessage(const std::string &message);
 
     std::string encryptUsername();
+    const char *encryptUsername2();
 
     std::string generateMultiMessage();
     void clearMessageQueue();

@@ -94,9 +94,11 @@ public:
     bool userExists(std::string username);
     bool userExists(int user_id);
 
-    ftcp_server_user &getUser(std::string username);
-    ftcp_server_user &getUser(int user_id);
+    std::optional<std::reference_wrapper<ftcp_server_user>> getUser(std::string username);
+    std::optional<std::reference_wrapper<ftcp_server_user>> getUser(int user_id);
 
     void setMaxClientsPerIp(unsigned int amount);
     unsigned int getMaxClientsPerIp();
+
+    const std::vector<int>& getConnections();
 };

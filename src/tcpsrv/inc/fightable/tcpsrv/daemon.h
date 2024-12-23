@@ -13,6 +13,7 @@ void _fTcpSrvDestroy(struct ftcp_server_daemon *daemon);
 
 struct ftcp_server_user *_fTcpSrvGetUserByName(struct ftcp_server_daemon *daemon, const char *username);
 struct ftcp_server_user *_fTcpSrvGetUserById(struct ftcp_server_daemon *daemon, int user_id);
+struct ftcp_server_user* _fTcpSrvGetUserByIndex(struct ftcp_server_daemon* daemon, unsigned int idx);
 
 void _fTcpSrvSendGlobalMsg(struct ftcp_server_daemon *daemon, const char *message);
 

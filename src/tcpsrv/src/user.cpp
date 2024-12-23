@@ -113,6 +113,11 @@ void _fTcpSrvUserSendMessage(struct ftcp_server_user *user, const char *message)
 
     user->sendMessage(msg);
 }
+const char *ftcp_server_user::encryptUsername2() {
+    _base64username = encryptUsername();
+
+    return _base64username.c_str();
+}
 
 const char *_fTcpSrvUserGetName(struct ftcp_server_user *user) {
     if (!user) return NULL;
@@ -145,4 +150,10 @@ void _fTcpSrvUserSetNameEncrypted(struct ftcp_server_user *user, const char *use
     if (!user) return;
 
     user->setUsername(username, true);
+}
+
+const char* _fTcpSrvUserGetNameEncrypted(struct ftcp_server_user* user) {
+    if (!user) return nullptr;
+
+    return user->encryptUsername2();
 }

@@ -20,7 +20,7 @@ struct ftcpclient* _fTcpClientCreate(const char* address, unsigned short port, s
         return NULL;
     }
 
-    struct ftcpclient* client = malloc(sizeof(struct ftcpclient));
+    struct ftcpclient* client = (struct ftcpclient* )malloc(sizeof(struct ftcpclient));
     memset(client, 0, sizeof(struct ftcpclient));
 
     delegate->client = client;
@@ -66,9 +66,9 @@ struct ftcpclient* _fTcpClientCreate(const char* address, unsigned short port, s
         return NULL;
     }
 
-    bzero((char*)&client->serveraddr, sizeof(client->serveraddr));
+    memset((void*)&client->serveraddr, 0, sizeof(client->serveraddr));
     client->serveraddr.sin_family = AF_INET;
-    bcopy((char*)client->server->h_addr_list[0], (char*)&client->serveraddr.sin_addr.s_addr, client->server->h_length);
+    memcpy((void *)&client->serveraddr.sin_addr.s_addr, (void *)client->server->h_addr_list[0], client->server->h_length);
     client->serveraddr.sin_port = htons(port);
 
     res = connect(client->sockfd, (const struct sockaddr*)&client->serveraddr, sizeof(client->serveraddr));
