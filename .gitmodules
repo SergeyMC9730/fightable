@@ -22,3 +22,6 @@
 [submodule "ext/raylib"]
 	path = ext/raylib
 	url = https://github.com/sergeymc9730/raylib.git
+[submodule "ext/safestringlib"]
+	path = ext/safestringlib
+	url = https://github.com/intel/safestringlib.git

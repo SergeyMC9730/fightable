@@ -147,7 +147,7 @@ void sendPlayerInfo(Vector2 pos) {
     char* buffer = (char*)MemAlloc(64);
     snprintf(buffer, 64, "%c%d,%d", COMMAND_SET_POS, (int)pos.x, (int)pos.y);
 
-    // _fTcpClientSendMsg(__client, buffer);
+    _fTcpClientSendMsg(__client, buffer);
 
     MemFree(buffer);
 }
@@ -160,13 +160,13 @@ void *ClnThread(void *ctx) {
         struct example_player* ref = (struct example_player*)ctx;
 
         if (memcmp(&ref->old_pos, &ref->pos, sizeof(Vector2)) != 0) {
-            if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("PLAYER POS UPDATED\n");
-            sendPlayerInfo(ref->pos);
+            // if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("PLAYER POS UPDATED\n");
+            // sendPlayerInfo(ref->pos);
         }
 
         ref->old_pos = ref->pos;
 
-        // getOtherUsers();
+	getOtherUsers();
         
         _fSleep(1000);
     }

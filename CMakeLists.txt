@@ -303,6 +303,15 @@ else()
     message(FATAL_ERROR "Fightable does not support targets beyond Unix and NT")
 endif()
 
+if (UNIX OR LINUX)
+    message(STATUS "Applying linkage patches for Unix")
+    
+    target_sources(fshared PRIVATE src/shared/src/assert.c)
+    add_subdirectory(ext/safestringlib)
+    
+    set(FIGHTABLE_NATIVE_LIBS ${FIGHTABLE_NATIVE_LIBS} safestring_static)
+endif()
+
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FIGHTABLE_COPTS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")
 

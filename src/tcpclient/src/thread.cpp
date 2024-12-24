@@ -28,10 +28,11 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
         if (client->requested_messages->len != 0) {
             std::string msg_to_send = "";
 
-            for (int i = 0; i < client->requested_messages->len; i++) {
-                char* msg = RSBGetAtIndex_pchar(client->requested_messages, i);
-                size_t len = strlen(msg);
+            for (int i = 0; i < client->requested_messages->added_elements; i++) {
+                char* msg = client->requested_messages->objects[i];
+                if ((long long)msg <= 0x1000) continue;
 
+                size_t len = strlen(msg);
                 if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d -> message %s with length %ld\n", i, msg, len);
 
                 msg_to_send += std::string((const char*)msg) + "|";
@@ -39,7 +40,7 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
                 free(msg);
             }
 
-            RSBDestroy_pchar(client->requested_messages);
+            RSBDestroy_pchar(client->requested_messages); client->requested_messages = NULL;
             client->requested_messages = RSBCreateArray_pchar();
 
             if (!msg_to_send.empty()) {
@@ -95,7 +96,7 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
         rsb_array__pchar* message_container = _fSplitString(client->buf_r, '|');
         if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d entries\n", message_container->len);
 
-        for (unsigned int i = 0; i < message_container->len; i++) {
+        for (unsigned int i = 0; i < message_container->added_elements; i++) {
             char* data = RSBGetAtIndex_pchar(message_container, i);
 
             if (strlen(data) < 5) {

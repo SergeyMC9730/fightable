@@ -3,6 +3,7 @@
 
 #ifdef TARGET_UNIX
 #include <unistd.h>
+#include <fightable/sockcompat.h>
 #define SHUT_REASON SHUT_RDWR
 #elif defined(TARGET_WIN32)
 #include <windows.h>
