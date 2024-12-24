@@ -53,7 +53,7 @@ int __userId = -1;
 #define COMMAND_SET_POS         0x03
 #define COMMAND_GLOB_SET_POS    0x04
 
-#define NO_SERVER_CHECK
+// #define NO_SERVER_CHECK
 
 void processReceive(struct ftcpclient_delegate *self, const char *message) {
     if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[CLIENT] received %ld bytes: %s\n", strlen(message) + 1, message);
@@ -87,7 +87,7 @@ void processReceive(struct ftcpclient_delegate *self, const char *message) {
     case COMMAND_GET_USERS: {
         message++;
 
-        rsb_array__pchar* array1 = _fSplitString(message, ';');
+        rsb_array__pchar* array1 = _fSplitString((const char *)message, ';');
         if (!array1) return;
 
         for (unsigned int i = 0; i < array1->added_elements; i++) {
@@ -113,7 +113,7 @@ void processReceive(struct ftcpclient_delegate *self, const char *message) {
                 };
                 RSBAddElement_example_player(__client_players, player);
             }
-            else {
+            else if (uid != __userId) {
                 struct example_player* ref = __client_players->objects + idx;
                 ref->pos = pos;
             }
@@ -153,22 +153,26 @@ void sendPlayerInfo(Vector2 pos) {
 }
 
 #include <fightable/time.h>
-#include <pthread.h>
+#include <thread>
+#include <chrono>
 
-void *ClnThread(void *ctx) {
+void ClnThread(void *ctx) {
     while (__client != NULL && !__stop_thread) {
-        struct example_player* ref = (struct example_player*)ctx;
+        int self_idx = ClnGetPlayerIndex(__userId);
+        auto ref = __client_players->objects + self_idx;
 
         if (memcmp(&ref->old_pos, &ref->pos, sizeof(Vector2)) != 0) {
-            // if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("PLAYER POS UPDATED\n");
-            // sendPlayerInfo(ref->pos);
+            // printf("PLAYER POS UPDATED\n");
+            sendPlayerInfo(ref->pos);
         }
 
         ref->old_pos = ref->pos;
 
+	// printf("in loop\n");
+
 	getOtherUsers();
         
-        _fSleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(25));
     }
 }
 
@@ -190,8 +194,8 @@ int main() {
 
     SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
+    std::thread *thr = nullptr;
     bool thread_initialized = false;
-    pthread_t network_thread;
     
     while (!WindowShouldClose()) {
         if (__userId != -1 && !thread_initialized) {
@@ -201,7 +205,9 @@ int main() {
             }
             else {
                 struct example_player* ref = __client_players->objects + self_idx;
-                pthread_create(&network_thread, NULL, ClnThread, ref);
+                if (thr == nullptr) thr = new std::thread([ref]() {
+            	    ClnThread(ref);
+                });
             }
         }
 
@@ -256,7 +262,10 @@ int main() {
     }
     
     __stop_thread = true;
-    pthread_join(network_thread, NULL);
+    if (thread_initialized) {
+	thr->join();
+	delete thr;
+    }
 
     _fTcpClientDestroy(__client);
 #ifndef DISABLE_MP_SERVER
@@ -276,7 +285,7 @@ int main() {
 
 void processSrvDisconnect(struct ftcp_server_delegate *self, struct ftcp_server_user *user) {
     int uid = _fTcpSrvUserGetId(user);
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[SERVER] disconnect: user %d has been disconnected\n", uid);
+    printf("[SERVER] disconnect: user %d has been disconnected\n", uid);
 
     bool should_cleanup = false;
     if (!should_cleanup) return;
@@ -292,7 +301,7 @@ void processConnect(struct ftcp_server_delegate* self, struct ftcp_server_user* 
     
     int idx = SrvGetPlayerIndex(uid);
     if (idx == -1) {
-        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[SERVER] %d: NEW PLAYER\n", uid);
+        if (1) printf("[SERVER] %d: NEW PLAYER\n", uid);
         struct example_player player = {
             .uid = uid,
             .pos = (Vector2){0, 0}
@@ -302,7 +311,8 @@ void processConnect(struct ftcp_server_delegate* self, struct ftcp_server_user* 
     }
 }
 void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_user *user, unsigned char *message, unsigned int len) {
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[SERVER] received message from user with len %d: \"%s\"\n", len, message);
+    // int uid = _fTcpSrvUserGetId(user);
+    // if (1) printf("[SERVER] received message from user %d with len %d: \"%s\"\n", uid, len, message);
     
     char command = message[0];
     if (command == '$') return;
@@ -347,7 +357,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
                 result = (char*)MemRealloc(result, cur_alloc_size);
             }
 
-            strncat_s(result, cur_alloc_size, buf, 256);
+            strcat(result, buf);
 
             MemFree(buf);
 
@@ -366,6 +376,8 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
         message++;
 
         int uid = _fTcpSrvUserGetId(user);
+        // int desc = _fTcpSrvUserGetDescriptor(user);
+        
         int pl_idx = SrvGetPlayerIndex(uid);
 
         if (pl_idx < 0) {
@@ -374,7 +386,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
         }
         
         struct example_player* ref = __server_players->objects + pl_idx;
-        rsb_array__pchar* entries = _fSplitString(message, ',');
+        rsb_array__pchar* entries = _fSplitString((const char *)message, ',');
 
         if (entries->added_elements < 2) {
             printf("[SERVER] player %d sent too little information about position\n", uid);
@@ -384,7 +396,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
         Vector2 new_pos = { (float)atoi(entries->objects[0]), (float)atoi(entries->objects[1]) };
         ref->pos = new_pos;
 
-        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[SERVER] NEW POS: %f %f\n", new_pos.x, new_pos.y);
+        // if (1) printf("[SERVER] NEW POS: %f %f for player with id %d(%d)\n", new_pos.x, new_pos.y, uid, desc);
         
         break;
     }
@@ -396,7 +408,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
 }
 
 void createLocalServer() {
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("* starting tcp server on 0.0.0.0:8000\n");
+    if (1) printf("* starting tcp server on 0.0.0.0:8000\n");
     
     struct ftcp_server_delegate delegate = {
 	    .processDisconnect = processSrvDisconnect,
@@ -407,7 +419,7 @@ void createLocalServer() {
     
     __server = _fTcpSrvCreate(8000, &__server_delegate);
     
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("* done\n");
+    if (1) printf("* done\n");
 }
 #endif
 
@@ -415,7 +427,7 @@ int tryToConnect() {
 #if defined(NO_SERVER_CHECK) && !defined(DISABLE_MP_SERVER)
     createLocalServer();
 #endif
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("* trying to connect to 127.0.0.1:8000\n");
+    if (1) printf("* trying to connect to 127.0.0.1:8000\n");
 
     struct ftcpclient_delegate delegate = {
         .processReceive = processReceive
@@ -430,13 +442,13 @@ int tryToConnect() {
 	printf("* unrecoverable failure (DISABLE_MP_SERVER is defined)\n");
 	return -1;
 #else
-        if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("* opening tcp server and trying to connect to it\n");
+        if (1) printf("* opening tcp server and trying to connect to it\n");
 	createLocalServer();
 	return tryToConnect();
 #endif
     }
 
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("* done\n");
+    if (1) printf("* done\n");
 
     return 0;
 }
