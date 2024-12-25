@@ -172,7 +172,7 @@ void ClnThread(void *ctx) {
 
 	getOtherUsers();
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
 
@@ -287,7 +287,7 @@ void processSrvDisconnect(struct ftcp_server_delegate *self, struct ftcp_server_
     int uid = _fTcpSrvUserGetId(user);
     printf("[SERVER] disconnect: user %d has been disconnected\n", uid);
 
-    bool should_cleanup = false;
+    bool should_cleanup = true;
     if (!should_cleanup) return;
 
     int idx = SrvGetPlayerIndex(uid);

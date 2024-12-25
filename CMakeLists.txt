@@ -7,11 +7,18 @@ set(FIGHTABLE_SHARED_INC
     src/shared/inc
 )
 
+add_library(md5-c STATIC
+    ext/md5-c/md5.c
+)
+target_include_directories(md5-c PRIVATE
+    ext/md5-c
+)
+
 add_library(fshared STATIC
     src/shared/src/cstr.c
     src/shared/src/uchar.c
     src/shared/src/auchar.c
-    "src/shared/src/time.cpp"
+    src/shared/src/time.cpp
     src/shared/src/string.c
     src/shared/src/char.c
     src/shared/src/pchar.c
@@ -316,10 +323,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FIGHTABLE_COPTS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")
 
 add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
-target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
+target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared md5-c)
 target_include_directories(ftcpsrv PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
+    ext/md5-c
 )
 
 add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
@@ -339,11 +347,12 @@ target_include_directories(tcpserver-raylib-test PRIVATE
 )
 
 add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
-target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS} md5-c)
 target_include_directories(ftcpclient PRIVATE
     src/tcpclient/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
+    ext/md5-c
 )
 
 add_executable(ftcpclient-test src/tcpclient_test/main.c)

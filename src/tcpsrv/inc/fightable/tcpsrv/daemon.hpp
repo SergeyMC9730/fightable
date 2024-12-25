@@ -106,5 +106,7 @@ public:
 
     const std::vector<int>& getConnections();
 
+    static std::string getShortHash(const std::string &str);
+
     ~ftcp_server_daemon();
 };

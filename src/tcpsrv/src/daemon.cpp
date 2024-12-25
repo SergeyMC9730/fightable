@@ -5,6 +5,9 @@
 #include <fightable/tcpsrv/user.h>
 #include <fightable/sockcompat.h>
 #include <fightable/shared_config.h>
+extern "C" {
+    #include <md5.h>
+}
 
 #ifdef TARGET_UNIX
 #include <fightable/time.h>
@@ -665,4 +668,16 @@ void ftcp_server_daemon::finishSocket(int fd) {
     delete ctx;
 
     _userThreads.erase(fd);
+}
+
+typedef uint8_t fmd5_t[16];
+
+std::string ftcp_server_daemon::getShortHash(const std::string &str) {
+    fmd5_t md5;
+    md5String((char *)str.c_str(), md5);
+
+    std::string hash = GenericTools::valueToHex<fmd5_t>(md5);
+    hash.erase(hash.length() - 20, 20);
+
+    return hash;
 }

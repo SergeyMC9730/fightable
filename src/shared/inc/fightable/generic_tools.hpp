@@ -40,21 +40,26 @@ namespace GenericTools {
 
     template<typename T>
     inline std::string valueToHex(const T &v) {
-        char buffer[sizeof(T) * 2 + 1] = {};
-
-        std::string format = "%0" + std::to_string(sizeof(T) * 2) + "X";
-
-        snprintf(buffer, sizeof(T) * 2 + 1, format.c_str(), v);
-
-        std::string b = buffer;
-        return b;
+	constexpr size_t sz = sizeof(T);
+	const auto work = (unsigned char *)&v;
+	std::string result;
+	
+	for (unsigned int i = 0; i < sz; i++) {
+	    const unsigned char b = work[i];
+	    char buf[3];
+	    
+	    snprintf(buf, 3, "%02X", b);
+	    result += (std::string)buf;
+	}
+	
+	return result;
     }
 
     template<typename T>
     inline std::string vectorToString(const std::vector<T> &v) {
         std::string res = "";
 
-        for (T &el : v) {
+        for (const T &el : v) {
             res += valueToHex<T>(el) + " ";
         }
 

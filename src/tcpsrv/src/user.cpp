@@ -97,8 +97,10 @@ std::string ftcp_server_user::generateMultiMessage() {
     }
 
     gen.pop_back();
+    
+    std::string hash = ftcp_server_daemon::getShortHash(gen) + gen;
 
-    return gen;
+    return hash;
 }
 void ftcp_server_user::clearMessageQueue() {
     _requestedMessages.clear();

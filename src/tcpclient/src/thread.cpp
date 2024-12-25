@@ -4,6 +4,7 @@
 #include <fightable/tcpcln/delegate.h>
 #include <fightable/sockcompat.h>
 #include <fightable/shared_config.h>
+#include <fightable/generic_tools.hpp>
 
 #include <string.h>
 #include <strings.h>
@@ -14,10 +15,11 @@
 #include <io.h>
 #endif
 #include <stdio.h>
-
 #include <math.h>
-
 #include <string>
+extern "C" {
+    #include <md5.h>
+}
 
 #define BASE_COMMAND_ACK '$'
 
@@ -71,15 +73,17 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
     return NULL;
 }
 
+typedef uint8_t fmd5_t[16];
+
 void* _fTcpClientReadThread(struct ftcpclient* client) {
     if (!client) return NULL;
 
     while (!client->thread_should_exit) {
         memset(client->buf_r, 0, client->buf_size);
 #ifndef TARGET_WIN32
-        int n = NPD_READ(client->sockfd, client->buf_r, client->buf_size);
+        int n = NPD_READ(client->sockfd, client->buf_r, client->buf_size - 1);
 #else
-        int n = recv(client->sockfd, client->buf_r, client->buf_size, 0);
+        int n = recv(client->sockfd, client->buf_r, client->buf_size - 1, 0);
 #endif
 
         if (n < 0 || n == 0) {
@@ -92,8 +96,26 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
         }
 
         if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("ftcpclient: received %d bytes: splitting got ", n);
-
-        rsb_array__pchar* message_container = _fSplitString(client->buf_r, '|');
+        
+        auto base = client->buf_r;
+        std::string orig_hash{base, 12};
+        std::string hash;
+        
+        {
+    	    fmd5_t md5;
+    	    md5String(base + 12, md5);
+    	    hash = GenericTools::valueToHex<fmd5_t>(md5);
+	    hash.erase(hash.length() - 20, 20);
+        }
+        
+        if (orig_hash != hash) {
+    	    printf("ftcpclient: invalid hash. %s(o) != %s(e)\n", orig_hash.c_str(), hash.c_str());
+    	    continue;
+        }
+        
+        base += 12;
+        
+        rsb_array__pchar* message_container = _fSplitString(base, '|');
         if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d entries\n", message_container->len);
 
         for (unsigned int i = 0; i < message_container->added_elements; i++) {

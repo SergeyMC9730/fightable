@@ -25,3 +25,6 @@
 [submodule "ext/safestringlib"]
 	path = ext/safestringlib
 	url = https://github.com/intel/safestringlib.git
+[submodule "ext/md5-c"]
+	path = ext/md5-c
+	url = https://github.com/Zunawe/md5-c.git
