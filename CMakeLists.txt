@@ -226,6 +226,13 @@ set(FIGHTABLE_SRC
     src/client/entity/base/accessory.c
     src/client/entity/base/cleanup.c
     src/client/etc/config.c
+    src/client/entity/base/damage.c
+    src/client/etc/mixer.c
+    src/client/entity/lplayer/damage.c
+    src/client/block/update.c
+    src/client/audio/fx.c
+    src/client/entity/lplayer/perform_death.c
+    src/client/level/gameover.c
     ${FIGHTABLE_GPU_SRC}
 )
 

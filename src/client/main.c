@@ -273,7 +273,9 @@ int main(int argc, char **argv) {
 
         __state.base_game_size = actual_sz;
 
+        _fAudioFxUpdate(&__state.sound_engine);
         _fGfxUpdate(&__state.gfx);
+
         __state.gui_render_offset.x = __state.gfx.shake_v.x;
         __state.gui_render_offset.y = __state.gfx.shake_v.y;
 

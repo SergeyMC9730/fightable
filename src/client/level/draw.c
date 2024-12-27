@@ -5,8 +5,11 @@
 #include <fightable/state.h>
 #include <fightable/block.h>
 #include <fightable/entity.h>
+#include <fightable/color.h>
 #include <stdio.h>
 #include <math.h>
+
+extern double _rendererOutQuint(double x);
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (!level || !level->tilemap) return;
@@ -17,6 +20,28 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 #endif
 
+    float gameover_rotation = 0.f;
+    float gameover_zoom = 1.f;
+    float gameover_speed = 1.f / 3.f;
+    float gameover_ratio = 0.f;
+    Color gameover_bg = BLANK;
+
+    if (level->in_gameover_mode) {
+        gameover_ratio = _rendererOutQuint(level->gameover_time * gameover_speed);
+        gameover_rotation = gameover_ratio * 30.f;
+        gameover_zoom = 1 + (gameover_ratio * 1.5f);
+
+        Color end_bg = RED;
+        end_bg.a = 128;
+
+        gameover_bg = _fMixColors(BLANK, end_bg, level->gameover_time * gameover_speed);
+
+        level->gameover_time += GetFrameTime();
+        if (level->gameover_time > 1.f) {
+            level->gameover_time = 1.f;
+        }
+    }
+
     RLRectangle *rects = 0;
     struct fentity *player = 0;
 
@@ -26,15 +51,17 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     Camera2D actual_cam = level->camera;
-    actual_cam.target.x = (int)actual_cam.target.x;
-    actual_cam.target.y = (int)actual_cam.target.y;
+    actual_cam.target.x = (int)actual_cam.target.x + __state.gui_render_offset.x;
+    actual_cam.target.y = (int)actual_cam.target.y + __state.gui_render_offset.y;
+    actual_cam.rotation = gameover_rotation;
+    actual_cam.zoom = gameover_zoom;
 
     int tx = level->tilemap->tile_size.x;
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
-        actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
+        actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
+        actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
     }
 
     BeginMode2D(actual_cam);
@@ -116,10 +143,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     for (unsigned int i = 0; i < level->data_size; i++) {
+        _fBlockUpdate(level->objects + i, level);
+
         struct fblock obj = level->objects[i];
 
         if (_fBlockIdFromRenderable(obj.base) == 0) continue;
-        if (!CheckCollisionPointRec((Vector2){obj.base.block_x * tx, obj.base.block_y * ty}, area)) continue;
+        if (!CheckCollisionPointRec((Vector2){(float)(obj.base.block_x * tx), (float)(obj.base.block_y * ty)}, area)) continue;
 
         int _x = initial_pos.x + (obj.base.block_x * tx);
         int _y = initial_pos.y + (obj.base.block_y * ty);
@@ -151,8 +180,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (player) {
             EndMode2D();
 
-            actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2);
-            actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2);
+            actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
+            actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
 
             BeginMode2D(actual_cam);
         }
@@ -179,6 +208,24 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (rects) {
         MemFree(rects);
     }
+
+    if (IsKeyPressed(KEY_M)) {
+        TraceLog(LOG_INFO, "Damaging all entities by 0%");
+
+        for (int i = 0; i < level->entity_data_size; i++) {
+            struct fentity* entity = level->entities[i];
+            if (!entity) continue;
+
+            if (!entity->damage) {
+                _fEntityDamage(entity, 0.f);
+            }
+            else {
+                entity->damage(entity, 0.f);
+            }
+        }
+    }
+
+    DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
 }

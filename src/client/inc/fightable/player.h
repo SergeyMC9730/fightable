@@ -13,6 +13,8 @@ struct felplayer {
 void _flPlayerInit(struct felplayer* instance);
 void _flPlayerDraw(struct felplayer* instance);
 void _flPlayerUpdate(struct felplayer* instance);
+void _flPlayerDamage(struct felplayer* instance, float hp);
+void _flPlayerPerformDeath(struct felplayer* instance);
 
 #ifdef __cplusplus
 }

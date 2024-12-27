@@ -39,5 +39,7 @@ struct feditor *_fEditorCreate() {
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);
 
+    __state.sound_engine.do_not_shake = 1;
+
     return editor;
 }

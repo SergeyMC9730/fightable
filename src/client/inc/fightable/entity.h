@@ -52,6 +52,9 @@ struct fentity {
     unsigned char complete_px : 1;
     unsigned char complete_nx : 1;
     unsigned char can_double_jump : 1;
+    unsigned char can_be_damaged : 1;
+
+    unsigned char dead : 1;
 
     fhitbox hitbox;
 
@@ -71,9 +74,20 @@ struct fentity {
 
     rsb_array__fentity_accessory* accessories;
 
+    float max_damage_colddown;
+    float damage_colddown;
+
+    float max_hp;
+    float hp;
+
+    Color tint;
+
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
     void (*cleanup)(struct fentity* entity);
+    void (*damage)(struct fentity* entity, float damage);
+    void (*kill)(struct fentity* entity);
+    void (*perform_death)(struct fentity* entity);
 };
 
 #pragma pack(pop)
@@ -85,6 +99,8 @@ struct fentity {
 void _fEntityUpdate(struct fentity *entity);
 void _fEntityDraw(struct fentity *entity);
 void _fEntityCleanup(struct fentity* entity);
+void _fEntityDamage(struct fentity* entity, float damage);
+void _fEntityKill(struct fentity* entity);
 #endif
 
 void _fEntityMove(struct fentity* entity, Vector2 pos);

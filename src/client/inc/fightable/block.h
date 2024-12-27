@@ -37,6 +37,10 @@ struct fblock_listing _fBlockGetAvailable();
 fserializable _fBlockSerialize(struct fblock block);
 struct fblock _fBlockLoad(fserializable *serializable, uint16_t level_version);
 
+struct flevel;
+
+void _fBlockUpdate(struct fblock* block, struct flevel* env);
+
 #ifdef __cplusplus
 }
 #endif

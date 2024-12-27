@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <stdio.h>
 #include <fightable/debug.h>
+#include <fightable/color.h>
 
 #define X_SPEED 70.f
 #define Y_SPEED 150.f
@@ -87,5 +88,11 @@ void _fEntityUpdate(struct fentity* entity) {
 
             break;
         }
+    }
+
+    if (entity->damage_colddown > 0) {
+        entity->damage_colddown -= GetFrameTime();
+        if (entity->damage_colddown < 0) entity->damage_colddown = 0;
+        entity->tint = _fMixColors(WHITE, RED, entity->damage_colddown * (1 / entity->max_damage_colddown));
     }
 }

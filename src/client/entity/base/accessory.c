@@ -23,7 +23,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 				pos.x = basepos.x + 1;
 			}
 
-			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 11, 1 }, entity->render_direction, 0, WHITE);
+			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 11, 1 }, entity->render_direction, 0, entity->tint);
 
 			break;
 		}
@@ -33,7 +33,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 				.y = basepos.y - (int)entity->hitbox.height
 			};
 
-			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 1, 7 }, entity->render_direction, 0, WHITE);
+			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 1, 7 }, entity->render_direction, 0, entity->tint);
 
 			break;
 		}
@@ -43,7 +43,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 				.y = basepos.y - (int)entity->hitbox.height
 			};
 
-			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 2, 7 }, entity->render_direction, 0, WHITE);
+			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 2, 7 }, entity->render_direction, 0, entity->tint);
 
 			break;
 		}
@@ -53,7 +53,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 				.y = basepos.y
 			};
 
-			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 0, 7 }, entity->render_direction, 0, WHITE);
+			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 0, 7 }, entity->render_direction, 0, entity->tint);
 
 			break;
 		}

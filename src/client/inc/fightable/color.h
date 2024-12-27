@@ -23,6 +23,8 @@ FColor _fInvertFColor(FColor col);
 
 void _fFColorSanitize(FColor *col);
 
+Color _fMixColors(Color a, Color b, float equality);
+
 #ifdef __cplusplus
 }
 #endif

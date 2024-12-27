@@ -50,6 +50,7 @@ static struct fblock __blocks[] = {
     {TSET(24, 0,Stone), .parent_id = 40},       // 44
     {TSET(25, 0,Stone), .parent_id = 40},       // 45
     {TSET(26, 0,Stone), .parent_id = 40},       // 46
+    {TSET(22, 1,Magma)}                         // 47
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

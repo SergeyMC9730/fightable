@@ -1,6 +1,8 @@
 #include <fightable/entity.h>
 
 void _fEntityJump(struct fentity* entity, unsigned char holding) {
+    if (!entity || entity->dead) return;
+
     if (entity->on_ground) {
         entity->speed.y = -32.5f;
         entity->can_double_jump = 1;

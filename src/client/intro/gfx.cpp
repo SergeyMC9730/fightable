@@ -63,7 +63,9 @@ public:
 
             if (should_shake) {
                 if (!_shake_lock[i]) {
-                    _fGfxShake(&__state.gfx, 1.f);
+                    if (!__state.sound_engine.do_not_shake) {
+                        _fGfxShake(&__state.gfx, 1.f);
+                    }
                     _shake_lock[i] = 1;
                 }
             }

@@ -12,7 +12,6 @@ extern "C" {
 #endif
 
 typedef struct openmpt_module openmpt_module;
-
 typedef struct AudioStream AudioStream;
 
 struct faudio_engine {
@@ -20,9 +19,10 @@ struct faudio_engine {
 
     short *buffer;
 
-    unsigned char mod_lock;
-    unsigned char should_stop;
-    unsigned char ready;
+    unsigned char mod_lock : 1;
+    unsigned char should_stop : 1;
+    unsigned char ready : 1;
+    unsigned char do_not_shake : 1;
 
     unsigned int _order;
     unsigned int _pattern;
@@ -33,8 +33,17 @@ struct faudio_engine {
     AudioStream *stream;
 #endif
 
-    // VOLUME SHOULD BE FROM 0 TO 2
+    // volume allows values from 0 to 2
     float volume;
+
+    struct _fx {
+        unsigned char perform_volume_slider : 1;
+
+        float slide_volume_old;
+        float slide_volume_value;
+        float slide_volume_time;
+        float slide_volume_cur_time;
+    } fx;
 };
 
 void _fAudioBegin(struct faudio_engine *engine);
@@ -47,6 +56,9 @@ int _fAudioGetChannelsTotal(struct faudio_engine *engine);
 const char *_fAudioGetSongName(struct faudio_engine *engine);
 float _fAudioGetVolume(struct faudio_engine *engine);
 void _fAudioSetVolume(struct faudio_engine *engine, float v);
+
+void _fAudioFxUpdate(struct faudio_engine* engine);
+void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time);
 
 #ifdef __cplusplus
 }

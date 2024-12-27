@@ -31,6 +31,7 @@ struct flevel {
     unsigned int objects_rendered;
 
     unsigned char in_workbench_mode : 1;
+    unsigned char in_gameover_mode : 1;
 
     struct fentity **entities;
     unsigned int entity_data_size;
@@ -45,6 +46,8 @@ struct flevel {
 #endif
 
     RLRectangle render_crop_area;
+    
+    float gameover_time;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
@@ -53,6 +56,7 @@ RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
 fserializable _fLevelSerialize(struct flevel *level);
 struct flevel _fLevelLoad(fserializable *serializable);
+void _fLevelTriggerGameOver(struct flevel* level);
 
 #ifdef COTARGET_PTX
 void _fLevelReloadCudaCtx(struct flevel *level);
