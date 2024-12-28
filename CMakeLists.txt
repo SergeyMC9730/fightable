@@ -234,6 +234,8 @@ set(FIGHTABLE_SRC
     src/client/entity/lplayer/perform_death.c
     src/client/level/gameover.c
     src/client/renderer/gfx/damage_overlay.c
+    src/client/entity/text.c
+    src/client/level/destroy_entity.c
     ${FIGHTABLE_GPU_SRC}
 )
 

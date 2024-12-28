@@ -2,6 +2,8 @@
 #include <fightable/entity.h>
 
 void _fEntityInit(struct fentity* entity) {
+    if (!entity || entity->object_destroyed) return;
+
     entity->update = _fEntityUpdate;
     entity->draw = _fEntityDraw;
     entity->cleanup = _fEntityCleanup;
@@ -10,6 +12,4 @@ void _fEntityInit(struct fentity* entity) {
     entity->max_damage_colddown = 0.5f;
     entity->damage_colddown = 0;
     entity->tint = WHITE;
-
-    return;
 }

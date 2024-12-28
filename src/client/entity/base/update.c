@@ -1,8 +1,11 @@
+#define WITH_PLACEHOLDERS
+
 #include <fightable/entity.h>
 #include <raylib.h>
 #include <stdio.h>
 #include <fightable/debug.h>
 #include <fightable/color.h>
+#include <fightable/level.h>
 
 #define X_SPEED 70.f
 #define Y_SPEED 150.f
@@ -10,6 +13,8 @@
 // #define DEBUG
 
 void _fEntityUpdate(struct fentity* entity) {
+    if (!entity || entity->object_destroyed) return;
+
     static const double max_speed_x = 1.5 / 1.1 * 70.f;
     static const double max_speed_y = 3.f * 20.f;
 
@@ -91,8 +96,25 @@ void _fEntityUpdate(struct fentity* entity) {
     }
 
     if (entity->damage_colddown > 0) {
-        entity->damage_colddown -= GetFrameTime();
+        entity->damage_colddown -= delta;
         if (entity->damage_colddown < 0) entity->damage_colddown = 0;
         entity->tint = _fMixColors(WHITE, RED, entity->damage_colddown * (1 / entity->max_damage_colddown));
+    }
+
+    if (entity->begin_destruction) {
+        entity->destroy_timer -= delta;
+        if (entity->destroy_timer < 0.f) {
+            TraceLog(LOG_INFO, "Destroying entity");
+
+            if (entity->cleanup) entity->cleanup(entity);
+            else {
+                _fEntityCleanup(entity);
+            }
+
+            entity->object_destroyed = 1;
+            entity->begin_destruction = 0;
+
+            _fLevelDestroyEntity(entity->level, entity);
+        }
     }
 }

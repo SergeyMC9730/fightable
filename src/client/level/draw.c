@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <math.h>
 
+RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
+
 extern double _rendererOutQuint(double x);
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
@@ -20,7 +22,16 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 #endif
 
-    float gameover_rotation = 0.f;
+    const float delta = GetFrameTime();
+
+    if (IsKeyDown(KEY_MINUS)) {
+        level->cam_rot -= delta;
+    }
+    else if (IsKeyDown(KEY_EQUAL)) {
+        level->cam_rot += delta;
+    }
+
+    float gameover_rotation = level->cam_rot;
     float gameover_zoom = 1.f;
     float gameover_speed = 1.f / 3.f;
     float gameover_ratio = 0.f;
@@ -36,7 +47,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         gameover_bg = _fMixColors(BLANK, end_bg, level->gameover_time * gameover_speed);
 
-        level->gameover_time += GetFrameTime();
+        level->gameover_time += delta;
         if (level->gameover_time > 1.f) {
             level->gameover_time = 1.f;
         }
@@ -45,7 +56,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     RLRectangle *rects = 0;
     struct fentity *player = 0;
 
-    if (level->entities && level->entity_data_size != 0) {
+    if (level->entities) {
         rects = _fLevelGetHitboxes(level);
         player = _fLevelFindPlayer(level);
     }
@@ -124,7 +135,14 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             int _y = initial_pos.y + (obj.base.block_y * ty);
 
             _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
-        
+
+            if (player && player->damage_colddown > 0 && obj.dangerous) {
+                Color col = RED;
+                col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
+
+                DrawRectangleLines(_x, _y, tx, ty, col);
+            }
+
             level->objects_rendered++;
         }
     } else {
@@ -155,6 +173,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         _fBlockUpdate(level->objects + i, level);
 
         _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
+        if (player && player->damage_colddown > 0 && obj.dangerous) {
+            Color col = RED;
+            col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
+
+            DrawRectangleLines(_x, _y, tx, ty, col);
+        }
 
         level->objects_rendered++;
     }
@@ -163,8 +187,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 #endif
 
     if (level->entities && rects) {
-        for (int i = 0; i < level->entity_data_size; i++) {
-            struct fentity *entity = level->entities[i];
+        for (int i = 0; i < level->entities->added_elements; i++) {
+            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
             entity->obstacles = rects;
@@ -187,8 +211,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             BeginMode2D(actual_cam);
         }
 
-        for (int i = 0; i < level->entity_data_size; i++) {
-            struct fentity* entity = level->entities[i];
+        for (int i = 0; i < level->entities->added_elements; i++) {
+            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
             if (!entity->draw) {
@@ -210,11 +234,11 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         MemFree(rects);
     }
 
-    if (IsKeyPressed(KEY_M)) {
+    if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");
 
-        for (int i = 0; i < level->entity_data_size; i++) {
-            struct fentity* entity = level->entities[i];
+        for (int i = 0; i < level->entities->added_elements; i++) {
+            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
             if (!entity->damage) {

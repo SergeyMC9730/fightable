@@ -55,6 +55,8 @@ struct fentity {
     unsigned char can_be_damaged : 1;
 
     unsigned char dead : 1;
+    unsigned char object_destroyed : 1;
+    unsigned char begin_destruction : 1;
 
     fhitbox hitbox;
 
@@ -81,6 +83,8 @@ struct fentity {
     float hp;
 
     Color tint;
+
+    float destroy_timer;
 
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
@@ -120,6 +124,8 @@ void _fEntityDrawAccessory(struct fentity* entity);
 void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);
 
 enum fentity_accessory_type _fAccessoryGetType(enum fentity_accessory_obj accessory);
+
+void _fEntitySetDestroyTimer(struct fentity* entity, float time);
 
 #ifdef __cplusplus
 }

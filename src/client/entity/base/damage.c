@@ -3,7 +3,7 @@
 #include <fightable/entity.h>
 
 void _fEntityDamage(struct fentity* entity, float damage) {
-	if (!entity || entity->dead || entity->damage_colddown > 0) return;
+	if (!entity || entity->dead || entity->damage_colddown > 0 || entity->object_destroyed) return;
 
 	entity->hp -= damage;
 	if (entity->hp < 0) {
@@ -17,7 +17,7 @@ void _fEntityDamage(struct fentity* entity, float damage) {
 }
 
 void _fEntityKill(struct fentity* entity) {
-	if (!entity) return;
+	if (!entity || entity->object_destroyed) return;
 
 	if (!entity->damage) {
 		_fEntityDamage(entity, entity->max_hp);

@@ -1,6 +1,8 @@
 #include <fightable/entity.h>
 
 void _fEntityMove(struct fentity *entity, Vector2 pos) {
+    if (!entity || entity->object_destroyed) return;
+
     float delta = GetFrameTime();
     pos.y *= delta;
     pos.x *= delta;

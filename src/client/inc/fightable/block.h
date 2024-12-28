@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#pragma pack(push, 1)
+
 struct fblock {
     struct frendered_object base;
     const char *name;
@@ -17,7 +19,10 @@ struct fblock {
     unsigned char singular : 1;
     unsigned char passable : 1;
     unsigned char metaobject : 1;
+    unsigned char dangerous : 1;
 };
+
+#pragma pack(pop)
 
 // id + block_x + block_y + bitflags
 #define BLOCK_SIZE (sizeof(short) + sizeof(short) + sizeof(short) + sizeof(uint8_t))

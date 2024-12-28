@@ -9,12 +9,8 @@
 
 void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 	if (!block || !env) return;
-	
-	unsigned short id = _fBlockIdFromBlock(*block);
-	switch (id) {
-	case BLOCK_MAGMA: {
-		if (env->entities == NULL) break;
 
+	if (block->dangerous && env->entities) {
 		RLRectangle r = {
 			.width = (float)env->tilemap->tile_size.x,
 			.height = (float)env->tilemap->tile_size.y,
@@ -22,8 +18,9 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 			.y = (float)((block->base.block_y - 1) * env->tilemap->tile_size.y),
 		};
 
-		for (unsigned int i = 0; i < env->entity_data_size; i++) {
-			struct fentity* entity = env->entities[i];
+		for (unsigned int i = 0; i < env->entities->added_elements; i++) {
+			struct fentity* entity = RSBGetAtIndex_fentity(env->entities, i);
+			if (!entity) continue;
 
 			RLRectangle er = entity->hitbox;
 			IVector2 v = _fEntityGetDrawingPos(entity);
@@ -39,6 +36,5 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 				}
 			}
 		}
-	}
 	}
 }

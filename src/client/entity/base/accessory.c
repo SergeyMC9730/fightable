@@ -5,7 +5,7 @@
 RSB_ARRAY_IMPL_GEN(struct fentity_accessory, _fentity_accessory);
 
 void _fEntityDrawAccessory(struct fentity* entity) {
-	if (!entity || !entity->accessories) return;
+	if (!entity || !entity->accessories || entity->object_destroyed) return;
 
 	IVector2 basepos = _fEntityGetDrawingPos(entity);
 	

@@ -62,9 +62,6 @@ void _fEditorDraw(struct feditor *editor) {
         editor->level.data_size = editor->render_objects.size();
     }
 
-    editor->level.entities = editor->entities.data();
-    editor->level.entity_data_size = editor->entities.size();
-
     if (!editor->should_playback) {
         editor->level.render_crop_area = { 0, 0, 160, 120 };
     }
@@ -315,6 +312,8 @@ void _fEditorDraw(struct feditor *editor) {
                 __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
                 __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
 
+                editor->level.entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
+
                 editor->f1_lock = true;
             }
         }
@@ -344,16 +343,25 @@ void _fEditorDraw(struct feditor *editor) {
             __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
             __state.overlay_framebuffer = LoadRenderTexture(800 + 255, 600);
 
-            for (fentity* e : editor->entities) {
-                if (e->cleanup) {
-                    e->cleanup(e);
-                }
-                else {
-                    _fEntityCleanup(e);
+            if (editor->level.entities != NULL) {
+                for (unsigned int i = 0; i < editor->level.entities->added_elements; i++) {
+                    fentity* e = RSBGetAtIndex_fentity(editor->level.entities, i);
+                    if (!e) continue;
+
+                    if (e->cleanup) {
+                        e->cleanup(e);
+                    }
+                    else {
+                        _fEntityCleanup(e);
+                    }
+
+                    MemFree(e);
                 }
 
-                MemFree(e);
+                RSBDestroy_fentity(editor->level.entities);
+                editor->level.entities = NULL;
             }
+
             editor->entities.clear();
 
             const float old_vol = __state.config.volume_slider.progress;

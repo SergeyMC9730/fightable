@@ -23,6 +23,7 @@
 #include <nt5emul/renderer_keyframe.h>
 #include <nt5emul/renderer_animation.h>
 #include <nt5emul/renderer_ease.h>
+#include <raylib.h>
 #include <stddef.h>
 #if DEBUG == 1
 #include <stdio.h>
@@ -56,13 +57,13 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
             animation->final_value = animation->starting_value + selected->ending_value;
 
 #if DEBUG == 1
-            printf("[%d] keyframe %d completed\n", animation->anim_id, animation->current_keyframe);
+            TraceLog(LOG_INFO, "[%d] keyframe %d completed\n", animation->anim_id, animation->current_keyframe);
 #endif
 
             if (animation->current_keyframe >= animation->count) {
                 animation->completed_local = 1;
 #if DEBUG == 1
-                printf("[%d] animation completed\n", animation->anim_id);
+                TraceLog(LOG_INFO, "[%d] animation completed\n", animation->anim_id);
 #endif
                 return;
             }
@@ -92,7 +93,7 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
 
     if (animation->current_keyframe < animation->count) {
 #if false
-        printf("[%d] processing keyframe %d\n", animation->anim_id, animation->current_keyframe);
+        TraceLog(LOG_INFO, "[%d] processing keyframe %d\n", animation->anim_id, animation->current_keyframe);
 #endif
         
         double (*selected_easing)(double) = easings[selected->easing];

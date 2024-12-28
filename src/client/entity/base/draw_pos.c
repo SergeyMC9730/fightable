@@ -1,7 +1,7 @@
 #include <fightable/entity.h>
 
 IVector2 _fEntityGetDrawingPos(struct fentity* entity) {
-    if (!entity) return (IVector2) { 0 };
+    if (!entity || entity->object_destroyed) return (IVector2) { 0 };
 
     fhitbox hitbox = entity->hitbox;
 

@@ -220,6 +220,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->len = 0;                                                                         \
     array->current_index = 0;                                                               \
     array->added_elements = 0;                                                              \
+    array->objects = 0;                                                                     \
     array->lock = 0;                                                                        \
 }
 

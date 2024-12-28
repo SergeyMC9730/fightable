@@ -2,7 +2,7 @@
 #include <fightable/color.h>
 
 void _fEntityDraw(struct fentity *entity) {
-    if (!entity || entity->dead) return;
+    if (!entity || entity->dead || entity->object_destroyed) return;
 
     fhitbox hitbox = entity->hitbox;
 
