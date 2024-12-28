@@ -49,6 +49,10 @@ void _fGfxFadeInOut(struct gfx_manager *m, Color begin, Color end, double time);
 
 void _fGfxSetFadeOutFunc(struct gfx_manager *m, void (*callback)(void *user), void *user);
 
+void _fGfxActivateDamageOverlay();
+void _fGfxStopDamageOverlay();
+void _fGfxDrawDamageOverlay();
+
 void _fGfxUpdate(struct gfx_manager *m);
 void _fGfxDraw(struct gfx_manager *m);
 

@@ -32,7 +32,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         gameover_zoom = 1 + (gameover_ratio * 1.5f);
 
         Color end_bg = RED;
-        end_bg.a = 128;
+        end_bg.a = 196;
 
         gameover_bg = _fMixColors(BLANK, end_bg, level->gameover_time * gameover_speed);
 

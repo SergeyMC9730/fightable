@@ -37,9 +37,6 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 				else {
 					_fEntityDamage(entity, damage);
 				}
-				if (entity->damage_colddown == entity->max_damage_colddown) {
-					printf("damage!\n");
-				}
 			}
 		}
 	}

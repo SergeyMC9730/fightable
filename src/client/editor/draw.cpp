@@ -336,6 +336,7 @@ void _fEditorDraw(struct feditor *editor) {
             editor->should_process_interactions = true;
             editor->should_playback = false;
             editor->level.entities = 0;
+            editor->level.in_gameover_mode = 0;
 
             UnloadRenderTexture(__state.framebuffer);
             UnloadRenderTexture(__state.overlay_framebuffer);
@@ -354,6 +355,11 @@ void _fEditorDraw(struct feditor *editor) {
                 MemFree(e);
             }
             editor->entities.clear();
+
+            const float old_vol = __state.config.volume_slider.progress;
+            _fAudioFxSlideVolume(&__state.sound_engine, old_vol, 0.5f);
+
+            _fGfxStopDamageOverlay();
         }
         
         editor->f1_lock = false;

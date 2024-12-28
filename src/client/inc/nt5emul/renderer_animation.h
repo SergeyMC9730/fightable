@@ -44,6 +44,10 @@ struct renderer_animation {
     // but this behaviour is disabled by default
     double current_value;
 
+    // initial value, its not modified on runtime
+    // useful when resetting animation
+    double early_value;
+
     // local current value
     // it is not affected by the linked animation
     double local_current_value;
@@ -79,12 +83,18 @@ struct renderer_animation {
     unsigned char valid;
 };
 
+// updates current keyframe inside of animation chain and switches to the next one if required.
+// if no keyframes remain animation ends
 void _ntRendererUpdateAnimation(struct renderer_animation *animation);
+// loads animation from json file.
+// all objects are allocated so they should be freed after use
 struct renderer_animation *_ntRendererLoadAnimation(const char *path);
+// resets animation to initial state
+void _ntRendererResetAnimation(struct renderer_animation* animation);
 
 // check if specific animation id exists inside the main node
 unsigned char _ntRendererAnimIdExists(struct renderer_animation *animation, int anim_id);
-// if not found 'assert' would be called. child nodes also are gonna be checked
+// if animation id could not be found 0 is returned
 double _ntRendererGetAnimationResult(struct renderer_animation *animation, int anim_id);
 
 void _ntRendererPrintAnimationTree(struct renderer_animation *animation);

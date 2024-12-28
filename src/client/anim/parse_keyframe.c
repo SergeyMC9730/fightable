@@ -23,11 +23,6 @@
 #include <raylib.h>
 #include <stdio.h>
 
-// struct kv_map_str_rtt {
-//     const char *k;
-//     renderer_tweak_type v;
-// };
-
 struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
     cJSON *cjson_object = (cJSON *)cjson_object_ptr;
     struct renderer_keyframe frame = {0};
@@ -48,7 +43,7 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
         if (cJSON_IsNumber(tmp_obj)) {
             frame.length = cJSON_GetNumberValue(tmp_obj);
         } else {
-            printf("parse_keyframe.c: length is not a number (NAN)\n");
+            TraceLog(LOG_INFO, "parse_keyframe.c: length is not a number (NaN)\n");
         }
     }
 
@@ -59,7 +54,7 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
         if (cJSON_IsNumber(tmp_obj)) {
             frame.ending_value = cJSON_GetNumberValue(tmp_obj);
         } else {
-            printf("parse_keyframe.c: ending_value is not a number (NAN)\n");
+            TraceLog(LOG_INFO, "parse_keyframe.c: ending_value is not a number (NaN)\n");
         }
     }
 
@@ -73,7 +68,7 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
             // easing should not be set beyond the TOEnd
             frame.easing = easing % TOEnd;
         } else {
-            printf("parse_keyframe.c: easing is not a number (NAN)\n");
+            TraceLog(LOG_INFO, "parse_keyframe.c: easing is not a number (NaN)\n");
         }
     }
 

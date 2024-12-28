@@ -43,6 +43,8 @@ struct faudio_engine {
         float slide_volume_value;
         float slide_volume_time;
         float slide_volume_cur_time;
+
+        float resulting_volume;
     } fx;
 };
 

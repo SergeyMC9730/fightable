@@ -25,6 +25,7 @@ struct fhttpserver;
 #include <fightable/keyboard.h>
 #include <fightable/button.h>
 #include <fightable/config.h>
+#include <nt5emul/renderer_animation.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -122,6 +123,12 @@ struct fightable_state {
     double cuda_time;
 
     struct fconfig config;
+
+    Texture2D damage_overlay;
+    struct renderer_animation* damage_overlay_anim;
+    float damage_overlay_timer;
+    float damage_overlay_timer2;
+    unsigned char damage_overlay_play;
 };
 
 extern struct fightable_state __state;

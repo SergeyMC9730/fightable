@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/debug.h>
+#include <fightable/sanitizer.h>
 #ifndef _DISABLE_MP_SERVER_
 #include <fightable/http/http_server.h>
 #endif
@@ -16,6 +17,7 @@
 #include <fightable/flags.h>
 #include <time.h>
 #include <pthread.h>
+#include <math.h>
 int flags = 0;
 bool v_sync_flag = 1;
 struct flevel __level;
@@ -169,13 +171,17 @@ int main(int argc, char **argv) {
 
     struct fresource_file resources[] = {
         {"fightable1.png"},
-        {"text.png"}
+        {"text.png"},
+        {"damage_overlay.png"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
+
+    __state.damage_overlay = LoadTexture("damage_overlay.png");
+    __state.damage_overlay_anim = _ntRendererLoadAnimation("damage_overlay.json");
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -289,6 +295,12 @@ int main(int argc, char **argv) {
 
         _fDraw();
 
+        if (IsKeyPressed(KEY_O)) {
+            _fGfxActivateDamageOverlay();
+        }
+
+        _fGfxDrawDamageOverlay();
+
         EndTextureModeStacked();
 
         BeginTextureModeStacked(__state.overlay_framebuffer);
@@ -326,7 +338,7 @@ int main(int argc, char **argv) {
         DrawFPS(32, 8);
 
         if (debug_output) {
-            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n gpu time: %fms", 
+            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f",
                 align_x,
                 (float)UI_SCALE,
                 (float)__state.window_scale,
@@ -336,7 +348,9 @@ int main(int argc, char **argv) {
                 (int)__state.song_id,
                 __state.framebuffer.texture.width, __state.framebuffer.texture.height,
                 __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y,
-                __state.cuda_time
+                __state.cuda_time,
+                __state.damage_overlay_timer,
+                __state.damage_overlay_timer2
             );
 
             RlDrawText(dbg_buffer, 8, 32, 20, RED);

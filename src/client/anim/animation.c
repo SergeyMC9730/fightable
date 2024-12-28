@@ -121,3 +121,19 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
     animation->time += animation->delta;
     animation->itime += animation->delta;
 }
+
+void _ntRendererResetAnimation(struct renderer_animation* animation) {
+    if (!animation || !animation->valid) return;
+
+    animation->completed = 0;
+    animation->completed_local = 0;
+    animation->current_keyframe = 0;
+    animation->current_value = 0;
+    animation->starting_value = animation->early_value;
+    animation->itime = 0;
+    animation->time = 0;
+
+    if (animation->linked_animation != NULL) {
+        _ntRendererResetAnimation(animation->linked_animation);
+    }
+}

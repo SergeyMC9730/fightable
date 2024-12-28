@@ -1,0 +1,16 @@
+{
+  "anim_id": 1,
+  "starting_value": 1,
+  "keyframes": [
+    {
+      "length": 1,
+      "ending_value": 0.8,
+      "easing": 23
+    },
+    {
+      "length": 1.5,
+      "ending_value": -0.8,
+      "easing": 2
+    }
+  ]
+}

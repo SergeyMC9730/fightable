@@ -14,6 +14,8 @@ void _fEditorSwipeCurrentObjects(struct feditor *editor, float swipe_delta) {
         }
     }
 
-    auto b = _fBlockFromId(editor->current_block_id);
-    if (b.parent_id != 0) _fEditorSwipeCurrentObjects(editor, (swipe_delta > 0.f) ? 1.f : -1.f);
+    if (swipe_delta != 0.f) {
+        auto b = _fBlockFromId(editor->current_block_id);
+        if (b.parent_id != 0) _fEditorSwipeCurrentObjects(editor, (swipe_delta > 0.f) ? 1.f : -1.f);
+    }
 }

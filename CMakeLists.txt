@@ -233,6 +233,7 @@ set(FIGHTABLE_SRC
     src/client/audio/fx.c
     src/client/entity/lplayer/perform_death.c
     src/client/level/gameover.c
+    src/client/renderer/gfx/damage_overlay.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -543,3 +544,5 @@ message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
 
 message(STATUS "")
 message(STATUS "")
+
+#

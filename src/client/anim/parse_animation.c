@@ -98,7 +98,7 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
         if (cJSON_IsNumber(tmp_obj)) {
             result->anim_id = (int)cJSON_GetNumberValue(tmp_obj);
         } else {
-            printf("parse_animation.c: anim_id is not a number (NAN)\n");
+            TraceLog(LOG_INFO, "parse_animation.c: anim_id is not a number (NaN)\n");
         }
     }
 
@@ -107,8 +107,9 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
     if (tmp_obj) {
         if (cJSON_IsNumber(tmp_obj)) {
             result->starting_value = cJSON_GetNumberValue(tmp_obj);
+            result->early_value = result->starting_value;
         } else {
-            printf("parse_animation.c: starting_value is not a number (NAN)\n");
+            TraceLog(LOG_INFO, "parse_animation.c: starting_value is not a number (NaN)\n");
         }
     }
 
@@ -142,13 +143,13 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
                 // copy keyframe to the keyframe array
                 result->keyframes[i] = keyframe;
             } else {
-                printf("parse_animation.c: array element with invalid type found\n");
+                TraceLog(LOG_INFO, "parse_animation.c: array element with invalid type found\n");
             }
         }
     }
 
     // set 'valid' flag. 
-    // we should take in a mind that keyframes array should be valid
+    // we take in a mind that keyframe array should be valid
 
     result->valid = true && result->keyframes != NULL;
 
