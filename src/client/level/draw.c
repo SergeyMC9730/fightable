@@ -143,8 +143,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     for (unsigned int i = 0; i < level->data_size; i++) {
-        _fBlockUpdate(level->objects + i, level);
-
         struct fblock obj = level->objects[i];
 
         if (_fBlockIdFromRenderable(obj.base) == 0) continue;
@@ -152,6 +150,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         int _x = initial_pos.x + (obj.base.block_x * tx);
         int _y = initial_pos.y + (obj.base.block_y * ty);
+
+        _fBlockUpdate(level->objects + i, level);
 
         _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
 

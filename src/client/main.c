@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    unsigned char debug_output = 1;
+    static const unsigned char debug_output = 0;
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -182,6 +182,8 @@ int main(int argc, char **argv) {
 
     __state.damage_overlay = LoadTexture("damage_overlay.png");
     __state.damage_overlay_anim = _ntRendererLoadAnimation("damage_overlay.json");
+
+    SetTextureWrap(__state.damage_overlay, TEXTURE_WRAP_CLAMP);
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -335,9 +337,9 @@ int main(int argc, char **argv) {
 
         _fGfxDraw(&__state.gfx);
 
-        DrawFPS(32, 8);
-
         if (debug_output) {
+            DrawFPS(32, 8);
+
             snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f",
                 align_x,
                 (float)UI_SCALE,
