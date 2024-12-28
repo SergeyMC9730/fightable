@@ -118,6 +118,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
             if (!level->host_allow_pipeline[i]) continue;
 
+            _fBlockUpdate(level->objects + i, level);
+
             int _x = initial_pos.x + (obj.base.block_x * tx);
             int _y = initial_pos.y + (obj.base.block_y * ty);
 
@@ -127,7 +129,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         }
     } else {
 #endif
-
     if (level->in_workbench_mode) {
         for (unsigned int i = 0; i < level->data_size; i++) {
             struct fblock obj = level->objects[i];
