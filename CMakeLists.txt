@@ -237,6 +237,7 @@ set(FIGHTABLE_SRC
     src/client/entity/text.c
     src/client/level/destroy_entity.c
     src/client/level/light_source.c
+    src/client/mp_create/draw.c
     ${FIGHTABLE_GPU_SRC}
 )
 

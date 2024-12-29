@@ -40,6 +40,9 @@ struct fhttpserver;
     #include <pthread.h>
 #endif
 
+#define UI_MENU_MAIN        0
+#define UI_MENU_MPCREATE    1
+
 #ifdef TARGET_ANDROID
 struct android_app;
 #endif
@@ -129,6 +132,14 @@ struct fightable_state {
     float damage_overlay_timer;
     float damage_overlay_timer2;
     unsigned char damage_overlay_play;
+
+    unsigned char current_ui_menu;
+
+    Texture2D mp_create_bg1;
+    Texture2D mp_create_bg2;
+    Shader mp_create_wave_shader;
+
+    long double mp_create_time;
 };
 
 extern struct fightable_state __state;

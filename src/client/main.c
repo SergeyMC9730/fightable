@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    static const unsigned char debug_output = 0;
+    static const unsigned char debug_output = 1;
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -172,7 +172,9 @@ int main(int argc, char **argv) {
     struct fresource_file resources[] = {
         {"fightable1.png"},
         {"text.png"},
-        {"damage_overlay.png"}
+        {"damage_overlay.png"},
+        {"3g_crim.xm"},
+        {"wave_warp.fs"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
