@@ -2,7 +2,7 @@
 
 #define TSET(x,y,n) .base.tile_x = x, .base.tile_y = y, .name = #n
 
-static struct fblock __blocks[] = {
+static const struct fblock __blocks[] = {
     {.base.tile_x = 40, .base.tile_y = 7, .name = "Air", .passable = 1},    // 0
     {.base.tile_x = 13, .base.tile_y = 0, .name = "Grass"},                 // 1
     {.base.tile_x = 14, .base.tile_y = 0, .name = "Grass", .metaobject=1},  // 2
@@ -31,9 +31,9 @@ static struct fblock __blocks[] = {
     {.base.tile_x = 19, .base.tile_y = 1, .name = "Dirt", .parent_id=22},   // 25
     {.base.tile_x = 14, .base.tile_y = 2, .name = "Dirt", .parent_id=19},   // 26
     {.base.tile_x = 18, .base.tile_y = 2, .name = "Dirt", .parent_id=22},   // 27
-    {.base.tile_x = 13, .base.tile_y = 4, .name = "Dirt", .metaobject=1},   // 28
-    {.base.tile_x = 14, .base.tile_y = 4, .name = "Dirt", .parent_id=28},   // 29
-    {.base.tile_x = 15, .base.tile_y = 4, .name = "Dirt", .parent_id=28},   // 30
+    {.base.tile_x = 13, .base.tile_y = 4, .name = "Dirt", .metaobject=1, .passable = 1},   // 28
+    {.base.tile_x = 14, .base.tile_y = 4, .name = "Dirt", .parent_id=28, .passable = 1},   // 29
+    {.base.tile_x = 15, .base.tile_y = 4, .name = "Dirt", .parent_id=28, .passable = 1},   // 30
     {.base.tile_x = 17, .base.tile_y = 4, .name = "Dirt", .metaobject=1},   // 31
     {.base.tile_x = 18, .base.tile_y = 4, .name = "Dirt", .parent_id=31},   // 32
     {.base.tile_x = 19, .base.tile_y = 4, .name = "Dirt", .parent_id=31},   // 33
@@ -50,7 +50,31 @@ static struct fblock __blocks[] = {
     {TSET(24, 0,Stone), .parent_id = 40},       // 44
     {TSET(25, 0,Stone), .parent_id = 40},       // 45
     {TSET(26, 0,Stone), .parent_id = 40},       // 46
-    {TSET(22, 1,Magma), .dangerous = 1}         // 47
+    {TSET(22, 1,Magma), .dangerous = 1},        // 47
+    {TSET(25, 2,BStne), .metaobject = 1},       // 48
+    {TSET(19, 2,BStne), .parent_id = 48},       // 49
+    {TSET(20, 2,BStne), .parent_id = 48},       // 50
+    {TSET(21, 2,BStne), .parent_id = 48},       // 51
+    {TSET(22, 2,BStne), .parent_id = 48},       // 52
+    {TSET(23, 2,BStne), .parent_id = 48},       // 53
+    {TSET(24, 2,BStne), .parent_id = 48},       // 54
+    {TSET(20, 1,Planks)},                       // 55
+    {TSET(20, 0,Planks)},                       // 56
+    {TSET(27, 0,Planks)},                       // 57
+    {TSET(28, 2,Aspht)},                        // 58
+    {TSET(28, 0,Aspht)},                        // 59
+    {TSET(29, 0,Aspht)},                        // 60
+    {TSET(30, 0,Aspht)},                        // 61
+    {TSET(27, 1,Aspht)},                        // 62
+    {TSET(28, 1,Aspht)},                        // 63
+    {TSET(29, 1,Aspht)},                        // 64
+    {TSET(30, 1,Aspht)},                        // 65
+    {TSET(28, 3,Aspht)},                        // 66
+    {TSET(30, 3,Bush), .metaobject = 1},        // 67
+    {TSET(30, 2,Bush), .parent_id = 67},        // 68
+    {TSET(14, 3,Chain)},                        // 69
+    {TSET(29, 3,Lamp), .light_level = 127},     // 70
+    {TSET(29, 2,Lamp), .light_level = 127}      // 71
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

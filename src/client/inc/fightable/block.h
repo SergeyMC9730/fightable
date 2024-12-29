@@ -11,15 +11,19 @@ extern "C" {
 
 struct fblock {
     struct frendered_object base;
-    const char *name;
 
-    unsigned short parent_id;
+    unsigned char light_level;
+
+    const char *name;
 
     unsigned char is_start_pos : 1;
     unsigned char singular : 1;
     unsigned char passable : 1;
     unsigned char metaobject : 1;
     unsigned char dangerous : 1;
+
+    unsigned short group_id;
+    unsigned short parent_id;
 };
 
 #pragma pack(pop)

@@ -6,6 +6,7 @@
 #include <fightable/block.h>
 #include <fightable/entity.h>
 #include <fightable/color.h>
+#include <fightable/sanitizer.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -178,6 +179,19 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
 
             DrawRectangleLines(_x, _y, tx, ty, col);
+        }
+        if (obj.light_level != 0) {
+            double sz = (sinl(__state.time * 1.05f) + 1.f) / 2.f;
+
+            Color col = WHITE;
+            col.a = obj.light_level;
+            
+            int cx = _x + (tx / 2);
+            int cy = _y + (ty / 2);
+
+            BeginBlendMode(BLEND_ADDITIVE);
+            DrawCircleGradient(cx, cy, sz * tx * 2, col, BLANK);
+            EndBlendMode();
         }
 
         level->objects_rendered++;
