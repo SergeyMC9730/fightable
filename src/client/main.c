@@ -226,10 +226,6 @@ int main(int argc, char **argv) {
     ChangeDirectory("..");
 #endif
 
-#ifndef _DISABLE_MP_SERVER_
-    __state.webserver = _fHttpServerCreate(3000, _fMainLog);
-#endif
-
     _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
@@ -254,14 +250,6 @@ int main(int argc, char **argv) {
             SaveFileText(dbg_buffer, data_str);
         }
     }
-
-#ifndef _DISABLE_MP_SERVER_
-#ifdef TARGET_ANDROID
-    _fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
-#else
-    _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
-#endif
-#endif
 
     __state.gfx.fade_v.should_process = 1;
 
@@ -297,7 +285,7 @@ int main(int argc, char **argv) {
 
         _fDraw();
 
-        if (IsKeyPressed(KEY_O)) {
+        if (IsKeyPressed(KEY_F3)) {
             __state.show_debug_info = !__state.show_debug_info;
         }
 

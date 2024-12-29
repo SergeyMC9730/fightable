@@ -13,6 +13,7 @@
 #include <fightable/mp_create_menu.h>
 #include <math.h>
 
+#ifndef _DISABLE_MP_SERVER_
 void _fIntroMenuOnMpCreateCallback(void *ctx) {
     float* old_vol = (float*)ctx;
     if (!old_vol) return;
@@ -80,8 +81,10 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
 
     _fMpCreateOpenServer();
 }
+#endif
 
 void _fIntroMenuOnMpCreate() {
+#ifndef _DISABLE_MP_SERVER_
     float* old_vol = (float *)MemAlloc(sizeof(float));
     *old_vol = _fAudioGetVolume(&__state.sound_engine);
 
@@ -89,4 +92,5 @@ void _fIntroMenuOnMpCreate() {
     _fGfxSetFadeOutFunc(&__state.gfx, _fIntroMenuOnMpCreateCallback, old_vol);
     
     _fAudioFxSlideVolume(&__state.sound_engine, 0.f, 0.4f);
+#endif
 }

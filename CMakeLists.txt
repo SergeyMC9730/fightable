@@ -237,8 +237,8 @@ set(FIGHTABLE_SRC
     src/client/entity/text.c
     src/client/level/destroy_entity.c
     src/client/level/light_source.c
-    src/client/mp_create/draw.c
-    src/client/mp_create/delegate.c
+    src/client/mpserver/draw.c
+    src/client/mpserver/delegate.c
     ${FIGHTABLE_GPU_SRC}
 )
 
