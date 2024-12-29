@@ -96,7 +96,10 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
     _socketInfo.address.sin_port = htons(port);
 
     status = bind(_socketInfo.masterSocket, (const struct sockaddr*)&_socketInfo.address, _socketInfo.addrLen);
-    assert(status >= 0 && "ftcp_server_daemon: bind: fail");
+    if (status < 0) {
+        printf("ftcp_server_daemon: listen: fail (%d)\n", status);
+        return;
+    }
 
     status = listen(_socketInfo.masterSocket, 8192);
     assert(status >= 0 && "ftcp_server_daemon: listen: fail");
@@ -112,6 +115,8 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
         }, this);
 
     std::cout << "ftcp_server_daemon: listening on 0.0.0.0:" << port << std::endl;
+
+    _ready = true;
 }
 
 const char* ftcp_server_daemon::_getConnectionHeader() {
@@ -680,4 +685,13 @@ std::string ftcp_server_daemon::getShortHash(const std::string &str) {
     hash.erase(hash.length() - 20, 20);
 
     return hash;
+}
+
+bool ftcp_server_daemon::ready() {
+    return _ready;
+}
+unsigned char _fTcpSrvReady(struct ftcp_server_daemon* daemon) {
+    if (!daemon) return 0;
+
+    return (unsigned char)daemon->ready();
 }

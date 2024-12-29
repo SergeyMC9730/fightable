@@ -45,6 +45,8 @@ private:
     std::vector<std::string> _ipAddresses;
     std::map<int, std::string> _ipMap;
 
+    bool _ready = false;
+
     std::map<int, ftcp_server_daemon_user_context*> _userThreads;
 
     struct SocketInfo {
@@ -109,4 +111,6 @@ public:
     static std::string getShortHash(const std::string &str);
 
     ~ftcp_server_daemon();
+
+    bool ready();
 };

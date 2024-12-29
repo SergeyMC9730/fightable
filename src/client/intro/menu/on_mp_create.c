@@ -10,6 +10,7 @@
 #include <fightable/editor.h>
 #include <fightable/storage.h>
 #include <fightable/sound_library.h>
+#include <fightable/mp_create_menu.h>
 #include <math.h>
 
 void _fIntroMenuOnMpCreateCallback(void *ctx) {
@@ -76,6 +77,8 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
     __state.song_id = MUS_3G_ANTS;
     __state.current_ui_menu = UI_MENU_MPCREATE;
     __state.mp_create_time = 0;
+
+    _fMpCreateOpenServer();
 }
 
 void _fIntroMenuOnMpCreate() {
@@ -85,5 +88,5 @@ void _fIntroMenuOnMpCreate() {
     _fGfxFadeOut(&__state.gfx, BLACK, 0.5);
     _fGfxSetFadeOutFunc(&__state.gfx, _fIntroMenuOnMpCreateCallback, old_vol);
     
-    _fAudioFxSlideVolume(&__state.sound_engine, 0.f, 0.5f);
+    _fAudioFxSlideVolume(&__state.sound_engine, 0.f, 0.4f);
 }

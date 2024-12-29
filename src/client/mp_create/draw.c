@@ -1,5 +1,6 @@
 #include <fightable/mp_create_menu.h>
 #include <fightable/state.h>
+#include <stdio.h>
 
 void _fMpCreateDraw() {
 	Color bg = {
@@ -40,10 +41,21 @@ void _fMpCreateDraw() {
 	EndBlendMode();
 
 	w = __state.framebuffer.texture.width / 2;
+	int h = __state.framebuffer.texture.height / 2;
 
 	BeginBlendMode(BLEND_MULTIPLIED);
 	DrawRectangleGradientH(__state.framebuffer.texture.width - w, 0, w, __state.framebuffer.texture.height, WHITE, BLACK);
+	DrawRectangleGradientV(0, __state.framebuffer.texture.height - h, w * 2, h, WHITE, BLACK);
 	EndBlendMode();
 
 	__state.mp_create_time += (long double)GetFrameTime();
+
+	if (!_fTcpSrvReady(__state.mp_server_instance)) return;
+
+	char buffer[32] = {};
+	snprintf(buffer, 32, "running on port\n %d", __state.mp_server_port);
+
+	_fTextDraw(&__state.text_manager, buffer, (IVector2) { 8, 8 }, BLACK, 1);
+
+	_fTextDraw(&__state.text_manager, "join now!", (IVector2) { 8, 24 }, BLUE, 1);
 }

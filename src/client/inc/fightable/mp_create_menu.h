@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 void _fMpCreateDraw();
+void _fMpCreateOpenServer();
 
 #ifdef __cplusplus
 }

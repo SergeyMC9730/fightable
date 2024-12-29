@@ -26,6 +26,8 @@ struct fhttpserver;
 #include <fightable/button.h>
 #include <fightable/config.h>
 #include <nt5emul/renderer_animation.h>
+#include <fightable/tcpsrv/daemon.h>
+#include <fightable/tcpsrv/delegate.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -140,6 +142,12 @@ struct fightable_state {
     Shader mp_create_wave_shader;
 
     long double mp_create_time;
+
+    unsigned char show_debug_info;
+
+    struct ftcp_server_daemon* mp_server_instance;
+    struct ftcp_server_delegate mp_server_delegate;
+    unsigned short mp_server_port;
 };
 
 extern struct fightable_state __state;

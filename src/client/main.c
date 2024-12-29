@@ -115,8 +115,6 @@ int main(int argc, char **argv) {
 
     _fStoragePrepareWritable();
 
-    static const unsigned char debug_output = 1;
-
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
     actual_sz = (Vector2){0, 0};
@@ -300,7 +298,7 @@ int main(int argc, char **argv) {
         _fDraw();
 
         if (IsKeyPressed(KEY_O)) {
-            _fGfxActivateDamageOverlay();
+            __state.show_debug_info = !__state.show_debug_info;
         }
 
         _fGfxDrawDamageOverlay();
@@ -339,7 +337,7 @@ int main(int argc, char **argv) {
 
         _fGfxDraw(&__state.gfx);
 
-        if (debug_output) {
+        if (__state.show_debug_info) {
             DrawFPS(32, 8);
 
             snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f",
