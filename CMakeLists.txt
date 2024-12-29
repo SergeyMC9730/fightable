@@ -382,6 +382,7 @@ target_include_directories(tcpclient-raylib-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+
 if (NOT DISABLE_MP_SERVER)
     if (WIN32)
         set(HTTPSERVER_NAME libhttpserver-win32)
@@ -470,6 +471,14 @@ add_executable(collide-test
     src/collide_test/hitbox/clip_y.c
     src/collide_test/hitbox/move.c
 )
+add_executable(gun-test
+    src/shooting_system_test/src/main.cpp
+    src/shooting_system_test/src/hitbox/clip_x.c
+    src/shooting_system_test/src/hitbox/clip_y.c
+    src/shooting_system_test/src/hitbox/expand.c
+    src/shooting_system_test/src/hitbox/intersects.c
+    src/shooting_system_test/src/hitbox/move.c
+)
 
 target_include_directories(fightable PRIVATE 
     src/client/inc 
@@ -487,16 +496,22 @@ target_include_directories(physics-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+target_include_directories(gun-test PRIVATE 
+    ext/raylib/src
+    src/shooting_system_test/include
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 target_include_directories(collide-test PRIVATE 
     ext/raylib/src
     src/collide_test/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-
 target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
+target_link_libraries(gun-test raylib)
 
 add_executable(mp-rect-test
     src/mp_rect_test/src/main.cpp
