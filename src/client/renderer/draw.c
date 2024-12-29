@@ -6,6 +6,7 @@
 #include <fightable/level.h>
 #include <fightable/editor.h>
 #include <fightable/intro.h>
+#include <fightable/mp_create_menu.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -28,6 +29,15 @@ void _fDraw() {
     cam.target = __state.gui_render_offset;
 
     BeginMode2D(cam);
-    _fIntroDraw();
+    switch (__state.current_ui_menu) {
+    case UI_MENU_MAIN: {
+        _fIntroDraw();
+        break;
+    }
+    case UI_MENU_MPCREATE: {
+        _fMpCreateDraw();
+        break;
+    }
+    }
     EndMode2D();
 }

@@ -73,8 +73,8 @@ static const struct fblock __blocks[] = {
     {TSET(30, 3,Bush), .metaobject = 1},        // 67
     {TSET(30, 2,Bush), .parent_id = 67},        // 68
     {TSET(14, 3,Chain)},                        // 69
-    {TSET(29, 3,Lamp), .light_level = 96},     // 70
-    {TSET(29, 2,Lamp), .light_level = 96}      // 71
+    {TSET(29, 3,Lamp), .light_level = 96},      // 70
+    {TSET(29, 2,Lamp), .light_level = 96}       // 71
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

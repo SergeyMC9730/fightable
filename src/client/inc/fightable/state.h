@@ -26,6 +26,8 @@ struct fhttpserver;
 #include <fightable/button.h>
 #include <fightable/config.h>
 #include <nt5emul/renderer_animation.h>
+#include <fightable/tcpsrv/daemon.h>
+#include <fightable/tcpsrv/delegate.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -39,6 +41,9 @@ struct fhttpserver;
 #else // unix
     #include <pthread.h>
 #endif
+
+#define UI_MENU_MAIN        0
+#define UI_MENU_MPCREATE    1
 
 #ifdef TARGET_ANDROID
 struct android_app;
@@ -129,6 +134,20 @@ struct fightable_state {
     float damage_overlay_timer;
     float damage_overlay_timer2;
     unsigned char damage_overlay_play;
+
+    unsigned char current_ui_menu;
+
+    Texture2D mp_create_bg1;
+    Texture2D mp_create_bg2;
+    Shader mp_create_wave_shader;
+
+    long double mp_create_time;
+
+    unsigned char show_debug_info;
+
+    struct ftcp_server_daemon* mp_server_instance;
+    struct ftcp_server_delegate mp_server_delegate;
+    unsigned short mp_server_port;
 };
 
 extern struct fightable_state __state;

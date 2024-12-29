@@ -237,6 +237,8 @@ set(FIGHTABLE_SRC
     src/client/entity/text.c
     src/client/level/destroy_entity.c
     src/client/level/light_source.c
+    src/client/mp_create/draw.c
+    src/client/mp_create/delegate.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -485,6 +487,8 @@ target_include_directories(fightable PRIVATE
     ext/raylib/src 
     ext/cJSON 
     ext/portaudio_opensles/include
+    src/tcpclient/inc
+    src/tcpsrv/inc
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}

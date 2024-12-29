@@ -37,7 +37,7 @@ void _fIntroMenuProcessPlay() {
             EndBlendMode();
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-
+                _fIntroMenuOnMpJoin();
             }
         }
         
@@ -48,7 +48,7 @@ void _fIntroMenuProcessPlay() {
             EndBlendMode();
 
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                
+                _fIntroMenuOnMpCreate();
             }
         }
     }
