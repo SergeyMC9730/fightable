@@ -49,7 +49,7 @@ struct fightable_state {
     struct flevel *current_level;
 
     unsigned long frames_rendered;
-    double time;
+    long double time;
 
     RenderTexture2D framebuffer;
 

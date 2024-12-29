@@ -11,6 +11,7 @@
 #include <math.h>
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
+RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
 
 extern double _rendererOutQuint(double x);
 
@@ -22,6 +23,14 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         _fLevelReloadCudaCtx(level);   
     }
 #endif
+
+    if (level->light_sources) {
+        level->light_sources->added_elements = 0;
+        level->light_sources->current_index = 0;
+    }
+    else {
+        level->light_sources = RSBCreateArray_lls();
+    }
 
     const float delta = GetFrameTime();
 
@@ -181,17 +190,18 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             DrawRectangleLines(_x, _y, tx, ty, col);
         }
         if (obj.light_level != 0) {
-            double sz = (sinl(__state.time * 1.05f) + 1.f) / 2.f;
-
             Color col = WHITE;
             col.a = obj.light_level;
             
-            int cx = _x + (tx / 2);
-            int cy = _y + (ty / 2);
+            int cx = _x;
+            int cy = _y;
 
-            BeginBlendMode(BLEND_ADDITIVE);
-            DrawCircleGradient(cx, cy, sz * tx * 2, col, BLANK);
-            EndBlendMode();
+            struct flevel_light_source source = {
+                .pos = (IVector2){cx, cy},
+                .tint = col
+            };
+
+            RSBAddElement_lls(level->light_sources, source);
         }
 
         level->objects_rendered++;
@@ -241,6 +251,22 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (level->render_crop_area.width * level->render_crop_area.height > 0.f) {
         EndScissorMode();
     }
+
+    BeginBlendMode(BLEND_ADDITIVE);
+
+    for (unsigned int i = 0; i < level->light_sources->added_elements; i++) {
+        struct flevel_light_source* source = level->light_sources->objects + i;
+        if (player) {
+            if (!CheckCollisionPointRec((Vector2) { source->pos.x, source->pos.y }, player->hitbox)) {
+                _fLevelLightSourceDraw(level, source);
+            }
+        }
+        else {
+            _fLevelLightSourceDraw(level, source);
+        }
+    }
+
+    EndBlendMode();
 
     EndMode2D();
 

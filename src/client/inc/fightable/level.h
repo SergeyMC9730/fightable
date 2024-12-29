@@ -18,6 +18,13 @@ struct fblock;
 
 RSB_ARRAY_DEF_GEN(struct fentity*, _fentity);
 
+struct flevel_light_source {
+    IVector2 pos;
+    Color tint;
+};
+
+RSB_ARRAY_DEF_GEN(struct flevel_light_source, _lls);
+
 struct flevel {
     struct fblock *objects;
     unsigned int data_size;
@@ -52,6 +59,8 @@ struct flevel {
     float gameover_time;
 
     float cam_rot;
+
+    rsb_array__lls* light_sources;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
@@ -62,6 +71,8 @@ fserializable _fLevelSerialize(struct flevel *level);
 struct flevel _fLevelLoad(fserializable *serializable);
 void _fLevelTriggerGameOver(struct flevel* level);
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
+
+void _fLevelLightSourceDraw(struct flevel* env, struct flevel_light_source* source);
 
 #ifdef COTARGET_PTX
 void _fLevelReloadCudaCtx(struct flevel *level);

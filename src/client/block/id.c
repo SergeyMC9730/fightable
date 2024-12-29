@@ -50,7 +50,7 @@ static const struct fblock __blocks[] = {
     {TSET(24, 0,Stone), .parent_id = 40},       // 44
     {TSET(25, 0,Stone), .parent_id = 40},       // 45
     {TSET(26, 0,Stone), .parent_id = 40},       // 46
-    {TSET(22, 1,Magma), .dangerous = 1},        // 47
+    {TSET(22, 1,Magma), .dangerous = 1, .light_level = 24}, // 47
     {TSET(25, 2,BStne), .metaobject = 1},       // 48
     {TSET(19, 2,BStne), .parent_id = 48},       // 49
     {TSET(20, 2,BStne), .parent_id = 48},       // 50
@@ -73,8 +73,8 @@ static const struct fblock __blocks[] = {
     {TSET(30, 3,Bush), .metaobject = 1},        // 67
     {TSET(30, 2,Bush), .parent_id = 67},        // 68
     {TSET(14, 3,Chain)},                        // 69
-    {TSET(29, 3,Lamp), .light_level = 127},     // 70
-    {TSET(29, 2,Lamp), .light_level = 127}      // 71
+    {TSET(29, 3,Lamp), .light_level = 96},     // 70
+    {TSET(29, 2,Lamp), .light_level = 96}      // 71
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

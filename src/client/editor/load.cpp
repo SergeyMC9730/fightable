@@ -7,6 +7,7 @@
 
 struct feditor *_fEditorCreate() {
     feditor *editor = new feditor;
+    editor->current_block_id = 0;
 
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;

@@ -14,6 +14,8 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
     level.objects = (struct fblock *)malloc(sizeof(struct fblock) * level.data_size);
     level.tilemap = tilemap;
 
+    memset(level.objects, 0, sizeof(struct fblock) * level.data_size);
+
     level.camera = _fCameraLoadDefault();
     level.camera_size = (IVector2){level.width * tilemap->tile_size.x, level.height * tilemap->tile_size.y};
 

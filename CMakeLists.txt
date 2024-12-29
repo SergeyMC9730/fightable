@@ -236,6 +236,7 @@ set(FIGHTABLE_SRC
     src/client/renderer/gfx/damage_overlay.c
     src/client/entity/text.c
     src/client/level/destroy_entity.c
+    src/client/level/light_source.c
     ${FIGHTABLE_GPU_SRC}
 )
 
