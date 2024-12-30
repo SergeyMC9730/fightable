@@ -13,6 +13,7 @@
 #include <fightable/renderer.h>
 #include <fightable/intvec.h>
 #include <fightable/player.h>
+#include <fightable/rect.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
@@ -449,4 +450,9 @@ void _fEditorDraw(struct feditor *editor) {
             _fSliderDraw(&editor->test_slider);
         });
     }
+
+    // Color ccc = BLACK;
+    // ccc.a = 64;
+    // _fRectDraw((RLRectangle) { 32, 32, 50, 16 }, YELLOW, ORANGE, ccc);
+    // _fLevelDrawPixelated(&editor->level, (IRectangle) { 32 + 1, 32 + 1, 50 - 1, 16 - 1 });
 }

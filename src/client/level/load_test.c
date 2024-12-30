@@ -7,8 +7,8 @@
 struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){ 
     struct flevel level = {};
     
-    level.width = 8;
-    level.height = 1;
+    level.width = 32;
+    level.height = 8;
     
     level.data_size = level.width * level.height;
     level.objects = (struct fblock *)malloc(sizeof(struct fblock) * level.data_size);
@@ -25,8 +25,12 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
 
             struct fblock *obj = level.objects + idx;
 
-            obj->base.tile_x = 11;
-            obj->base.tile_y = 0;
+            if (y == 0) {
+                *obj = _fBlockFromId(2);
+            }
+            else {
+                *obj = _fBlockFromId(19);
+            }
 
             obj->base.block_x = x;
             obj->base.block_y = y + 3;

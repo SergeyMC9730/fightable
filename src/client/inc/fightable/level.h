@@ -3,6 +3,7 @@
 #include <fightable/rendered_object.h>
 #include <raylib.h>
 #include <fightable/intvec.h>
+#include <fightable/intrect.h>
 #include <fightable/serializable.h>
 #include <rsb/rsb_array_gen.h>
 
@@ -64,6 +65,7 @@ struct flevel {
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
+void _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
 struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
 RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);

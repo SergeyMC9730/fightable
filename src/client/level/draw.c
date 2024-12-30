@@ -152,6 +152,20 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
                 DrawRectangleLines(_x, _y, tx, ty, col);
             }
+            if (obj.light_level != 0) {
+                Color col = WHITE;
+                col.a = obj.light_level;
+
+                int cx = _x;
+                int cy = _y;
+
+                struct flevel_light_source source = {
+                    .pos = (IVector2){cx, cy},
+                    .tint = col
+                };
+
+                RSBAddElement_lls(level->light_sources, source);
+            }
 
             level->objects_rendered++;
         }

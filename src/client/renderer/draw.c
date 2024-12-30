@@ -18,7 +18,7 @@ void _fDraw() {
         if (__state.current_editor != NULL) {
             _fEditorDraw(__state.current_editor);
         } else {
-            if (__state.current_level) {
+            if (__state.current_level && __state.current_ui_menu != UI_MENU_MPCREATE) {
                 _fLevelDraw(__state.current_level, (IVector2){0, 0});
             }
         }

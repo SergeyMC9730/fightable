@@ -157,6 +157,8 @@ struct fightable_state {
 
     struct ftcpclient* mp_client;
     struct ftcpclient_delegate* mp_client_delegate;
+
+    Vector2 mp_level_preview_offset;
 };
 
 extern struct fightable_state __state;

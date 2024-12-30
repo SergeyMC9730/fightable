@@ -239,6 +239,7 @@ set(FIGHTABLE_SRC
     src/client/level/light_source.c
     src/client/mpserver/draw.c
     src/client/mpserver/delegate.c
+    src/client/level/draw_pixelated.cpp
     ${FIGHTABLE_GPU_SRC}
 )
 
