@@ -97,12 +97,15 @@ ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* 
 
     status = bind(_socketInfo.masterSocket, (const struct sockaddr*)&_socketInfo.address, _socketInfo.addrLen);
     if (status < 0) {
-        printf("ftcp_server_daemon: listen: fail (%d)\n", status);
+        printf("ftcp_server_daemon: bind: fail (%d)\n", status);
         return;
     }
 
     status = listen(_socketInfo.masterSocket, 8192);
-    assert(status >= 0 && "ftcp_server_daemon: listen: fail");
+    if (status < 0) {
+        printf("ftcp_server_daemon: listen: fail (%d)\n", status);
+        return;
+    }
 
     _baseThreadValue = std::thread([](ftcp_server_daemon* daemon) {
         daemon->_baseThread();

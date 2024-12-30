@@ -84,6 +84,8 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 		int _x = frame.x + obj.base.block_x;
 		int _y = frame.y + obj.base.block_y;
 
+		// if (GetCollisio)
+
 		DrawPixel(_x, _y, col);
 	}
 	EndMode2D();

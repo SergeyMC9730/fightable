@@ -14,12 +14,12 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 	if (format != LEVEL_FORMAT_VERSION) return NULL;
 
-	short width = ((short*)data)[1];
-	short height = ((short*)data)[2];
+	unsigned short width = ((short*)data)[1];
+	unsigned short height = ((short*)data)[2];
 
 	TraceLog(LOG_INFO, "Level size: %dx%d", width, height);
 
-	unsigned int objects = *(unsigned int*)(data + 6);
+	unsigned int objects = *(unsigned int*)(data + 6) % 3000000;
 
 	TraceLog(LOG_INFO, "Objects: %d", objects);
 
@@ -34,12 +34,15 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 	level->objects = (struct fblock*)MemAlloc(sizeof(struct fblock) * level->data_size);
 
 	for (unsigned int i = 0; i < objects; i++) {
-		unsigned char* ref = data + 10 + (9 * i);
+		int offset = 10 + (9 * i);
+		if (offset >= len) break;
+
+		unsigned char* ref = data + offset;
 		short* sref = (short*)ref;
 
 		unsigned short id = sref[0];
 		if (id == BLOCK_AIR || id == INVALID_BLOCK_ID) {
-			TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
+			// TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
 			continue;
 		}
 
@@ -56,8 +59,6 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 		block.base.block_y = y;
 
 		level->objects[i] = block;
-
-		TraceLog(LOG_INFO, "%d:%d=%d", x, y, id);
 	}
 
 	MemFree(data);
