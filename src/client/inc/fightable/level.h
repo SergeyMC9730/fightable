@@ -7,7 +7,7 @@
 #include <fightable/serializable.h>
 #include <rsb/rsb_array_gen.h>
 
-#define LEVEL_FORMAT_VERSION (uint16_t)1
+#define LEVEL_FORMAT_VERSION (uint16_t)2
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,7 +70,7 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
 RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
 fserializable _fLevelSerialize(struct flevel *level);
-struct flevel _fLevelLoad(fserializable *serializable);
+struct flevel *_fLevelLoad(fserializable *serializable);
 void _fLevelTriggerGameOver(struct flevel* level);
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
 

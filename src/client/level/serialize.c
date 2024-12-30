@@ -4,13 +4,18 @@
 #include <fightable/block_library.h>
 
 fserializable _fLevelSerialize(struct flevel *level) {
+    unsigned int entities = 0;
+    if (level->entities) {
+        entities = level->entities->added_elements;
+    }
+
     size_t sz = level->data_size * BLOCK_SIZE + 
-                level->entity_data_size * ENTITY_SIZE +
+                entities * ENTITY_SIZE +
                 sizeof(LEVEL_FORMAT_VERSION) +
                 sizeof(level->width) + 
                 sizeof(level->height) +
                 sizeof(level->data_size) +
-                sizeof(level->entity_data_size);
+                sizeof(entities);
 
     int air_blocks = 0;
     for (int i = 0; i < level->data_size; i++) {
@@ -38,10 +43,10 @@ fserializable _fLevelSerialize(struct flevel *level) {
         fUnloadSerializableObject(&block);
     }
 
-    fSerializableAddInt32(&ret, level->entity_data_size);
+    fSerializableAddInt32(&ret, entities);
 
-    for(int i = 0; i < level->entity_data_size; i++) {
-        fserializable entity = _fEntitySerialize(level->entities[i]);
+    for(int i = 0; i < entities; i++) {
+        fserializable entity = _fEntitySerialize(level->entities->objects[i]);
         fSerializableAddData(&ret, entity.data, entity.size);
         fUnloadSerializableObject(&entity);
     }
@@ -49,23 +54,26 @@ fserializable _fLevelSerialize(struct flevel *level) {
     return ret;
 }
 
-struct flevel _fLevelLoad(fserializable *serializable) {
+struct flevel *_fLevelLoad(fserializable *serializable) {
     uint16_t level_version = fSerializableGetInt16(serializable);
 
-    struct flevel ret;
-    ret.width = fSerializableGetInt16(serializable);
-    ret.height = fSerializableGetInt16(serializable);
-    ret.data_size = fSerializableGetInt32(serializable);
-    ret.objects = MemAlloc(ret.data_size * sizeof(struct fblock));
+    struct flevel* ret = (struct flevel*)MemAlloc(sizeof(struct flevel));
+    ret->width = fSerializableGetInt16(serializable);
+    ret->height = fSerializableGetInt16(serializable);
+    ret->data_size = fSerializableGetInt32(serializable);
+    ret->objects = (struct fblock *)MemAlloc(ret->data_size * sizeof(struct fblock));
 
-    for(int i = 0; i < ret.data_size; i++) {
-        ret.objects[i] = _fBlockLoad(serializable, level_version);
+    for(int i = 0; i < ret->data_size; i++) {
+        ret->objects[i] = _fBlockLoad(serializable, level_version);
     }
 
-    ret.entity_data_size = fSerializableGetInt32(serializable);
+    int amount = fSerializableGetInt32(serializable);
+    if (amount > 0) {
+        ret->entities = RSBCreateArray_fentity();
 
-    for(int i = 0; i < ret.data_size; i++) {
-        ret.entities[i] = _fEntityLoad(serializable, level_version);
+        for (int i = 0; i < amount; i++) {
+            RSBAddElement_fentity(ret->entities, _fEntityLoad(serializable, level_version));
+        }
     }
 
     return ret;

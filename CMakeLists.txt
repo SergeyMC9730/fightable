@@ -240,6 +240,9 @@ set(FIGHTABLE_SRC
     src/client/mpserver/draw.c
     src/client/mpserver/delegate.c
     src/client/level/draw_pixelated.cpp
+    src/client/level/serialize.c
+    src/client/entity/base/serialize.c
+    src/client/block/serialize.c
     ${FIGHTABLE_GPU_SRC}
 )
 
