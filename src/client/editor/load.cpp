@@ -3,6 +3,8 @@
 #include <fightable/state.h>
 #include <fightable/camera.h>
 #include <fightable/renderer.h>
+#include <fightable/storage.h>
+#include <nfd.h>
 #include <stdio.h>
 
 struct feditor *_fEditorCreate() {
@@ -12,7 +14,36 @@ struct feditor *_fEditorCreate() {
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;
 
-    editor->level = _fLevelLoadTest(__state.tilemap, {28, 4});
+#ifndef TARGET_ANDROID
+    nfdu8char_t* out_path;
+    nfdu8filteritem_t filters[1] = { { "Level file", ".bin" } };
+    nfdopendialogu8args_t args = { 0 };
+    args.filterList = filters;
+    args.filterCount = 2;
+    nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
+
+    if (result != NFD_OKAY) {
+        TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
+        editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+    }
+    else {
+        auto ref = _fLevelLoadFromFile(out_path);
+        if (!ref) {
+            TraceLog(LOG_INFO, "Could not open level");
+            editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+        }
+        else {
+            TraceLog(LOG_INFO, "Opening chosen level");
+
+            editor->level = *ref;
+            MemFree(ref);
+        }
+
+        NFD_FreePathU8(out_path);
+    }
+#else
+    editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+#endif
     editor->level.camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
     editor->select_block_label = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);

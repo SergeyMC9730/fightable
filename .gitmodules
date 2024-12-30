@@ -28,3 +28,9 @@
 [submodule "ext/md5-c"]
 	path = ext/md5-c
 	url = https://github.com/Zunawe/md5-c.git
+[submodule "ext/tinyfd"]
+	path = ext/tinyfd
+	url = http://git.code.sf.net/p/tinyfiledialogs/code
+[submodule "ext/nativefiledialog-extended"]
+	path = ext/nativefiledialog-extended
+	url = https://github.com/btzy/nativefiledialog-extended.git

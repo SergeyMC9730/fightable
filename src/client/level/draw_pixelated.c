@@ -2,8 +2,6 @@
 #include <fightable/block_library.h>
 #include <fightable/tilemap.h>
 #include <fightable/block.h>
-#include <map>
-#include <vector>
 
 void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 	if (!level || (frame.width * frame.height) <= 0 || !level->objects || level->data_size == 0) return;

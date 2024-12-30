@@ -18,6 +18,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <math.h>
+#include <nfd.h>
 int flags = 0;
 bool v_sync_flag = 1;
 struct flevel __level;
@@ -104,6 +105,8 @@ void _fMainDestroyResources(struct fresource_file *resources, int files) {
 int main(int argc, char **argv) {
 #ifdef TARGET_ANDROID
     __state.system = GetAndroidApp();
+#else
+    NFD_Init();
 #endif
     char *dbg_buffer = (char *)MemAlloc(2048);
 

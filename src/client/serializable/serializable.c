@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 fserializable fCreateSerializableObject(size_t size) {
-    return (fserializable){RL_MALLOC(size), size, 0};
+    return fLoadSerializableObjectFromMemory((uint8_t*)MemAlloc(size), size);
 }
 
 fserializable fLoadSerializableObjectFromMemory(uint8_t* data, size_t size) {
@@ -19,7 +19,7 @@ fserializable fLoadSerializableObjectFromFile(const char* filename) {
 }
 
 void fUnloadSerializableObject(fserializable* serializable) {
-    free(serializable->data);
+    MemFree(serializable->data);
 }
 
 void fSerializableAddData(fserializable* serializable, void* data, size_t size) {
@@ -106,11 +106,11 @@ double fSerializableGetDouble(fserializable* serializable) {
 }
 
 const char* fSerializableGetString(fserializable* serializable) {
-    int length;
+    int length = 0;
     uint8_t* ptr = serializable->data + serializable->offset;
 
     while(*ptr) assert(serializable->offset + length++ < serializable->size);
-    const char* str = RL_MALLOC(length);
+    const char* str = (const char *)MemAlloc(length);
     strcpy(str, serializable->data + serializable->offset);
     serializable->offset += length;
 

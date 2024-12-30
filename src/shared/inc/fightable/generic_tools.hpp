@@ -6,7 +6,7 @@
 namespace GenericTools {
     template<typename T>
     inline void addVectors(std::vector<T> *output, const std::vector<T> &input) {
-        for (T &obj : input) {
+        for (const T &obj : input) {
             output->push_back(obj);
         }
     }
@@ -14,14 +14,14 @@ namespace GenericTools {
     #pragma message("should we handle cpu endianess?")
     
     template<typename T>
-    inline std::vector<unsigned char> valueToVector(T* value) {
-        unsigned int val_size = sizeof(T);
-        unsigned char *bytes = (unsigned char *)value;
+    inline std::vector<unsigned char> valueToVector(const T& v) {
+        constexpr size_t sz = sizeof(T);
+        const auto work = (unsigned char*)&v;
 
         std::vector<unsigned char> vec;
 
-        for (unsigned int i = 0; i < val_size; i++) {
-            vec.push_back(bytes[i]);
+        for (unsigned int i = 0; i < sz; i++) {
+            vec.push_back(work[i]);
         }
 
         return vec;
@@ -40,19 +40,19 @@ namespace GenericTools {
 
     template<typename T>
     inline std::string valueToHex(const T &v) {
-	constexpr size_t sz = sizeof(T);
-	const auto work = (unsigned char *)&v;
-	std::string result;
+	    constexpr size_t sz = sizeof(T);
+	    const auto work = (unsigned char *)&v;
+	    std::string result;
 	
-	for (unsigned int i = 0; i < sz; i++) {
-	    const unsigned char b = work[i];
-	    char buf[3];
+	    for (unsigned int i = 0; i < sz; i++) {
+	        const unsigned char b = work[i];
+	        char buf[3];
 	    
-	    snprintf(buf, 3, "%02X", b);
-	    result += (std::string)buf;
-	}
+	        snprintf(buf, 3, "%02X", b);
+	        result += (std::string)buf;
+	    }
 	
-	return result;
+	    return result;
     }
 
     template<typename T>

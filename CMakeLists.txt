@@ -137,6 +137,9 @@ endif()
 
 add_subdirectory(ext/cJSON)
 add_subdirectory(ext/raylib)
+if (NOT ANDROID)
+    add_subdirectory(ext/nativefiledialog-extended)
+endif()
 
 set(FIGHTABLE_SRC
     src/client/main.c
@@ -239,10 +242,12 @@ set(FIGHTABLE_SRC
     src/client/level/light_source.c
     src/client/mpserver/draw.c
     src/client/mpserver/delegate.c
-    src/client/level/draw_pixelated.cpp
+    "src/client/level/draw_pixelated.c"
     src/client/level/serialize.c
     src/client/entity/base/serialize.c
     src/client/block/serialize.c
+    src/client/level/save.cpp
+    src/client/level/load.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -493,6 +498,7 @@ target_include_directories(fightable PRIVATE
     ext/portaudio_opensles/include
     src/tcpclient/inc
     src/tcpsrv/inc
+    ext/nativefiledialog-extended/src/include
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -516,7 +522,7 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared)
+target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 target_link_libraries(gun-test raylib)

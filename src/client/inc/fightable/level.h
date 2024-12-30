@@ -73,6 +73,8 @@ fserializable _fLevelSerialize(struct flevel *level);
 struct flevel *_fLevelLoad(fserializable *serializable);
 void _fLevelTriggerGameOver(struct flevel* level);
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
+void _fLevelSave(struct flevel* level, const char* filename);
+struct flevel* _fLevelLoadFromFile(const char* filename);
 
 void _fLevelLightSourceDraw(struct flevel* env, struct flevel_light_source* source);
 

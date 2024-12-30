@@ -286,15 +286,13 @@ void _fEditorDraw(struct feditor *editor) {
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                 TraceLog(LOG_INFO, "Trying to save level into a file");
 
-                fserializable level_data = _fLevelSerialize(&editor->level);
-
                 std::string writable = _fStorageGetWritable();
                 std::string filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
 
-                // fSaveSerializedObject(level_data, filename.c_str());
-                // fUnloadSerializableObject(&level_data);
+                _fLevelSave(&editor->level, filename.c_str());
 
                 TraceLog(LOG_INFO, "Save done");
+                _fLevelLoadFromFile(filename.c_str());
 
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
