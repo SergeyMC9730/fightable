@@ -10,10 +10,12 @@
 #include <stdio.h>
 #include <cmath>
 #include <optional>
+#include <string>
 #include <fightable/renderer.h>
 #include <fightable/intvec.h>
 #include <fightable/player.h>
 #include <fightable/rect.h>
+#include <fightable/storage.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
@@ -282,7 +284,17 @@ void _fEditorDraw(struct feditor *editor) {
             btn.tint = WHITE;
             
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
-                printf("click\n");
+                TraceLog(LOG_INFO, "Trying to save level into a file");
+
+                fserializable level_data = _fLevelSerialize(&editor->level);
+
+                std::string writable = _fStorageGetWritable();
+                std::string filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+
+                // fSaveSerializedObject(level_data, filename.c_str());
+                // fUnloadSerializableObject(&level_data);
+
+                TraceLog(LOG_INFO, "Save done");
 
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 

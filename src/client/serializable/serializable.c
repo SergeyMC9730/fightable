@@ -116,3 +116,7 @@ const char* fSerializableGetString(fserializable* serializable) {
 
     return str;
 }
+
+void fSaveSerializedObject(fserializable obj, const char* filename) {
+    SaveFileData(filename, obj.data, obj.size);
+}

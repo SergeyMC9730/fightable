@@ -12,7 +12,7 @@ fserializable _fEntitySerialize(struct fentity* entity) {
 }
 
 struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version) {
-    struct fentity* ret = MemAlloc(sizeof(struct fentity));
+    struct fentity* ret = (struct fentity* )MemAlloc(sizeof(struct fentity));
     _fEntityInit(ret);
 
     ret->global_entity_id = fSerializableGetInt16(serializable);

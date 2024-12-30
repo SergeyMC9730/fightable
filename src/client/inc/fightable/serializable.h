@@ -18,6 +18,8 @@ fserializable fCreateSerializableObject(size_t size);
 fserializable fLoadSerializableObjectFromMemory(uint8_t* data, size_t size);
 fserializable fLoadSerializableObjectFromFile(const char* filename);
 
+void fSaveSerializedObject(fserializable obj, const char* filename);
+
 void fUnloadSerializableObject(fserializable* serializable);
 
 void fSerializableAddData(fserializable* serializable, void* data, size_t size);
