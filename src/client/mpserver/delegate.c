@@ -99,8 +99,7 @@ void _fMpCreateOpenServer() {
 	unsigned char create_successful = false;
 
 	for (int i = 0; i < 16; i++) {
-		__state.mp_server_port = GetRandomValue(1024, 8000);
-		__state.mp_server_port = 8000;
+        __state.mp_server_port = GetRandomValue(1024, 8000);
 		__state.mp_server_instance = _fTcpSrvCreate(__state.mp_server_port, &__state.mp_server_delegate);
 
 		if (!__state.mp_server_instance || !_fTcpSrvReady(__state.mp_server_instance)) {

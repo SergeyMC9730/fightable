@@ -215,7 +215,6 @@ set(FIGHTABLE_SRC
     src/client/entity/lplayer/draw.c
     src/client/entity/base/draw_pos.c
     src/client/entity/base/setters.c
-    src/client/serializable/serializable.c
     src/client/intro/gfx.cpp
     src/client/renderer/keyboard.c
     src/client/renderer/overlay_scheduler.cpp
@@ -243,9 +242,6 @@ set(FIGHTABLE_SRC
     src/client/mpserver/draw.c
     src/client/mpserver/delegate.c
     src/client/level/draw_pixelated.c
-    src/client/level/serialize.c
-    src/client/entity/base/serialize.c
-    src/client/block/serialize.c
     src/client/level/save.cpp
     src/client/level/load.c
     ${FIGHTABLE_GPU_SRC}

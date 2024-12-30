@@ -121,11 +121,13 @@ void _fMpCreateDraw() {
 
 	if (_fButtonDrawSimple("Open", (IVector2) { 108, 17 + 15 + 2 }, WHITE)) {
 #ifndef TARGET_ANDROID
-		nfdu8char_t* out_path;
-		nfdu8filteritem_t filters[1] = { { "Level file", ".bin" } };
+		// NFD_Init();
+
+		nfdu8char_t* out_path = NULL;
+		nfdu8filteritem_t filters[1] = { { "Level file", "bin" } };
 		nfdopendialogu8args_t args = { 0 };
-		args.filterList = filters;
-		args.filterCount = 2;
+		args.filterList = NULL;
+		args.filterCount = 0;
 		nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
 
 		if (result != NFD_OKAY) {
