@@ -5,6 +5,7 @@
 #include <fightable/level.h>
 #include <fightable/button.h>
 #include <fightable/renderer.h>
+#include <nfd.h>
 
 void _fMpCreateDraw() {
 #ifndef _DISABLE_MP_SERVER_
@@ -119,7 +120,31 @@ void _fMpCreateDraw() {
 	}
 
 	if (_fButtonDrawSimple("Open", (IVector2) { 108, 17 + 15 + 2 }, WHITE)) {
+#ifndef TARGET_ANDROID
+		nfdu8char_t* out_path;
+		nfdu8filteritem_t filters[1] = { { "Level file", ".bin" } };
+		nfdopendialogu8args_t args = { 0 };
+		args.filterList = filters;
+		args.filterCount = 2;
+		nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
 
+		if (result != NFD_OKAY) {
+			TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
+		}
+		else {
+			struct flevel *ref = _fLevelLoadFromFile(out_path);
+			if (!ref) {
+				TraceLog(LOG_INFO, "Could not open level");
+			}
+			else {
+				TraceLog(LOG_INFO, "Opening chosen level");
+
+				__state.current_level = ref;
+			}
+
+			NFD_FreePathU8(out_path);
+		}
+#endif
 	}
 #endif
 }

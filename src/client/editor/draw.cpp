@@ -16,6 +16,7 @@
 #include <fightable/player.h>
 #include <fightable/rect.h>
 #include <fightable/storage.h>
+#include <nfd.h>
 
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
@@ -284,16 +285,6 @@ void _fEditorDraw(struct feditor *editor) {
             btn.tint = WHITE;
             
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
-                TraceLog(LOG_INFO, "Trying to save level into a file");
-
-                std::string writable = _fStorageGetWritable();
-                std::string filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
-
-                _fLevelSave(&editor->level, filename.c_str());
-
-                TraceLog(LOG_INFO, "Save done");
-                _fLevelLoadFromFile(filename.c_str());
-
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
                 editor->should_display_sidebar = false;
@@ -327,6 +318,32 @@ void _fEditorDraw(struct feditor *editor) {
 
                 editor->f1_lock = true;
             }
+        }
+
+        if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + 14, blackbox_starty + 84 }, WHITE)) {
+            TraceLog(LOG_INFO, "Trying to save level into a file");
+
+            std::string writable = _fStorageGetWritable();
+            std::string filename;
+
+#ifdef TARGET_ANDROID
+            filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+#else
+            nfdu8char_t* out_path = nullptr;
+            auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level.bin");
+
+            if (!out_path || result != NFD_OKAY) {
+                filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+            }
+            else {
+                filename = out_path;
+                NFD_FreePathU8(out_path);
+            }
+#endif
+
+            _fLevelSave(&editor->level, filename.c_str());
+
+            TraceLog(LOG_INFO, "Save done");
         }
     }
 
