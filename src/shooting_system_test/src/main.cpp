@@ -10,11 +10,27 @@ Camera2D camera;
 float m_speedX = 0.0f;
 float m_speedY = 0.0f;
 bool m_onGround;
+enum Weapons {
+    GUN = 0,
+    REVOLVER,
+    SHOTGUN,
+    ROCKETLAUNCHER
+};
 struct Bullet {
      Vector2 position;
      float rotation;
      float speed;
      float startTime;
+     Vector2 posRelToPlr;
+};
+struct Weapon {
+    // TODO: switch Texture2D to Vector2 posInTile
+    Texture2D weapon;
+    Bullet bullet;
+    // weaponDulo - это расстояние от центра оружие до самого дула, центр оружия просчитывается в функции отрисовки
+    Vector3 weaponDulo;
+    float weaponRotation;
+    float weaponPositionRot;
 };
 Vector2 convertToCameraPos(Vector2 pos) {
     return Vector2 {
@@ -51,42 +67,44 @@ int main(void) {
 
     SetTargetFPS(60);
 
-    RLRectangle gun = {0, 0, 25, 100};
     fhitbox player = {10, 75, 50, 50};
     fhitbox placement[] = {
         {-100, 500, 2000, 100},
         {0, 0, 720, 8},
     };
-
-    int side = 0;
-    int bulletStartPos;
-    int bulletStartTime;
     
-    bool bulletActive = false;
     bool debug = 0;
     bool isCanJump = 1;
-    bool bulletLock = 0;
 
-    const float g = 9.8;
-    float rad;
     float delay = 0;
-    float v = 3;
     float playerRotate = 1.0f;
-
+    float playerWeaponRot;
+    float lineRotate = 25;
+    
     Color bouncingColor = RED;
-
-    Bullet bullet;
-    bullet.speed = 5;
     
     Texture2D playerTEX = LoadTexture("assets/guntest/player.png");
     Texture2D bigGun = LoadTexture("assets/guntest/pistolet.png");
+    Texture2D revolver = LoadTexture("assets/guntest/revolver.png");
+    Texture2D shotgun = LoadTexture("assets/guntest/shotgun.png");
+    Texture2D rocketLauncher = LoadTexture("assets/guntest/rocketlauncher.png");
 
     uint16_t ammo = 16;
     std::vector<Bullet> bullets {
 
     };
-    float weaponRot;
-    float playerWeaponRot;
+    std::vector<Weapon> weapons {
+        {},
+        {bigGun, {0, 0, 5, 0}, {25, 15, -25}, 0},
+        {revolver, {0, 0, 5, 0}, {0, 0, 0}, 0},
+        {shotgun, {0, 0, 5, 0}, {0, 0, 0}, 0},
+        {rocketLauncher, {0, 0, 5, 0}, {0, 0, 0}, 0}
+    };
+    
+    Weapon currentWeapon;
+    currentWeapon = weapons[1];
+    currentWeapon.bullet.speed = 5;
+    float currentWeaponPos;
     while (!WindowShouldClose())  {
         bouncingColor.r++;
         bouncingColor.g++;
@@ -94,33 +112,43 @@ int main(void) {
         if(delay != 0) {
             delay -= 0.5;
         }
-
+        for(int i = 0; i < weapons.size(); i++) {
+            if(IsKeyDown(KEY_ONE + i)) {
+                currentWeapon = weapons[i + 1];
+            }
+        }
         Vector2 mpos = convertToCameraPos(GetMousePosition());
+
         Vector2 delta;
         delta.x = mpos.x - player.x - (player.width / 2);
         delta.y = mpos.y - player.y - (player.height / 2);
-
-        float time = GetTime() / 100;
 
         camera.target = {player.x, 0};
         camera.offset = (Vector2){(float)GetScreenWidth() / 2, 0};
         camera.rotation = 0.0f;
         camera.zoom = 1.0f;
 
-        
-        weaponRot = atan2(mpos.y - player.y, mpos.x - (player.x + player.width / 2)) * RAD2DEG;
-        if(mpos.x < camera.target.x) {
+        currentWeapon.weaponRotation= atan2(mpos.y - player.y - 15, mpos.x - (player.x + player.width / 2 - 10));
+        if(mpos.x < camera.target.x + player.width / 2) {
             playerRotate = -1.0f;
             playerWeaponRot = -95;
+            currentWeaponPos = currentWeapon.weaponDulo.z;
         } 
-        if(mpos.x > camera.target.x) {
+        if(mpos.x > camera.target.x + player.width / 2) {
             playerRotate = 1.0f;
             playerWeaponRot = 0;
+            currentWeaponPos = currentWeapon.weaponDulo.x;
         }
 
         for(int i = 0; i < bullets.size(); i++) {
-            bullets[i].position.x += bullets[i].speed * cos(bullets[i].rotation);
-            bullets[i].position.y += bullets[i].speed * sin(bullets[i].rotation);
+            if(bullets[i].posRelToPlr.x < bullets[i].posRelToPlr.y) {
+                bullets[i].position.x -= bullets[i].speed;
+            } 
+            if(bullets[i].posRelToPlr.x > bullets[i].posRelToPlr.y) {
+                bullets[i].position.x += bullets[i].speed;
+            }
+ //  * cos(bullets[i].rotation)
+            // bullets[i].position.y += bullets[i].speed * sin(bullets[i].rotation); 
             if(GetTime() - bullets[i].startTime >= 5) {
                 bullets.erase(bullets.begin() + i);
             }
@@ -128,10 +156,12 @@ int main(void) {
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && ammo != 0 && delay == 0) {
             delay = 10;
-            bullet.startTime = GetTime();
-            bullet.rotation = atan2(delta.y, delta.x);
-            bullet.position = (Vector2){player.x + player.width / 2, player.y + player.width / 2};
-            bullets.push_back(bullet);
+            currentWeapon.bullet.startTime = GetTime();
+            currentWeapon.bullet.rotation = atan2(delta.y, delta.x);
+            currentWeapon.bullet.position = (Vector2){player.x + player.width + 20 + playerWeaponRot + currentWeaponPos, player.y + currentWeapon.weaponDulo.y};
+            currentWeapon.bullet.posRelToPlr.x = mpos.x;
+            currentWeapon.bullet.posRelToPlr.y = camera.target.x + player.width / 2;
+            bullets.push_back(currentWeapon.bullet);
             if(ammo > 0) {
                 ammo--;
             }
@@ -142,7 +172,6 @@ int main(void) {
         if(IsKeyPressed(KEY_F3)) {
             debug = !debug;
         }
-        gun = {(player.x + player.width), (player.y + player.height / 2)};
         if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) m_speedX += 1.1 * 1.1;
         if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) m_speedX -= 1.1 * 1.1;
         if ((IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && m_onGround) {
@@ -155,6 +184,9 @@ int main(void) {
         if(m_onGround) {   
 
         }
+        float xd = mpos.x - (player.x + player.width + 20 + playerWeaponRot) - (currentWeapon.weapon.width * 5 / 2);
+        float yd = mpos.y - (player.y + 25) - (currentWeapon.weapon.height * 5 / 2);
+        float rot = atan2(xd, yd);
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
@@ -163,9 +195,11 @@ int main(void) {
             DrawRectangle(placement[0].x, placement[0].y, placement[0].width, placement[0].height, MAROON);
             DrawRectangle(placement[1].x, placement[1].y, placement[1].width, placement[1].height, MAROON);
             DrawRectangle(player.x, player.y, player.width, player.height, BLUE);
-            DrawTexturePro(playerTEX, {0, 0, 8 * playerRotate, 8}, {player.x, player.y, 50, 50}, {0, 0}, 0, RAYWHITE);
-            DrawTexturePro(bigGun, {0, 0, 11, 8 * playerRotate}, {player.x + player.width + 20 + playerWeaponRot, player.y + 25, 50, 40}, {50 / 2, 40 / 2}, weaponRot, RAYWHITE);            
-            DrawLine(player.x + player.width, player.y, mpos.x, mpos.y, GREEN);
+            
+            DrawTexturePro(playerTEX, {0, 0, 8 * playerRotate, 8}, {player.x, player.y, 50, 50}, {0, 0}, 0, RAYWHITE);    
+            DrawTexturePro(currentWeapon.weapon, {0, 0, (float)currentWeapon.weapon.width, (float)currentWeapon.weapon.height * playerRotate}, {player.x + player.width + 20 + playerWeaponRot, player.y + 25, (float)currentWeapon.weapon.width * 5, (float)currentWeapon.weapon.height * 5}, {50 / 2, 40 / 2}, currentWeapon.weaponRotation * RAD2DEG, RAYWHITE);   //         
+            
+            DrawLine((player.x + player.width + 20 + playerWeaponRot) + (currentWeapon.weapon.width * 5 / 2) * cos(rot), player.y + ((float)currentWeapon.weapon.width * 5) * sin(rot), mpos.x, mpos.y, GREEN); //   
             for(int i = 0; i < bullets.size(); i++) {
                 DrawCircle(bullets[i].position.x, bullets[i].position.y, 5, GOLD);
             }
@@ -179,10 +213,9 @@ int main(void) {
                     RlDrawText(TextFormat("Delay: %f", delay), 0, 200, 25, MAROON);
                     RlDrawText(TextFormat("Bullet size: %i", bullets.size()), 0, 225, 25, MAROON);
                 }
-                RlDrawText(TextFormat("Radium: %f", rad), 0, 100, 25, MAROON);
-                RlDrawText(TextFormat("Rotation: %f", bullet.rotation), 0, 125, 25, MAROON);
+                RlDrawText(TextFormat("Rotation: %f", currentWeapon.bullet.rotation), 0, 125, 25, MAROON);
                 RlDrawText(TextFormat("Delta: %f, %f", delta.x, delta.y), 0, 150, 25, MAROON);
-
+                RlDrawText(TextFormat("Bullet Speed: %f", weapons[0].bullet.speed), 0, 250, 25, MAROON);
             }
             
             EndMode2D();
@@ -192,4 +225,3 @@ int main(void) {
 
     return 0;
 }
-
