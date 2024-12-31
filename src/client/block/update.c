@@ -15,7 +15,7 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 			.width = (float)env->tilemap->tile_size.x,
 			.height = (float)env->tilemap->tile_size.y,
 			.x = (float)(block->base.block_x * env->tilemap->tile_size.x),
-			.y = (float)((block->base.block_y - 1) * env->tilemap->tile_size.y),
+			.y = (float)((block->base.block_y) * env->tilemap->tile_size.y - 1),
 		};
 
 		for (unsigned int i = 0; i < env->entities->added_elements; i++) {
