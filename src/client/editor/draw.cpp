@@ -28,7 +28,22 @@ void _fEditorDraw(struct feditor *editor) {
         editor->swipe_enabled = 0;
     }
 
-    editor->level.in_workbench_mode = !editor->should_playback;
+    if (IsKeyPressed(KEY_LEFT)) {
+        editor->current_layer--;
+        if (editor->current_layer < -1) editor->current_layer = -1;
+    }
+    else if (IsKeyPressed(KEY_RIGHT)) {
+        editor->current_layer++;
+        if (editor->current_layer > 0xFFFF) editor->current_layer = 0xFFFF;
+    }
+
+    if (editor->current_layer >= 0) {
+        while (editor->objects.size() <= (editor->current_layer + 1)) {
+            editor->objects.push_back({});
+        }
+    }
+
+    editor->level.in_workbench_mode = ~editor->should_playback;
     if (editor->level.in_workbench_mode) {
         editor->entities.clear();
     }
@@ -53,12 +68,33 @@ void _fEditorDraw(struct feditor *editor) {
 
         editor->level.camera = editor->camera;
         editor->render_objects.clear();
-        for (auto &[x, ys] : editor->objects) {
-            for (auto &[y, _obj] : ys) {
-                _obj.base.block_x = x;
-                _obj.base.block_y = y;
+        if (editor->current_layer < 0) {
+            int l = 0;
+            for (auto& layer : editor->objects) {
+                for (auto& [x, ys] : layer) {
+                    for (auto& [y, _obj] : ys) {
+                        _obj.base.block_x = x;
+                        _obj.base.block_y = y;
+                        _obj.layer_id = l;
 
-                editor->render_objects.push_back(_obj);
+                        editor->render_objects.push_back(_obj);
+                    }
+                }
+
+                l++;
+            }
+        }
+        else {
+            if (editor->objects.size() > (editor->current_layer + 1)) {
+                for (auto& [x, ys] : editor->objects[editor->current_layer]) {
+                    for (auto& [y, _obj] : ys) {
+                        _obj.base.block_x = x;
+                        _obj.base.block_y = y;
+                        _obj.layer_id = editor->current_layer;
+
+                        editor->render_objects.push_back(_obj);
+                    }
+                }
             }
         }
 
@@ -114,9 +150,12 @@ void _fEditorDraw(struct feditor *editor) {
             (int)(mapped_block_pos.y / ty)
         };
 
-        if (editor->objects.count(selected_block_pos.x)) {
-            if (editor->objects[selected_block_pos.x].count(selected_block_pos.y)) {
-                selected_object = editor->objects[selected_block_pos.x][selected_block_pos.y];
+        int layer_id = editor->current_layer;
+        if (layer_id < 0) layer_id = 0;
+
+        if (editor->objects[layer_id].count(selected_block_pos.x)) {
+            if (editor->objects[layer_id][selected_block_pos.x].count(selected_block_pos.y)) {
+                selected_object = editor->objects[layer_id][selected_block_pos.x][selected_block_pos.y];
             }
         }
 
@@ -263,11 +302,16 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 46, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 46, space / 2, 1, grad_gray, grad_black);
 
-        sel_block_len = _fTextMeasure(&__state.text_manager, "render");
+        sel_block_len = _fTextMeasure(&__state.text_manager, "layer");
         center = (space - sel_block_len.x) / 2;
-        _fTextDraw(&__state.text_manager, "render", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
+        _fTextDraw(&__state.text_manager, "layer", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
 
-        snprintf(buf, 8, "%d", editor->level.objects_rendered);
+        if (editor->current_layer < 0) {
+            memcpy(buf, "all", 3);
+        }
+        else {
+            snprintf(buf, 8, "%d", editor->current_layer);
+        }
         sel_block_len = _fTextMeasure(&__state.text_manager, buf);
         center = (space - sel_block_len.x) / 2;
 
@@ -458,7 +502,7 @@ void _fEditorDraw(struct feditor *editor) {
                     blocks_count++;
 
                     if (cur_blocks_pos.x >= BG.width) {
-                        cur_blocks_pos.y += 100;
+                        cur_blocks_pos.y += 60;
                         cur_blocks_pos.x = 100;
                     }
                     blocks_check = { (float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level.tilemap->tile_size.x * 5, (float)editor->level.tilemap->tile_size.x * 5 };

@@ -10,6 +10,7 @@
 struct feditor *_fEditorCreate() {
     feditor *editor = new feditor;
     editor->current_block_id = 0;
+    editor->current_layer = -1;
 
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;
@@ -50,8 +51,12 @@ struct feditor *_fEditorCreate() {
 
     editor->render_objects.assign(editor->level.objects, editor->level.objects + editor->level.data_size);
 
-    for (fblock &obj : editor->render_objects) {
-        editor->objects[obj.base.block_x][obj.base.block_y] = obj;
+    for (const fblock &obj : editor->render_objects) {
+        while (editor->objects.size() < (obj.layer_id + 1)) {
+            editor->objects.push_back({});
+        }
+
+        editor->objects[obj.layer_id][obj.base.block_x][obj.base.block_y] = obj;
     }
 
     editor->block_listing = _fBlockGetAvailable();

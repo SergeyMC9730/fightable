@@ -24,6 +24,7 @@ struct fblock {
 
     unsigned short group_id;
     unsigned short parent_id;
+    unsigned short layer_id;
 };
 
 #pragma pack(pop)
