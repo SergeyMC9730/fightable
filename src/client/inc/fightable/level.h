@@ -7,7 +7,7 @@
 #include <fightable/serializable.h>
 #include <rsb/rsb_array_gen.h>
 
-#define LEVEL_FORMAT_VERSION (uint16_t)2
+#define LEVEL_FORMAT_VERSION (uint16_t)3
 
 #ifdef __cplusplus
 extern "C" {

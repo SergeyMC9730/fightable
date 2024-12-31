@@ -10,7 +10,7 @@
 #include <vector>
 
 struct feditor {
-    std::map<int, std::map<int, fblock>> objects;
+    std::vector<std::map<int, std::map<int, fblock>>> objects;
     std::vector<fblock> render_objects;
 
     fblock_listing block_listing;
@@ -35,4 +35,6 @@ struct feditor {
     unsigned short current_object_page;
 
     fslider test_slider;
+
+    int current_layer;
 };

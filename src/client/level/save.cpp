@@ -38,7 +38,8 @@ void _fLevelSave(struct flevel* level, const char* filename) {
 		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_x)); // ->4
 		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_y)); // ->6
 		GenericTools::addVectors(&output, GenericTools::valueToVector(block.group_id)); // ->8
-		GenericTools::addVectors(&output, GenericTools::valueToVector(bitdata)); // -> 10
+		GenericTools::addVectors(&output, GenericTools::valueToVector(block.layer_id)); // ->10
+		GenericTools::addVectors(&output, GenericTools::valueToVector(bitdata)); // -> 11
 	}
 
 	TraceLog(LOG_INFO, "Output size: %d bytes", output.size());

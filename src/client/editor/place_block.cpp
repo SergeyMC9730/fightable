@@ -6,9 +6,15 @@
 void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos) {
     auto block = _fBlockFromId(id);
 
+    int layer_id = editor->current_layer;
+    if (layer_id < 0) layer_id = 0;
+
     if (block.singular && _fEditorContainsId(editor, id)) {
         IVector2 pos = _fEditorGetPosOfFirstId(editor, id);
-        editor->objects[pos.x][pos.y] = _fBlockFromId(0);
+        auto air = _fBlockFromId(0);
+        air.layer_id = layer_id;
+
+        editor->objects[layer_id][pos.x][pos.y] = air;
     } else if (block.metaobject) {
         std::vector<unsigned short> variants = {id};
 
@@ -23,10 +29,13 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
         int _id = variants[idx];
         
         auto b = _fBlockFromId(_id);
-        editor->objects[pos.x][pos.y] = b;
+        b.layer_id = layer_id;
+
+        editor->objects[layer_id][pos.x][pos.y] = b;
 
         return;
     }
 
-    editor->objects[pos.x][pos.y] = block;
+    block.layer_id = layer_id;
+    editor->objects[layer_id][pos.x][pos.y] = block;
 }
