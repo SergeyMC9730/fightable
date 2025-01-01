@@ -411,9 +411,10 @@ void createLocalServer() {
     if (1) printf("* starting tcp server on 0.0.0.0:8000\n");
     
     struct ftcp_server_delegate delegate = {
+        .daemon = nullptr,
 	    .processDisconnect = processSrvDisconnect,
+        .processConnect = processConnect,
 	    .processMessage = processSrvMessage,
-        .processConnect = processConnect
     };
     __server_delegate = delegate;
     

@@ -109,12 +109,28 @@ static const struct fblock __blocks[] = {
     {TSET(25, 5,Line2)},                        // 103
     {TSET(26, 5,Line2)},                        // 104
     {TSET(27, 5,Line2)},                        // 105
-    {TSET(27, 2,Brick)}                         // 106
+    {TSET(27, 2,Brick)},                        // 106
+    {TSET(34, 0,Wool)},                         // 107
+    {TSET(35, 0,Wool)},                         // 108
+    {TSET(36, 0,Wool)},                         // 109
+    {TSET(37, 0,Wool)},                         // 110
+    {TSET(38, 0,Wool)},                         // 111
+    {TSET(39, 0,Wool)},                         // 112
+    {TSET(40, 0,Wool)},                         // 113
+    {TSET(38, 1,Wool)},                         // 114
+    {TSET(39, 1,Wool)},                         // 115
+    {TSET(40, 2,Wool)},                         // 116
+    {TSET(38, 2,Wool)},                         // 117
+    {TSET(39, 2,Wool)},                         // 118
+    {TSET(40, 2,Wool)},                         // 119
+    {TSET(38, 3,Wool)},                         // 120
+    {TSET(39, 3,Wool)},                         // 121
+    {TSET(40, 3,Wool)},                         // 122
 };
 
 struct fblock _fBlockFromId(unsigned short id) {
     const unsigned short blocks_total = sizeof(__blocks) / sizeof(struct fblock);
-    
+
     if (id >= blocks_total) {
         struct fblock empty_block = {0};
 
@@ -152,5 +168,5 @@ struct fblock_listing _fBlockGetAvailable() {
     l.blocks = __blocks;
     l.total = sizeof(__blocks) / sizeof(struct fblock);
 
-    return l; 
+    return l;
 }

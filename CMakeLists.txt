@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(fightable LANGUAGES C CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
 
 set(FIGHTABLE_SHARED_INC
@@ -115,16 +116,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CXX_STANDARD ${OVERRIDE_CXX_STD})
 set(CXX_STANDARD_REQUIRED TRUE)
 set(BUILD_SHARED_LIBS ON)
+option(JACK OFF)
+set(JACK_FOUND OFF)
 
 if (ANDROID)
-	set(JACK OFF)
-	set(JACK_FOUND OFF)
 	set(PLATFORM Android)
 
 	message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
 
-add_subdirectory(ext/portaudio_opensles)
+if (NOT DISABLE_PORTAUDIO)
+    add_subdirectory(ext/portaudio_opensles)
+else()
+    add_compile_definitions(_DISABLE_PORTAUDIO_)
+endif()
 
 set(BUILD_SHARED_LIBS OFF)
 set(ENABLE_CJSON_UNINSTALL OFF)
@@ -324,16 +329,16 @@ else()
     message(STATUS "Compiling for unknown platform")
     set(FIGHTABLE_TARGET Unknown platform)
     add_compile_definitions(TARGET_UNKNOWN_PLATFORM)
-	
+
     message(FATAL_ERROR "Fightable does not support targets beyond Unix and NT")
 endif()
 
 if (UNIX OR LINUX)
     message(STATUS "Applying linkage patches for Unix")
-    
+
     target_sources(fshared PRIVATE src/shared/src/assert.c)
     add_subdirectory(ext/safestringlib)
-    
+
     set(FIGHTABLE_NATIVE_LIBS ${FIGHTABLE_NATIVE_LIBS} safestring_static)
 endif()
 
@@ -487,10 +492,10 @@ add_executable(gun-test
     src/shooting_system_test/src/hitbox/move.c
 )
 
-target_include_directories(fightable PRIVATE 
-    src/client/inc 
-    ext/raylib/src 
-    ext/cJSON 
+target_include_directories(fightable PRIVATE
+    src/client/inc
+    ext/raylib/src
+    ext/cJSON
     ext/portaudio_opensles/include
     src/tcpclient/inc
     src/tcpsrv/inc
@@ -501,24 +506,28 @@ target_include_directories(fightable PRIVATE
     ${FIGHTABLE_SHARED_INC}
 )
 
-target_include_directories(physics-test PRIVATE 
+target_include_directories(physics-test PRIVATE
     ext/raylib/src
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-target_include_directories(gun-test PRIVATE 
+target_include_directories(gun-test PRIVATE
     ext/raylib/src
     src/shooting_system_test/include
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-target_include_directories(collide-test PRIVATE 
+target_include_directories(collide-test PRIVATE
     ext/raylib/src
     src/collide_test/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+if (NOT DISABLE_PORTAUDIO)
+    target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+else()
+    target_link_libraries(fightable raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+endif()
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 target_link_libraries(gun-test raylib)
@@ -526,7 +535,7 @@ target_link_libraries(gun-test raylib)
 add_executable(mp-rect-test
     src/mp_rect_test/src/main.cpp
 )
-target_include_directories(mp-rect-test PRIVATE 
+target_include_directories(mp-rect-test PRIVATE
     ext/raylib/src
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -569,6 +578,10 @@ endif()
 
 message(STATUS "  Compiler: ${FIGHTABLE_COMPILER}")
 message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
+
+if (DISABLE_PORTAUDIO)
+    message(STATUS "  PortAudio is disabled")
+endif()
 
 message(STATUS "")
 message(STATUS "")
