@@ -29,7 +29,7 @@ struct faudio_engine {
     unsigned int _row;
     unsigned int _channels;
 
-#ifdef TARGET_ANDROID
+#if defined(TARGET_ANDROID) || defined (_DISABLE_PORTAUDIO_)
     AudioStream *stream;
 #endif
 

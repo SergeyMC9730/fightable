@@ -1,14 +1,14 @@
 #define IAUDIO_ENGINE
 #include <fightable/sound_engine.h>
 
-#ifndef TARGET_ANDROID
+#if !defined(TARGET_ANDROID) && !defined(_DISABLE_PORTAUDIO_)
+#pragma message("enabling portaudio")
 #include <portaudio.h>
 #endif
 
 #include <libopenmpt/libopenmpt.h>
 #include <libopenmpt/libopenmpt_stream_callbacks_file.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -16,12 +16,21 @@
 
 #include <fightable/time.h>
 
+#if !defined(TARGET_ANDROID) && !defined(_DISABLE_PORTAUDIO_)
+#define USE_PORTAUDIO
+#endif
+
 void _fAudioBegin(struct faudio_engine *engine) {
-    size_t bufsize1 = sizeof(short) * CHANNEL_BUFFER_SIZE * 2;
+    int channels = 1;
+#ifndef TARGET_ANDROID
+    channels = 2;
+#endif
+
+    size_t bufsize1 = sizeof(short) * CHANNEL_BUFFER_SIZE * channels;
 
     engine->buffer = (short *)malloc(bufsize1);
 
-#ifndef TARGET_ANDROID
+#ifdef USE_PORTAUDIO
     PaStream *stream;
 
     PaError result = Pa_Initialize();
@@ -47,12 +56,12 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
     TraceLog(LOG_INFO, "Initialized PortAudio");
 #else
-    AudioStream stream = LoadAudioStream(CHANNEL_SAMPLE_RATE, 16, 1);
+    AudioStream stream = LoadAudioStream(CHANNEL_SAMPLE_RATE, 16, channels);
     PlayAudioStream(stream);
 
     engine->stream = &stream;
 
-    TraceLog(LOG_INFO, "Initialized audio stream");
+    TraceLog(LOG_INFO, "Initialized audio stream (PortAudio is not available)");
 #endif
 
     engine->ready = 1;
@@ -60,6 +69,10 @@ void _fAudioBegin(struct faudio_engine *engine) {
     short *merge_buffer[2] = {engine->buffer, engine->buffer + CHANNEL_BUFFER_SIZE};
 
     while (1) {
+#if !defined(TARGET_ANDROID) && defined(_DISABLE_PORTAUDIO_)
+        while (!IsAudioStreamProcessed(stream)) {}
+#endif
+
         if (engine->should_stop) {
             // printf("1\n");
             break;
@@ -118,7 +131,7 @@ void _fAudioBegin(struct faudio_engine *engine) {
             continue;
         }
 
-#ifndef TARGET_ANDROID
+#ifdef USE_PORTAUDIO
         result = Pa_WriteStream(stream, merge_buffer, count);
         if (result != paNoError) {
             TraceLog(LOG_ERROR, "Portaudio failed to write stream: %d, %s", (int)result, Pa_GetErrorText(result));
@@ -126,13 +139,17 @@ void _fAudioBegin(struct faudio_engine *engine) {
             continue;
         }
 #else
+#ifdef TARGET_ANDROID
         UpdateAudioStream(stream, merge_buffer[0], count);
+#else
+        UpdateAudioStream(stream, merge_buffer[0], count * channels);
+#endif
 #endif
     }
 
     TraceLog(LOG_INFO, "Closing sound engine");
 
-#ifndef TARGET_ANDROID
+#ifdef USE_PORTAUDIO
     Pa_StopStream(stream);
     Pa_CloseStream(stream);
     Pa_Terminate();
