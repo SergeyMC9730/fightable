@@ -26,8 +26,6 @@ struct ftcp_server_daemon_user_context {
 
 struct ftcp_server_daemon {
 private:
-    std::array<char, 4096> _connectionBuffer;
-
     bool _stopThreads = false;
 
     std::thread _baseThreadValue;
@@ -71,7 +69,7 @@ private:
     void _eventThread();
 
     // tells if descriptor should exist or not
-    bool _processDescriptor(int desc);
+    bool _processDescriptor(int desc, std::array<char, 4096> *buffer);
 
     bool descriptorExists(int fd);
 

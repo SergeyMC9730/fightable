@@ -23,8 +23,8 @@ struct ftcpclient {
 
     unsigned char thread_should_exit;
 
-    rsb_array__pchar *received_headers;
-    rsb_array__pchar *requested_messages;
+    void *received_headers;
+    void *requested_messages;
 
     int sockfd;
     struct sockaddr_in serveraddr;
@@ -34,7 +34,6 @@ struct ftcpclient {
     unsigned short port;
 
     unsigned int buf_size;
-
     char *buf_r;
 
     struct ftcpclient_delegate *delegate;

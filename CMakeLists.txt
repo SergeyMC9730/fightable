@@ -253,10 +253,10 @@ set(FIGHTABLE_TCP_SERVER_SRC
     src/tcpsrv/src/user.cpp
 )
 set(FIGHTABLE_TCP_CLIENT_SRC
-    src/tcpclient/src/create.c
+    "src/tcpclient/src/create.cpp"
     src/tcpclient/src/thread.cpp
-    src/tcpclient/src/destroy.c
-    src/tcpclient/src/send_msg.c
+    "src/tcpclient/src/destroy.cpp"
+    "src/tcpclient/src/send_msg.cpp"
     src/tcpclient/src/disconnect.c
 )
 
@@ -374,7 +374,7 @@ target_include_directories(ftcpclient PRIVATE
 )
 
 add_executable(ftcpclient-test src/tcpclient_test/main.c)
-target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS} md5-c)
 target_include_directories(ftcpclient-test PRIVATE
     src/tcpclient/inc
     ${FIGHTABLE_SHARED_INC}

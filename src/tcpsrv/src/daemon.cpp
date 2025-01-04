@@ -39,8 +39,6 @@ extern "C" {
 #include <algorithm>
 
 ftcp_server_daemon::ftcp_server_daemon(unsigned int port, ftcp_server_delegate* delegate) {
-    _connectionBuffer.fill(0x00);
-
     unsigned int maxClients = 0xFFFF;
     int opt = 1;
 
@@ -228,8 +226,11 @@ void ftcp_server_daemon::_baseThread() {
                 ctx->should_exit = false;
                 ctx->desc = accept_status;
                 ctx->thread = std::thread([this, ctx]() {
+                    auto buffer = new std::array<char, 4096>();
+                    buffer->fill(0);
+
                     while (!ctx->should_exit) {
-                        if (!_processDescriptor(ctx->desc)) {
+                        if (!_processDescriptor(ctx->desc, buffer)) {
                             _socketInfo.descriptorsToRemove.push_back(ctx->desc);
 #ifdef TARGET_UNIX
                             _fSleep(10);
@@ -237,6 +238,8 @@ void ftcp_server_daemon::_baseThread() {
                             return;
                         }
                     }
+
+                    delete buffer;
                 });
 
                 _userThreads[accept_status] = ctx;
@@ -337,37 +340,47 @@ bool ftcp_server_daemon::sendMessage(int socket, const std::string& message) {
     return sendMessage(socket, c);
 }
 
-bool ftcp_server_daemon::_processDescriptor(int desc) {
+#include <md5.h>
+
+bool ftcp_server_daemon::_processDescriptor(int desc, std::array<char, 4096>* buffer) {
     // if (FD_ISSET(desc, &_socketInfo.socketDescriptors)) {
 #ifndef TARGET_WIN32
-        int valread = NPD_READ(desc, _connectionBuffer.data(), _connectionBuffer.size());
+        int valread = NPD_READ(desc, buffer->data(), buffer->size() - 1);
 #else 
-        int valread = recv(desc, _connectionBuffer.data(), _connectionBuffer.size(), 0);
+        int valread = recv(desc, buffer->data(), buffer->size() - 1, 0);
 #endif
 
         // assert(valread != -1 && "ftcp_server_daemon: read: fail");
 
-        if (valread == 0 || valread == -1) {
+        if (valread <= 0) {
             printf("ftcp_server_daemon: read: fail (%d)\n", valread);
 #ifdef TARGET_WIN32
-            printf("ftcp_server_daemon: WSAGetLastError: %d\n", WSAGetLastError());
+            printf("                    WSAGetLastError: %d\n", WSAGetLastError());
 #endif
-	    return false;
+	        return false;
         }
+
+        if (valread < 12) {
+            printf("ftcp_server_daemon: invalid header received\n");
+            return true;
+        }
+
+        ((char*)buffer->data())[valread] = 0;
 
         _delegate->daemon = this;
 
-        std::vector<unsigned char> v = {};
+        const char* vcStr = buffer->data() + 12;
+        std::string vStr = vcStr;
 
-        for (unsigned int i = 0; i < valread; i++) {
-            v.push_back(_connectionBuffer[i]);
+        std::string orig_hash{ vcStr - 12, 12 };
+        std::string hash = getShortHash(vStr);
+
+        if (orig_hash != hash) {
+            printf("ftcp_server_daemon: invalid hash. %s(o) != %s(e)\n", orig_hash.c_str(), hash.c_str());
+            return true;
         }
 
-        v.push_back(0);
-
-        unsigned char* vcStr = v.data();
-
-        std::vector<std::string> actualMessages = GenericTools::splitString((const char*)vcStr, '|');
+        std::vector<std::string> actualMessages = GenericTools::splitString(vcStr, '|');
 
         ftcp_server_user& user = _socketInfo.users.at(desc);
 
@@ -384,8 +397,6 @@ bool ftcp_server_daemon::_processDescriptor(int desc) {
         }
 
         _socketInfo.users[desc] = user;
-
-        _connectionBuffer.fill(0);
 
         if (user.shouldDisconnect()) {
             printf("ftcp_server_daemon: read: force disconnect (%d bytes read)\n", valread);
