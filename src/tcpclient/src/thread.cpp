@@ -23,31 +23,43 @@ extern "C" {
 
 #define BASE_COMMAND_ACK '$'
 
+typedef uint8_t fmd5_t[16];
+
 void* _fTcpClientWriteThread(struct ftcpclient* client) {
     if (!client) return NULL;
 
-    while (!client->thread_should_exit) {
-        if (client->requested_messages->len != 0) {
-            std::string msg_to_send = "";
+    std::vector<char*>* v1 = (std::vector<char*>*)client->requested_messages;
 
-            for (int i = 0; i < client->requested_messages->added_elements; i++) {
-                char* msg = client->requested_messages->objects[i];
+    while (!client->thread_should_exit) {
+        if (v1->size() != 0) {
+            std::string msgbase;
+
+            for (int i = 0; i < v1->size(); i++) {
+                char* msg = v1->at(i);
                 if ((long long)msg <= 0x1000) continue;
 
                 size_t len = strlen(msg);
                 if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("%d -> message %s with length %ld\n", i, msg, len);
 
-                msg_to_send += std::string((const char*)msg) + "|";
+                msgbase += std::string((const char*)msg) + "|";
 
                 free(msg);
             }
 
-            RSBDestroy_pchar(client->requested_messages); client->requested_messages = NULL;
-            client->requested_messages = RSBCreateArray_pchar();
+            v1->clear();
+
+            if (msgbase.empty()) continue;
+            msgbase.pop_back();
+
+            fmd5_t md5;
+            md5String((char*)msgbase.c_str(), md5);
+
+            std::string hash = GenericTools::valueToHex<fmd5_t>(md5);
+            hash.erase(hash.length() - 20, 20);
+
+            std::string msg_to_send = hash + msgbase;
 
             if (!msg_to_send.empty()) {
-                msg_to_send.pop_back();
-
                 if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("sending message %s (len=%ld)\n", msg_to_send.c_str(), msg_to_send.length());
 
 #ifndef TARGET_WIN32
@@ -73,10 +85,10 @@ void* _fTcpClientWriteThread(struct ftcpclient* client) {
     return NULL;
 }
 
-typedef uint8_t fmd5_t[16];
-
 void* _fTcpClientReadThread(struct ftcpclient* client) {
     if (!client) return NULL;
+
+    std::vector<char*>* v2 = (std::vector<char*>*)client->received_headers;
 
     while (!client->thread_should_exit) {
         memset(client->buf_r, 0, client->buf_size);
@@ -105,7 +117,7 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
     	    fmd5_t md5;
     	    md5String(base + 12, md5);
     	    hash = GenericTools::valueToHex<fmd5_t>(md5);
-	    hash.erase(hash.length() - 20, 20);
+	        hash.erase(hash.length() - 20, 20);
         }
         
         if (orig_hash != hash) {
@@ -129,8 +141,8 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
             char header[5] = { data[0], data[1], data[2], data[3], 0 };
             unsigned char header_found = 0;
 
-            for (unsigned int j = 0; j < client->received_headers->len; j++) {
-                char* loaded_header = RSBGetAtIndex_pchar(client->received_headers, j);
+            for (unsigned int j = 0; j < v2->size(); j++) {
+                char* loaded_header = v2->at(j);
                 if (strncmp(header, loaded_header, 4) == 0) {
                     // printf("ftcpclient: duplicate string found\n");
                     header_found = 1;
@@ -140,7 +152,7 @@ void* _fTcpClientReadThread(struct ftcpclient* client) {
 
             if (!header_found) {
                 // printf("ftcpclient: registering header %s\n", header);
-                RSBAddElement_pchar(client->received_headers, _fCopyString(header));
+                v2->push_back(_fCopyString(header));
             }
             else {
                 continue;

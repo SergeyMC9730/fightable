@@ -1,6 +1,7 @@
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
 #include <fightable/shared_config.h>
+#include <vector>
 
 #include <stdlib.h>
 #include <string.h>
@@ -91,8 +92,8 @@ struct ftcpclient* _fTcpClientCreate(const char* address, unsigned short port, s
     client->buf_size = 65536;
     client->buf_r = (char*)malloc(client->buf_size);;
 
-    client->received_headers = RSBCreateArray_pchar();
-    client->requested_messages = RSBCreateArray_pchar();
+    client->received_headers = new std::vector<char*>();
+    client->requested_messages = new std::vector<char*>();
 
     client->delegate = delegate;
 

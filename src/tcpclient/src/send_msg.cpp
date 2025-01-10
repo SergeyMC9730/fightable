@@ -1,17 +1,24 @@
 #include <fightable/tcpcln/client.h>
 #include <string.h>
 #include <stdio.h>
+//extern "C" {
+//    #include <md5.h>
+//}
+#include <string>
+#include <fightable/generic_tools.hpp>
+#include <vector>
+
+// typedef uint8_t fmd5_t[16];
 
 unsigned char _fTcpClientSendMsg(struct ftcpclient *client, const char *message) {
     if (!client || !client->requested_messages || !message) return 0;
 
     unsigned int len = strlen(message) + 1;
+    char *dup = (char *)malloc(len);
 
-    unsigned char *dup = (unsigned char *)malloc(len);
-    memset(dup, 0, len);
-    memcpy(dup, message, len - 1);
+    snprintf(dup, len, "%s", message);
 
-    RSBAddElement_pchar(client->requested_messages, dup);
+    ((std::vector<char*>*)client->requested_messages)->push_back(dup);
 
     return 1;
 }

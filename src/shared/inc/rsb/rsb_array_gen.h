@@ -79,7 +79,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->lock = 1;                                                                                                        \
                                                                                                                             \
     if (!array->objects) {                                                                                                  \
-        array->objects = (type *)calloc(1, sizeof(type));                                                                   \
+        while (!array->objects) array->objects = (type *)calloc(1, sizeof(type));                                           \
         array->len = 1;                                                                                                     \
         array->current_index = 0;                                                                                           \
         array->added_elements = 0;                                                                                          \
@@ -87,6 +87,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
                                                                                                                             \
     if ((array->added_elements + 1) > array->len) {                                                                         \
         array->objects = (type *)realloc(array->objects, sizeof(type) * (array->len + 1));                                  \
+        while (!array->objects) array->objects = (type *)calloc(array->len + 1, sizeof(type));                               \
         array->len++;                                                                                                       \
     }                                                                                                                       \
                                                                                                                             \

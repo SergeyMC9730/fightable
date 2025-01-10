@@ -4,8 +4,11 @@
 #include <fightable/shared_config.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <string>
 #include <raylib.h>
+
+static std::string __ip;
+static unsigned short __port = 5000;
 
 struct example_player {
     int uid;
@@ -176,7 +179,17 @@ void ClnThread(void *ctx) {
     }
 }
 
-int main() {
+int main(int argc, char **argv) {
+    if (argc > 1) {
+        __ip = argv[1];
+        if (argc > 2) {
+            std::string port = argv[2];
+            __port = std::stoi(port);
+        }
+
+        printf("--- CLIENT WANTS TO CONNECT TO %s:%d\n", __ip.c_str(), __port);
+    }
+
 #ifndef DISABLE_MP_SERVER
     __server_players = RSBCreateArray_example_player();
 #endif
@@ -389,7 +402,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
         rsb_array__pchar* entries = _fSplitString((const char *)message, ',');
 
         if (entries->added_elements < 2) {
-            printf("[SERVER] player %d sent too little information about position\n", uid);
+            printf("[SERVER] incomplete request from user %d\n", uid);
             break;
         }
 
@@ -408,7 +421,7 @@ void processSrvMessage(struct ftcp_server_delegate *self, struct ftcp_server_use
 }
 
 void createLocalServer() {
-    if (1) printf("* starting tcp server on 0.0.0.0:8000\n");
+    if (1) printf("* starting tcp server on 0.0.0.0:%d\n", __port);
     
     struct ftcp_server_delegate delegate = {
         .daemon = nullptr,
@@ -418,7 +431,7 @@ void createLocalServer() {
     };
     __server_delegate = delegate;
     
-    __server = _fTcpSrvCreate(8000, &__server_delegate);
+    __server = _fTcpSrvCreate(__port, &__server_delegate);
     
     if (1) printf("* done\n");
 }
@@ -428,24 +441,25 @@ int tryToConnect() {
 #if defined(NO_SERVER_CHECK) && !defined(DISABLE_MP_SERVER)
     createLocalServer();
 #endif
-    if (1) printf("* trying to connect to 127.0.0.1:8000\n");
+    if (1) printf("* trying to connect to %s:%d\n", __ip.c_str(), __port);
 
     struct ftcpclient_delegate delegate = {
         .processReceive = processReceive
     };
     __client_delegate = delegate;
-    __client = _fTcpClientCreate("127.0.0.1", 8000, &__client_delegate);
+    __client = _fTcpClientCreate(__ip.c_str(), __port, &__client_delegate);
 
     if (!__client) {
-        printf("* could not connect to 127.0.0.1:8000\n");
+        printf("* could not connect to %s:%d\n", __ip.c_str(), __port);
         
 #ifdef DISABLE_MP_SERVER
 	printf("* unrecoverable failure (DISABLE_MP_SERVER is defined)\n");
 	return -1;
 #else
         if (1) printf("* opening tcp server and trying to connect to it\n");
-	createLocalServer();
-	return tryToConnect();
+
+	    createLocalServer();
+	    return tryToConnect();
 #endif
     }
 

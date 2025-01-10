@@ -13,6 +13,7 @@
 #define SHUT_REASON SD_BOTH
 #endif
 #include <stdio.h>
+#include <vector>
 
 void _fTcpClientDestroy(struct ftcpclient* client) {
     if (!client) return;
@@ -29,8 +30,14 @@ void _fTcpClientDestroy(struct ftcpclient* client) {
         free(client->buf_r);
     }
 
-    _fCleanupSplittedString(client->received_headers);
-    _fCleanupSplittedString(client->requested_messages);
+    if (client->received_headers) {
+        auto* v = (std::vector<char*>*)client->received_headers;
+        delete v;
+    }
+    if (client->requested_messages) {
+        auto* v = (std::vector<char*>*)client->requested_messages;
+        delete v;
+    }
 
     free(client);
 
