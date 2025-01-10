@@ -34,7 +34,7 @@ struct Weapon {
 };
 Vector2 convertToCameraPos(Vector2 pos) {
     return Vector2 {
-        (camera.target.x - camera.offset.x / camera.zoom) + pos.x / camera.zoom, 
+        (camera.target.x - camera.offset.x / camera.zoom) + pos.x / camera.zoom,
         (camera.target.y - camera.offset.y / camera.zoom) + pos.y / camera.zoom
     };
 }
@@ -58,7 +58,7 @@ void _fMovePlayer(float x, float y, struct fhitbox* room, struct fhitbox* player
     // Stop motion on collision
     if (prevX != x) m_speedX = 0.f;
     if (prevY != y) m_speedY = 0.f;
-} 
+}
 int main(void) {
     const int screenWidth = 800;
     const int screenHeight = 600;
@@ -72,7 +72,7 @@ int main(void) {
         {-100, 500, 2000, 100},
         {0, 0, 720, 8},
     };
-    
+
     bool debug = 0;
     bool isCanJump = 1;
 
@@ -80,9 +80,11 @@ int main(void) {
     float playerRotate = 1.0f;
     float playerWeaponRot;
     float lineRotate = 25;
-    
+
+    float multest = 1.0;
+
     Color bouncingColor = RED;
-    
+
     Texture2D playerTEX = LoadTexture("assets/guntest/player.png");
     Texture2D bigGun = LoadTexture("assets/guntest/pistolet.png");
     Texture2D revolver = LoadTexture("assets/guntest/revolver.png");
@@ -100,7 +102,7 @@ int main(void) {
         {shotgun, {0, 0, 5, 0}, {0, 0, 0}, 0},
         {rocketLauncher, {0, 0, 5, 0}, {0, 0, 0}, 0}
     };
-    
+
     Weapon currentWeapon;
     currentWeapon = weapons[1];
     currentWeapon.bullet.speed = 5;
@@ -108,7 +110,7 @@ int main(void) {
     while (!WindowShouldClose())  {
         bouncingColor.r++;
         bouncingColor.g++;
-        bouncingColor.b++;  
+        bouncingColor.b++;
         if(delay != 0) {
             delay -= 0.5;
         }
@@ -128,12 +130,12 @@ int main(void) {
         camera.rotation = 0.0f;
         camera.zoom = 1.0f;
 
-        currentWeapon.weaponRotation= atan2(mpos.y - player.y - 15, mpos.x - (player.x + player.width / 2 - 10));
+        currentWeapon.weaponRotation= atan2(mpos.y - player.y - ((playerTEX.width * 5) / 2), mpos.x - (player.x + player.width / 2 - 10));
         if(mpos.x < camera.target.x + player.width / 2) {
             playerRotate = -1.0f;
             playerWeaponRot = -95;
             currentWeaponPos = currentWeapon.weaponDulo.z;
-        } 
+        }
         if(mpos.x > camera.target.x + player.width / 2) {
             playerRotate = 1.0f;
             playerWeaponRot = 0;
@@ -143,12 +145,12 @@ int main(void) {
         for(int i = 0; i < bullets.size(); i++) {
             if(bullets[i].posRelToPlr.x < bullets[i].posRelToPlr.y) {
                 bullets[i].position.x -= bullets[i].speed;
-            } 
+            }
             if(bullets[i].posRelToPlr.x > bullets[i].posRelToPlr.y) {
                 bullets[i].position.x += bullets[i].speed;
             }
  //  * cos(bullets[i].rotation)
-            // bullets[i].position.y += bullets[i].speed * sin(bullets[i].rotation); 
+            // bullets[i].position.y += bullets[i].speed * sin(bullets[i].rotation);
             if(GetTime() - bullets[i].startTime >= 5) {
                 bullets.erase(bullets.begin() + i);
             }
@@ -180,8 +182,8 @@ int main(void) {
         _fMovePlayer(m_speedX, m_speedY, placement, &player);
         m_speedY += 1;
         m_speedX *= 0.850f;
-        m_speedY *= 0.850f; 
-        if(m_onGround) {   
+        m_speedY *= 0.850f;
+        if(m_onGround) {
 
         }
         float xd = mpos.x - (player.x + player.width + 20 + playerWeaponRot) - (currentWeapon.weapon.width * 5 / 2);
@@ -190,16 +192,69 @@ int main(void) {
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
-            BeginMode2D(camera);        
+            Vector2 goffset = {
+                (float)(playerTEX.width * 5) / 2 + 10,
+                (float)(playerTEX.height / 2 * 5)
+            };
+
+            BeginMode2D(camera);
 
             DrawRectangle(placement[0].x, placement[0].y, placement[0].width, placement[0].height, MAROON);
             DrawRectangle(placement[1].x, placement[1].y, placement[1].width, placement[1].height, MAROON);
             DrawRectangle(player.x, player.y, player.width, player.height, BLUE);
-            
-            DrawTexturePro(playerTEX, {0, 0, 8 * playerRotate, 8}, {player.x, player.y, 50, 50}, {0, 0}, 0, RAYWHITE);    
-            DrawTexturePro(currentWeapon.weapon, {0, 0, (float)currentWeapon.weapon.width, (float)currentWeapon.weapon.height * playerRotate}, {player.x + player.width + 20 + playerWeaponRot, player.y + 25, (float)currentWeapon.weapon.width * 5, (float)currentWeapon.weapon.height * 5}, {50 / 2, 40 / 2}, currentWeapon.weaponRotation * RAD2DEG, RAYWHITE);   //         
-            
-            DrawLine((player.x + player.width + 20 + playerWeaponRot) + (currentWeapon.weapon.width * 5 / 2) * cos(rot), player.y + ((float)currentWeapon.weapon.width * 5) * sin(rot), mpos.x, mpos.y, GREEN); //   
+
+            // mpos.x += goffset.x;
+            // mpos.y += goffset.y;
+
+            if (playerRotate < 0.f) {
+                goffset = {
+                      (float)(playerTEX.width * 5) / 2 - 10,
+                      (float)(playerTEX.height / 2 * 5) + 20
+                };
+
+                DrawPixel(mpos.x + goffset.x, mpos.y + goffset.y - 20, RED);
+            } else {
+                DrawPixel(mpos.x + goffset.x, mpos.y + goffset.y, RED);
+            }
+
+            currentWeapon.weaponRotation = atan2(mpos.y - player.y - goffset.x, mpos.x - player.x - goffset.y);
+
+            if (IsKeyPressed(KEY_MINUS)) {
+                multest -= 0.1f;
+            } else if (IsKeyPressed(KEY_EQUAL)) {
+                multest += 0.1f;
+            }
+
+            float mul = 1.1f;
+
+            RLRectangle obj = {
+                player.x + goffset.x * cos(currentWeapon.weaponRotation), player.y + goffset.y * sin(currentWeapon.weaponRotation),
+                (float)currentWeapon.weapon.width * 5, (float)currentWeapon.weapon.height * 5
+            };
+            if (playerRotate < 0.f) {
+                obj.x -= obj.width - 10;
+                mul = 0.9f;
+
+                DrawLine(player.x + goffset.x, player.y + goffset.y + 10, mpos.x, mpos.y, RED);
+            } else {
+                DrawLine(player.x + goffset.x, player.y + goffset.y + 10, mpos.x, mpos.y, RED);
+            }
+
+            if (CheckCollisionPointRec(mpos, obj)) {
+                auto area = GetCollisionRec(obj, {mpos.x, mpos.y, 1, 1});
+                RLRectangle rarea = {-area.x, area.y - obj.y, area.width, area.height};
+
+                // currentWeapon.weaponRotation = atan2(mpos.y - player.y + goffset.x + rarea.x, mpos.x - player.x - goffset.y - rarea.y);
+
+                // TraceLog(LOG_INFO, "%f %f %f %f", -area.x, area.y - obj.y, area.width, area.height);
+            }
+
+            DrawRectangleRec(obj, RED);
+
+            DrawTexturePro(playerTEX, {0, 0, 8 * playerRotate, 8}, {player.x, player.y, 50, 50}, {0, 0}, 0, RAYWHITE);
+            DrawTexturePro(currentWeapon.weapon, {0, 0, (float)currentWeapon.weapon.width, (float)currentWeapon.weapon.height * playerRotate}, {player.x + goffset.x, player.y + goffset.y, (float)currentWeapon.weapon.width * 5, (float)currentWeapon.weapon.height * 5}, {0, 0}, currentWeapon.weaponRotation * RAD2DEG, WHITE);
+
+            // DrawLine((player.x + player.width + 20 + playerWeaponRot) + (currentWeapon.weapon.width * 5 / 2) * cos(rot), player.y + ((float)currentWeapon.weapon.width * 5) * sin(rot), mpos.x, mpos.y, GREEN); //
             for(int i = 0; i < bullets.size(); i++) {
                 DrawCircle(bullets[i].position.x, bullets[i].position.y, 5, GOLD);
             }
@@ -217,7 +272,7 @@ int main(void) {
                 RlDrawText(TextFormat("Delta: %f, %f", delta.x, delta.y), 0, 150, 25, MAROON);
                 RlDrawText(TextFormat("Bullet Speed: %f", weapons[0].bullet.speed), 0, 250, 25, MAROON);
             }
-            
+
             EndMode2D();
         EndDrawing();
     }

@@ -39,7 +39,7 @@ unsigned short _fBlockIdFromBlock(struct fblock block);
 unsigned short _fBlockIdFromRenderable(struct frendered_object obj);
 
 struct fblock_listing {
-    struct fblock *blocks;
+    const struct fblock *blocks;
     unsigned short total;
 };
 

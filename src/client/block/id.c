@@ -119,13 +119,10 @@ static const struct fblock __blocks[] = {
     {TSET(40, 0,Wool)},                         // 113
     {TSET(38, 1,Wool)},                         // 114
     {TSET(39, 1,Wool)},                         // 115
-    {TSET(40, 2,Wool)},                         // 116
+    {TSET(40, 1,Wool)},                         // 116
     {TSET(38, 2,Wool)},                         // 117
     {TSET(39, 2,Wool)},                         // 118
     {TSET(40, 2,Wool)},                         // 119
-    {TSET(38, 3,Wool)},                         // 120
-    {TSET(39, 3,Wool)},                         // 121
-    {TSET(40, 3,Wool)},                         // 122
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

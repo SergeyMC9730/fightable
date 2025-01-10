@@ -7,8 +7,6 @@
 #include <fightable/entity.h>
 #include <fightable/color.h>
 #include <fightable/sanitizer.h>
-#include <stdio.h>
-#include <math.h>
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
 RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
@@ -20,7 +18,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
 #ifdef COTARGET_PTX
     if (__state.can_use_gpu_accel) {
-        _fLevelReloadCudaCtx(level);   
+        _fLevelReloadCudaCtx(level);
     }
 #endif
 
@@ -81,12 +79,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
-        actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
+        actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
+        actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
     }
 
     BeginMode2D(actual_cam);
-    
+
     RLRectangle source = {0};
     source.width = __state.framebuffer.texture.width;
     source.height = __state.framebuffer.texture.height;
@@ -96,7 +94,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     RLRectangle dest = source;
     dest.x = actual_cam.target.x;
     dest.y = actual_cam.target.y;
-    
+
     DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, DARKGRAY);
 
     level->objects_rendered = 0;
@@ -133,7 +131,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
                 _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
             }
         }
-        
+
         for (unsigned int i = 0; i < level->data_size; i++) {
             struct fblock obj = level->objects[i];
 
@@ -206,7 +204,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (obj.light_level != 0) {
             Color col = WHITE;
             col.a = obj.light_level;
-            
+
             int cx = _x;
             int cy = _y;
 
@@ -231,7 +229,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
             entity->obstacles = rects;
             entity->obstacles_length = level->data_size;
-        
+
             if (!entity->update) {
                 _fEntityUpdate(entity);
             }
@@ -243,8 +241,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (player) {
             EndMode2D();
 
-            actual_cam.target.x = (int)(player->hitbox.x - __state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
-            actual_cam.target.y = (int)(player->hitbox.y - __state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
+            actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
+            actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
 
             BeginMode2D(actual_cam);
         }
