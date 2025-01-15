@@ -37,4 +37,6 @@ struct feditor {
     fslider test_slider;
 
     int current_layer;
+
+    bool in_edit_mode = false;
 };

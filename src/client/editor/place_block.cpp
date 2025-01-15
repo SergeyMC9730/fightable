@@ -1,9 +1,10 @@
 #include <fightable/editor.h>
 #include <fightable/editor.hpp>
 #include <fightable/block.h>
-#include <stdio.h>
 
 void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos) {
+    if (!editor || editor->in_edit_mode) return;
+
     auto block = _fBlockFromId(id);
 
     int layer_id = editor->current_layer;
@@ -27,7 +28,7 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
 
         int idx = GetRandomValue(0, variants.size() - 1);
         int _id = variants[idx];
-        
+
         auto b = _fBlockFromId(_id);
         b.layer_id = layer_id;
 

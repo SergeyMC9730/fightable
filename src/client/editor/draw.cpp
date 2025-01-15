@@ -115,8 +115,8 @@ void _fEditorDraw(struct feditor *editor) {
     float v = 128.f * ((std::sin(__state.time * 3.f) / 2.f) + 0.5f) + 15.f;
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
-    
-    
+
+
     Vector2 mouse_pos = _fGetMousePosPix();
 
     // printf("b\n");
@@ -205,7 +205,7 @@ void _fEditorDraw(struct feditor *editor) {
 
                 mdelta.x /= __state.window_scale / speed;
                 mdelta.y /= __state.window_scale / speed;
-            
+
                 editor->camera.target.x -= mdelta.x;
                 editor->camera.target.y -= mdelta.y;
             }
@@ -233,7 +233,7 @@ void _fEditorDraw(struct feditor *editor) {
 
             _fTextDraw(&__state.text_manager, buf, {4, 4}, GREEN, 1);
         }
-    
+
         float v = GetMouseWheelMove();
         _fEditorSwipeCurrentObjects(editor, v);
     }
@@ -255,7 +255,7 @@ void _fEditorDraw(struct feditor *editor) {
         int center = (space - sel_block_len.x) / 2;
         struct fbutton btnBlock = {};
         btnBlock.text = "Blocks";
-        
+
         btnBlock.position.x = blackbox_startx + 10;
         btnBlock.position.y = blackbox_starty + 66;
         btnBlock.tint = WHITE;
@@ -267,12 +267,12 @@ void _fEditorDraw(struct feditor *editor) {
 
         if (!selected_object.has_value()) {
             center = (space - none_len.x) / 2;
-            
+
             _fTextDraw(&__state.text_manager, "none", {blackbox_startx + center, current_position_y + 4}, RED, 1);
             current_position_y += 5 + none_len.y;
         } else {
             fblock obj = selected_object.value();
-            
+
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
             _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, current_position_y + 2}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
@@ -323,11 +323,11 @@ void _fEditorDraw(struct feditor *editor) {
         if (_fEditorContainsId(editor, BLOCK_START)) {
             struct fbutton btn = {};
             btn.text = "Play";
-            
+
             btn.position.x = blackbox_startx + 14;
             btn.position.y = blackbox_starty + 75;
             btn.tint = WHITE;
-            
+
             if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                 IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
@@ -389,6 +389,16 @@ void _fEditorDraw(struct feditor *editor) {
 
             TraceLog(LOG_INFO, "Save done");
         }
+
+        Color cc = (editor->in_edit_mode) ? GREEN : RED;
+        if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + 14, blackbox_starty + 93 }, cc)) {
+            editor->in_edit_mode = !editor->in_edit_mode;
+        }
+
+        cc = (editor->swipe_enabled) ? GREEN : RED;
+        if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + 14, blackbox_starty + 101 }, cc)) {
+            editor->swipe_enabled = !editor->swipe_enabled;
+        }
     }
 
     if (editor->should_playback) {
@@ -441,7 +451,7 @@ void _fEditorDraw(struct feditor *editor) {
 
             _fGfxStopDamageOverlay();
         }
-        
+
         editor->f1_lock = false;
     }
 
@@ -477,22 +487,22 @@ void _fEditorDraw(struct feditor *editor) {
 
             constexpr float label_scaling = 5;
             float center_x = (BG.width - (editor->select_block_label.width * label_scaling)) / 2;
-            
+
             DrawRectangle(BG.x, BG.y, BG.width, BG.height, { 50, 50, 50, 200 });
             DrawTextureEx(editor->select_block_label, { center_x + BG.x, BG.y + 15.f }, 0, label_scaling, WHITE);
             DrawRectangle(mpos.x, mpos.y, 10, 10, MAROON);
             if(CheckCollisionPointRec(mpos, back)) {
                 btn_tile_offset.x = 31;
                 if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                    btn_tile_offset.x = 33;    
+                    btn_tile_offset.x = 33;
                     mouse_button_down = 5;
                 }
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                    editor->should_display_selector = ~editor->should_display_selector;            
+                    editor->should_display_selector = ~editor->should_display_selector;
                 }
             }
             _fTilemapDrawMegatileScaled(editor->level.tilemap, {(int)back.x - 15, (int)back.y - 15}, btn_tile_offset, {2, 2}, 0, 0, WHITE, 5);
-            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);  
+            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);
             for (int i = 0; i < editor->block_listing.total; i++) {
                 fblock block = editor->block_listing.blocks[i];
                 if (block.parent_id == 0) {
@@ -512,7 +522,7 @@ void _fEditorDraw(struct feditor *editor) {
                         DrawRectangleRec(blocks_check, bouncing_color);
                         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                             editor->current_block_id = i;
-                            editor->should_display_selector = ~editor->should_display_selector;          
+                            editor->should_display_selector = ~editor->should_display_selector;
                         }
                     }
                 }
