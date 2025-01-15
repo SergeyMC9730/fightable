@@ -12,8 +12,8 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 
 	BeginScissorMode(frame.x, frame.y, frame.width, frame.height);
 	Camera2D cam = level->camera;
-	cam.target.x /= tx;
-	cam.target.y /= ty;
+	// cam.target.x /= tx;
+	// cam.target.y /= ty;
 
 	BeginMode2D(cam);
 	for (unsigned int i = 0; i < level->data_size; i++) {
