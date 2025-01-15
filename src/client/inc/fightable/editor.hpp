@@ -41,4 +41,6 @@ struct feditor {
 
     bool in_edit_mode = false;
     RLRectangle edit_selection = {};
+
+    int button_page = 0;
 };
