@@ -1,5 +1,6 @@
 #pragma once
 
+#include "raylib.h"
 #include <fightable/intvec.h>
 #include <fightable/level.h>
 #include <fightable/block.h>
@@ -39,4 +40,5 @@ struct feditor {
     int current_layer;
 
     bool in_edit_mode = false;
+    RLRectangle edit_selection = {};
 };

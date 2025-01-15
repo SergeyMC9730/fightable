@@ -1,3 +1,4 @@
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -24,7 +25,7 @@ void _fEditorDraw(struct feditor *editor) {
 
     if (IsKeyDown(KEY_LEFT_SHIFT)) {
         editor->swipe_enabled = 1;
-    } else {
+    } else if (IsKeyReleased(KEY_LEFT_SHIFT)) {
         editor->swipe_enabled = 0;
     }
 
@@ -193,10 +194,11 @@ void _fEditorDraw(struct feditor *editor) {
         if(selected_object.has_value() && IsKeyPressed(KEY_DELETE)) {
             _fEditorPlaceBlock(editor, BLOCK_AIR, selected_block_pos);
         }
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT && !mouse_out_of_bounds && editor->in_edit_mode && editor->swipe_enabled)) {
+            editor->edit_selection = {m_world_pos.x, m_world_pos.y, 1, 1};
+        }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
-            if (editor->swipe_enabled) {
-                _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
-            } else {
+            if (editor->in_edit_mode && editor->swipe_enabled) {
                 Vector2 mdelta = GetMouseDelta();
 
                 if (mdelta.x * mdelta.y != 0.f) {
@@ -206,8 +208,31 @@ void _fEditorDraw(struct feditor *editor) {
                 mdelta.x /= __state.window_scale / speed;
                 mdelta.y /= __state.window_scale / speed;
 
-                editor->camera.target.x -= mdelta.x;
-                editor->camera.target.y -= mdelta.y;
+                editor->edit_selection.width += mdelta.x;
+                editor->edit_selection.height += mdelta.y;
+
+                if (editor->edit_selection.width < 0) {
+                    editor->edit_selection.width = -editor->edit_selection.width;
+                    editor->edit_selection.x -= editor->edit_selection.width;
+                }
+            } else {
+                editor->edit_selection = {m_world_pos.x, m_world_pos.y, 0, 0};
+
+                if (editor->swipe_enabled) {
+                    _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
+                } else {
+                    Vector2 mdelta = GetMouseDelta();
+
+                    if (mdelta.x * mdelta.y != 0.f) {
+                        editor->holded_previosly = 1;
+                    }
+
+                    mdelta.x /= __state.window_scale / speed;
+                    mdelta.y /= __state.window_scale / speed;
+
+                    editor->camera.target.x -= mdelta.x;
+                    editor->camera.target.y -= mdelta.y;
+                }
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !editor->swipe_enabled && !editor->holded_previosly && !mouse_out_of_bounds) {
@@ -225,6 +250,8 @@ void _fEditorDraw(struct feditor *editor) {
 #define MAX_BLOCK_AREA ((0xFFFF + 1) * 8)
 
             DrawRectangleLinesEx({-MAX_BLOCK_AREA / 2, -MAX_BLOCK_AREA / 2, MAX_BLOCK_AREA / 1, MAX_BLOCK_AREA / 1}, 3.f, bouncing_color);
+
+            DrawRectangleLinesEx(editor->edit_selection, 1.f, GREEN);
 
             EndMode2D();
 
@@ -396,7 +423,7 @@ void _fEditorDraw(struct feditor *editor) {
         }
 
         cc = (editor->swipe_enabled) ? GREEN : RED;
-        if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + 14, blackbox_starty + 101 }, cc)) {
+        if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + 14, blackbox_starty + 102 }, cc)) {
             editor->swipe_enabled = !editor->swipe_enabled;
         }
     }
