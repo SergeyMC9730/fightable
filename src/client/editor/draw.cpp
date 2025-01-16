@@ -248,15 +248,7 @@ void _fEditorDraw(struct feditor *editor) {
 
             DrawRectangleLinesEx({-MAX_BLOCK_AREA / 2, -MAX_BLOCK_AREA / 2, MAX_BLOCK_AREA / 1, MAX_BLOCK_AREA / 1}, 3.f, bouncing_color);
 
-            RLRectangle edit_sel = editor->edit_selection;
-            if (edit_sel.width < 0) {
-                edit_sel.x += edit_sel.width;
-                edit_sel.width = -edit_sel.width;
-            }
-            if (edit_sel.height < 0) {
-                edit_sel.y += edit_sel.height;
-                edit_sel.height = -edit_sel.height;
-            }
+            RLRectangle edit_sel = _fRectAbsSize(editor->edit_selection);
             Color bouncing_color2 = bouncing_color;
             bouncing_color2.a = (unsigned char)((float)bouncing_color.a / 2.f);
             DrawRectangleRec(edit_sel, bouncing_color2);
