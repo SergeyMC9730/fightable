@@ -59,7 +59,7 @@ int __userId = -1;
 // #define NO_SERVER_CHECK
 
 void processReceive(struct ftcpclient_delegate *self, const char *message) {
-    if (FIGHTABLE_OUTPUT_ONLY_WARNINGS) printf("[CLIENT] received %ld bytes: %s\n", strlen(message) + 1, message);
+    printf("[CLIENT] received %ld bytes: %s\n", strlen(message) + 1, message);
     
     char response_cmd = message[0];
     
@@ -222,6 +222,11 @@ int main(int argc, char **argv) {
             	    ClnThread(ref);
                 });
             }
+        }
+
+        if (IsKeyPressed(KEY_I)) {
+            printf("Getting other users\n");
+            getOtherUsers();
         }
 
 	    BeginDrawing();

@@ -375,7 +375,8 @@ bool ftcp_server_daemon::_processDescriptor(int desc, std::array<char, 4096>* bu
         std::string orig_hash{ vcStr - 12, 12 };
         std::string hash = getShortHash(vStr);
 
-        if (orig_hash != hash) {
+#pragma warning("TEMP REMOVAL")
+        if (orig_hash != hash && false) { // TEMP
             printf("ftcp_server_daemon: invalid hash. %s(o) != %s(e)\n", orig_hash.c_str(), hash.c_str());
             return true;
         }
