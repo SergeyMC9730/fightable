@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include <fightable/level.h>
 #include <fightable/block.h>
 #include <fightable/block_library.h>
@@ -7,7 +8,11 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 	int len = 0;
 	unsigned char* data = LoadFileData(filename, &len);
 
-	if (!data || len < 10) return NULL;
+	if (!data) return NULL;
+	if (len < 10) {
+		MemFree(data);
+		return NULL;
+	}
 
 	short format = ((short*)data)[0];
 	TraceLog(LOG_INFO, "Level format: %d", format);

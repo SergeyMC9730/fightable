@@ -68,7 +68,7 @@ void _fMainLoadResources(struct fresource_file *resources, int files) {
 void _fMainCloneResources(struct fresource_file *resources, int files) {
     const char *path = _fStorageGetWritable();
     char *buffer = (char *)MemAlloc(2048);
-    
+
     for (int i = 0; i < files; i++) {
         struct fresource_file resource = resources[i];
         if (!resource.data) {
@@ -102,7 +102,7 @@ void _fMainDestroyResources(struct fresource_file *resources, int files) {
     }
 }
 
-int main(int argc, char **argv) {
+void _fInit(int argc, char **argv) {
 #ifdef TARGET_ANDROID
     __state.system = GetAndroidApp();
 #else
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 #endif
     flags = 0;
     v_sync_flag = 1;
-    // if(v_sync_flag) flags |= FLAG_VSYNC_HINT; 
+    // if(v_sync_flag) flags |= FLAG_VSYNC_HINT;
     SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -303,7 +303,7 @@ int main(int argc, char **argv) {
 
         ClearBackground(BLACK);
 
-        double scaling_y = (double)actual_sz.y / (double)__state.framebuffer.texture.height; 
+        double scaling_y = (double)actual_sz.y / (double)__state.framebuffer.texture.height;
         int align_x = (actual_sz.x - (__state.framebuffer.texture.width * scaling_y)) / 2;
 
         __state.mouse_pos_offset = (Vector2){align_x, 0};
@@ -317,7 +317,7 @@ int main(int argc, char **argv) {
         }
 
         {
-            double scaling_y = (double)actual_sz.y / (double)__state.overlay_framebuffer.texture.height; 
+            double scaling_y = (double)actual_sz.y / (double)__state.overlay_framebuffer.texture.height;
             int align_x = (actual_sz.x - (__state.overlay_framebuffer.texture.width * scaling_y)) / 2;
 
             RLRectangle source = (RLRectangle){ 0, 0, (float)__state.overlay_framebuffer.texture.width, (float)-__state.overlay_framebuffer.texture.height };
@@ -357,7 +357,7 @@ int main(int argc, char **argv) {
 
     _fTilemapUnload(&__tilemap);
     UnloadRenderTexture(txt);
-    
+
     if (__state.current_level) {
         UnloadTexture(__state.current_level->background_tile);
         free(__state.current_level->objects);
@@ -373,6 +373,4 @@ int main(int argc, char **argv) {
 #endif
 
     _fConfigSave(&__state.config);
-
-    return 0;
 }

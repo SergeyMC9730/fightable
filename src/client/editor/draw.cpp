@@ -1,3 +1,4 @@
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -18,13 +19,15 @@
 #include <fightable/storage.h>
 #include <nfd.h>
 
+#define MAX_BUTTON_PAGES 2
+
 void _fEditorDraw(struct feditor *editor) {
     std::optional<fblock> selected_object = std::nullopt;
     bool mouse_out_of_bounds = false;
 
     if (IsKeyDown(KEY_LEFT_SHIFT)) {
         editor->swipe_enabled = 1;
-    } else {
+    } else if (IsKeyReleased(KEY_LEFT_SHIFT)) {
         editor->swipe_enabled = 0;
     }
 
@@ -115,8 +118,8 @@ void _fEditorDraw(struct feditor *editor) {
     float v = 128.f * ((std::sin(__state.time * 3.f) / 2.f) + 0.5f) + 15.f;
 
     bouncing_color.a = (unsigned char)(std::max(0.f, std::min(v, 255.f)));
-    
-    
+
+
     Vector2 mouse_pos = _fGetMousePosPix();
 
     // printf("b\n");
@@ -193,10 +196,11 @@ void _fEditorDraw(struct feditor *editor) {
         if(selected_object.has_value() && IsKeyPressed(KEY_DELETE)) {
             _fEditorPlaceBlock(editor, BLOCK_AIR, selected_block_pos);
         }
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && !mouse_out_of_bounds) {
-            if (editor->swipe_enabled) {
-                _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
-            } else {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT && !mouse_out_of_bounds && editor->in_edit_mode && editor->swipe_enabled)) {
+            editor->edit_selection = {m_world_pos.x, m_world_pos.y, 1, 1};
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            if (editor->in_edit_mode && editor->swipe_enabled) {
                 Vector2 mdelta = GetMouseDelta();
 
                 if (mdelta.x * mdelta.y != 0.f) {
@@ -205,9 +209,27 @@ void _fEditorDraw(struct feditor *editor) {
 
                 mdelta.x /= __state.window_scale / speed;
                 mdelta.y /= __state.window_scale / speed;
-            
-                editor->camera.target.x -= mdelta.x;
-                editor->camera.target.y -= mdelta.y;
+
+                editor->edit_selection.width += mdelta.x;
+                editor->edit_selection.height += mdelta.y;
+            } else {
+                // editor->edit_selection = {m_world_pos.x, m_world_pos.y, 0, 0};
+
+                if (editor->swipe_enabled) {
+                    _fEditorPlaceBlock(editor, editor->current_block_id, selected_block_pos);
+                } else {
+                    Vector2 mdelta = GetMouseDelta();
+
+                    if (mdelta.x * mdelta.y != 0.f) {
+                        editor->holded_previosly = 1;
+                    }
+
+                    mdelta.x /= __state.window_scale / speed;
+                    mdelta.y /= __state.window_scale / speed;
+
+                    editor->camera.target.x -= mdelta.x;
+                    editor->camera.target.y -= mdelta.y;
+                }
             }
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && !editor->swipe_enabled && !editor->holded_previosly && !mouse_out_of_bounds) {
@@ -226,6 +248,12 @@ void _fEditorDraw(struct feditor *editor) {
 
             DrawRectangleLinesEx({-MAX_BLOCK_AREA / 2, -MAX_BLOCK_AREA / 2, MAX_BLOCK_AREA / 1, MAX_BLOCK_AREA / 1}, 3.f, bouncing_color);
 
+            RLRectangle edit_sel = _fRectAbsSize(editor->edit_selection);
+            Color bouncing_color2 = bouncing_color;
+            bouncing_color2.a = (unsigned char)((float)bouncing_color.a / 2.f);
+            DrawRectangleRec(edit_sel, bouncing_color2);
+            DrawRectangleLinesEx(edit_sel, 1.f, GREEN);
+
             EndMode2D();
 
             char buf[16] = {};
@@ -233,7 +261,7 @@ void _fEditorDraw(struct feditor *editor) {
 
             _fTextDraw(&__state.text_manager, buf, {4, 4}, GREEN, 1);
         }
-    
+
         float v = GetMouseWheelMove();
         _fEditorSwipeCurrentObjects(editor, v);
     }
@@ -253,26 +281,17 @@ void _fEditorDraw(struct feditor *editor) {
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
 
         int center = (space - sel_block_len.x) / 2;
-        struct fbutton btnBlock = {};
-        btnBlock.text = "Blocks";
-        
-        btnBlock.position.x = blackbox_startx + 10;
-        btnBlock.position.y = blackbox_starty + 66;
-        btnBlock.tint = WHITE;
-        if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
-            editor->should_display_selector = ~editor->should_display_selector;
-        }
         _fTextDraw(&__state.text_manager, "sel block", {blackbox_startx + center, current_position_y + 4}, GREEN, 1);
         current_position_y += 4 + sel_block_len.y;
 
         if (!selected_object.has_value()) {
             center = (space - none_len.x) / 2;
-            
+
             _fTextDraw(&__state.text_manager, "none", {blackbox_startx + center, current_position_y + 4}, RED, 1);
             current_position_y += 5 + none_len.y;
         } else {
             fblock obj = selected_object.value();
-            
+
             center = (space - editor->level.tilemap->tile_size.x) / 2;
 
             _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, current_position_y + 2}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
@@ -320,74 +339,115 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 64, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 64, space / 2, 1, grad_gray, grad_black);
 
-        if (_fEditorContainsId(editor, BLOCK_START)) {
-            struct fbutton btn = {};
-            btn.text = "Play";
-            
-            btn.position.x = blackbox_startx + 14;
-            btn.position.y = blackbox_starty + 75;
-            btn.tint = WHITE;
-            
-            if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
-                IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
+        switch (editor->button_page) {
+            case 0: {
+                struct fbutton btnBlock = {};
+                btnBlock.text = "Blocks";
 
-                editor->should_display_sidebar = false;
-                editor->should_process_interactions = false;
-                editor->should_playback = true;
+                btnBlock.position.x = blackbox_startx + 10;
+                btnBlock.position.y = blackbox_starty + 66;
+                btnBlock.tint = WHITE;
+                if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
+                    editor->should_display_selector = ~editor->should_display_selector;
+                }
 
-                felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
+                if (_fEditorContainsId(editor, BLOCK_START)) {
+                    struct fbutton btn = {};
+                    btn.text = "Play";
 
-                player->base.level = &editor->level;
+                    btn.position.x = blackbox_startx + 14;
+                    btn.position.y = blackbox_starty + 75;
+                    btn.tint = WHITE;
 
-                _flPlayerInit(player);
-                _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
-                _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_1);
+                    if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
+                        IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
 
-                editor->entities.push_back((fentity *)player);
+                        editor->should_display_sidebar = false;
+                        editor->should_process_interactions = false;
+                        editor->should_playback = true;
 
-                Vector2 dpi = GetWindowScaleDPI();
-                Vector2 wanted_resolution = {
-                    .x = 160,
-                    .y = 120
-                };
+                        felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 
-                // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
-                UnloadRenderTexture(__state.framebuffer);
-                UnloadRenderTexture(__state.overlay_framebuffer);
+                        player->base.level = &editor->level;
 
-                __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
-                __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
+                        _flPlayerInit(player);
+                        _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
+                        _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_1);
 
-                editor->level.entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
+                        editor->entities.push_back((fentity *)player);
 
-                editor->f1_lock = true;
+                        Vector2 dpi = GetWindowScaleDPI();
+                        Vector2 wanted_resolution = {
+                            .x = 160,
+                            .y = 120
+                        };
+
+                        // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
+                        UnloadRenderTexture(__state.framebuffer);
+                        UnloadRenderTexture(__state.overlay_framebuffer);
+
+                        __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
+                        __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
+
+                        editor->level.entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
+
+                        editor->f1_lock = true;
+                    }
+                }
+
+                if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + 14, blackbox_starty + 84 }, WHITE)) {
+                    TraceLog(LOG_INFO, "Trying to save level into a file");
+
+                    std::string writable = _fStorageGetWritable();
+                    std::string filename;
+
+        #ifdef TARGET_ANDROID
+                    filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+        #else
+                    nfdu8char_t* out_path = nullptr;
+                    auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level.bin");
+
+                    if (!out_path || result != NFD_OKAY) {
+                        filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+                    }
+                    else {
+                        filename = out_path;
+                        NFD_FreePathU8(out_path);
+                    }
+        #endif
+
+                    _fLevelSave(&editor->level, filename.c_str());
+
+                    TraceLog(LOG_INFO, "Save done");
+                }
+
+                Color cc = (editor->in_edit_mode) ? GREEN : RED;
+                if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + 14, blackbox_starty + 93 }, cc)) {
+                    editor->in_edit_mode = !editor->in_edit_mode;
+                }
+
+                cc = (editor->swipe_enabled) ? GREEN : RED;
+                if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + 14, blackbox_starty + 102 }, cc)) {
+                    editor->swipe_enabled = !editor->swipe_enabled;
+                }
+
+                if (_fButtonDrawSimple("More", (IVector2) { blackbox_startx + 14, blackbox_starty + 111 }, WHITE)) {
+                    if ((editor->button_page + 1) < MAX_BUTTON_PAGES) {
+                        editor->button_page++;
+                    }
+                }
+
+                break;
             }
-        }
+            case 1: {
+                if (_fButtonDrawSimple("Exit", (IVector2) { blackbox_startx + 14, blackbox_starty + 66 }, WHITE)) {
 
-        if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + 14, blackbox_starty + 84 }, WHITE)) {
-            TraceLog(LOG_INFO, "Trying to save level into a file");
+                }
 
-            std::string writable = _fStorageGetWritable();
-            std::string filename;
-
-#ifdef TARGET_ANDROID
-            filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
-#else
-            nfdu8char_t* out_path = nullptr;
-            auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level.bin");
-
-            if (!out_path || result != NFD_OKAY) {
-                filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
+                if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + 14, blackbox_starty + 75 }, WHITE)) {
+                    editor->button_page--;
+                }
             }
-            else {
-                filename = out_path;
-                NFD_FreePathU8(out_path);
-            }
-#endif
-
-            _fLevelSave(&editor->level, filename.c_str());
-
-            TraceLog(LOG_INFO, "Save done");
         }
     }
 
@@ -441,7 +501,7 @@ void _fEditorDraw(struct feditor *editor) {
 
             _fGfxStopDamageOverlay();
         }
-        
+
         editor->f1_lock = false;
     }
 
@@ -477,22 +537,22 @@ void _fEditorDraw(struct feditor *editor) {
 
             constexpr float label_scaling = 5;
             float center_x = (BG.width - (editor->select_block_label.width * label_scaling)) / 2;
-            
+
             DrawRectangle(BG.x, BG.y, BG.width, BG.height, { 50, 50, 50, 200 });
             DrawTextureEx(editor->select_block_label, { center_x + BG.x, BG.y + 15.f }, 0, label_scaling, WHITE);
             DrawRectangle(mpos.x, mpos.y, 10, 10, MAROON);
             if(CheckCollisionPointRec(mpos, back)) {
                 btn_tile_offset.x = 31;
                 if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                    btn_tile_offset.x = 33;    
+                    btn_tile_offset.x = 33;
                     mouse_button_down = 5;
                 }
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                    editor->should_display_selector = ~editor->should_display_selector;            
+                    editor->should_display_selector = ~editor->should_display_selector;
                 }
             }
             _fTilemapDrawMegatileScaled(editor->level.tilemap, {(int)back.x - 15, (int)back.y - 15}, btn_tile_offset, {2, 2}, 0, 0, WHITE, 5);
-            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);  
+            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);
             for (int i = 0; i < editor->block_listing.total; i++) {
                 fblock block = editor->block_listing.blocks[i];
                 if (block.parent_id == 0) {
@@ -512,7 +572,7 @@ void _fEditorDraw(struct feditor *editor) {
                         DrawRectangleRec(blocks_check, bouncing_color);
                         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                             editor->current_block_id = i;
-                            editor->should_display_selector = ~editor->should_display_selector;          
+                            editor->should_display_selector = ~editor->should_display_selector;
                         }
                     }
                 }

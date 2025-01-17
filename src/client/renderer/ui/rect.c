@@ -11,3 +11,16 @@ void _fRectDraw(RLRectangle r, Color grad_top, Color grad_bottom, Color containe
     DrawRectangle(r.x, r.y, r.width, 1, grad_top);
     DrawRectangle(r.x, r.y + r.height, r.width + 1, 1, grad_bottom);
 }
+
+RLRectangle _fRectAbsSize(RLRectangle r) {
+    if (r.width < 0) {
+        r.x += r.width;
+        r.width = -r.width;
+    }
+    if (r.height < 0) {
+        r.y += r.height;
+        r.height = -r.height;
+    }
+
+    return r;
+}

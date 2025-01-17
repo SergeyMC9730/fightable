@@ -90,7 +90,7 @@ message(STATUS "libopenmpt lib path: ${OPENMPT_LIB}")
 
 CHECK_INCLUDE_FILE("libopenmpt/libopenmpt.h" HAVE_LIBOPENMPT)
 if (NOT HAVE_LIBOPENMPT AND NOT OPENMPT_INC)
-	message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
+    message(FATAL_ERROR "libopenmpt binaries were found but the header files itself are missing")
 endif()
 message(STATUS "libopenmpt custom include path: ${OPENMPT_INC}")
 
@@ -120,9 +120,9 @@ option(JACK OFF)
 set(JACK_FOUND OFF)
 
 if (ANDROID)
-	set(PLATFORM Android)
+    set(PLATFORM Android)
 
-	message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
+    message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
 
 if (NOT DISABLE_PORTAUDIO)
@@ -269,18 +269,19 @@ if (ANDROID)
     message(STATUS "Compiling for Android")
     set(FIGHTABLE_TARGET Android)
 
-	set(FIGHTABLE_SRC
-		${FIGHTABLE_SRC}
-		$ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
-	)
+    set(FIGHTABLE_SRC
+        ${FIGHTABLE_SRC}
+        $ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+    )
 
-	include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
+    include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
 
-	add_library(fightable SHARED ${FIGHTABLE_SRC})
+    add_library(fbase STATIC ${FIGHTABLE_SRC})
+    add_library(fightable SHARED src/launcher/main.c)
 
-	set(FIGHTABLE_NATIVE_LIBS android log m)
+    set(FIGHTABLE_NATIVE_LIBS android log m)
 
-	add_compile_definitions(TARGET_ANDROID)
+    add_compile_definitions(TARGET_ANDROID)
     add_compile_definitions(TARGET_UNIX)
     add_compile_definitions(TARGET_LINUX)
 elseif(WIN32)
@@ -290,8 +291,9 @@ elseif(WIN32)
     set(BUILD_SHARED_LIBS OFF)
     add_subdirectory(ext/pthread-win32)
 
-	add_executable(fightable ${FIGHTABLE_SRC})
-	add_compile_definitions(TARGET_WIN32)
+    add_library(fbase STATIC ${FIGHTABLE_SRC})
+    add_executable(fightable src/launcher/main.c)
+    add_compile_definitions(TARGET_WIN32)
     add_compile_definitions(__MINGW32__)
 
     set(FIGHTABLE_NATIVE_LIBS pthreadVC3 Ws2_32)
@@ -312,17 +314,19 @@ elseif(LINUX)
 
     set(FIGHTABLE_TARGET Linux)
 
-    add_executable(fightable ${FIGHTABLE_SRC})
+    add_library(fbase STATIC ${FIGHTABLE_SRC})
+    add_executable(fightable src/launcher/main.c)
     add_compile_definitions(TARGET_UNIX)
     add_compile_definitions(TARGET_LINUX)
 
     set(FIGHTABLE_NATIVE_LIBS pthread m)
 elseif(UNIX)
-    message(STATUS "Compiling for Unix-like operating systems")
+    message(STATUS "Compiling for Unix-like operating systems with X Window System")
 
     set(FIGHTABLE_TARGET Unix)
 
-    add_executable(fightable ${FIGHTABLE_SRC})
+    add_library(fbase STATIC ${FIGHTABLE_SRC})
+    add_executable(fightable src/launcher/main.c)
     add_compile_definitions(TARGET_UNIX)
     set(FIGHTABLE_NATIVE_LIBS pthread m)
 else()
@@ -330,7 +334,7 @@ else()
     set(FIGHTABLE_TARGET Unknown platform)
     add_compile_definitions(TARGET_UNKNOWN_PLATFORM)
 
-    message(FATAL_ERROR "Fightable does not support targets beyond Unix and NT")
+    message(FATAL_ERROR "Fightable does not support targets beyond Unix(X11) and NT")
 endif()
 
 if (UNIX OR LINUX)
@@ -492,7 +496,7 @@ add_executable(gun-test
     src/shooting_system_test/src/hitbox/move.c
 )
 
-target_include_directories(fightable PRIVATE
+target_include_directories(fbase PRIVATE
     src/client/inc
     ext/raylib/src
     ext/cJSON
@@ -504,6 +508,9 @@ target_include_directories(fightable PRIVATE
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
     ${FIGHTABLE_SHARED_INC}
+)
+target_include_directories(fightable PRIVATE
+    src/client/inc
 )
 
 target_include_directories(physics-test PRIVATE
@@ -524,10 +531,11 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fightable raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+    target_link_libraries(fbase raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
 else()
-    target_link_libraries(fightable raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+    target_link_libraries(fbase raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
 endif()
+target_link_libraries(fightable fbase)
 target_link_libraries(physics-test raylib)
 target_link_libraries(collide-test raylib)
 target_link_libraries(gun-test raylib)

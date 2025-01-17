@@ -1,5 +1,6 @@
 #pragma once
 
+#include "raylib.h"
 #include <fightable/intvec.h>
 #include <fightable/level.h>
 #include <fightable/block.h>
@@ -34,7 +35,13 @@ struct feditor {
 
     unsigned short current_object_page;
 
-    fslider test_slider;
+    fslider test_slider = {};
 
     int current_layer;
+
+    bool in_edit_mode = false;
+    RLRectangle edit_selection = {};
+    std::vector<fblock> selected_objects = {};
+
+    int button_page = 0;
 };

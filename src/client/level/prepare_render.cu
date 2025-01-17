@@ -5,7 +5,7 @@
 #include <chrono>
 #include <cmath>
 
-__device__ unsigned char rlCheckCollisionPointRec(Vector2 point, Rectangle rec) {
+__device__ unsigned char rlCheckCollisionPointRec(Vector2 point, RLRectangle rec) {
     if ((point.x >= rec.x) && (point.x < (rec.x + rec.width)) && (point.y >= rec.y) && (point.y < (rec.y + rec.height))) {
         return 1;
     }
@@ -13,7 +13,7 @@ __device__ unsigned char rlCheckCollisionPointRec(Vector2 point, Rectangle rec) 
     return 0;
 }
 
-__global__ void _fLevelOptimizeLevelRenderingCuda(Rectangle area, fblock *blocks, unsigned char tile_w,unsigned char tile_h, int block_amount, unsigned char *allows) {
+__global__ void _fLevelOptimizeLevelRenderingCuda(RLRectangle area, fblock *blocks, unsigned char tile_w, unsigned char tile_h, int block_amount, unsigned char *allows) {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     if (i >= block_amount) return;
 
@@ -24,7 +24,7 @@ __global__ void _fLevelOptimizeLevelRenderingCuda(Rectangle area, fblock *blocks
     allows[i] = rlCheckCollisionPointRec(Vector2{(float)block.base.block_x * tile_w, (float)block.base.block_y * tile_h}, area);
 }
 
-void _fLevelPrepareCudaRender(struct flevel *level, Rectangle area) {
+void _fLevelPrepareCudaRender(struct flevel *level, RLRectangle area) {
     // cudaDeviceSynchronize();
 
     int n = level->data_size;

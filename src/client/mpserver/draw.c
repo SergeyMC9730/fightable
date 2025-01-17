@@ -12,7 +12,7 @@ void _fMpCreateDraw() {
 	Color bg = {
 		243, 134, 5, 255
 	};
-	
+
 	RLRectangle dest = {
 		.width = (float)__state.mp_create_bg1.width,
 		.height = (float)__state.mp_create_bg1.height
@@ -80,7 +80,7 @@ void _fMpCreateDraw() {
 
 	int tx = __state.tilemap->tile_size.x;
 	int ty = __state.tilemap->tile_size.y;
-	
+
 	int offset = ((tx * 2) + 6);
 
 	for (int i = 0; i < 6; i++) {
@@ -99,7 +99,7 @@ void _fMpCreateDraw() {
 	_fTextDraw(&__state.text_manager, "select level", (IVector2) { 96, 8 }, YELLOW, 1);
 
 	// void _fRectDraw(RLRectangle r, Color grad_top, Color grad_bottom, Color container);
-	
+
 	RLRectangle area = { 96, 16, sel_sz.x, 16 };
 
 	Color container_color = BLACK;
@@ -114,8 +114,8 @@ void _fMpCreateDraw() {
 		if (CheckCollisionPointRec(mouse, area) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
 			Vector2 d = GetMouseDelta();
 
-			__state.current_level->camera.target.x -= d.x * (1.f / tx) * 6;
-			__state.current_level->camera.target.y -= d.y * (1.f / ty) * 6;
+			__state.current_level->camera.target.x -= d.x / ((float)__state.current_level->tilemap->tile_size.x / 1.5f);
+			__state.current_level->camera.target.y -= d.y / ((float)__state.current_level->tilemap->tile_size.y / 1.5f);
 		}
 	}
 
