@@ -24,6 +24,12 @@ bool v_sync_flag = 1;
 struct flevel __level;
 struct ftilemap __tilemap;
 
+#ifndef TARGET_ANDROID
+unsigned int UI_SCALE = 4;
+#else
+unsigned int UI_SCALE = 5;
+#endif
+
 void *main_thr0(void *user) {
     _fAudioBegin(&__state.sound_engine);
 
@@ -112,7 +118,7 @@ void _fInit(int argc, char **argv) {
 
     Vector2 win_sz = {800, 600};
     Vector2 actual_sz = win_sz;
-    Vector2 editor_sz = {255, 0};
+    Vector2 editor_sz = {255 / (5.f / (float)UI_SCALE), 0};
 
     SetRandomSeed(time(0));
 
@@ -175,7 +181,8 @@ void _fInit(int argc, char **argv) {
         {"text.png"},
         {"damage_overlay.png"},
         {"3g_crim.xm"},
-        {"wave_warp.fs"}
+        {"wave_warp.fs"},
+        {"test.obj"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -196,7 +203,22 @@ void _fInit(int argc, char **argv) {
     if (argc > 1) {
         printf("ARGV[1] = %s\n", argv[1]);
 
-        if (strcmp(argv[1], "editor") == 0) {
+        unsigned char want_editor = 0;
+
+        for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "editor") == 0) {
+                want_editor = 1;
+            }
+            else if (strcmp(argv[i], "android") == 0) {
+                UI_SCALE = 5;
+
+                editor_sz = (Vector2){ 255 / (5.f / (float)UI_SCALE), 0 };
+                editor_sz.x *= ui_scaling.x;
+                editor_sz.y *= ui_scaling.y;
+            }
+        }
+
+        if (want_editor) {
             __state.current_editor = _fEditorCreate();
             free(__level.objects);
 

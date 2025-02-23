@@ -6,6 +6,15 @@
 extern "C" {
 #endif
 
+#include <nt5emul/renderer_event.h>
+#include <rsb/rsb_array_gen.h>
+
+struct frenderer_sched {
+	renderer_event_t func;
+	long double delay;
+	int times;
+};
+
 void _fDraw();
 
 // raylib additions
@@ -30,17 +39,26 @@ void EndTextureModeStacked();
 // else it returns index inside the stack
 int _ntRendererGetMainIdxInStack();
 
-void _fScheduleOverlayFunc(void (*callback)(void *user), void *user);
+void _fScheduleOverlayFunc(renderer_event_t on_draw);
 void _fSchedulerIterateOverlays();
+void _fSchedulerVisit();
+// schedules a `func` to be called before draw after `delay` seconds.
+// required function will be called `n` times.
+// ! timer accuracity depends on framerate ! 
+// ! for more precise stuff use _ntInstallTimer and _ntSetupTimerSync !
+void _fSchedule(renderer_event_t func, long double delay, int n);
 
 Vector2 _fGetMousePosPix();
 Vector2 _fGetMousePosOverlay();
+
+// check if function has been runned inside the renderer thread
+unsigned char _ntRendererInThread();
 
 #ifdef COTARGET_PTX
 void _fPtxInit();
 #endif
 
-#define UI_SCALE 5
+extern unsigned int UI_SCALE;
 
 #ifdef __cplusplus
 

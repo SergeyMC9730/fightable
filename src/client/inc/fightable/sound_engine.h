@@ -45,6 +45,8 @@ struct faudio_engine {
         float slide_volume_cur_time;
 
         float resulting_volume;
+
+        double time;
     } fx;
 };
 
@@ -61,6 +63,7 @@ void _fAudioSetVolume(struct faudio_engine *engine, float v);
 
 void _fAudioFxUpdate(struct faudio_engine* engine);
 void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time);
+void _fAudioFxInitEcho(struct faudio_engine* engine);
 
 #ifdef __cplusplus
 }

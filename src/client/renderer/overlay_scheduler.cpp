@@ -5,10 +5,10 @@
 
 static std::vector<std::variant<foverlay_callback, renderer_event_t>> __overlay_callbacks = {};
 
-void _fScheduleOverlayFunc(void (*callback)(void *user), void *user) {
-    if (!callback) return;
+void _fScheduleOverlayFunc(renderer_event_t func) {
+    if (!func.callback) return;
 
-    __overlay_callbacks.push_back(renderer_event_t{callback, user});
+    __overlay_callbacks.push_back(func);
 }
 void _fScheduleOverlayFunc(const foverlay_callback &callback) {
     if (!callback) return;

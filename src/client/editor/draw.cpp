@@ -106,7 +106,7 @@ void _fEditorDraw(struct feditor *editor) {
     }
 
     if (!editor->should_playback) {
-        editor->level.render_crop_area = { 0, 0, 160, 120 };
+        editor->level.render_crop_area = { 0, 0, 800 / (float)UI_SCALE, 600 / (float)UI_SCALE};
     }
     else {
         editor->level.render_crop_area = { 0, 0, 0, 0 };
@@ -378,8 +378,8 @@ void _fEditorDraw(struct feditor *editor) {
 
                         Vector2 dpi = GetWindowScaleDPI();
                         Vector2 wanted_resolution = {
-                            .x = 160,
-                            .y = 120
+                            .x = 800 / (float)UI_SCALE,
+                            .y = 600 / (float)UI_SCALE
                         };
 
                         // SetWindowSize(__state.base_game_size.x - __state.editor_size.x, __state.base_game_size.y - __state.editor_size.y);
@@ -472,8 +472,10 @@ void _fEditorDraw(struct feditor *editor) {
             UnloadRenderTexture(__state.framebuffer);
             UnloadRenderTexture(__state.overlay_framebuffer);
 
-            __state.framebuffer = LoadRenderTexture((800 + 255) / UI_SCALE, 600 / UI_SCALE);
-            __state.overlay_framebuffer = LoadRenderTexture(800 + 255, 600);
+            int pix = 255 / (5.f / (float)UI_SCALE);
+
+            __state.framebuffer = LoadRenderTexture((800 + pix ) / UI_SCALE, 600 / UI_SCALE);
+            __state.overlay_framebuffer = LoadRenderTexture(800 + pix, 600);
 
             if (editor->level.entities != NULL) {
                 for (unsigned int i = 0; i < editor->level.entities->added_elements; i++) {
@@ -579,6 +581,19 @@ void _fEditorDraw(struct feditor *editor) {
             }
 
             _fSliderDraw(&editor->test_slider);
+
+            // UpdateCamera(&editor->test_cam, CAMERA_FREE);
+            
+            float scale = 0.25f;
+
+            Camera camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
+            BeginMode3D(camera);
+            DrawGrid(10, 1.0f);
+            // DrawModel(editor->test_model, { 0, 0, 0 }, 1.f, GREEN);
+            DrawModelEx(editor->test_model, { 0, 0, 0 }, { 10, 0, 10 }, 10.f, { scale, scale, scale }, GREEN);
+            DrawModelWiresEx(editor->test_model, { 0, 0, 0 }, { 10, 0, 10 }, 10.f, { scale, scale, scale }, BLACK);
+            EndMode3D();
+            
         });
     }
 

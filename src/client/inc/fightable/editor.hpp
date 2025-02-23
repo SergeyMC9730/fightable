@@ -44,4 +44,7 @@ struct feditor {
     std::vector<fblock> selected_objects = {};
 
     int button_page = 0;
+
+    Model test_model = {};
+    Camera3D test_cam = {};
 };
