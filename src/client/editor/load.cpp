@@ -73,10 +73,7 @@ struct feditor *_fEditorCreate() {
 
     editor->test_slider = slider;
 
-    editor->test_model = LoadModel("test.obj");
-    Camera3D test3d = {};
-    test3d.fovy = 60;
-    editor->test_cam = test3d;
+    editor->test_model = LoadModel(".fightable/test.obj");
 
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);

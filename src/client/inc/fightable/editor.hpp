@@ -46,5 +46,5 @@ struct feditor {
     int button_page = 0;
 
     Model test_model = {};
-    Camera3D test_cam = {};
+    float test_z = 16;
 };

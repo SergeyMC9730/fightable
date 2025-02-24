@@ -519,6 +519,15 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangle(0, 0, wsz.x, wsz.y, c);
     }
 
+    if (IsKeyDown(KEY_MINUS)) {
+        editor->test_z -= GetFrameTime() * 2.f;
+        TraceLog(LOG_INFO, "test_z=%f", editor->test_z);
+    }
+    else if (IsKeyDown(KEY_EQUAL)) {
+        editor->test_z += GetFrameTime() * 2.f;
+        TraceLog(LOG_INFO, "test_z=%f", editor->test_z);
+    }
+
     if (editor->should_display_selector) {
         _fScheduleOverlayFunc([editor, bouncing_color](Vector2 mpos) {
             constexpr float offset_x = 50;
@@ -581,19 +590,6 @@ void _fEditorDraw(struct feditor *editor) {
             }
 
             _fSliderDraw(&editor->test_slider);
-
-            // UpdateCamera(&editor->test_cam, CAMERA_FREE);
-            
-            float scale = 0.25f;
-
-            Camera camera = { { 0.0f, 10.0f, 10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, 45.0f, 0 };
-            BeginMode3D(camera);
-            DrawGrid(10, 1.0f);
-            // DrawModel(editor->test_model, { 0, 0, 0 }, 1.f, GREEN);
-            DrawModelEx(editor->test_model, { 0, 0, 0 }, { 10, 0, 10 }, 10.f, { scale, scale, scale }, GREEN);
-            DrawModelWiresEx(editor->test_model, { 0, 0, 0 }, { 10, 0, 10 }, 10.f, { scale, scale, scale }, BLACK);
-            EndMode3D();
-            
         });
     }
 
