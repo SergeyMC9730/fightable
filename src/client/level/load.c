@@ -27,7 +27,14 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 		unsigned short width = ((short*)data)[1];
 		unsigned short height = ((short*)data)[2];
 
+		unsigned char parse_bitfield = 0;
+
 		TraceLog(LOG_INFO, "Level size: %dx%d", width, height);
+
+		if (width == 0xFFFF) {
+			parse_bitfield = 1;
+			TraceLog(LOG_INFO, "Parsing bitfields for outdated level");
+		}
 
 		unsigned int objects = *(unsigned int*)(data + 6) % 3000000;
 
@@ -72,7 +79,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 			block.layer_id = 0;
 			block.base.block_x = x;
 			block.base.block_y = y;
-			// _fBlockRecoverBitfield(&block, bitdata);
+			if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
 
 			level->objects[i] = block;
 
@@ -97,7 +104,14 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 		unsigned short width = ((short*)data)[1];
 		unsigned short height = ((short*)data)[2];
 
+		unsigned char parse_bitfield = 0;
+
 		TraceLog(LOG_INFO, "Level size: %dx%d", width, height);
+
+		if (width == 0xFFFF) {
+			parse_bitfield = 1;
+			TraceLog(LOG_INFO, "Parsing bitfields for outdated level");
+		}
 
 		unsigned int objects = *(unsigned int*)(data + 6) % 3000000;
 
@@ -142,7 +156,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 			block.layer_id = lid;
 			block.base.block_x = x;
 			block.base.block_y = y;
-			// _fBlockRecoverBitfield(&block, bitdata);
+			if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
 
 			level->objects[i] = block;
 
