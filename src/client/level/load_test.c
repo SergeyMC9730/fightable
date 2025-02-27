@@ -19,6 +19,8 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
     level.camera = _fCameraLoadDefault();
     level.camera_size = (IVector2){level.width * tilemap->tile_size.x, level.height * tilemap->tile_size.y};
 
+    level.block_entries = RSBCreateArray_lre();
+
     for (int x = 0; x < level.width; x++) {
         for (int y = 0; y < level.height; y++) {
             int idx = (y * level.width) + x;

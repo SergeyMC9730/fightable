@@ -12,39 +12,9 @@
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
 RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
+RSB_ARRAY_IMPL_GEN(struct flevel_registry_entry, _lre);
 
 extern double _rendererOutQuint(double x);
-
-extern void rlColor3f(float x, float y, float z);
-extern void rlBegin(int mode);
-extern void rlVertex3f(float x, float y, float z);
-extern void rlEnd(void);
-
-// Draw a grid centered at (0, 0, 0)
-void DrawGridEx(int slices, float spacing, float y)
-{
-    int halfSlices = slices / 2;
-
-    rlBegin(0x0001);
-    for (int i = -halfSlices; i <= halfSlices; i++)
-    {
-        if (i == 0)
-        {
-            rlColor3f(0.5f, 0.5f, 0.5f);
-        }
-        else
-        {
-            rlColor3f(0.75f, 0.75f, 0.75f);
-        }
-
-        rlVertex3f((float)i * spacing, y, (float)-halfSlices * spacing);
-        rlVertex3f((float)i * spacing, y, (float)halfSlices * spacing);
-
-        rlVertex3f((float)-halfSlices * spacing, y, (float)i * spacing);
-        rlVertex3f((float)halfSlices * spacing, y, (float)i * spacing);
-    }
-    rlEnd();
-}
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (!level || !level->tilemap) return;
@@ -330,20 +300,21 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);
 
-    float rev = 4.5f;
-    if (UI_SCALE == 5) rev = 4.f;
+    float camfov = 45.f;
 
-    float scale = 0.25f;
-    Camera camera = { { 0.0f, 0.0f, 16.f / (25.f / (float)pow(rev, 2)) / sin(PI / 4.f)}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.f, 0 };
+    Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
     camera.position.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
     camera.target.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
     camera.position.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
     camera.target.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
+
     BeginMode3D(camera);
+
     DrawGridEx(10, 1.0f, 0.f);
     DrawGridEx(10, 1.0f, -4.f);
     DrawGridEx(10, 1.0f, -8.f);
     DrawGridEx(10, 1.0f, -12.f);
+
     EndMode3D();
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);

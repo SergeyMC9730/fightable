@@ -249,6 +249,9 @@ set(FIGHTABLE_SRC
     src/client/level/draw_pixelated.c
     src/client/level/save.cpp
     src/client/level/load.c
+    src/client/etc/unitype.c
+    src/client/renderer/grid_3d.c
+    src/client/block/bitfield.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -345,6 +348,15 @@ if (UNIX OR LINUX)
 
     set(FIGHTABLE_NATIVE_LIBS ${FIGHTABLE_NATIVE_LIBS} safestring_static)
 endif()
+
+include (TestBigEndian)
+TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+if (IS_BIG_ENDIAN)
+    message(STATUS "Target CPU is big-endian")
+    add_compile_definitions(TARGET_BIG_ENDIAN)
+else ()
+    message(STATUS "Target CPU is little-endian")
+endif ()
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FIGHTABLE_COPTS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")

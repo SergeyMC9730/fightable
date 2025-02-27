@@ -28,12 +28,13 @@ namespace GenericTools {
     }
 
     template<typename T = char>
-    inline std::vector<T> stringToVector(const std::string &str) {
+    inline std::vector<T> stringToVector(const std::string& str, bool with_null_sep = false) {
         std::vector<T> v;
 
         for (char c : str) {
             v.push_back(c);
         }
+        if (with_null_sep) v.push_back(0);
 
         return v;
     }
@@ -87,6 +88,18 @@ namespace GenericTools {
         }
 
         return v;
+    }
+
+    template<typename T>
+    inline std::vector<unsigned char> arrayToVector(T* a, size_t sz) {
+        std::vector<unsigned char> vec;
+
+        for (size_t i = 0; i < sz; i++) {
+            T e = a[i];
+            addVectors(&vec, valueToVector(e));
+        }
+
+        return vec;
     }
 
     std::vector<std::string> splitString(const char* str, char d, unsigned int max_entries = 0);

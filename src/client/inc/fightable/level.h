@@ -6,8 +6,9 @@
 #include <fightable/intrect.h>
 #include <fightable/serializable.h>
 #include <rsb/rsb_array_gen.h>
+#include <tunnelos/unitype.h>
 
-#define LEVEL_FORMAT_VERSION (uint16_t)3
+#define LEVEL_FORMAT_VERSION (uint16_t)4
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +25,13 @@ struct flevel_light_source {
     Color tint;
 };
 
+struct flevel_registry_entry {
+    unsigned int id;
+    unitype_t* entry;
+};
+
 RSB_ARRAY_DEF_GEN(struct flevel_light_source, _lls);
+RSB_ARRAY_DEF_GEN(struct flevel_registry_entry, _lre);
 
 struct flevel {
     struct fblock *objects;
@@ -62,6 +69,9 @@ struct flevel {
     float cam_rot;
 
     rsb_array__lls* light_sources;
+    rsb_array__lre* block_entries;
+
+    unsigned int last_entry_id;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);

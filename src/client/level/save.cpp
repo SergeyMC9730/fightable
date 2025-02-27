@@ -20,6 +20,11 @@ void _fLevelSave(struct flevel* level, const char* filename) {
 	GenericTools::addVectors(&output, GenericTools::valueToVector(level->width));
 	GenericTools::addVectors(&output, GenericTools::valueToVector(level->height));
 	GenericTools::addVectors(&output, GenericTools::valueToVector(valid_blocks));
+#ifdef TARGET_BIG_ENDIAN
+	GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)1));
+#else
+	GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)0));
+#endif
 
 	for (unsigned int i = 0; i < level->data_size; i++) {
 		struct fblock block = level->objects[i];
@@ -27,19 +32,58 @@ void _fLevelSave(struct flevel* level, const char* filename) {
 
 		if (id == BLOCK_AIR) continue;
 
-		uint8_t bitdata = 0;
-		bitdata |= (block.base.flipped_x << 0);
-		bitdata |= (block.base.flipped_y << 1);
-		bitdata |= (block.is_start_pos << 2);
-		bitdata |= (block.passable << 3);
-		bitdata |= (block.dangerous << 4);
+		GenericTools::addVectors(&output, GenericTools::valueToVector(id));
+		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_x));
+		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_y));
+		GenericTools::addVectors(&output, GenericTools::valueToVector(block.layer_id));
+		GenericTools::addVectors(&output, GenericTools::valueToVector(block.registry_id));
+		GenericTools::addVectors(&output, GenericTools::valueToVector(_fBlockGetBitfield(&block)));
+	}
 
-		GenericTools::addVectors(&output, GenericTools::valueToVector(id)); // ->2
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_x)); // ->4
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_y)); // ->6
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.group_id)); // ->8
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.layer_id)); // ->10
-		GenericTools::addVectors(&output, GenericTools::valueToVector(bitdata)); // -> 11
+	if (level->block_entries == NULL) {
+		GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned int)(0)));
+	}
+	else {
+		GenericTools::addVectors(&output, GenericTools::valueToVector(level->block_entries->len));
+
+		TraceLog(LOG_INFO, "Amount of block entries: %d", level->block_entries->len);
+
+		for (unsigned int i = 0; i < level->block_entries->len; i++) {
+			auto e = level->block_entries->objects[i];
+			GenericTools::addVectors(&output, GenericTools::valueToVector(e.id));
+
+			unsigned int l = 0;
+			unitype_t* u = e.entry;
+
+			while (u != NULL) {
+				u = u->next;
+				l++;
+			}
+
+			GenericTools::addVectors(&output, GenericTools::valueToVector(l));
+
+			TraceLog(LOG_INFO, "%d: Amount of extra objects: %d", i, l);
+
+			if (l != 0) {
+				u = e.entry;
+
+				while (u != NULL) {
+					if (!u->name || (u->p == NULL && u->p_sz != 0) || (u->p != NULL && u->p_sz == 0)) continue;
+
+					std::string name = u->name;
+					size_t name_len = name.length();
+
+					GenericTools::addVectors(&output, GenericTools::valueToVector(name_len));
+					GenericTools::addVectors(&output, GenericTools::stringToVector<uint8_t>(name));
+
+					GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
+					GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
+					GenericTools::addVectors(&output, GenericTools::arrayToVector((uint8_t *)u->p, u->p_sz));
+
+					u = u->next;
+				}
+			}
+		}
 	}
 
 	TraceLog(LOG_INFO, "Output size: %d bytes", output.size());

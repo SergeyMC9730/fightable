@@ -21,8 +21,9 @@ struct fblock {
     unsigned char passable : 1;
     unsigned char metaobject : 1;
     unsigned char dangerous : 1;
+    unsigned char __reserved__ : 3;
 
-    unsigned short group_id;
+    unsigned int registry_id;
     unsigned short parent_id;
     unsigned short layer_id;
 };
@@ -46,6 +47,9 @@ struct fblock_listing {
 struct fblock_listing _fBlockGetAvailable();
 fserializable _fBlockSerialize(struct fblock block);
 struct fblock _fBlockLoad(fserializable *serializable, uint16_t level_version);
+
+void _fBlockRecoverBitfield(struct fblock *block, unsigned char original);
+unsigned char _fBlockGetBitfield(struct fblock* block);
 
 struct flevel;
 

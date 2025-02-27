@@ -34,9 +34,21 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
 
         editor->objects[layer_id][pos.x][pos.y] = b;
 
+        struct flevel_registry_entry entry = { 0 };
+        entry.id = ++editor->level.last_entry_id;
+        entry.entry = __uni_create(" ");
+
+        RSBAddElement_lre(editor->level.block_entries, entry);
+
         return;
     }
 
     block.layer_id = layer_id;
     editor->objects[layer_id][pos.x][pos.y] = block;
+
+    struct flevel_registry_entry entry = { 0 };
+    entry.id = ++editor->level.last_entry_id;
+    entry.entry = __uni_create(" ");
+
+    RSBAddElement_lre(editor->level.block_entries, entry);
 }

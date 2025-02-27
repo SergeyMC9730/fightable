@@ -54,6 +54,9 @@ Vector2 _fGetMousePosOverlay();
 // check if function has been runned inside the renderer thread
 unsigned char _ntRendererInThread();
 
+// Draw a grid centered at (0, y, 0)
+void DrawGridEx(int slices, float spacing, float y);
+
 #ifdef COTARGET_PTX
 void _fPtxInit();
 #endif
