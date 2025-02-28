@@ -90,6 +90,13 @@ cd $TARGET_REPO
 source setup_android_builds.sh
 source compile_android.sh
 
-printf '123456\n%.0s' {1..8} | bash android_setup.sh
+cd gh
+tr -dc A-Za-z0-9 < /dev/random | (head -c 13; echo) > rand.txt
+cat rand.txt rand.txt keystore.txt > newkeystore.txt
+cp newkeystore.txt ../
+cd ..
 
-ls bin
+cat newkeystore.txt | bash android_setup.sh
+
+cd bin
+mv app.txt fightable.apk
