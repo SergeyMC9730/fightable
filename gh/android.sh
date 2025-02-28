@@ -92,11 +92,11 @@ source compile_android.sh
 
 cd gh
 tr -dc A-Za-z0-9 < /dev/random | (head -c 13; echo) > rand.txt
-cat rand.txt rand.txt keystore.txt > newkeystore.txt
+cat rand.txt rand.txt keystore.txt rand.txt > newkeystore.txt
 cp newkeystore.txt ../
 cd ..
 
 cat newkeystore.txt | bash android_setup.sh
 
 cd bin
-mv app.txt fightable.apk
+mv app.apk fightable.apk
