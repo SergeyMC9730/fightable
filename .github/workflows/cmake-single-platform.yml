@@ -30,6 +30,5 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build
 
-      - name: Build for Android
+    - name: Build for Android
       run: bash ${{github.workspace}}/gh/android.sh ${{github.workspace}}
-
