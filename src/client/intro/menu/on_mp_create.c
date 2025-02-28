@@ -64,10 +64,15 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
     SetTextureWrap(__state.mp_create_bg1, TEXTURE_WRAP_REPEAT);
     SetTextureWrap(__state.mp_create_bg2, TEXTURE_WRAP_REPEAT);
 
+#ifndef GRAPHICS_API_OPENGL_ES3
     snprintf(buffer, 256, "%s/wave_warp.fs", readable);
+#else
+    snprintf(buffer, 256, "%s/wave_warp_es3.fs", readable);
+#endif
     __state.mp_create_wave_shader = LoadShader(NULL, buffer);
 
     snprintf(buffer, 256, "%s/3g_crim.xm", readable);
+
     _fAudioPlayModule(&__state.sound_engine, buffer);
     _fAudioLoopCurrent(&__state.sound_engine);
     _fAudioFxSlideVolume(&__state.sound_engine, *old_vol, 0.5f);

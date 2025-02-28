@@ -185,6 +185,7 @@ void _fInit(int argc, char **argv) {
         {"damage_overlay.json"},
         {"3g_crim.xm"},
         {"wave_warp.fs"},
+        {"wave_warp_es3.fs"},
         {"test.obj"}
     };
 
@@ -192,11 +193,6 @@ void _fInit(int argc, char **argv) {
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
-
-    __state.damage_overlay = LoadTexture("damage_overlay.png");
-    __state.damage_overlay_anim = _ntRendererLoadAnimation("damage_overlay.json");
-
-    SetTextureWrap(__state.damage_overlay, TEXTURE_WRAP_CLAMP);
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -258,6 +254,15 @@ void _fInit(int argc, char **argv) {
     _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
     _fConfigInit(&__state.config);
+
+    {
+        snprintf(dbg_buffer, 2048, "%s/damage_overlay.png", _fStorageGetWritable());
+        __state.damage_overlay = LoadTexture(dbg_buffer);
+        snprintf(dbg_buffer, 2048, "%s/damage_overlay.json", _fStorageGetWritable());
+        __state.damage_overlay_anim = _ntRendererLoadAnimation(dbg_buffer);
+
+        SetTextureWrap(__state.damage_overlay, TEXTURE_WRAP_CLAMP);
+    }
 
     {
         cJSON *data = _fTilemapCreateJson(__state.tilemap);
