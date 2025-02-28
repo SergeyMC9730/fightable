@@ -14,7 +14,7 @@ void _fGfxStopDamageOverlay() {
     __state.damage_overlay_timer = 0.f;
     __state.damage_overlay_timer2 = 0.f;
     __state.damage_overlay_play = 0;
-    __state.damage_overlay_anim->current_value = 0;
+    if (__state.damage_overlay_anim) __state.damage_overlay_anim->current_value = 0;
 }
 void _fGfxDrawDamageOverlay() {
     const Vector2 surface_size = {

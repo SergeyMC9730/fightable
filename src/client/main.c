@@ -127,6 +127,8 @@ void _fInit(int argc, char **argv) {
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
     actual_sz = (Vector2){0, 0};
+
+    __state.show_debug_info = 1;
 #else
     __state.window_scale = UI_SCALE;
     // SetTraceLogLevel(LOG_WARNING | LOG_ERROR);
@@ -180,6 +182,7 @@ void _fInit(int argc, char **argv) {
         {"fightable1.png"},
         {"text.png"},
         {"damage_overlay.png"},
+        {"damage_overlay.json"},
         {"3g_crim.xm"},
         {"wave_warp.fs"},
         {"test.obj"}
