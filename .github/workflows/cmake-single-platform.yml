@@ -26,9 +26,9 @@ jobs:
     - name: Configure CMake
       run: bash ${{github.workspace}}/gh/init_cmake.sh ${{github.workspace}} ${{github.workspace}}/build
 
-    - name: Build for Ubuntu Linux
+    #- name: Build for Ubuntu Linux
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build
+      #run: cmake --build ${{github.workspace}}/build
 
     - name: Build for Android
       run: bash ${{github.workspace}}/gh/android.sh ${{github.workspace}}

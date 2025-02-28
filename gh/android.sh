@@ -7,7 +7,7 @@ echo "* cores:" $(nproc)
 
 yes | sudo sdkmanager --licenses
 yes | sudo sdkmanager --update
-yes | sudo sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "platform-tools" "cmdline-tools;latest" "cmake;$CMAKE_VERISON"
+yes | sudo sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "platform-tools" "cmdline-tools;latest" "cmake;$CMAKE_VERSION"
 
 TARGET_REPO=$1
 
@@ -22,8 +22,8 @@ cd android_req
 wget https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.7.13+release.makefile.tar.gz
 wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz
 
-tar -xvf "libopenmpt-0.7.13+release.makefile.tar.gz"
-tar -xvf "libmicrohttpd-latest.tar.gz"
+tar -xf "libopenmpt-0.7.13+release.makefile.tar.gz"
+tar -xf "libmicrohttpd-latest.tar.gz"
 
 cd libopenmpt-0.7.13+release/
 cp build/android_ndk/* . -rv
