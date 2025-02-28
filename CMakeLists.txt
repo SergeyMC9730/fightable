@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.26)
 project(fightable LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
@@ -274,13 +274,12 @@ if (ANDROID)
 
     set(FIGHTABLE_SRC
         ${FIGHTABLE_SRC}
-        $ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
     )
 
     include_directories($ENV{ANDROID_NDK}/sources/android/native_app_glue)
 
     add_library(fbase STATIC ${FIGHTABLE_SRC})
-    add_library(fightable SHARED src/launcher/main.c)
+    add_library(fightable SHARED src/launcher/main.c $ENV{ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
 
     set(FIGHTABLE_NATIVE_LIBS android log m)
 
@@ -542,10 +541,15 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+if (ANDROID)
+	set(NFD_LINK )
+else ()
+	set(NFD_LINK nfd)
+endif ()
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+    target_link_libraries(fbase raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
 else()
-    target_link_libraries(fbase raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared nfd)
+    target_link_libraries(fbase raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test raylib)

@@ -8,6 +8,10 @@
 #include <fightable/tcpsrv/user.h>
 #endif
 
+#ifdef TARGET_ANDROID
+#include <android_native_app_glue.h>
+#endif
+
 extern void _fMainLog(const char* msg);
 
 #define COMMAND_GET_UID         0x01

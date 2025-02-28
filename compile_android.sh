@@ -21,10 +21,10 @@ compile_project() {
 compile_project
 
 ABI=armeabi-v7a
-compile_project
+# compile_project
 
 ABI=x86
-compile_project
+# compile_project
 
 ABI=x86_64
-compile_project
+# compile_project
