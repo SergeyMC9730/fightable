@@ -28,7 +28,7 @@ tar -xf "libmicrohttpd-latest.tar.gz"
 cd libopenmpt-0.7.13+release/
 cp build/android_ndk/* . -rv
 mkdir jni
-cp * jni/ -rv
+cp * jni/ -r
 ndk-build -j $(nproc)
 sudo cp libs/arm64-v8a/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/ -rv
 sudo cp libs/armeabi-v7a/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/ -rv
@@ -89,6 +89,7 @@ sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
 cd $TARGET_REPO
 source setup_android_builds.sh
 source compile_android.sh
-yes | bash android_setup.sh
+
+printf '123456\n%.0s' {1..8} | bash android_setup.sh
 
 ls bin
