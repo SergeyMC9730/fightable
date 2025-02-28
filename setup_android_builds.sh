@@ -18,10 +18,10 @@ setup_project() {
 setup_project
 
 ABI=armeabi-v7a
-# setup_project
+setup_project
 
 ABI=x86
-# setup_project
+setup_project
 
 ABI=x86_64
-# setup_project
+setup_project

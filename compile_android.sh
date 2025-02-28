@@ -15,16 +15,24 @@ compile_project() {
     cd $BPATH
     cmake --build . -j$(nproc)
     cp libfightable.so $LIB_PATH -v
+    cp $(find . | grep "libportaudio") $LIB_PATH -v
+    cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libmicrohttpd.so $LIB_PATH -v
+    cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libopenmpt.so $LIB_PATH -v
+    cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libc++_shared.so $LIB_PATH -v
     cd ..
 }
 
+SYSROOT_LIB=aarch64-linux-android
 compile_project
 
 ABI=armeabi-v7a
-# compile_project
+SYSROOT_LIB=arm-linux-androideabi
+compile_project
 
 ABI=x86
-# compile_project
+SYSROOT_LIB=i686-linux-android
+compile_project
 
 ABI=x86_64
-# compile_project
+SYSROOT_LIB=x86_64-linux-android
+compile_project
