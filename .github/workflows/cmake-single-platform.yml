@@ -60,5 +60,5 @@ jobs:
     - name: Install external dependencies
       run: bash ${{github.workspace}}/gh/ubuntu_deps_x86_64.sh
 
-	    - name: Generate an APK file
+    - name: Generate an APK file
       run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}
