@@ -53,12 +53,12 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Download compiled libraries
-        uses: actions/download-artifact@v3
-        with:
-          path: lib
+      uses: actions/download-artifact@v3
+      with:
+        path: lib
 
     - name: Install external dependencies
       run: bash ${{github.workspace}}/gh/ubuntu_deps_x86_64.sh
 
-    - name: Generate an APK file
+	    - name: Generate an APK file
       run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}
