@@ -14,8 +14,8 @@
     <!-- This .apk has no Java code itself, so set hasCode to false. -->
     <application
         android:debuggable="true"
-        android:allowBackup="false"
-        android:fullBackupContent="false"
+        android:allowBackup="true"
+        android:fullBackupContent="true"
         android:label="Fightable"
         android:hasCode="false">
 
@@ -36,5 +36,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

@@ -8,7 +8,7 @@ fi
 if [ $A_ABI = "armeabi-v7a" ]; then
 	export NDK_ABI=arm
 	export SYSROOT_LIB=$NDK_ABI-linux-androideabi
-	export CLANG_TARGET=armv7a-linux-androideabli
+	export CLANG_TARGET=armv7a-linux-androideabi
 fi
 if [ $A_ABI = "x86" ]; then
 	export NDK_ABI=i686
