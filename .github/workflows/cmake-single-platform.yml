@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
-name: CMake on a single platform
+name: CMake for multiple platforms
 
 on:
   push:
@@ -9,10 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,12 +23,42 @@ jobs:
 
     - name: Build for Ubuntu Linux
       run: cmake --build ${{github.workspace}}/build
+  android:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+           arch: ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          submodules: recursive
+
+    - name: Install external dependencies
+      run: bash ${{github.workspace}}/gh/ubuntu_deps_x86_64.sh
 
     - name: Build for Android
-      run: bash ${{github.workspace}}/gh/android.sh ${{github.workspace}}
+      run: bash ${{github.workspace}}/gh/android.sh ${{github.workspace}} ${{matrix.arch}}
 
     - uses: actions/upload-artifact@v4
       with:
-          name: android-artifact
-          path: ${{github.workspace}}/bin/fightable.apk
+          name: android-artifact-${{matrix.arch}}
+          path: ${{github.workspace}}/lib
           if-no-files-found: error
+  apk:
+    runs-on: ubuntu-latest
+    needs: android
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download compiled libraries
+        uses: actions/download-artifact@v3
+        with:
+          path: lib
+
+    - name: Install external dependencies
+      run: bash ${{github.workspace}}/gh/ubuntu_deps_x86_64.sh
+
+    - name: Generate an APK file
+      run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}

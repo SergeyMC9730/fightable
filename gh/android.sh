@@ -10,9 +10,11 @@ yes | sudo sdkmanager --update
 yes | sudo sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "platform-tools" "cmdline-tools;latest" "cmake;$CMAKE_VERSION"
 
 TARGET_REPO=$1
+W_ARCH=$2
 
 cd $TARGET_REPO
 source setup_android_vars.sh
+source translate_abi.sh $W_ARCH
 
 export PATH=/usr/lib/android-sdk/ndk/$NDK_VERSION:$PATH
 
@@ -29,11 +31,12 @@ cd libopenmpt-0.7.13+release/
 cp build/android_ndk/* . -rv
 mkdir jni
 cp * jni/ -r
-ndk-build -j $(nproc)
-sudo cp libs/arm64-v8a/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/ -rv
-sudo cp libs/armeabi-v7a/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/ -rv
-sudo cp libs/x86/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/ -rv
-sudo cp libs/x86_64/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/ -rv
+if ndk-build -j $(nproc) ; then
+	echo
+else
+	exit 1
+fi
+sudo cp libs/$W_ARCH/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
 sudo mkdir -p $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt
 sudo cp libopenmpt/*.h* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt/ -rv
 
@@ -41,7 +44,7 @@ cd ..
 cd libmicrohttpd-1.0.1/
 
 export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
-export TARGET=aarch64-linux-android
+export TARGET=$CLANG_TARGET
 export API=$ANDROID_API
 export AR=$TOOLCHAIN/bin/llvm-ar
 export CC="$TOOLCHAIN/bin/clang --target=$TARGET$API"
@@ -50,54 +53,21 @@ export CXX="$TOOLCHAIN/bin/clang++ --target=$TARGET$API"
 export LD=$TOOLCHAIN/bin/ld
 export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
 export STRIP=$TOOLCHAIN/bin/llvm-strip
-./configure --host $TARGET --prefix=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr
-make -j$(nproc)
-sudo make install
-sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/ -rv
-sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
+if ./configure --host $TARGET --prefix=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr ; then
+	echo
+else
+	exit 1
+fi
 
-make clean
-export TARGET=armv7a-linux-androideabi
-export CC="$TOOLCHAIN/bin/clang --target=$TARGET$API"
-export CXX="$TOOLCHAIN/bin/clang++ --target=$TARGET$API"
-./configure --host $TARGET --prefix=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr
-make -j$(nproc)
+if make -j$(nproc) ; then
+	echo
+else
+	exit 1
+fi
 sudo make install
-sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/ -rv
-sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
-
-make clean
-export TARGET=i686-linux-android
-export CC="$TOOLCHAIN/bin/clang --target=$TARGET$API"
-export CXX="$TOOLCHAIN/bin/clang++ --target=$TARGET$API"
-./configure --host $TARGET --prefix=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr
-make -j$(nproc)
-sudo make install
-sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/ -rv
-sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
-
-make clean
-export TARGET=x86_64-linux-android
-export CC="$TOOLCHAIN/bin/clang --target=$TARGET$API"
-export CXX="$TOOLCHAIN/bin/clang++ --target=$TARGET$API"
-./configure --host $TARGET --prefix=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr
-make -j$(nproc)
-sudo make install
-sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/ -rv
+sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
 sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
 
 cd $TARGET_REPO
-source setup_android_builds.sh
-source compile_android.sh
-
-cd gh
-tr -dc A-Za-z0-9 < /dev/random | (head -c 13; echo) > rand.txt
-cat rand.txt rand.txt keystore.txt rand.txt rand.txt > newkeystore.txt
-cp newkeystore.txt ../
-cd ..
-
-cat newkeystore.txt | bash android_setup.sh
-
-ls bin
-cd bin
-mv app.apk fightable.apk
+source setup_android_build.sh $W_ABI
+source compile_android_arch.sh $W_ABI
