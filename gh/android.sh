@@ -4,6 +4,9 @@ PLATFORM_VERSION=android-26
 CMAKE_VERSION=3.31.5
 
 echo "* cores:" $(nproc)
+echo
+echo "---- COMPILING FOR $2 AT $1 ----"
+echo
 
 yes | sudo sdkmanager --licenses
 yes | sudo sdkmanager --update

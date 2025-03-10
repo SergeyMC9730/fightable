@@ -2,9 +2,17 @@ source setup_android_vars.sh
 export BASE_LIB_PATH=$PWD/lib
 mkdir -p $BASE_LIB_PATH
 
+echo "* BASE_LIB_PATH=$BASE_LIB_PATH"
+echo "* PWD=$PWD"
+echo "* TEST=$2"
+
 LABI=$1
 BPATH=build_android_$LABI
 LIB_PATH=$BASE_LIB_PATH/$LABI
+
+echo "* LABI=$LABI"
+echo "* BPATH=$BPATH"
+echo "* LIB_PATH=$LIB_PATH"
 
 source translate_abi.sh $LABI
 

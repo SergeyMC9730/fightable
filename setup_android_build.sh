@@ -3,6 +3,10 @@ source setup_android_vars.sh
 ABI=$1
 BPATH=build_android_$ABI
 
+echo "* ABI=$ABI"
+echo "* BPATH=$BPATH"
+echo "* TEST=$2"
+
 mkdir $BPATH -p
 cd $BPATH
 
