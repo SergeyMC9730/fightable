@@ -133,8 +133,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
             if (!level->host_allow_pipeline[i]) continue;
 
-            _fBlockUpdate(level->objects + i, level);
-
             int _x = initial_pos.x + (obj.base.block_x * tx);
             int _y = initial_pos.y + (obj.base.block_y * ty);
 
@@ -187,8 +185,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         int _x = initial_pos.x + (obj.base.block_x * tx);
         int _y = initial_pos.y + (obj.base.block_y * ty);
-
-        _fBlockUpdate(level->objects + i, level);
 
         _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
         if (player && player->damage_colddown > 0 && obj.dangerous) {

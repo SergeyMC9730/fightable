@@ -57,17 +57,17 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
             animation->final_value = animation->starting_value + selected->ending_value;
 
 #if DEBUG == 1
-            TraceLog(LOG_INFO, "[%d] keyframe %d completed\n", animation->anim_id, animation->current_keyframe);
+            TraceLog(LOG_INFO, "[%d] keyframe %d completed", animation->anim_id, animation->current_keyframe);
 #endif
 
             if (animation->current_keyframe >= animation->count) {
                 animation->completed_local = 1;
 #if DEBUG == 1
-                TraceLog(LOG_INFO, "[%d] animation completed\n", animation->anim_id);
+                TraceLog(LOG_INFO, "[%d] animation completed", animation->anim_id);
 #endif
                 return;
             }
-        
+
             animation->starting_value += selected->ending_value;
 
             selected = animation->keyframes + animation->current_keyframe;
@@ -85,7 +85,7 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
         _rendererInOutCirc, _rendererInBack, _rendererOutBack,
         _rendererInOutBack, _rendererInElastic, _rendererOutElastic,
         _rendererInOutElastic, _rendererInBounce, _rendererOutBounce,
-        _rendererInOutBounce 
+        _rendererInOutBounce
     };
 
     double _res = 0;
@@ -93,9 +93,9 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
 
     if (animation->current_keyframe < animation->count) {
 #if false
-        TraceLog(LOG_INFO, "[%d] processing keyframe %d\n", animation->anim_id, animation->current_keyframe);
+        TraceLog(LOG_INFO, "[%d] processing keyframe %d", animation->anim_id, animation->current_keyframe);
 #endif
-        
+
         double (*selected_easing)(double) = easings[selected->easing];
 
         _res = selected_easing(animation->itime / selected->length);
@@ -117,7 +117,7 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
         res += anim->current_value;
     }
 
-    animation->current_value = res;    
+    animation->current_value = res;
 
     animation->time += animation->delta;
     animation->itime += animation->delta;

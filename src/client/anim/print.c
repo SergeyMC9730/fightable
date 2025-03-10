@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <raylib.h>
 
 static char __ntRendererAnimTreeText[64] = {};
 
@@ -34,10 +35,10 @@ void _ntRendererPrintAnimationTree(struct renderer_animation *animation) {
 
     size_t tree_level_idx = strlen(__ntRendererAnimTreeText);
 
-    printf("%sbegin anim_id %d:\n", __ntRendererAnimTreeText, animation->anim_id);
+    TraceLog(LOG_INFO, "%sbegin anim_id %d:", __ntRendererAnimTreeText, animation->anim_id);
 
     if (!animation->valid) {
-        printf("%s #invalid animation#\n", __ntRendererAnimTreeText);
+        TraceLog(LOG_INFO, "%s #invalid animation#", __ntRendererAnimTreeText);
 
         if (tree_level_idx != 0) {
             __ntRendererAnimTreeText[--tree_level_idx] = 0;
@@ -46,37 +47,37 @@ void _ntRendererPrintAnimationTree(struct renderer_animation *animation) {
         return;
     }
 
-    printf("%s - initial value: %f\n", __ntRendererAnimTreeText, (float)animation->starting_value);
-    printf("%s - current value: %f (local: %f)\n", __ntRendererAnimTreeText, (float)animation->current_value, (float)animation->local_current_value);
-    printf("%s - final   value: %f\n", __ntRendererAnimTreeText, (float)animation->final_value);
+    TraceLog(LOG_INFO, "%s - initial value: %f", __ntRendererAnimTreeText, (float)animation->starting_value);
+    TraceLog(LOG_INFO, "%s - current value: %f (local: %f)", __ntRendererAnimTreeText, (float)animation->current_value, (float)animation->local_current_value);
+    TraceLog(LOG_INFO, "%s - final   value: %f", __ntRendererAnimTreeText, (float)animation->final_value);
 
-    printf("\n%s - time spent: %f\n", __ntRendererAnimTreeText, (float)animation->time);
-    printf("%s - time spent on keyframe: %f\n", __ntRendererAnimTreeText, (float)animation->itime);
-    printf("%s - delta time: %f\n", __ntRendererAnimTreeText, (float)animation->delta);
+    TraceLog(LOG_INFO, "\n%s - time spent: %f", __ntRendererAnimTreeText, (float)animation->time);
+    TraceLog(LOG_INFO, "%s - time spent on keyframe: %f", __ntRendererAnimTreeText, (float)animation->itime);
+    TraceLog(LOG_INFO, "%s - delta time: %f", __ntRendererAnimTreeText, (float)animation->delta);
 
-    printf("\n%s - completed: %d (local %d)\n", __ntRendererAnimTreeText, animation->completed, animation->completed_local);
+    TraceLog(LOG_INFO, "\n%s - completed: %d (local %d)", __ntRendererAnimTreeText, animation->completed, animation->completed_local);
 
-    printf("\n%s - current keyframe: %d\n", __ntRendererAnimTreeText, animation->current_keyframe);
-    printf("%s - keyframes (%d):\n", __ntRendererAnimTreeText, animation->count);
+    TraceLog(LOG_INFO, "\n%s - current keyframe: %d", __ntRendererAnimTreeText, animation->current_keyframe);
+    TraceLog(LOG_INFO, "%s - keyframes (%d):", __ntRendererAnimTreeText, animation->count);
 
     for (unsigned int i = 0; i < animation->count; i++) {
         struct renderer_keyframe keyframe = animation->keyframes[i];
 
-        printf("%s  %d: (v)%f; (e)%d; (l)%f\n", __ntRendererAnimTreeText, i, (float)keyframe.ending_value, keyframe.easing, (float)keyframe.length);
+        TraceLog(LOG_INFO, "%s  %d: (v)%f; (e)%d; (l)%f", __ntRendererAnimTreeText, i, (float)keyframe.ending_value, keyframe.easing, (float)keyframe.length);
     }
 
     if (animation->linked_animation != NULL) {
-        printf("\n%s - linked animation:\n", __ntRendererAnimTreeText);
-        
+        TraceLog(LOG_INFO, "\n%s - linked animation:", __ntRendererAnimTreeText);
+
         if (tree_level_idx == sizeof(__ntRendererAnimTreeText) - 1) {
-            printf("%s   cannot be displayed: too big tree\n", __ntRendererAnimTreeText);
+            TraceLog(LOG_INFO, "%s   cannot be displayed: too big tree", __ntRendererAnimTreeText);
         } else {
             __ntRendererAnimTreeText[tree_level_idx + 0] = ' ';
 
             _ntRendererPrintAnimationTree(animation->linked_animation);
         }
     } else if (animation->linked_animation == NULL && animation->influenced) {
-        printf("\n%s ?? animation's influenced by NULL\n", __ntRendererAnimTreeText); 
+        TraceLog(LOG_INFO, "\n%s ?? animation's influenced by NULL", __ntRendererAnimTreeText);
     }
 
     if (tree_level_idx != 0) {

@@ -1,3 +1,4 @@
+#include "fightable/level.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
 #include <fightable/state.h>
@@ -79,6 +80,10 @@ struct feditor *_fEditorCreate() {
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);
 
     __state.sound_engine.do_not_shake = 1;
+
+    if (editor->level.block_processor_thread == 0) {
+        _fLevelLoadProcessor(&editor->level);
+    }
 
     return editor;
 }

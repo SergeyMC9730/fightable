@@ -43,7 +43,7 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
         if (cJSON_IsNumber(tmp_obj)) {
             frame.length = cJSON_GetNumberValue(tmp_obj);
         } else {
-            TraceLog(LOG_INFO, "parse_keyframe.c: length is not a number (NaN)\n");
+            TraceLog(LOG_INFO, "%s:%s: length is not a number (NaN)", __FILE_NAME__, __LINE__);
         }
     }
 
@@ -54,7 +54,7 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
         if (cJSON_IsNumber(tmp_obj)) {
             frame.ending_value = cJSON_GetNumberValue(tmp_obj);
         } else {
-            TraceLog(LOG_INFO, "parse_keyframe.c: ending_value is not a number (NaN)\n");
+            TraceLog(LOG_INFO, "%s:%s: ending_value is not a number (NaN)\n", __FILE_NAME__, __LINE__);
         }
     }
 
@@ -64,11 +64,11 @@ struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {
         // check if easing can be parsed or not
         if (cJSON_IsNumber(tmp_obj)) {
             renderer_tweak_type easing = (renderer_tweak_type)(cJSON_GetNumberValue(tmp_obj));
-        
+
             // easing should not be set beyond the TOEnd
             frame.easing = easing % TOEnd;
         } else {
-            TraceLog(LOG_INFO, "parse_keyframe.c: easing is not a number (NaN)\n");
+            TraceLog(LOG_INFO, "%s:%s: easing is not a number (NaN)\n", __FILE_NAME__, __LINE__);
         }
     }
 

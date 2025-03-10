@@ -75,7 +75,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 			uint8_t bitdata = ref[9];
 
 			struct fblock block = _fBlockFromId(id);
-			
+
 			block.layer_id = 0;
 			block.base.block_x = x;
 			block.base.block_y = y;
@@ -312,6 +312,10 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 	}
 
 	if (data != NULL) MemFree(data);
+
+	if (level) {
+	   _fLevelLoadProcessor(level);
+	}
 
 	return level;
 }

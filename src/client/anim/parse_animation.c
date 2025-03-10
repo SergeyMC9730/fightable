@@ -31,12 +31,20 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
     // load data from PATH to text. we expect data from path to be UTF-8 or ASCII text
     char *text = LoadFileText(path);
 
+    if (text == NULL) {
+        TraceLog(LOG_ERROR, "%s:%s: could not load %s", __FILE_NAME__, __LINE__, path);
+
+        return NULL;
+    }
+
     // lets try to interpret this text as JSON object
     cJSON *root = cJSON_Parse(text);
 
     if (root == NULL) {
         // parsing failed. cleaning everything
         // and returning NULL
+
+        TraceLog(LOG_ERROR, "%s:%s: could not parse %s", __FILE_NAME__, __LINE__, path);
 
         MemFree(text);
         return NULL;
@@ -52,7 +60,7 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
     // required entries because it would save some
     // stack space
 
-    // try to get reference to the linked animation. 
+    // try to get reference to the linked animation.
     // we need a file path to this anim
     cJSON *tmp_obj = cJSON_GetObjectItem(root, "linked_animation_path");
     if (tmp_obj) {
@@ -68,10 +76,10 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
             // allocate enough memory to work with
             size_t sz = strlen(root_path) + strlen(linked_animation_path) + 4;
             char *tmp = MemAlloc(sz);
-            
+
             // create filepath for the linked animation
             snprintf(tmp, sz, "%s/%s", root_path, linked_animation_path);
-        
+
             // try to parse this linked animation
             struct renderer_animation *lanim = _ntRendererLoadAnimation(tmp);
             result->linked_animation = lanim;
@@ -98,7 +106,7 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
         if (cJSON_IsNumber(tmp_obj)) {
             result->anim_id = (int)cJSON_GetNumberValue(tmp_obj);
         } else {
-            TraceLog(LOG_INFO, "parse_animation.c: anim_id is not a number (NaN)\n");
+            TraceLog(LOG_ERROR, "%s:%s: anim_id is not a number (NaN)", __FILE_NAME__, __LINE__);
         }
     }
 
@@ -109,13 +117,13 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
             result->starting_value = cJSON_GetNumberValue(tmp_obj);
             result->early_value = result->starting_value;
         } else {
-            TraceLog(LOG_INFO, "parse_animation.c: starting_value is not a number (NaN)\n");
+            TraceLog(LOG_ERROR, "%s:%s: starting_value is not a number (NaN)", __FILE_NAME__, __LINE__);
         }
     }
 
     // try to get keyframes array
     tmp_obj = cJSON_GetObjectItem(root, "keyframes");
-    
+
     // check if tmp_obj is valid and is an array
     if (tmp_obj && cJSON_IsArray(tmp_obj)) {
         // get size of this array
@@ -131,24 +139,24 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
         for (int i = 0; i < cJSON_GetArraySize(tmp_obj); i++) {
             // get object from the array
             cJSON *obj = cJSON_GetArrayItem(tmp_obj, i);
-            
+
             // check if obj is valid and is an object
             if (obj && cJSON_IsObject(obj)) {
                 // parse keyframe
                 struct renderer_keyframe keyframe = _ntRendererLoadKeyframe(obj);
-            
+
                 // check if keyframe is not valid
                 if (keyframe.length < 0) continue;
 
                 // copy keyframe to the keyframe array
                 result->keyframes[i] = keyframe;
             } else {
-                TraceLog(LOG_INFO, "parse_animation.c: array element with invalid type found\n");
+                TraceLog(LOG_ERROR, "%s:%s: array element with invalid type found", __FILE_NAME__, __LINE__);
             }
         }
     }
 
-    // set 'valid' flag. 
+    // set 'valid' flag.
     // we take in a mind that keyframe array should be valid
 
     result->valid = true && result->keyframes != NULL;

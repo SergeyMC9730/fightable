@@ -1,15 +1,17 @@
+#include "raylib.h"
 #include <fightable/level.h>
 #include <fightable/camera.h>
 #include <fightable/tilemap.h>
 #include <fightable/block.h>
+#include <pthread.h>
 #include <stdlib.h>
 
-struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){ 
+struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){
     struct flevel level = {};
-    
+
     level.width = 32;
     level.height = 8;
-    
+
     level.data_size = level.width * level.height;
     level.objects = (struct fblock *)malloc(sizeof(struct fblock) * level.data_size);
     level.tilemap = tilemap;
@@ -41,6 +43,11 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
 
     level.background_tile = _fTilemapExportTile(tilemap, background_tile);
     SetTextureWrap(level.background_tile, TEXTURE_WRAP_REPEAT);
+
+    level.tps = 20.f;
+    level.block_processor_thread = 0;
+
+    TraceLog(LOG_WARNING, "Tick thread won't be created when creating a test level");
 
     return level;
 }

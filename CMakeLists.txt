@@ -45,6 +45,7 @@ if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
         src/client/init_ptx.cu
         src/client/level/prepare_render.cu
         src/client/level/reload_cuda_ctx.cu
+        src/client/level/destroy.cu
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -252,6 +253,8 @@ set(FIGHTABLE_SRC
     src/client/etc/unitype.c
     src/client/renderer/grid_3d.c
     src/client/block/bitfield.c
+    src/client/level/destroy.c
+    src/client/level/block_processor.c
     ${FIGHTABLE_GPU_SRC}
 )
 
