@@ -19,3 +19,4 @@ elif [ $A_ABI = "x86_64" ]; then
 else
 	echo "!! architecture not supported (A_ABI=$A_ABI)"
 	exit 1
+fi
