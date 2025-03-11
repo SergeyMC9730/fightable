@@ -1,4 +1,7 @@
 BPATH=$1
 
-ls $BPATH
-ls $BPATH/lib
+ls $BPATH -la
+echo ---------------
+ls $BPATH/lib -la
+echo ---------------
+file $BPATH/lib/*
