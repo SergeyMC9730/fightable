@@ -14,13 +14,15 @@ void *_fLevelDoBlockUpdate(void* _level) {
     clock_t end;
 
     while (!level->block_p_close) {
-        if (level->block_p_profile) start = clock();
-        _fLevelTick(level);
-        if (level->block_p_profile) {
-            end = clock();
-            double t = ((double)(end - start) / (double)CLOCKS_PER_SEC) * 1000.f;
+        if (!level->pause_world) {
+            if (level->block_p_profile) start = clock();
+            _fLevelTick(level);
+            if (level->block_p_profile) {
+                end = clock();
+                double t = ((double)(end - start) / (double)CLOCKS_PER_SEC) * 1000.f;
 
-            TraceLog(LOG_INFO, "Level ticked in %fms", (float)t);
+                TraceLog(LOG_INFO, "Level ticked in %fms", (float)t);
+            }
         }
 
         if (level->tps > 0.f) _fSleep((int)(1000.f / level->tps));

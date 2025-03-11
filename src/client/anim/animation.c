@@ -37,6 +37,14 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
 
     animation->valid = 1;
 
+    if (animation->completed && animation->looping) {
+#if DEBUG == 1
+        TraceLog(LOG_INFO, "[%d] repeating whole animation", animation->anim_id);
+#endif
+
+        _ntRendererResetAnimation(animation);
+    }
+
     if (animation->linked_animation != NULL) {
         struct renderer_animation *anim = (struct renderer_animation *)animation->linked_animation;
         anim->delta = animation->delta;
@@ -129,8 +137,8 @@ void _ntRendererResetAnimation(struct renderer_animation* animation) {
     animation->completed = 0;
     animation->completed_local = 0;
     animation->current_keyframe = 0;
-    animation->current_value = 0;
     animation->starting_value = animation->early_value;
+    animation->current_value = animation->starting_value;
     animation->itime = 0;
     animation->time = 0;
 

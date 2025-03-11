@@ -81,6 +81,9 @@ struct renderer_animation {
 
     // indicates if animation is valid or not
     unsigned char valid;
+
+    // indicates if animation should play again after it finished
+    unsigned char looping;
 };
 
 // updates current keyframe inside of animation chain and switches to the next one if required.

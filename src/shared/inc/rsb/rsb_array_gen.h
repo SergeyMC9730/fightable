@@ -119,7 +119,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->len--;                                                                                                       \
     array->added_elements--;                                                                                            \
                                                                                                                         \
-    if (array->current_index > array->len) {                                                                            \
+    if (array->current_index > array->added_elements) {                                                                 \
         if (array->current_index != 0) array->current_index--;                                                          \
     }                                                                                                                   \
                                                                                                                         \
@@ -149,7 +149,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     while (destination->lock) {}                                                            \
     destination->lock = 1;                                                                  \
                                                                                             \
-    for (size_t i = 0; i < source->len; i++) {                                              \
+    for (size_t i = 0; i < source->added_elements; i++) {                                   \
         type obj = RSBGetAtIndex##funname(source, i);                                       \
                                                                                             \
         RSBAddElement##funname(destination, obj);                                           \
@@ -162,11 +162,11 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 #define RSB_ARRAY_FUNC_ADDELEMENTATINDEX_IMPL(type, funname) RSB_ARRAY_FUNC_ADDELEMENTATINDEX_DEF(type, funname) {  \
     if (!array || index > array->len) return;                                                                       \
     while (array->lock) {}                                                                                          \
-    array->lock = 1;                                                                                                \
+    array->lock = 0;                                                                                                \
                                                                                                                     \
     rsb_array_##funname *new_arr = RSBCreateArray##funname();                                                       \
                                                                                                                     \
-    for (size_t i = 0; i < array->len; i++) {                                                                       \
+    for (size_t i = 0; i < array->added_elements; i++) {                                                            \
         if (i == index) {                                                                                           \
             RSBAddElement##funname(new_arr, object);                                                                \
         }                                                                                                           \
@@ -174,11 +174,9 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
         RSBAddElement##funname(new_arr, RSBGetAtIndex##funname(array, i));                                          \
     }                                                                                                               \
                                                                                                                     \
-    while (array->len != 0) {                                                                                       \
-        RSBPopElement##funname(array);                                                                              \
-    }                                                                                                               \
+    RSBClear##funname(array);                                                                                       \
                                                                                                                     \
-    for (size_t i = 0; i < new_arr->len; i++) {                                                                     \
+    for (size_t i = 0; i < new_arr->added_elements; i++) {                                                          \
         RSBAddElement##funname(array, RSBGetAtIndex##funname(new_arr, i));                                          \
     }                                                                                                               \
                                                                                                                     \
@@ -189,21 +187,19 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 #define RSB_ARRAY_FUNC_POPELEMENTATINDEX_IMPL(type, funname) RSB_ARRAY_FUNC_POPELEMENTATINDEX_DEF(type, funname) {  \
     if (!array || index > array->len) return;                                                                       \
     while (array->lock) {}                                                                                          \
-    array->lock = 1;                                                                                                \
+    array->lock = 0;                                                                                                \
                                                                                                                     \
     rsb_array_##funname *new_arr = RSBCreateArray##funname();                                                       \
                                                                                                                     \
-    for (size_t i = 0; i < array->len; i++) {                                                                       \
+    for (size_t i = 0; i < array->added_elements; i++) {                                                            \
         if (i != index) {                                                                                           \
             RSBAddElement##funname(new_arr, RSBGetAtIndex##funname(array, i));                                      \
         }                                                                                                           \
     }                                                                                                               \
                                                                                                                     \
-    while (array->len != 0) {                                                                                       \
-        RSBPopElement##funname(array);                                                                              \
-    }                                                                                                               \
+    RSBClear##funname(array);                                                                                       \
                                                                                                                     \
-    for (size_t i = 0; i < new_arr->len; i++) {                                                                     \
+    for (size_t i = 0; i < new_arr->added_elements; i++) {                                                          \
         RSBAddElement##funname(array, RSBGetAtIndex##funname(new_arr, i));                                          \
     }                                                                                                               \
                                                                                                                     \

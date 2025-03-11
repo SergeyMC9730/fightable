@@ -1,3 +1,4 @@
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/level.h>
@@ -18,6 +19,10 @@ extern double _rendererOutQuint(double x);
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (!level || !level->tilemap) return;
+
+    if (IsKeyPressed(KEY_P)) {
+        level->pause_world = !level->pause_world;
+    }
 
 #ifdef COTARGET_PTX
     if (__state.can_use_gpu_accel) {

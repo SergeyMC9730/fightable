@@ -8,7 +8,7 @@
 
 void _flPlayerDamage(struct felplayer* instance, float hp) {
 	_fEntityDamage(&instance->base, hp);
-	
+
 	if (instance->base.damage_colddown == instance->base.max_damage_colddown) {
 		TraceLog(LOG_INFO, "Applied damage to local player");
 

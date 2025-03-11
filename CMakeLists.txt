@@ -414,6 +414,15 @@ target_include_directories(tcpclient-raylib-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
+add_executable(anim_editor src/anim_editor/main.cpp)
+target_link_libraries(anim_editor fbase raylib ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(tcpclient-raylib-test PRIVATE
+    src/client/inc
+    ext/raylib/src
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
 if (NOT DISABLE_MP_SERVER)
     if (WIN32)
         set(HTTPSERVER_NAME libhttpserver-win32)
@@ -614,4 +623,4 @@ endif()
 message(STATUS "")
 message(STATUS "")
 
-####
+#####

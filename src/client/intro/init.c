@@ -1,6 +1,5 @@
 #include <fightable/intro.h>
 #include <fightable/state.h>
-#include <stdio.h>
 
 #define SONGS_AVAILABLE 2
 

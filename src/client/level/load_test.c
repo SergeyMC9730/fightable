@@ -45,7 +45,7 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
     level->background_tile = _fTilemapExportTile(tilemap, background_tile);
     SetTextureWrap(level->background_tile, TEXTURE_WRAP_REPEAT);
 
-    level->tps = 20.f;
+    level->tps = 50.f;
     level->block_processor_thread = 0;
 
     _fLevelLoadProcessor(level);

@@ -90,11 +90,17 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
 
     // try to get 'influenced' flag
     tmp_obj = cJSON_GetObjectItem(root, "influenced");
-    if (tmp_obj) {
+    if (tmp_obj && cJSON_IsBool(tmp_obj)) {
         bool value = cJSON_IsTrue(tmp_obj);
 
         // we also need to check if linked_animation is valid
         result->influenced = value && result->linked_animation != NULL;
+    }
+
+    // try to get 'looping' flag
+    tmp_obj = cJSON_GetObjectItem(root, "looping");
+    if (tmp_obj && cJSON_IsBool(tmp_obj)) {
+        result->looping = cJSON_IsTrue(tmp_obj);
     }
 
     // try to get animation id

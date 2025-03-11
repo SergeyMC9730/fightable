@@ -1,8 +1,6 @@
 #include <fightable/intro.h>
 #include <raylib.h>
 #include <fightable/state.h>
-#include <stdio.h>
-#include <math.h>
 #include <fightable/debug.h>
 
 #ifdef DEBUG

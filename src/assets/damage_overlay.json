@@ -12,5 +12,6 @@
       "ending_value": -0.8,
       "easing": 2
     }
-  ]
+  ],
+  "looping": true
 }
