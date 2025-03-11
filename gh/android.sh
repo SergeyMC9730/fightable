@@ -8,7 +8,7 @@ echo
 echo "---- COMPILING FOR $2 AT $1 ----"
 echo
 
-yes | sudo sdkmanager --licenses
+yes | sudo sdkmanager --licenses > /dev/null
 yes | sudo sdkmanager --update
 yes | sudo sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "platform-tools" "cmdline-tools;latest" "cmake;$CMAKE_VERSION"
 
@@ -18,6 +18,8 @@ W_ARCH=$2
 cd $TARGET_REPO
 source setup_android_vars.sh
 source translate_abi.sh $W_ARCH
+
+echo "---- TRANSLATED ABI: $W_ARCH $CLANG_TARGET $W_ABI'
 
 export PATH=/usr/lib/android-sdk/ndk/$NDK_VERSION:$PATH
 
