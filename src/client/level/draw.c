@@ -57,13 +57,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         }
     }
 
-    RLRectangle *rects = 0;
-    struct fentity *player = 0;
-
-    if (level->entities) {
-        rects = _fLevelGetHitboxes(level);
-        player = _fLevelFindPlayer(level);
-    }
+    struct fentity *player = _fLevelFindPlayer(level);
 
     Camera2D actual_cam = level->camera;
     actual_cam.target.x = (int)actual_cam.target.x + __state.gui_render_offset.x;
@@ -214,23 +208,15 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 #endif
 
-    if (level->entities && rects) {
-        for (int i = 0; i < level->entities->added_elements; i++) {
-            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
-            if (!entity) continue;
-
-            entity->obstacles = rects;
-            entity->obstacles_length = level->data_size;
-
-            if (!entity->update) {
-                _fEntityUpdate(entity);
-            }
-            else {
-                entity->update(entity);
-            }
-        }
-
+    if (level->entities) {
         if (player) {
+            player->custom_delta = 0.f;
+            player->obstacles = _fLevelGetHitboxes(level);
+            player->obstacles_length = level->data_size;
+            player->update(player);
+            MemFree(player->obstacles);
+            player->obstacles_length = 0;
+
             EndMode2D();
 
             actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
@@ -240,7 +226,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         }
 
         for (int i = 0; i < level->entities->added_elements; i++) {
-            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
+            struct fentity* entity = level->entities->objects[i];
             if (!entity) continue;
 
             if (!entity->draw) {
@@ -273,10 +259,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     EndBlendMode();
 
     EndMode2D();
-
-    if (rects) {
-        MemFree(rects);
-    }
 
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");

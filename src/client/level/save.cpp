@@ -68,7 +68,31 @@ void _fLevelSave(struct flevel* level, const char* filename) {
 				u = e.entry;
 
 				while (u != NULL) {
-					if (!u->name || (u->p == NULL && u->p_sz != 0) || (u->p != NULL && u->p_sz == 0)) continue;
+				    if (!u->name || (u->p == NULL && u->p_sz != 0) || (u->p != NULL && u->p_sz == 0)) {
+						TraceLog(LOG_WARNING, "%d: Entry cannot be saved properly %s(status=%d%d%d%d%d|%p.%d.%c)",
+						    i,
+						    u->next == NULL ? "and continued " : "\0",
+							!u->name,
+							u->p == NULL,
+							u->p_sz != 0,
+							u->p != NULL,
+							u->p_sz == 0,
+							u->p,
+							u->p_sz,
+							u->type
+						);
+
+						GenericTools::addVectors(&output, GenericTools::valueToVector((size_t)0));
+						GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
+						GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
+
+						if (u->next == NULL) {
+							break;
+						} else {
+							u = u->next;
+							continue;
+						}
+					}
 
 					std::string name = u->name;
 					size_t name_len = name.length();

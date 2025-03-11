@@ -255,6 +255,7 @@ set(FIGHTABLE_SRC
     src/client/block/bitfield.c
     src/client/level/destroy.c
     src/client/level/block_processor.c
+    src/client/entity/base/getters.c
     ${FIGHTABLE_GPU_SRC}
 )
 

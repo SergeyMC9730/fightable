@@ -18,7 +18,7 @@ struct feditor {
     unsigned short current_block_id;
 
     Camera2D camera;
-    struct flevel level;
+    struct flevel *level;
 
     Texture2D select_block_label;
 

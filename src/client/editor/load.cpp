@@ -29,6 +29,7 @@ struct feditor *_fEditorCreate() {
         editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
     }
     else {
+        TraceLog(LOG_INFO, "Opening chosen level");
         auto ref = _fLevelLoadFromFile(out_path);
         if (!ref) {
             TraceLog(LOG_INFO, "Could not open level");
@@ -37,20 +38,21 @@ struct feditor *_fEditorCreate() {
         else {
             TraceLog(LOG_INFO, "Opening chosen level");
 
-            editor->level = *ref;
-            MemFree(ref);
+            editor->level = ref;
         }
+
+        __state.current_level = editor->level;
 
         NFD_FreePathU8(out_path);
     }
 #else
     editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
 #endif
-    editor->level.camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
+    editor->level->camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
     editor->select_block_label = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
 
-    editor->render_objects.assign(editor->level.objects, editor->level.objects + editor->level.data_size);
+    editor->render_objects.assign(editor->level->objects, editor->level->objects + editor->level->data_size);
 
     for (const fblock &obj : editor->render_objects) {
         while (editor->objects.size() < (obj.layer_id + 1)) {
@@ -77,12 +79,12 @@ struct feditor *_fEditorCreate() {
     editor->test_model = LoadModel(".fightable/test.obj");
 
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
-    TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level.camera_size.x, editor->level.camera_size.y);
+    TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level->camera_size.x, editor->level->camera_size.y);
 
     __state.sound_engine.do_not_shake = 1;
 
-    if (editor->level.block_processor_thread == 0) {
-        _fLevelLoadProcessor(&editor->level);
+    if (editor->level->block_processor_thread == 0) {
+        _fLevelLoadProcessor(editor->level);
     }
 
     return editor;

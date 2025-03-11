@@ -5,10 +5,6 @@
 
 void _fIntroMenuOnEditorCallback() {
     __state.current_editor = _fEditorCreate();
-    MemFree(__state.current_level->objects);
-    __state.current_level->objects = NULL;
-
-    __state.current_level = NULL;
 
     __state.initial_game_size.x += __state.editor_size.x;
     __state.initial_game_size.y += __state.editor_size.y;

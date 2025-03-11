@@ -1,5 +1,6 @@
 #include <fightable/state.h>
-#include <fightable/sanitizer.h>    
+#include <fightable/sanitizer.h>
+#include <fightable/renderer.h>
 
 void _fGfxActivateDamageOverlay() {
     __state.damage_overlay_timer += 1.5f;
@@ -31,7 +32,7 @@ void _fGfxDrawDamageOverlay() {
             __state.damage_overlay_anim->current_value = __state.damage_overlay_anim->starting_value;
         }
 
-        float scale = _ntRendererGetAnimationResult(__state.damage_overlay_anim, 1);
+        float scale = _ntRendererGetAnimationResult(__state.damage_overlay_anim, 1) / ((float)UI_SCALE / 4.f);
         const Vector2 texture_size = {
             (float)__state.damage_overlay.width * scale,
             (float)__state.damage_overlay.height * scale,

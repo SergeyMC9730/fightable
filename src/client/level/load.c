@@ -40,8 +40,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 		TraceLog(LOG_INFO, "Objects: %d", objects);
 
-		level = (struct flevel*)MemAlloc(sizeof(struct flevel));
-		*level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });
+		level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });
 
 		free(level->objects);
 
@@ -117,8 +116,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 		TraceLog(LOG_INFO, "Objects: %d", objects);
 
-		level = (struct flevel*)MemAlloc(sizeof(struct flevel));
-		*level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });
+		level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });;
 
 		free(level->objects);
 
@@ -211,8 +209,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 		TraceLog(LOG_INFO, "Level size: %dx%d", width, height);
 		TraceLog(LOG_INFO, "Objects: %d", objects);
 
-		level = (struct flevel*)MemAlloc(sizeof(struct flevel));
-		*level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });
+		level = _fLevelLoadTest(__state.tilemap, (IVector2) { 28, 4 });
 
 		free(level->objects);
 
@@ -278,7 +275,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 				fread(&name_len, sizeof(name_len), 1, file);
 
 				char* name = (char *)malloc(name_len + 1);
-				fread(name, sizeof(char), name_len, file);
+				if (name_len != 0) fread(name, sizeof(char), name_len, file);
 				name[name_len] = '\0';
 
 				char type;
@@ -287,8 +284,11 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 				unsigned int p_sz;
 				fread(&p_sz, sizeof(p_sz), 1, file);
 
-				void* p = malloc(p_sz);
-				fread(p, 1, p_sz, file);
+				void* p = NULL;
+				if (p_sz != 0) {
+				    p = malloc(p_sz);
+					fread(p, 1, p_sz, file);
+				}
 
 				unitype_t* u = __uni_createbase(name, type);
 				if (u->p) free(u->p);
@@ -312,10 +312,6 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 	}
 
 	if (data != NULL) MemFree(data);
-
-	if (level) {
-	   _fLevelLoadProcessor(level);
-	}
 
 	return level;
 }

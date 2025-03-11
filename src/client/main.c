@@ -19,9 +19,7 @@
 #include <pthread.h>
 #include <math.h>
 #include <nfd.h>
-int flags = 0;
-bool v_sync_flag = 1;
-struct flevel __level;
+
 struct ftilemap __tilemap;
 
 #ifndef TARGET_ANDROID
@@ -141,10 +139,10 @@ void _fInit(int argc, char **argv) {
 
     // __state.can_use_gpu_accel = 0;
 #endif
-    flags = 0;
-    v_sync_flag = 1;
+    // flags = 0;
+    // v_sync_flag = 1;
     // if(v_sync_flag) flags |= FLAG_VSYNC_HINT;
-    SetConfigFlags(flags);
+    // SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
     // SetTargetFPS(30);
@@ -196,9 +194,6 @@ void _fInit(int argc, char **argv) {
 
     __state.text_manager = _fTextLoadDefault();
 
-    __level = _fLevelLoadTest(__state.tilemap, (IVector2){28, 4});
-    __state.current_level = &__level;
-
     if (argc > 1) {
         printf("ARGV[1] = %s\n", argv[1]);
 
@@ -219,7 +214,6 @@ void _fInit(int argc, char **argv) {
 
         if (want_editor) {
             __state.current_editor = _fEditorCreate();
-            free(__level.objects);
 
             __state.current_level = NULL;
 

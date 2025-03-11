@@ -74,6 +74,7 @@ unitype_t* __uni_create(const char* mask) {
 	res->name = "base";
 	res->type = UNITYPE_TYPEBASE;
 	res->p = res;
+	res->p_sz = sizeof(unitype_t);
 
 	// Parse mask
 	if (mask) {

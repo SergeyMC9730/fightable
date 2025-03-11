@@ -17,3 +17,7 @@ void _fEntitySetDestroyTimer(struct fentity* entity, float time) {
 	entity->begin_destruction = 1;
 	entity->destroy_timer = time;
 }
+void _fEntitySetDelta(struct fentity* entity, float delta) {
+    if (!entity) return;
+    entity->custom_delta = delta;
+}

@@ -1,7 +1,9 @@
-#include "fightable/time.h"
-#include "raylib.h"
+#define WITH_PLACEHOLDERS
+
 #include <fightable/level.h>
 #include <fightable/block.h>
+#include <fightable/entity.h>
+#include <fightable/time.h>
 #include <time.h>
 
 void *_fLevelDoBlockUpdate(void* _level) {
@@ -34,11 +36,41 @@ void _fLevelTick(struct flevel* level) {
     for (unsigned int i = 0; i < level->data_size; i++) {
         _fBlockUpdate(level->objects + i, level);
     }
+
+    RLRectangle *rects = 0;
+    struct fentity *player = 0;
+
+    float delta = 1.f / level->tps;
+
+    if (level->entities) {
+        rects = _fLevelGetHitboxes(level);
+        player = _fLevelFindPlayer(level);
+    }
+
+    if (level->entities && rects) {
+        for (int i = 0; i < level->entities->added_elements; i++) {
+            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
+            if (!entity || entity == player) continue;
+
+            entity->obstacles = rects;
+            entity->obstacles_length = level->data_size;
+            entity->custom_delta = delta;
+
+            if (!entity->update) {
+                _fEntityUpdate(entity);
+            }
+            else {
+                entity->update(entity);
+            }
+        }
+    }
+
+    if (rects) MemFree(rects);
 }
 void _fLevelLoadProcessor(struct flevel *level) {
     TraceLog(LOG_INFO, "Loading level's tick thread");
 
-    level->block_p_profile = 1;
+    level->block_p_profile = 0;
 
     pthread_create(&level->block_processor_thread, NULL, _fLevelDoBlockUpdate, level);
 }

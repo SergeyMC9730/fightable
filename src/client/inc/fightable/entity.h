@@ -86,6 +86,8 @@ struct fentity {
 
     float destroy_timer;
 
+    float custom_delta;
+
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
     void (*cleanup)(struct fentity* entity);
@@ -126,6 +128,9 @@ void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj acc
 enum fentity_accessory_type _fAccessoryGetType(enum fentity_accessory_obj accessory);
 
 void _fEntitySetDestroyTimer(struct fentity* entity, float time);
+
+void _fEntitySetDelta(struct fentity* entity, float delta);
+float _fEntityGetDelta(struct fentity* entity);
 
 #ifdef __cplusplus
 }

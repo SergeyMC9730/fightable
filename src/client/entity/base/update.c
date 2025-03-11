@@ -2,13 +2,9 @@
 
 #include <fightable/entity.h>
 #include <raylib.h>
-#include <stdio.h>
 #include <fightable/debug.h>
 #include <fightable/color.h>
 #include <fightable/level.h>
-
-#define X_SPEED 70.f
-#define Y_SPEED 150.f
 
 // #define DEBUG
 
@@ -18,7 +14,7 @@ void _fEntityUpdate(struct fentity* entity) {
     static const double max_speed_x = 1.5 / 1.1 * 70.f;
     static const double max_speed_y = 3.f * 20.f;
 
-    const double delta = GetFrameTime();
+    const double delta = _fEntityGetDelta(entity);
 
     if (entity->moving_horizontally && !entity->moving_negative) {
         entity->speed.x += delta * 180.f;

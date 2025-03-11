@@ -6,28 +6,29 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){
-    struct flevel level = {};
+struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){
+    struct flevel *level = (struct flevel *)malloc(sizeof(struct flevel));
+    memset(level, 0, sizeof(struct flevel));
 
-    level.width = 32;
-    level.height = 8;
+    level->width = 32;
+    level->height = 8;
 
-    level.data_size = level.width * level.height;
-    level.objects = (struct fblock *)malloc(sizeof(struct fblock) * level.data_size);
-    level.tilemap = tilemap;
+    level->data_size = level->width * level->height;
+    level->objects = (struct fblock *)malloc(sizeof(struct fblock) * level->data_size);
+    level->tilemap = tilemap;
 
-    memset(level.objects, 0, sizeof(struct fblock) * level.data_size);
+    memset(level->objects, 0, sizeof(struct fblock) * level->data_size);
 
-    level.camera = _fCameraLoadDefault();
-    level.camera_size = (IVector2){level.width * tilemap->tile_size.x, level.height * tilemap->tile_size.y};
+    level->camera = _fCameraLoadDefault();
+    level->camera_size = (IVector2){level->width * tilemap->tile_size.x, level->height * tilemap->tile_size.y};
 
-    level.block_entries = RSBCreateArray_lre();
+    level->block_entries = RSBCreateArray_lre();
 
-    for (int x = 0; x < level.width; x++) {
-        for (int y = 0; y < level.height; y++) {
-            int idx = (y * level.width) + x;
+    for (int x = 0; x < level->width; x++) {
+        for (int y = 0; y < level->height; y++) {
+            int idx = (y * level->width) + x;
 
-            struct fblock *obj = level.objects + idx;
+            struct fblock *obj = level->objects + idx;
 
             if (y == 0) {
                 *obj = _fBlockFromId(2);
@@ -41,13 +42,13 @@ struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile
         }
     }
 
-    level.background_tile = _fTilemapExportTile(tilemap, background_tile);
-    SetTextureWrap(level.background_tile, TEXTURE_WRAP_REPEAT);
+    level->background_tile = _fTilemapExportTile(tilemap, background_tile);
+    SetTextureWrap(level->background_tile, TEXTURE_WRAP_REPEAT);
 
-    level.tps = 20.f;
-    level.block_processor_thread = 0;
+    level->tps = 20.f;
+    level->block_processor_thread = 0;
 
-    TraceLog(LOG_WARNING, "Tick thread won't be created when creating a test level");
+    _fLevelLoadProcessor(level);
 
     return level;
 }

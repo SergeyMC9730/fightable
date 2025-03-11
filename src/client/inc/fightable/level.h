@@ -83,7 +83,7 @@ struct flevel {
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
 void _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
-struct flevel _fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
+struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
 RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
 fserializable _fLevelSerialize(struct flevel *level);

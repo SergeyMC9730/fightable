@@ -46,8 +46,8 @@ void _fEditorDraw(struct feditor *editor) {
         }
     }
 
-    editor->level.in_workbench_mode = ~editor->should_playback;
-    if (editor->level.in_workbench_mode) {
+    editor->level->in_workbench_mode = ~editor->should_playback;
+    if (editor->level->in_workbench_mode) {
         editor->entities.clear();
     }
 
@@ -69,7 +69,7 @@ void _fEditorDraw(struct feditor *editor) {
         }
         float delta_speed = delta * speed;
 
-        editor->level.camera = editor->camera;
+        editor->level->camera = editor->camera;
         editor->render_objects.clear();
         if (editor->current_layer < 0) {
             int l = 0;
@@ -101,18 +101,18 @@ void _fEditorDraw(struct feditor *editor) {
             }
         }
 
-        editor->level.objects = editor->render_objects.data();
-        editor->level.data_size = editor->render_objects.size();
+        editor->level->objects = editor->render_objects.data();
+        editor->level->data_size = editor->render_objects.size();
     }
 
     if (!editor->should_playback) {
-        editor->level.render_crop_area = { 0, 0, 800 / (float)UI_SCALE, 600 / (float)UI_SCALE};
+        editor->level->render_crop_area = { 0, 0, 800 / (float)UI_SCALE, 600 / (float)UI_SCALE};
     }
     else {
-        editor->level.render_crop_area = { 0, 0, 0, 0 };
+        editor->level->render_crop_area = { 0, 0, 0, 0 };
     }
 
-    _fLevelDraw(&editor->level, {0, 0});
+    _fLevelDraw(editor->level, {0, 0});
 
     Color bouncing_color = RED;
     float v = 128.f * ((std::sin(__state.time * 3.f) / 2.f) + 0.5f) + 15.f;
@@ -125,7 +125,7 @@ void _fEditorDraw(struct feditor *editor) {
     // printf("b\n");
 
     if (editor->should_process_interactions && !editor->should_display_selector) {
-        Camera2D actual_cam = editor->level.camera;
+        Camera2D actual_cam = editor->level->camera;
         actual_cam.target.x = (int)actual_cam.target.x;
         actual_cam.target.y = (int)actual_cam.target.y;
 
@@ -136,8 +136,8 @@ void _fEditorDraw(struct feditor *editor) {
 
         // printf("pos: %f:%f\n", m_world_pos.x, m_world_pos.y);
 
-        float tx = editor->level.tilemap->tile_size.x;
-        float ty = editor->level.tilemap->tile_size.y;
+        float tx = editor->level->tilemap->tile_size.x;
+        float ty = editor->level->tilemap->tile_size.y;
 
         if (mouse_pos.x > 160 || mouse_pos.x < 0) {
             mouse_out_of_bounds = true;
@@ -292,9 +292,9 @@ void _fEditorDraw(struct feditor *editor) {
         } else {
             fblock obj = selected_object.value();
 
-            center = (space - editor->level.tilemap->tile_size.x) / 2;
+            center = (space - editor->level->tilemap->tile_size.x) / 2;
 
-            _fTilemapDraw(editor->level.tilemap, {center + blackbox_startx, current_position_y + 2}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
+            _fTilemapDraw(editor->level->tilemap, {center + blackbox_startx, current_position_y + 2}, {obj.base.tile_x, obj.base.tile_y}, 0, 0, WHITE);
             current_position_y += 2 + __state.tilemap->tile_size.y;
         }
 
@@ -311,7 +311,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         fblock block = _fBlockFromId(editor->current_block_id);
 
-        _fTilemapDraw(editor->level.tilemap, {blackbox_startx + 4, current_position_y + 1}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
+        _fTilemapDraw(editor->level->tilemap, {blackbox_startx + 4, current_position_y + 1}, {block.base.tile_x, block.base.tile_y}, 0, 0, WHITE);
         char buf[8] = {};
         snprintf(buf, 8, "%d", (int)editor->current_block_id);
 
@@ -368,7 +368,7 @@ void _fEditorDraw(struct feditor *editor) {
 
                         felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 
-                        player->base.level = &editor->level;
+                        player->base.level = editor->level;
 
                         _flPlayerInit(player);
                         _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
@@ -389,7 +389,7 @@ void _fEditorDraw(struct feditor *editor) {
                         __state.framebuffer = LoadRenderTexture(wanted_resolution.x, wanted_resolution.y);
                         __state.overlay_framebuffer = LoadRenderTexture(wanted_resolution.x * UI_SCALE, wanted_resolution.y * UI_SCALE);
 
-                        editor->level.entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
+                        editor->level->entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
 
                         editor->f1_lock = true;
                     }
@@ -405,7 +405,7 @@ void _fEditorDraw(struct feditor *editor) {
                     filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
         #else
                     nfdu8char_t* out_path = nullptr;
-                    auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level.bin");
+                    auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level->bin");
 
                     if (!out_path || result != NFD_OKAY) {
                         filename = writable + "/session_" + std::to_string(time(0)) + ".bin";
@@ -416,7 +416,7 @@ void _fEditorDraw(struct feditor *editor) {
                     }
         #endif
 
-                    _fLevelSave(&editor->level, filename.c_str());
+                    _fLevelSave(editor->level, filename.c_str());
 
                     TraceLog(LOG_INFO, "Save done");
                 }
@@ -466,8 +466,8 @@ void _fEditorDraw(struct feditor *editor) {
             editor->should_display_sidebar = true;
             editor->should_process_interactions = true;
             editor->should_playback = false;
-            editor->level.entities = 0;
-            editor->level.in_gameover_mode = 0;
+            editor->level->entities = 0;
+            editor->level->in_gameover_mode = 0;
 
             UnloadRenderTexture(__state.framebuffer);
             UnloadRenderTexture(__state.overlay_framebuffer);
@@ -477,9 +477,9 @@ void _fEditorDraw(struct feditor *editor) {
             __state.framebuffer = LoadRenderTexture((800 + pix ) / UI_SCALE, 600 / UI_SCALE);
             __state.overlay_framebuffer = LoadRenderTexture(800 + pix, 600);
 
-            if (editor->level.entities != NULL) {
-                for (unsigned int i = 0; i < editor->level.entities->added_elements; i++) {
-                    fentity* e = RSBGetAtIndex_fentity(editor->level.entities, i);
+            if (editor->level->entities != NULL) {
+                for (unsigned int i = 0; i < editor->level->entities->added_elements; i++) {
+                    fentity* e = RSBGetAtIndex_fentity(editor->level->entities, i);
                     if (!e) continue;
 
                     if (e->cleanup) {
@@ -492,8 +492,8 @@ void _fEditorDraw(struct feditor *editor) {
                     MemFree(e);
                 }
 
-                RSBDestroy_fentity(editor->level.entities);
-                editor->level.entities = NULL;
+                RSBDestroy_fentity(editor->level->entities);
+                editor->level->entities = NULL;
             }
 
             editor->entities.clear();
@@ -562,8 +562,8 @@ void _fEditorDraw(struct feditor *editor) {
                     editor->should_display_selector = ~editor->should_display_selector;
                 }
             }
-            _fTilemapDrawMegatileScaled(editor->level.tilemap, {(int)back.x - 15, (int)back.y - 15}, btn_tile_offset, {2, 2}, 0, 0, WHITE, 5);
-            _fTilemapDrawScaled(editor->level.tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);
+            _fTilemapDrawMegatileScaled(editor->level->tilemap, {(int)back.x - 15, (int)back.y - 15}, btn_tile_offset, {2, 2}, 0, 0, WHITE, 5);
+            _fTilemapDrawScaled(editor->level->tilemap, {(int)back.x + 5, (int)back.y + 5 - mouse_button_down}, {28, 6}, 0, 0, WHITE, 5);
             for (int i = 0; i < editor->block_listing.total; i++) {
                 fblock block = editor->block_listing.blocks[i];
                 if (block.parent_id == 0) {
@@ -576,9 +576,9 @@ void _fEditorDraw(struct feditor *editor) {
                         cur_blocks_pos.y += 60;
                         cur_blocks_pos.x = 100;
                     }
-                    blocks_check = { (float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level.tilemap->tile_size.x * 5, (float)editor->level.tilemap->tile_size.x * 5 };
+                    blocks_check = { (float)cur_blocks_pos.x,(float)cur_blocks_pos.y,(float)editor->level->tilemap->tile_size.x * 5, (float)editor->level->tilemap->tile_size.x * 5 };
 
-                    _fTilemapDrawScaled(editor->level.tilemap, cur_blocks_pos, { block.base.tile_x, block.base.tile_y }, 0, 0, WHITE, 5);
+                    _fTilemapDrawScaled(editor->level->tilemap, cur_blocks_pos, { block.base.tile_x, block.base.tile_y }, 0, 0, WHITE, 5);
                     if (CheckCollisionPointRec(mpos, blocks_check)) {
                         DrawRectangleRec(blocks_check, bouncing_color);
                         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
