@@ -1,6 +1,6 @@
 source setup_android_vars.sh
 
-ABI=$1
+ABI=$2
 BPATH=build_android_$ABI
 
 echo "* ABI=$ABI"

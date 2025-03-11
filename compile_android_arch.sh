@@ -6,7 +6,7 @@ echo "* BASE_LIB_PATH=$BASE_LIB_PATH"
 echo "* PWD=$PWD"
 echo "* TEST=$2"
 
-LABI=$1
+LABI=$2
 BPATH=build_android_$LABI
 LIB_PATH=$BASE_LIB_PATH/$LABI
 
