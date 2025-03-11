@@ -8,7 +8,7 @@ echo
 echo "---- COMPILING FOR $2 AT $1 ----"
 echo
 
-yes | sudo sdkmanager --licenses > /dev/null
+FTEMP=$(yes | sudo sdkmanager --licenses)
 yes | sudo sdkmanager --update
 yes | sudo sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION" "ndk;$NDK_VERSION" "platform-tools" "cmdline-tools;latest" "cmake;$CMAKE_VERSION"
 
@@ -19,7 +19,7 @@ cd $TARGET_REPO
 source setup_android_vars.sh
 source translate_abi.sh $W_ARCH
 
-echo "---- TRANSLATED ABI: $W_ARCH $CLANG_TARGET $W_ABI'
+echo "---- TRANSLATED ABI: $W_ARCH $CLANG_TARGET $W_ABI"
 
 export PATH=/usr/lib/android-sdk/ndk/$NDK_VERSION:$PATH
 
@@ -74,5 +74,6 @@ sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $ND
 sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
 
 cd $TARGET_REPO
-source setup_android_build.sh $W_ABI
-source compile_android_arch.sh $W_ABI
+bash setup_android_build.sh $W_ABI
+bash compile_android_arch.sh $W_ABI
+
