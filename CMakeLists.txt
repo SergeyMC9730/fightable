@@ -1,3 +1,9 @@
+
+#          Sergei Baigerov 2024 - 2025.
+# Distributed under the Boost Software License, Version 1.0.
+#    (See accompanying file LICENSE.txt or copy at
+#          https://www.boost.org/LICENSE_1_0.txt)
+
 cmake_minimum_required(VERSION 3.26)
 project(fightable LANGUAGES C CXX)
 
@@ -414,10 +420,18 @@ target_include_directories(tcpclient-raylib-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 
-add_executable(anim_editor src/anim_editor/main.cpp)
+add_executable(anim_editor
+    src/anim_editor/main.cpp
+    src/anim_editor/tab.cpp
+    src/anim_editor/tab_keyframe_prop.cpp
+    src/anim_editor/tab_keyframes.cpp
+    src/anim_editor/tab_viewpoint.cpp
+    src/anim_editor/state.cpp
+)
 target_link_libraries(anim_editor fbase raylib ${FIGHTABLE_NATIVE_LIBS})
-target_include_directories(tcpclient-raylib-test PRIVATE
+target_include_directories(anim_editor PRIVATE
     src/client/inc
+    src/anim_editor/inc
     ext/raylib/src
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -623,4 +637,4 @@ endif()
 message(STATUS "")
 message(STATUS "")
 
-#####
+######
