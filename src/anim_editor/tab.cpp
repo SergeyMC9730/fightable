@@ -169,7 +169,6 @@ void fightable::tab::visit() {
         }
     }
     DrawRectangleLines(_area.x, _area.y, _area.width, _area.height, BLACK);
-    drawTabTitle();
     BeginMode2D(_cam);
     draw();
     if (_limitScroll) {
@@ -181,5 +180,9 @@ void fightable::tab::visit() {
         }
     }
     EndMode2D();
+    postDraw();
+    drawTabTitle();
     EndScissorMode();
 }
+
+void fightable::tab::postDraw() {}

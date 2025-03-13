@@ -42,6 +42,7 @@ namespace fightable {
         virtual void drawTabTitle();
         void setCamPos(const Vector2 &v);
 
+        virtual void postDraw();
     public:
         tab(RLRectangle area, Color col, const std::string &title);
         void visit();

@@ -23,35 +23,23 @@
 
 // check if specific animation id exists inside the main node
 unsigned char _ntRendererAnimIdExists(struct renderer_animation *animation, int anim_id) {
-    if (animation == NULL) return 0;
-
-    // check if base node is the node we search
-    if (animation->anim_id == anim_id) {
-        return 0;
-    }
-
-    // check if linked animation node exists
-    if (animation->linked_animation != NULL) {
-        // search required animation id in the linked animation
-        return _ntRendererAnimIdExists(animation->linked_animation, anim_id);
-    }
-
-    return 0;
+    return _ntRendererGetEmbeddedAnimation(animation, anim_id) != NULL;
 }
 
-// if not found 'assert' would be called. child nodes also are gonna be checked
 double _ntRendererGetAnimationResult(struct renderer_animation *animation, int anim_id) {
-    if (animation == NULL) {
-        return 0;
-    }
+    struct renderer_animation *anim = _ntRendererGetEmbeddedAnimation(animation, anim_id);
+
+    if (!anim) return 0;
+
+    return anim->current_value;
+}
+
+struct renderer_animation *_ntRendererGetEmbeddedAnimation(struct renderer_animation *animation, int anim_id) {
+    if (!animation) return NULL;
 
     if (animation->anim_id == anim_id) {
-        return animation->current_value;
+        return animation;
     }
 
-    if (animation->linked_animation != NULL) {
-        return _ntRendererGetAnimationResult(animation->linked_animation, anim_id);
-    }
-
-    return 0;
+    return _ntRendererGetEmbeddedAnimation(animation->linked_animation, anim_id);
 }

@@ -13,6 +13,7 @@ namespace fightable {
     private:
         std::map<int, std::vector<Vector2>> _points;
         std::map<int, Color> _pointColors;
+        std::map<int, std::vector<Vector2>> _keyframes;
 
         bool _inDecart = false;
         bool _inMacro = false;
@@ -21,6 +22,8 @@ namespace fightable {
 
         void DrawGrid2D(int sizeWidth, int sizeHeight, int spacing);
         RLRectangle getVisibleCameraArea();
+
+        void postDraw() override;
     public:
         viewpoint_tab();
 

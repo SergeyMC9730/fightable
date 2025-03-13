@@ -18,7 +18,7 @@
     Contact Sergei Baigerov -- @dogotrigger in Discord
 */
 
-#define DEBUG 1
+// #define DEBUG 1
 
 #include <nt5emul/renderer_keyframe.h>
 #include <nt5emul/renderer_animation.h>

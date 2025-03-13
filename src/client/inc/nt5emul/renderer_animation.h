@@ -99,6 +99,8 @@ void _ntRendererResetAnimation(struct renderer_animation* animation);
 unsigned char _ntRendererAnimIdExists(struct renderer_animation *animation, int anim_id);
 // if animation id could not be found 0 is returned
 double _ntRendererGetAnimationResult(struct renderer_animation *animation, int anim_id);
+// if animation id could not be found NULL is returned
+struct renderer_animation *_ntRendererGetEmbeddedAnimation(struct renderer_animation *animation, int anim_id);
 
 void _ntRendererPrintAnimationTree(struct renderer_animation *animation);
 void _ntRendererResetAnimTree();

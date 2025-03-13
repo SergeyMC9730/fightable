@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "nt5emul/renderer_animation.h"
 #include "raylib.h"
 #include <fightable/anim_editor/viewpoint.hpp>
 #include <fightable/anim_editor/state.hpp>
@@ -34,30 +35,43 @@ fightable::viewpoint_tab::viewpoint_tab() : tab({0, 0, 1280, 512}, DARKGRAY, "Vi
         // SetRandomSeed(12);
 
         std::vector<int> entries;
+        std::map<int, int> curKeyframe;
+
         renderer_animation *child = __state.anim;
+
         while (child != NULL && entries.size() <= 256) {
             entries.push_back(child->anim_id);
 
             if (_pointColors.count(child->anim_id) == 0) {
-                Color c = SKYBLUE;
-                c.a = 64;
-                // _pointColors[child->anim_id] = {(unsigned char)GetRandomValue(0, 255), (unsigned char)GetRandomValue(0, 255), (unsigned char)GetRandomValue(0, 255), 64};
+                Color c = {(unsigned char)GetRandomValue(128, 255), (unsigned char)GetRandomValue(128, 255), (unsigned char)GetRandomValue(128, 255), 64};
+
                 _pointColors[child->anim_id] = c;
+                curKeyframe[child->anim_id] = 0;
+                _keyframes[child->anim_id].push_back({0, (float)child->early_value});
             }
 
             child = child->linked_animation;
         }
 
-        __state.anim->delta = 0.1f;
         float step = 0.1f;
-        int seconds = 240;
+        int seconds = 60;
+
+        __state.anim->delta = step;
+
         for (int i = 0; i < (int)((float)seconds / step); i++) {
             _ntRendererUpdateAnimation(__state.anim);
-
             for (int e : entries) {
-                Vector2 v = {(float)i / (1.f / step), (float)_ntRendererGetAnimationResult(__state.anim, e)};
+                auto ep = _ntRendererGetEmbeddedAnimation(__state.anim, e);
+
+                Vector2 v = {(float)i / (1.f / step), (float)ep->current_value};
                 _points[e].push_back(v);
-                _maxHeight = fmax(_maxHeight, v.y);
+
+                // _maxHeight = fmax(_maxHeight, v.y);
+
+                if (curKeyframe[e] != ep->current_keyframe) {
+                    curKeyframe[e] = ep->current_keyframe;
+                    _keyframes[e].push_back(v);
+                }
             }
         }
     }
@@ -151,22 +165,33 @@ void fightable::viewpoint_tab::draw() {
 
     DrawGrid2D(limit, limit_y, 20);
 
+    RLRectangle r = getVisibleCameraArea();
+
+    int drawn = 0;
     for (auto &[k, v] : _points) {
-        std::vector<Vector2> new_strip = v;
-        if (_inMacro) {
-            for (auto &s : new_strip) {
-                s.x *= (float)scaling;
-                s.y *= (float)scaling;
+        std::vector<Vector2> new_strip;
+        for (auto p : v) {
+            if (_inMacro) {
+                p.x *= (float)scaling;
+                p.y *= (float)scaling;
+            }
+            if (CheckCollisionPointRec(p, r)) {
+                new_strip.push_back(p);
             }
         }
+
+        drawn += new_strip.size();
 
         Color col = _pointColors[k];
         DrawLineStrip(new_strip.data(), new_strip.size(), col);
     }
+
+    std::string drawn_text = "drawn: " + std::to_string(drawn);
+    RlDrawTextEx(__state.unifont1, drawn_text.c_str(), {10, 10}, 16.f, 0.5f, WHITE);
 }
 
 RLRectangle fightable::viewpoint_tab::getVisibleCameraArea() {
-    int offscreen = 25;
+    int offscreen = 0;
 
     RLRectangle r = {_cam.target.x - offscreen, _cam.target.y - offscreen};
 
@@ -174,4 +199,20 @@ RLRectangle fightable::viewpoint_tab::getVisibleCameraArea() {
     r.height = _area.height / _cam.zoom + (offscreen * 2);
 
     return r;
+}
+
+void fightable::viewpoint_tab::postDraw() {
+    int scaling = 1.f;
+    if (_inMacro && !_inDecart) {
+        scaling = 8.f;
+    }
+
+    for (auto &[k, v] : _keyframes) {
+        Color col = _pointColors[k];
+        col.a = 255;
+
+        for (auto p : v) {
+            DrawPixel(((p.x * (float)scaling) - _cam.target.x) * _cam.zoom, ((p.y * (float)scaling) - _cam.target.y) * _cam.zoom, col);
+        }
+    }
 }
