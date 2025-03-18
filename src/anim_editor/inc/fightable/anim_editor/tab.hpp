@@ -43,8 +43,13 @@ namespace fightable {
         void setCamPos(const Vector2 &v);
 
         virtual void postDraw();
+
+        Vector2 getMousePos();
+        Vector2 getMousePosInCamera();
     public:
         tab(RLRectangle area, Color col, const std::string &title);
+        virtual ~tab();
+
         void visit();
         virtual void draw() = 0;
     };

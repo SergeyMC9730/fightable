@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/anim_editor/tab.hpp>
 #include <fightable/anim_editor/state.hpp>
 #include <fightable/camera.h>
@@ -82,9 +83,6 @@ void fightable::tab::visit() {
             if (CheckCollisionPointRec(cam_logic._internal[0], r1)) {
                 cam_logic._internal[1] = GetMouseDelta();
 
-                // cam_logic._internal[1].x *= delta * 100.f;
-                // cam_logic._internal[1].y *= delta * 100.f;
-
                 cam_logic._internal[3].x = cam_logic._internal[1].x < 0.f;
                 cam_logic._internal[3].y = cam_logic._internal[1].y < 0.f;
 
@@ -134,11 +132,6 @@ void fightable::tab::visit() {
 
                 if ((cam_logic._internal[1].x == 0.f) && (cam_logic._internal[1].y == 0.f)) cam_logic._internal[2].x = 0.f; // stop moving
 
-                // printf("vx %f vy %f time %f i %f | vx_neg %d vy_neg %d\n",
-                //     cam_logic._internal[1].x, cam_logic._internal[1].y, cam_logic._internal[2].x, interpolation,
-                //     (int)cam_logic._internal[3].x, (int)cam_logic._internal[3].y
-                // );
-
                 if (cam_logic._internal[2].x <= 0.f) cam_logic._internal[2].y = 0.f;
             } else {
                 cam_logic._internal[1].x = 0.f;
@@ -149,23 +142,23 @@ void fightable::tab::visit() {
 
     _cam.target = cam_logic.position;
 
-    BeginScissorMode(_area.x, _area.y, _area.width, _area.height);
+    // BeginScissorMode(_area.x, _area.y, _area.width, _area.height);
     DrawRectangleRec(_area, _col);
     if (_limitScroll) {
         if ((_limitScrollSzHigh.y - _limitScrollSzMin.y) != 0.f) {
             float scroll_l = 30;
-            float ratio = (_area.height - scroll_l) / (_limitScrollSzHigh.y - _limitScrollSzMin.y);
+            float ratio = (_area.height - scroll_l) / (fabs(_limitScrollSzHigh.y) + fabs(_limitScrollSzMin.y));
             float scroll_w = 8;
 
-            DrawRectangleRec({_area.x + _area.width - scroll_w, _area.y + (_cam.target.y * ratio), scroll_w, scroll_l}, _fMixColors(_col, WHITE, 0.08f));
+            DrawRectangleRec({_area.x + _area.width - scroll_w, _area.y + ((_cam.target.y - _limitScrollSzMin.y) * ratio), scroll_w, scroll_l}, _fMixColors(_col, WHITE, 0.08f));
 
         }
         if ((_limitScrollSzHigh.x - _limitScrollSzMin.x) != 0.f) {
             float scroll_l = 40;
-            float ratio = (_area.width - scroll_l) / (_limitScrollSzHigh.x - _limitScrollSzMin.x);
+            float ratio = (_area.width - scroll_l) / (fabs(_limitScrollSzHigh.x) + fabs(_limitScrollSzMin.x));
             float scroll_w = 8;
 
-            DrawRectangleRec({_area.x + (_cam.target.x * ratio), _area.y, scroll_l, scroll_w}, _fMixColors(_col, WHITE, 0.08f));
+            DrawRectangleRec({_area.x + ((_cam.target.x - _limitScrollSzMin.x) * ratio), _area.y, scroll_l, scroll_w}, _fMixColors(_col, WHITE, 0.08f));
         }
     }
     DrawRectangleLines(_area.x, _area.y, _area.width, _area.height, BLACK);
@@ -173,16 +166,35 @@ void fightable::tab::visit() {
     draw();
     if (_limitScroll) {
         if ((_limitScrollSzHigh.y - _limitScrollSzMin.y) != 0.f) {
-            DrawRectangleGradientV(_cam.target.x, fmax(_area.height, _limitScrollSzHigh.y + _area.height) - 100, _area.width, 100, BLANK, {0,0,0,127});
+            DrawRectangleGradientV(_cam.target.x, fmax(_area.height, _limitScrollSzHigh.y + _area.height) - 100, _area.width / _cam.zoom, 100, BLANK, {0,0,0,127});
         }
         if ((_limitScrollSzHigh.x - _limitScrollSzMin.x) != 0.f) {
-            DrawRectangleGradientH(fmax(_area.width, _limitScrollSzHigh.x + _area.width) - 100, 0, 100, fmax(_area.height, _limitScrollSzHigh.y + _area.height), BLANK, {0,0,0,127});
+            DrawRectangleGradientH(fmax(_area.width, _limitScrollSzHigh.x + _area.width) - 100, _limitScrollSzMin.y, 100, fmax(_area.height, _limitScrollSzHigh.y + _area.height), BLANK, {0,0,0,127});
         }
     }
     EndMode2D();
     postDraw();
     drawTabTitle();
-    EndScissorMode();
+    // EndScissorMode();
 }
 
 void fightable::tab::postDraw() {}
+
+Vector2 fightable::tab::getMousePos() {
+    Vector2 m = GetMousePosition();
+
+    m.x -= _area.x;
+    m.y -= _area.y;
+
+    return m;
+}
+Vector2 fightable::tab::getMousePosInCamera() {
+    Vector2 m = GetMousePosition();
+
+    m.x += (_cam.target.x + _cam.offset.x) * _cam.zoom + _area.x; m.x /= _cam.zoom;
+    m.y += (_cam.target.y + _cam.offset.y) * _cam.zoom + _area.y; m.y /= _cam.zoom;
+
+    return m;
+}
+
+fightable::tab::~tab() {}

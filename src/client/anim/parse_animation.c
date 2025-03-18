@@ -103,6 +103,12 @@ struct renderer_animation *_ntRendererLoadAnimation(const char *path) {
         result->looping = cJSON_IsTrue(tmp_obj);
     }
 
+    // try to get 'reset_after_loop' flag
+    tmp_obj = cJSON_GetObjectItem(root, "reset_after_loop");
+    if (tmp_obj && cJSON_IsBool(tmp_obj)) {
+        result->reset_after_loop = cJSON_IsTrue(tmp_obj) && result->looping;
+    }
+
     // try to get animation id
     tmp_obj = cJSON_GetObjectItem(root, "anim_id");
     if (tmp_obj) {

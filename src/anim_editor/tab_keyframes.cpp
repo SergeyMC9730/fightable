@@ -15,5 +15,6 @@ fightable::keyframe_tab::keyframe_tab() : tab({256, 512, 1280 - 256, 720 - 512},
 }
 
 void fightable::keyframe_tab::draw() {
-    DrawRectangleRec({20, 20, 50, 60}, GREEN);
+    // Vector2 m = getMousePosInCamera();
+    // DrawRectangleRec({m.x, m.y, 60, 60}, GREEN);
 }

@@ -9,7 +9,9 @@
 #include <fightable/anim_editor/viewpoint.hpp>
 #include <fightable/anim_editor/state.hpp>
 #include <fightable/color.h>
+#include <chrono>
 #include <math.h>
+#include <thread>
 
 void fightable::viewpoint_tab::DrawGrid2D(int sizeWidth, int sizeHeight, int spacing) {
     for (int i = -sizeHeight; i < sizeHeight; i += spacing) {
@@ -53,7 +55,7 @@ fightable::viewpoint_tab::viewpoint_tab() : tab({0, 0, 1280, 512}, DARKGRAY, "Vi
             child = child->linked_animation;
         }
 
-        float step = 0.1f;
+        float step = 1.f / 10.f;
         int seconds = 60;
 
         __state.anim->delta = step;
@@ -75,18 +77,22 @@ fightable::viewpoint_tab::viewpoint_tab() : tab({0, 0, 1280, 512}, DARKGRAY, "Vi
             }
         }
     }
+
+    _calcThread = std::thread([this](){
+        while (!this->_stopCalcThread) {
+           this->updatePointRendering();
+           std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    });
 }
 
 void fightable::viewpoint_tab::draw() {
     float wheel = GetMouseWheelMove();
 
     if (wheel != 0.f) {
-        if (wheel < 0.f && _cam.zoom >= -0.5) {
-            _cam.zoom += wheel / 8.f;
-        }
-        if (wheel > 0.f) {
-            _cam.zoom += wheel / 8.f;
-        }
+        float a = wheel / 4.f;
+        _cam.zoom += a;
+        if (_cam.zoom <= 0.f) _cam.zoom -= a;
     }
 
     if (IsKeyPressed(KEY_M)) {
@@ -104,10 +110,11 @@ void fightable::viewpoint_tab::draw() {
     int limit = 100000 / 2;
     int limit_y = limit / 20;
 
-    int scaling = 1.f;
-    if (_inMacro && !_inDecart) {
-        scaling = 8.f;
-    }
+    _limitScroll = true;
+    _limitScrollSzMin = {(float)-limit, (float)-limit_y};
+    _limitScrollSzHigh = {(float)limit, (float)limit_y};
+
+    int scaling = getScaling();
 
     int spacing = 20;
     float text_size = 16.f;
@@ -165,33 +172,20 @@ void fightable::viewpoint_tab::draw() {
 
     DrawGrid2D(limit, limit_y, 20);
 
-    RLRectangle r = getVisibleCameraArea();
-
     int drawn = 0;
-    for (auto &[k, v] : _points) {
-        std::vector<Vector2> new_strip;
-        for (auto p : v) {
-            if (_inMacro) {
-                p.x *= (float)scaling;
-                p.y *= (float)scaling;
-            }
-            if (CheckCollisionPointRec(p, r)) {
-                new_strip.push_back(p);
-            }
+    for (auto &[k, v] : _keyframes) {
+        if (_drawablePoints.count(k)) {
+            Color col = _pointColors[k];
+            DrawLineStrip(_drawablePoints[k].data(), _drawablePoints[k].size(), col);
+            drawn += _drawablePoints[k].size();
         }
-
-        drawn += new_strip.size();
-
-        Color col = _pointColors[k];
-        DrawLineStrip(new_strip.data(), new_strip.size(), col);
     }
 
-    std::string drawn_text = "drawn: " + std::to_string(drawn);
-    RlDrawTextEx(__state.unifont1, drawn_text.c_str(), {10, 10}, 16.f, 0.5f, WHITE);
+    _drawnPoints = drawn;
 }
 
 RLRectangle fightable::viewpoint_tab::getVisibleCameraArea() {
-    int offscreen = 0;
+    int offscreen = 24;
 
     RLRectangle r = {_cam.target.x - offscreen, _cam.target.y - offscreen};
 
@@ -202,17 +196,79 @@ RLRectangle fightable::viewpoint_tab::getVisibleCameraArea() {
 }
 
 void fightable::viewpoint_tab::postDraw() {
-    int scaling = 1.f;
-    if (_inMacro && !_inDecart) {
-        scaling = 8.f;
-    }
+    int scaling = getScaling();
+
+    auto m = getMousePos();
 
     for (auto &[k, v] : _keyframes) {
         Color col = _pointColors[k];
         col.a = 255;
 
         for (auto p : v) {
-            DrawPixel(((p.x * (float)scaling) - _cam.target.x) * _cam.zoom, ((p.y * (float)scaling) - _cam.target.y) * _cam.zoom, col);
+            if (_cam.zoom < 1.f) {
+                DrawPixel(((p.x * (float)scaling) - _cam.target.x) * _cam.zoom, ((p.y * (float)scaling) - _cam.target.y) * _cam.zoom, col);
+            } else {
+                float radius = 4.f;
+                RLRectangle r = {((p.x * (float)scaling) - _cam.target.x) * _cam.zoom - radius, ((p.y * (float)scaling) - _cam.target.y) * _cam.zoom - radius, radius * 2.f, radius * 2.f};
+                RLRectangle tr = r;
+                tr.x -= 8; tr.width += 16;
+                tr.y -= 8; tr.height += 16;
+
+                if (CheckCollisionPointRec(m, tr)) {
+                    SetTextLineSpacing(16.f);
+                    col = _fMixColors(col, WHITE, 0.2f);
+                    DrawRectangleRec(r, col);
+
+                    std::string info = "Time: " + std::to_string(p.x) + "\nValue: " + std::to_string(p.y) + "\nID: " + std::to_string(k);
+                    Vector2 sz = MeasureTextEx(__state.unifont1, info.c_str(), 16.f, 0.5f);
+                    float offset = 4.f;
+
+                    DrawRectangle(r.x - offset + (m.x - r.x), r.y - offset + (m.y - r.y), sz.x + (offset * 2), sz.y + (offset * 2), {0,0,0,127});
+                    RlDrawTextEx(__state.unifont1, info.c_str(), {r.x + (m.x - r.x), r.y + (m.y - r.y)}, 16.f, 0.5f, WHITE);
+                } else {
+                    DrawRectangleRec(r, col);
+                }
+            }
         }
     }
+
+    _title = "Viewpoint (" + std::to_string(_drawnPoints) + ")";
+}
+
+int fightable::viewpoint_tab::getScaling() {
+    int scaling = 1;
+    if (_inMacro && !_inDecart) {
+        scaling = 10;
+    }
+
+    return scaling;
+}
+
+void fightable::viewpoint_tab::updatePointRendering() {
+    RLRectangle r = getVisibleCameraArea();
+    int scaling = getScaling();
+
+    this->_drawablePoints.clear();
+
+    for (auto &[k, v] : _points) {
+        std::vector<Vector2> new_strip;
+        for (auto p : v) {
+            if (_inMacro) {
+                p.x *= (float)scaling;
+                p.y *= (float)scaling;
+            }
+            if (p.x >= r.x && p.x <= r.x + r.width) {
+                new_strip.push_back(p);
+            }
+        }
+
+        _drawablePoints[k] = new_strip;
+    }
+}
+
+fightable::viewpoint_tab::~viewpoint_tab() {
+    TraceLog(LOG_INFO, "Closing viewpoint thread");
+
+    this->_stopCalcThread = true;
+    _calcThread.join();
 }

@@ -84,6 +84,9 @@ struct renderer_animation {
 
     // indicates if animation should play again after it finished
     unsigned char looping;
+
+    // indicates if animation should reset after loop end
+    unsigned char reset_after_loop;
 };
 
 // updates current keyframe inside of animation chain and switches to the next one if required.

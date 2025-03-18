@@ -29,6 +29,22 @@
 #include <stdio.h>
 #endif
 
+void _ntRendererResetAnimationB(struct renderer_animation* animation) {
+    if (!animation || !animation->valid) return;
+
+    animation->completed = 0;
+    animation->completed_local = 0;
+    animation->current_keyframe = 0;
+    animation->current_value = animation->final_value;
+    animation->starting_value = animation->current_value;
+    animation->time = 0;
+    animation->itime = 0;
+
+    if (animation->linked_animation != NULL) {
+        _ntRendererResetAnimationB(animation->linked_animation);
+    }
+}
+
 void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
     animation->valid = 0;
 
@@ -42,7 +58,11 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
         TraceLog(LOG_INFO, "[%d] repeating whole animation", animation->anim_id);
 #endif
 
-        _ntRendererResetAnimation(animation);
+        if (animation->reset_after_loop) {
+            _ntRendererResetAnimation(animation);
+        } else {
+            _ntRendererResetAnimationB(animation);
+        }
     }
 
     if (animation->linked_animation != NULL) {
