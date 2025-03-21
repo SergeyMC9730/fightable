@@ -21,7 +21,7 @@
 #include <nt5emul/renderer_animation.h>
 #include <nt5emul/renderer_keyframe.h>
 #include <cJSON.h>
-#include <raylib.h>
+#include <fraylib.h>
 #include <stdio.h>
 #include <string.h>
 

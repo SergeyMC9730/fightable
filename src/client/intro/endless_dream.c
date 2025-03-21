@@ -1,7 +1,12 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/intro.h>
-#include <raylib.h>
+#include <fraylib.h>
 #include <fightable/state.h>
-#include <stdio.h>
 #include <math.h>
 #include <fightable/debug.h>
 
@@ -97,7 +102,7 @@ void _fIntroProcessEndlessDream() {
 
             if (!__state.current_editor) {
                 _fIntroMenuDraw();
-            } 
+            }
 
             DrawRectangle(0, 0, w, h, c);
         }

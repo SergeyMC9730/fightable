@@ -1,5 +1,10 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/button.h>
-#include <raylib.h>
 #include <fightable/state.h>
 #include <fightable/text.h>
 #include <math.h>
@@ -47,7 +52,7 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
     unsigned char ret = 0;
 
-    if (CheckCollisionPointRec(mpos, btn_rect) ){ 
+    if (CheckCollisionPointRec(mpos, btn_rect) ){
         btn_tile_offset.y++;
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
@@ -73,7 +78,7 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
         cur_pos.x += __state.tilemap->tile_size.x;
     }
-    
+
     _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
 
     _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, btn->tint, 0);
@@ -87,6 +92,6 @@ unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint) {
     btn.text = text;
     btn.position = pos;
     btn.tint = tint;
-    
+
     return _fButtonDraw(&btn);
 }

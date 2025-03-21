@@ -6,15 +6,8 @@
 
 #pragma once
 
-#include <fightable/intvec.h>
+#if TARGET_RDR == raylib
+#include <raylib.h>
+#elif TARGET_RDR == dummy
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void _fRectDraw(RLRectangle r, Color grad_top, Color grad_bottom, Color container);
-RLRectangle _fRectAbsSize(RLRectangle r);
-
-#ifdef __cplusplus
-}
 #endif

@@ -1,7 +1,12 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
 #include <fightable/intvec.h>
-#include <raylib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,7 +14,7 @@ extern "C" {
 
 struct fbutton {
     const char *text;
-    
+
     unsigned char howered : 1;
     unsigned char down : 1;
     unsigned char up : 1;

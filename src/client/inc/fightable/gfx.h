@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
 #ifdef __cplusplus
@@ -12,7 +18,7 @@ enum ffade_type {
     FadeInOut
 };
 
-#include <raylib.h>
+#include <fraylib.h>
 
 struct gfx_manager {
     struct shake {
@@ -59,4 +65,3 @@ void _fGfxDraw(struct gfx_manager *m);
 #ifdef __cplusplus
 }
 #endif
-

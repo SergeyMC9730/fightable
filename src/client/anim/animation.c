@@ -23,7 +23,6 @@
 #include <nt5emul/renderer_keyframe.h>
 #include <nt5emul/renderer_animation.h>
 #include <nt5emul/renderer_ease.h>
-#include <raylib.h>
 #include <stddef.h>
 #if DEBUG == 1
 #include <stdio.h>

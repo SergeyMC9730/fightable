@@ -1,5 +1,10 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/button.h>
-#include <raylib.h>
 #include <fightable/state.h>
 #include <fightable/text.h>
 #include <math.h>
@@ -32,11 +37,11 @@ unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
     RLRectangle btn_rect = {btn->position.x + 3, btn->position.y + 3, 10, 10};
     unsigned char ret = 0;
 
-    if (CheckCollisionPointRec(mpos, btn_rect) ){ 
+    if (CheckCollisionPointRec(mpos, btn_rect) ){
         btn_tile_offset.x = 31;
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            btn_tile_offset.x = 33;    
+            btn_tile_offset.x = 33;
             btn_label_offset.y--;
         }
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
@@ -57,7 +62,7 @@ unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
             if (!btn->flag) break;
 
             _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0, WHITE);
-            
+
             break;
         }
         case SQRBTN_EXIT: {
@@ -68,7 +73,7 @@ unsigned char _fSquareButtonDraw(struct fsquare_button *btn) {
             if (btn->flag) break;
 
             _fTilemapDraw(__state.tilemap, (IVector2){btn->position.x + center_x + 3, btn->position.y + 3 + btn_label_offset.y}, (IVector2){27, 6}, 0, 0, WHITE);
-            
+
             break;
         }
     }

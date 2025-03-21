@@ -20,7 +20,7 @@
 
 #include <nt5emul/renderer_keyframe.h>
 #include <cJSON.h>
-#include <raylib.h>
+#include <fraylib.h>
 #include <stdio.h>
 
 struct renderer_keyframe _ntRendererLoadKeyframe(void *cjson_object_ptr) {

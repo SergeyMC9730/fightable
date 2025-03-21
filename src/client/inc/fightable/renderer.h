@@ -1,6 +1,12 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
-#include <raylib.h>
+#include <fraylib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +50,7 @@ void _fSchedulerIterateOverlays();
 void _fSchedulerVisit();
 // schedules a `func` to be called before draw after `delay` seconds.
 // required function will be called `n` times.
-// ! timer accuracity depends on framerate ! 
+// ! timer accuracity depends on framerate !
 // ! for more precise stuff use _ntInstallTimer and _ntSetupTimerSync !
 void _fSchedule(renderer_event_t func, long double delay, int n);
 

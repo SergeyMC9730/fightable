@@ -10,6 +10,22 @@ project(fightable LANGUAGES C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
 
+include(ext/raylib/cmake/EnumOption.cmake)
+
+enum_option(FIGHTABLE_RENDERER "raylib;dummy" "Renderer used for Fightable")
+
+if (NOT DEFINED FIGHTABLE_RENDERER)
+    set(FIGHTABLE_RENDERER raylib)
+endif()
+
+add_compile_definitions(TARGET_RDR=${FIGHTABLE_RENDERER})
+set(FIGHTABLE_RENDERER_INC src/rfrontend/inc)
+
+if (FIGHTABLE_RENDERER STREQUAL "raylib")
+    set(FIGHTABLE_RENDERER_LIB raylib)
+    set(FIGHTABLE_RENDERER_INC ${FIGHTABLE_RENDERER_INC} ext/raylib/src)
+endif()
+
 set(FIGHTABLE_SHARED_INC
     src/shared/inc
 )
@@ -148,7 +164,9 @@ if (FIGHTABLE_COMPILER STREQUAL "Clang" AND WIN32)
 endif()
 
 add_subdirectory(ext/cJSON)
-add_subdirectory(ext/raylib)
+if (FIGHTABLE_RENDERER STREQUAL "raylib")
+    add_subdirectory(ext/raylib)
+endif()
 if (NOT ANDROID)
     add_subdirectory(ext/nativefiledialog-extended)
 endif()
@@ -392,6 +410,7 @@ target_include_directories(tcpserver-raylib-test PRIVATE
     src/tcpsrv/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
+    ${FIGHTABLE_RENDERER_INC}
 )
 
 add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
@@ -412,10 +431,10 @@ target_include_directories(ftcpclient-test PRIVATE
 )
 
 add_executable(tcpclient-raylib-test src/tcpclient_raylib/main.c)
-target_link_libraries(tcpclient-raylib-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(tcpclient-raylib-test ${FIGHTABLE_RENDERER_LIB} ftcpclient ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(tcpclient-raylib-test PRIVATE
     src/tcpclient/inc
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
@@ -428,11 +447,11 @@ add_executable(anim_editor
     src/anim_editor/tab_viewpoint.cpp
     src/anim_editor/state.cpp
 )
-target_link_libraries(anim_editor fbase raylib ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(anim_editor fbase ${FIGHTABLE_RENDERER_LIB} ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(anim_editor PRIVATE
     src/client/inc
     src/anim_editor/inc
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
@@ -536,7 +555,7 @@ add_executable(gun-test
 
 target_include_directories(fbase PRIVATE
     src/client/inc
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     ext/cJSON
     ext/portaudio_opensles/include
     src/tcpclient/inc
@@ -552,18 +571,18 @@ target_include_directories(fightable PRIVATE
 )
 
 target_include_directories(physics-test PRIVATE
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 target_include_directories(gun-test PRIVATE
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     src/shooting_system_test/include
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 target_include_directories(collide-test PRIVATE
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     src/collide_test/inc
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -574,26 +593,26 @@ else ()
 	set(NFD_LINK nfd)
 endif ()
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase raylib cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
 else()
-    target_link_libraries(fbase raylib cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
 endif()
 target_link_libraries(fightable fbase)
-target_link_libraries(physics-test raylib)
-target_link_libraries(collide-test raylib)
-target_link_libraries(gun-test raylib)
+target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )
+target_link_libraries(collide-test ${FIGHTABLE_RENDERER_LIB} )
+target_link_libraries(gun-test ${FIGHTABLE_RENDERER_LIB} )
 
 add_executable(mp-rect-test
     src/mp_rect_test/src/main.cpp
 )
 target_include_directories(mp-rect-test PRIVATE
-    ext/raylib/src
+    ${FIGHTABLE_RENDERER_INC}
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
     src/tcpclient/inc
     src/tcpsrv/inc
 )
-target_link_libraries(mp-rect-test raylib ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
+target_link_libraries(mp-rect-test ${FIGHTABLE_RENDERER_LIB} ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
 
 if (NOT DISABLE_MP_SERVER)
     target_link_libraries(mp-rect-test ftcpsrv)
@@ -633,6 +652,8 @@ message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
 if (DISABLE_PORTAUDIO)
     message(STATUS "  PortAudio is disabled")
 endif()
+
+message(STATUS "  Renderer: ${FIGHTABLE_RENDERER}")
 
 message(STATUS "")
 message(STATUS "")

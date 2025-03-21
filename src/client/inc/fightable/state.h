@@ -1,6 +1,12 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
-#include <raylib.h>
+#include <fraylib.h>
 
 #include <pthread.h>
 
@@ -37,7 +43,7 @@ struct fhttpserver;
     #define NOGDI
 
     #include <windows.h>
-    
+
     #undef far
     #undef near
     #undef min
@@ -105,7 +111,7 @@ struct fightable_state {
 
     Vector2 mouse_pos_offset;
     double window_scale;
-    
+
     Vector2 base_game_size;
     Vector2 editor_size;
     Vector2 initial_game_size;
@@ -123,7 +129,7 @@ struct fightable_state {
     float time1;
     unsigned char menu_perform_move;
     float menu_cur_x;
-    
+
     struct fkeyboard_mgr kbd;
 
     RenderTexture2D overlay_framebuffer;

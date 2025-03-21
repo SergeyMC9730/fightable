@@ -26,7 +26,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <raylib.h>
+#include <fraylib.h>
 
 static char __ntRendererAnimTreeText[64] = {};
 

@@ -1,8 +1,13 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
 #define ENTITY_PLAYER 1
 
-#include <raylib.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -19,7 +24,6 @@ enum fentity_direction {
 };
 
 #include <fightable/hitbox.h>
-#include <fightable/serializable.h>
 
 struct fentity_accessory {
     unsigned char type;
@@ -119,8 +123,6 @@ IVector2 _fEntityGetDrawingPos(struct fentity* entity);
 
 void _fEntitySetHitbox(struct fentity* entity, RLRectangle rec);
 void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
-fserializable _fEntitySerialize(struct fentity* entity);
-struct fentity* _fEntityLoad(fserializable *serializable, uint16_t level_version);
 
 void _fEntityDrawAccessory(struct fentity* entity);
 void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);

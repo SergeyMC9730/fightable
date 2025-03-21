@@ -1,11 +1,17 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/sound_engine.h>
 #include <fightable/mixer.h>
 #include <fightable/sanitizer.h>
-#include <raylib.h>
+#include <fraylib.h>
 
 void _fAudioFxUpdate(struct faudio_engine* engine) {
 	float delta = GetFrameTime();
-	
+
 	if (engine->fx.perform_volume_slider) {
 		const float ratio = 1 / engine->fx.slide_volume_time;
 		const float mix = _fCalculateValueMix(engine->fx.slide_volume_old, engine->fx.slide_volume_value, engine->fx.slide_volume_cur_time * ratio);

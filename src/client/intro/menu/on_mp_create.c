@@ -1,5 +1,11 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+#include <fraylib.h>
 #include <fightable/intro.h>
-#include <raylib.h>
 #include <fightable/state.h>
 #include <stdio.h>
 #include <fightable/button.h>
@@ -35,7 +41,7 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
         double v2 = fabs(sin(_x) * (((double)pattern_image1.height / 2) - gap)) * -1 + (double)pattern_image1.height;
         double v3 = fabs(sin(_x2) * (((double)pattern_image1.height / 2) - (gap + ((double)pattern_image1.height / 3)))) + gap;
         double v4 = fabs(sin(_x2) * (((double)pattern_image1.height / 2) - (gap + ((double)pattern_image1.height / 3)))) * -1 + (double)pattern_image1.height - gap;
-    
+
         Color col = WHITE;
         col.a = 24;
 
@@ -95,7 +101,7 @@ void _fIntroMenuOnMpCreate() {
 
     _fGfxFadeOut(&__state.gfx, BLACK, 0.5);
     _fGfxSetFadeOutFunc(&__state.gfx, _fIntroMenuOnMpCreateCallback, old_vol);
-    
+
     _fAudioFxSlideVolume(&__state.sound_engine, 0.f, 0.4f);
 #endif
 }

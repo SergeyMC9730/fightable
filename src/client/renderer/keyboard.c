@@ -1,5 +1,11 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/keyboard.h>
-#include <raylib.h>
+#include <fraylib.h>
 
 void _fKeyboardUpdate(struct fkeyboard_mgr* mgr) {
 	if (!mgr) return;
@@ -17,7 +23,7 @@ void _fKeyboardUpdate(struct fkeyboard_mgr* mgr) {
 		mgr->current.up[i] = IsKeyReleased(ch);
 	}
 #else
-	
+
 #endif
 
 	for (int i = 0; i < TRACKED_INPUTS; i++) {

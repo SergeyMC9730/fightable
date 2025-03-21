@@ -1,8 +1,13 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/config.h>
 #include <fightable/storage.h>
 #include <fightable/state.h>
 #include <cJSON.h>
-#include <raylib.h>
 #include <stdio.h>
 
 void _fConfigSave(struct fconfig* config) {
@@ -18,7 +23,7 @@ void _fConfigSave(struct fconfig* config) {
 	cJSON_AddItemReferenceToObject(main, "volume", volume);
 
 	char* str = cJSON_Print(main);
-	char* buffer = (char*)MemAlloc(2048); 
+	char* buffer = (char*)MemAlloc(2048);
 
 	snprintf(buffer, 2048, "%s/config.json", _fStorageGetWritable());
 	SaveFileText(buffer, str);
