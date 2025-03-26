@@ -288,6 +288,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);
 
+#ifdef TARGET_SUPPORTS_3D
     float camfov = 45.f;
 
     Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
@@ -304,6 +305,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     DrawGridEx(10, 1.0f, -12.f);
 
     EndMode3D();
+#endif
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
 }

@@ -6,8 +6,13 @@
 
 #pragma once
 
-#if TARGET_RDR == raylib
+#if TARGET_RDR_ID == 0
+#define TARGET_SUPPORTS_2D
+#define TARGET_SUPPORTS_3D
+#define TARGET_SUPPORTS_RLGL_2D
+#define TARGET_SUPPORTS_RLGL_3D
 #include <raylib.h>
-#elif TARGET_RDR == dummy
-
+#elif TARGET_RDR_ID == 1
+#define TARGET_SUPPORTS_2D
+#include <frfrontend/frasterizer.h>
 #endif

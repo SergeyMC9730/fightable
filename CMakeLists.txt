@@ -12,18 +12,38 @@ set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
 
 include(ext/raylib/cmake/EnumOption.cmake)
 
-enum_option(FIGHTABLE_RENDERER "raylib;dummy" "Renderer used for Fightable")
+enum_option(FIGHTABLE_RENDERER "raylib;frasterizer" "Renderer used for Fightable")
 
 if (NOT DEFINED FIGHTABLE_RENDERER)
     set(FIGHTABLE_RENDERER raylib)
 endif()
 
-add_compile_definitions(TARGET_RDR=${FIGHTABLE_RENDERER})
+add_compile_definitions(TARGET_RDR="${FIGHTABLE_RENDERER}")
 set(FIGHTABLE_RENDERER_INC src/rfrontend/inc)
 
 if (FIGHTABLE_RENDERER STREQUAL "raylib")
     set(FIGHTABLE_RENDERER_LIB raylib)
     set(FIGHTABLE_RENDERER_INC ${FIGHTABLE_RENDERER_INC} ext/raylib/src)
+    add_compile_definitions(TARGET_RDR_ID=0)
+endif()
+if (FIGHTABLE_RENDERER STREQUAL "frasterizer")
+    set(FIGHTABLE_RENDERER_LIB frfrontend)
+    set(FIGHTABLE_RENDERER_INC ${FIGHTABLE_RENDERER_INC})
+    add_compile_definitions(TARGET_RDR_ID=1)
+
+    include(FindX11)
+
+    if (X11_FOUND)
+        add_compile_definitions(TARGET_SUPPORTS_X11)
+    endif()
+
+    add_library(frfrontend STATIC
+        src/rfrontend/frasterizer/window.c
+        src/rfrontend/frasterizer/state.c
+    )
+    target_include_directories(frfrontend PRIVATE
+        ${FIGHTABLE_RENDERER_INC}
+    )
 endif()
 
 set(FIGHTABLE_SHARED_INC
