@@ -40,6 +40,7 @@ if (FIGHTABLE_RENDERER STREQUAL "frasterizer")
     add_library(frfrontend STATIC
         src/rfrontend/frasterizer/window.c
         src/rfrontend/frasterizer/state.c
+        src/rfrontend/frasterizer/raylib_char.c
     )
     target_include_directories(frfrontend PRIVATE
         ${FIGHTABLE_RENDERER_INC}
