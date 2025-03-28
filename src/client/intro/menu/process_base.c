@@ -5,23 +5,22 @@
 #include <fightable/button.h>
 
 void _fIntroMenuProcessBase() {
+#define SETUP_BUTTON(NAME, Y) SETUP_BUTTON_EX(NAME, Y, WHITE)
+#define SETUP_BUTTON_EX(NAME, Y, COLOR) sz = _fButtonMeasureSizeSimple(NAME); if (_fButtonDrawSimple(NAME, (IVector2){(wx - sz) / 2 + __state.menu_cur_x, Y}, COLOR))
     int wx = __state.framebuffer.texture.width;
     int wy = __state.framebuffer.texture.height;
+    int sz = 0;
 
-    Color tint = WHITE;
-
-    if (_fButtonDrawSimple("PLAY", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 50}, WHITE)) {
+    SETUP_BUTTON("PLAY", 50) {
         _fIntroMenuOnPlay();
     }
-            
-    if (_fButtonDrawSimple("OPTIONS", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 60}, WHITE)) {
+    SETUP_BUTTON("OPTIONS", 60) {
         _fIntroMenuOnOptions();
     }
-
-    if (_fButtonDrawSimple("EDITOR", (IVector2){(wx - (4 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 70}, WHITE)) {
+    SETUP_BUTTON("EDITOR", 70) {
         _fIntroMenuOnEditor();
     }
-    if (_fButtonDrawSimple("EXIT", (IVector2){(wx - (3 * __state.tilemap->tile_size.x)) / 2 + __state.menu_cur_x, 80}, WHITE)) {
+    SETUP_BUTTON("EXIT", 80) {
         _fConfigSave(&__state.config);
         exit(0);
     }

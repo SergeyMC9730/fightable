@@ -18,34 +18,14 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
     if (text_sz.x == 0) return 0;
 
-    int additional_size = 0;
-
-    if (text_sz.x > 22) {
-        additional_size = (int)ceil(((float)text_sz.x / 22.f) - 1.f);
-    }
-
-    RLRectangle r = {
-        .x = btn->position.x,
-        .y = btn->position.y,
-        .width = 0,
-        .height = 0
-    };
+    int msz = _fButtonMeasureSizeSimple(btn->text);
+    int tiles = msz / __state.tilemap->tile_size.x;
 
     IVector2 cur_pos = btn->position;
     IVector2 btn_tile_offset = {0};
     IVector2 btn_label_offset = {0};
 
-    // _fTilemapDraw(*__state.tilemap, cur_pos, (IVector2){35 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, WHITE);
-
-    cur_pos.x += __state.tilemap->tile_size.x;
-
-    for (int i = 0; i < 1 + additional_size; i++) {
-        cur_pos.x += __state.tilemap->tile_size.x;
-    }
-
-    cur_pos.x += __state.tilemap->tile_size.x;
-
-    int size = cur_pos.x - btn->position.x;
+    int size = msz;
     int center_x = (size - text_sz.x) / 2;
 
     RLRectangle btn_rect = {btn->position.x, btn->position.y + 1, size, 7};
@@ -71,15 +51,19 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
 
     _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){35 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
 
-    cur_pos.x += __state.tilemap->tile_size.x;
+    if (tiles == 0) cur_pos.x += __state.tilemap->tile_size.x;
 
-    for (int i = 0; i < 1 + additional_size; i++) {
-        _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){36 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
+    for (int i = 0; i < tiles; i++) {
+        if (i == 0) {
+            _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){35 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
+        } else if (i == tiles - 1) {
+            _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
+        } else {
+            _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){36 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
+        }
 
         cur_pos.x += __state.tilemap->tile_size.x;
     }
-
-    _fTilemapDraw(__state.tilemap, cur_pos, (IVector2){37 + btn_tile_offset.x, 1 + btn_tile_offset.y}, 0, 0, btn->tint);
 
     _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, btn->tint, 0);
 
@@ -94,4 +78,21 @@ unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint) {
     btn.tint = tint;
 
     return _fButtonDraw(&btn);
+}
+
+int _fButtonMeasureSize(struct fbutton *btn) {
+    if (!btn || !btn->text) return 0;
+
+    IVector2 text_sz = _fTextMeasure(&__state.text_manager, btn->text);
+    if (text_sz.x == 0) return 0;
+
+    int tiles = (int)ceil((float)text_sz.x / (float)__state.tilemap->tile_size.x) + 1;
+
+    return (tiles) * __state.tilemap->tile_size.x;
+}
+int _fButtonMeasureSizeSimple(const char *text) {
+    struct fbutton btn = {0};
+    btn.text = text;
+
+    return _fButtonMeasureSize(&btn);
 }

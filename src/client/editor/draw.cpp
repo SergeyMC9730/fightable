@@ -280,7 +280,7 @@ void _fEditorDraw(struct feditor *editor) {
 
         int current_position_y = blackbox_starty;
 
-        DrawRectangle(__state.framebuffer.texture.width - 51, 0, 51, __state.framebuffer.texture.height, Color{0, 0, 0, 100});
+        DrawRectangle(__state.framebuffer.texture.width - space, 0, space, __state.framebuffer.texture.height, Color{0, 0, 0, 100});
 
         IVector2 sel_block_len = _fTextMeasure(&__state.text_manager, "sel block");
         IVector2 none_len = _fTextMeasure(&__state.text_manager, "none");
@@ -349,7 +349,7 @@ void _fEditorDraw(struct feditor *editor) {
                 struct fbutton btnBlock = {};
                 btnBlock.text = "Blocks";
 
-                btnBlock.position.x = blackbox_startx + 10;
+                btnBlock.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btnBlock)) / 2);
                 btnBlock.position.y = blackbox_starty + 66;
                 btnBlock.tint = WHITE;
                 if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
@@ -360,7 +360,7 @@ void _fEditorDraw(struct feditor *editor) {
                     struct fbutton btn = {};
                     btn.text = "Play";
 
-                    btn.position.x = blackbox_startx + 14;
+                    btn.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btnBlock)) / 2);
                     btn.position.y = blackbox_starty + 75;
                     btn.tint = WHITE;
 
@@ -400,7 +400,7 @@ void _fEditorDraw(struct feditor *editor) {
                     }
                 }
 
-                if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + 14, blackbox_starty + 84 }, WHITE)) {
+                if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Save")) / 2), blackbox_starty + 84 }, WHITE)) {
                     TraceLog(LOG_INFO, "Trying to save level into a file");
 
                     std::string writable = _fStorageGetWritable();
@@ -427,16 +427,16 @@ void _fEditorDraw(struct feditor *editor) {
                 }
 
                 Color cc = (editor->in_edit_mode) ? GREEN : RED;
-                if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + 14, blackbox_starty + 93 }, cc)) {
+                if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Edit")) / 2), blackbox_starty + 93 }, cc)) {
                     editor->in_edit_mode = !editor->in_edit_mode;
                 }
 
                 cc = (editor->swipe_enabled) ? GREEN : RED;
-                if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + 14, blackbox_starty + 102 }, cc)) {
+                if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Swipe")) / 2), blackbox_starty + 102 }, cc)) {
                     editor->swipe_enabled = !editor->swipe_enabled;
                 }
 
-                if (_fButtonDrawSimple("More", (IVector2) { blackbox_startx + 14, blackbox_starty + 111 }, WHITE)) {
+                if (_fButtonDrawSimple("More", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("More")) / 2), blackbox_starty + 111 }, WHITE)) {
                     if ((editor->button_page + 1) < MAX_BUTTON_PAGES) {
                         editor->button_page++;
                     }
@@ -445,11 +445,11 @@ void _fEditorDraw(struct feditor *editor) {
                 break;
             }
             case 1: {
-                if (_fButtonDrawSimple("Exit", (IVector2) { blackbox_startx + 14, blackbox_starty + 66 }, WHITE)) {
+                if (_fButtonDrawSimple("Exit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Exit")) / 2), blackbox_starty + 66 }, WHITE)) {
 
                 }
 
-                if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + 14, blackbox_starty + 75 }, WHITE)) {
+                if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE)) {
                     editor->button_page--;
                 }
             }

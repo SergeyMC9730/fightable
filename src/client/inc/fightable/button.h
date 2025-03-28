@@ -48,6 +48,8 @@ struct fsquare_button {
 };
 unsigned char _fButtonDraw(struct fbutton *btn);
 unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint);
+int _fButtonMeasureSize(struct fbutton *btn);
+int _fButtonMeasureSizeSimple(const char *text);
 unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, unsigned char type, unsigned char flag);
 unsigned char _fSquareButtonDraw(struct fsquare_button *btn);
 #ifdef __cplusplus
