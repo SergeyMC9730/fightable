@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
 #include <fightable/renderer.h>
@@ -145,7 +151,7 @@ void _fInit(int argc, char **argv) {
     // SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-    // SetTargetFPS(30);
+    // SetTargetFPS(30); // TEMP
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
 
@@ -184,7 +190,8 @@ void _fInit(int argc, char **argv) {
         {"3g_crim.xm"},
         {"wave_warp.fs"},
         {"wave_warp_es3.fs"},
-        {"test.obj"}
+        {"test.obj"},
+        {"celestial_fantasia.s3m"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));

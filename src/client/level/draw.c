@@ -289,22 +289,22 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);
 
 #ifdef TARGET_SUPPORTS_3D
-    float camfov = 45.f;
+    // float camfov = 45.f;
 
-    Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
-    camera.position.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
-    camera.target.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
-    camera.position.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
-    camera.target.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
+    // Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
+    // camera.position.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
+    // camera.target.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
+    // camera.position.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
+    // camera.target.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
 
-    BeginMode3D(camera);
+    // BeginMode3D(camera);
 
-    DrawGridEx(10, 1.0f, 0.f);
-    DrawGridEx(10, 1.0f, -4.f);
-    DrawGridEx(10, 1.0f, -8.f);
-    DrawGridEx(10, 1.0f, -12.f);
+    // DrawGridEx(10, 1.0f, 0.f);
+    // DrawGridEx(10, 1.0f, -4.f);
+    // DrawGridEx(10, 1.0f, -8.f);
+    // DrawGridEx(10, 1.0f, -12.f);
 
-    EndMode3D();
+    // EndMode3D();
 #endif
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);

@@ -301,6 +301,7 @@ set(FIGHTABLE_SRC
     src/client/level/destroy.c
     src/client/level/block_processor.c
     src/client/entity/base/getters.c
+    src/client/intro/celestial_fantasia.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -680,4 +681,4 @@ message(STATUS "  Renderer: ${FIGHTABLE_RENDERER}")
 message(STATUS "")
 message(STATUS "")
 
-######
+#######

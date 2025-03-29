@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
 #ifdef __cplusplus
@@ -9,6 +15,7 @@ void _fIntroDraw();
 
 void _fIntroProcessEndlessDream();
 void _fIntroProcessElectricDrug();
+void _fIntroProcessCelestialFantasia();
 
 void _fIntroMenuInit();
 void _fIntroMenuDraw();

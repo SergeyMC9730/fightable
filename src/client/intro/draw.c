@@ -59,6 +59,10 @@ void _fIntroDraw() {
             _fIntroProcessElectricDrug();
             break;
         }
+        case 3: {
+            _fIntroProcessCelestialFantasia();
+            break;
+        }
     }
 
     return;
