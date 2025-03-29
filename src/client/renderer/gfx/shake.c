@@ -1,8 +1,13 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/state.h>
 #include <fightable/gfx.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 void _fGfxShake(struct gfx_manager *m, float strength) {
     m->shake_v.max += 0.15f * strength;
@@ -23,7 +28,7 @@ void _fGfxShakeUpdate(struct gfx_manager *m) {
         m->shake_v.s = 0;
         m->shake_v.max = 0;
         m->shake_v.time = 0;
-        
+
         return;
     }
 
@@ -41,13 +46,15 @@ void _fGfxShakeUpdate(struct gfx_manager *m) {
     m->shake_v.y = rng2 * strength_power * m->shake_v.s * ((reversed[1]) ? -1.f : 1.f);
 
     m->shake_v.time += delta;
-    
-    // printf("%f | %f -> %f | %f | %f %f -> %f:%f | %d %d\n",
-    //     speed,
-    //     m->shake_v.time, m->shake_v.time * speed,
-    //     strength_power,
-    //     rng1, rng2,
-    //     m->shake_v.x, m->shake_v.y,
-    //     reversed[0], reversed[1]
-    // );
+
+#if 0
+    TraceLog(LOG_INFO, "%f | %f -> %f | %f | %f %f -> %f:%f | %d %d",
+        speed,
+        m->shake_v.time, m->shake_v.time * speed,
+        strength_power,
+        rng1, rng2,
+        m->shake_v.x, m->shake_v.y,
+        reversed[0], reversed[1]
+    );
+#endif
 }

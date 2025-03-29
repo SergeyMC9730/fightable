@@ -191,7 +191,8 @@ void _fInit(int argc, char **argv) {
         {"wave_warp.fs"},
         {"wave_warp_es3.fs"},
         {"test.obj"},
-        {"celestial_fantasia.s3m"}
+        {"celestial_fantasia.s3m"},
+        {"cf_level.bin"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -362,7 +363,7 @@ void _fInit(int argc, char **argv) {
         if (__state.show_debug_info) {
             DrawFPS(32, 8);
 
-            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f",
+            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f",
                 align_x,
                 (float)UI_SCALE,
                 (float)__state.window_scale,
@@ -374,7 +375,9 @@ void _fInit(int argc, char **argv) {
                 __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y,
                 __state.cuda_time,
                 __state.damage_overlay_timer,
-                __state.damage_overlay_timer2
+                __state.damage_overlay_timer2,
+                __state.gui_render_offset.x,
+                __state.gui_render_offset.y
             );
 
             RlDrawText(dbg_buffer, 8, 32, 20, RED);

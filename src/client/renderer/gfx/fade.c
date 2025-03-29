@@ -1,10 +1,16 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/gfx.h>
 
 void _fGfxFadeIn(struct gfx_manager *m, Color end, double time) {
-    _fGfxFadeInOut(m, BLANK, end, time);
+    _fGfxFadeInOut(m, m->fade_v.current, end, time);
 }
 void _fGfxFadeOut(struct gfx_manager *m, Color begin, double time) {
-    _fGfxFadeInOut(m, begin, BLANK, time);
+    _fGfxFadeInOut(m, begin, m->fade_v.current, time);
 }
 
 void _fGfxFadeInOut(struct gfx_manager *m, Color begin, Color end, double time) {
@@ -47,8 +53,6 @@ Color _fGfxFadeCalculateMix(Color a, Color b, double equality) {
 
 #define STAGE_FADE_IN  0
 #define STAGE_FADE_OUT 1
-
-#include <stdio.h>
 
 void _fGfxFadeUpdate(struct gfx_manager *m) {
     if (!m->fade_v.should_process) return;

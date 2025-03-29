@@ -83,7 +83,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
     }
 
-    BeginMode2D(actual_cam);
+    BeginMode2DStacked(actual_cam);
 
     RLRectangle source = {0};
     source.width = __state.framebuffer.texture.width;
@@ -227,12 +227,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             MemFree(player->obstacles);
             player->obstacles_length = 0;
 
-            EndMode2D();
+            EndMode2DStacked();
 
             actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
             actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
 
-            BeginMode2D(actual_cam);
+            BeginMode2DStacked(actual_cam);
         }
 
         for (int i = 0; i < level->entities->added_elements; i++) {
@@ -268,7 +268,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     EndBlendMode();
 
-    EndMode2D();
+    EndMode2DStacked();
 
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");
@@ -306,6 +306,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     // EndMode3D();
 #endif
+
+    // DrawRectangleRec(area, (Color){255, 255, 255, 64});
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
 }

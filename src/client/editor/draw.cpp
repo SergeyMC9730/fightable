@@ -244,7 +244,7 @@ void _fEditorDraw(struct feditor *editor) {
         }
 
         {
-            BeginMode2D(actual_cam);
+            BeginMode2DStacked(actual_cam);
 
             if (!mouse_out_of_bounds) {
                 DrawRectangleV(mapped_block_pos, {tx, ty}, bouncing_color);
@@ -261,7 +261,7 @@ void _fEditorDraw(struct feditor *editor) {
             DrawRectangleRec(edit_sel, bouncing_color2);
             DrawRectangleLinesEx(edit_sel, 1.f, GREEN);
 
-            EndMode2D();
+            EndMode2DStacked();
 
             char buf[16] = {};
             snprintf(buf, 16, "%d:%d", (int)actual_cam.target.x, (int)actual_cam.target.y);
@@ -448,33 +448,24 @@ void _fEditorDraw(struct feditor *editor) {
             }
             case 1: {
                 if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
-                    TraceLog(LOG_INFO, "PERLIN GEN BEGIN");
-
                     int clayer = editor->current_layer;
                     editor->current_layer = 1;
                     while (editor->objects.size() <= (editor->current_layer + 1)) {
                         editor->objects.push_back({});
                     }
 
-                    TraceLog(LOG_INFO, "LAYER SET");
-
                     constexpr int chunks = 8;
                     constexpr int chunk_width = 16;
                     constexpr int chunk_height = 16;
 
-                    TraceLog(LOG_INFO, "CH SET");
-
                     IVector2 basegenpos = {0, 0};
                     for (int ci = 0; ci < chunks; ci++) {
-                        TraceLog(LOG_INFO, "PROCESSING CHUNK %d", ci);
+                        TraceLog(LOG_INFO, "Processing chunk %d", ci);
                         for (int cx = 0; cx < chunk_width; cx++) {
                             int grassLevel = (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + cx) * 0.01f, 0) - rand() % 2;
                             int stoneLevel = grassLevel + 4 + rand() % 3;
 
-                            TraceLog(LOG_INFO, "cx=%d, ci=%d, gl=%d, sl=%d", cx, ci, grassLevel, stoneLevel);
-
                             for (int cy = 0u; cy < chunk_height; cy++) {
-                                TraceLog(LOG_INFO, "cy=%d", cy);
                                 if (cy == chunk_height - 1) {
                                     _fEditorPlaceBlock(editor, 118, {basegenpos.x + cx, cy});
                                     continue;

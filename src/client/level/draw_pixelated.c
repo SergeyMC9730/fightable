@@ -1,8 +1,14 @@
-#include "raylib.h"
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/level.h>
 #include <fightable/block_library.h>
 #include <fightable/tilemap.h>
 #include <fightable/block.h>
+#include <fightable/renderer.h>
 
 void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 	if (!level || (frame.width * frame.height) <= 0 || !level->objects || level->data_size == 0) return;
@@ -15,7 +21,7 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 	// cam.target.x /= tx;
 	// cam.target.y /= ty;
 
-	BeginMode2D(cam);
+	BeginMode2DStacked(cam);
 	for (unsigned int i = 0; i < level->data_size; i++) {
 		struct fblock obj = level->objects[i];
 
@@ -118,6 +124,6 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 
 		DrawPixel(_x, _y, col);
 	}
-	EndMode2D();
+	EndMode2DStacked();
 	EndScissorMode();
 }

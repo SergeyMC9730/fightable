@@ -21,10 +21,6 @@ void _fDraw() {
     if (__state.intro_can_continue) {
         if (__state.current_editor != NULL) {
             _fEditorDraw(__state.current_editor);
-        } else {
-            if (__state.current_level && __state.current_ui_menu != UI_MENU_MPCREATE) {
-                _fLevelDraw(__state.current_level, (IVector2){0, 0});
-            }
         }
     }
 
@@ -32,7 +28,7 @@ void _fDraw() {
     cam.zoom = 1.f;
     cam.target = __state.gui_render_offset;
 
-    BeginMode2D(cam);
+    BeginMode2DStacked(cam);
     switch (__state.current_ui_menu) {
     case UI_MENU_MAIN: {
         _fIntroDraw();
@@ -43,5 +39,5 @@ void _fDraw() {
         break;
     }
     }
-    EndMode2D();
+    EndMode2DStacked();
 }

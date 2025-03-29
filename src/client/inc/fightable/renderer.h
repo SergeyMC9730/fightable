@@ -40,6 +40,21 @@ void BeginTextureModeStacked(RenderTexture2D txt);
 // made for making some routines easier in implementation
 void EndTextureModeStacked();
 
+// switch to the camera mode in stack mode
+//
+// - stack mode means that cameras can be pushed and pulled out of the stack
+// - if there are gonna be more than R2D_STACK_SIZE textures inside this stack, this function would behave like a standard `BeginMode2D` function
+//
+// made for making some routines easier in implementation
+void BeginMode2DStacked(Camera2D cam);
+
+// move from the 2d mode in stack mode
+//
+// - stack mode means that cameras can be pushed and pulled out of the stack
+//
+// made for making some routines easier in implementation
+void EndMode2DStacked();
+
 // tries to find main framebuffer inside the rendertexture stack
 // if it fails, it returns -1
 // else it returns index inside the stack

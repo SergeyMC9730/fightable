@@ -71,17 +71,17 @@ public:
                 should_shake |= (row.find(instrument) != std::string::npos);
             }
 
-            __state.sound_engine._row--;
-            const char* rowc_1 = _fAudioGetDbg(&__state.sound_engine, i);
-            __state.sound_engine._row++;
-            const char* rowc_2 = _fAudioGetDbg(&__state.sound_engine, i);
+            // __state.sound_engine._row--;
+            // const char* rowc_1 = _fAudioGetDbg(&__state.sound_engine, i);
+            // __state.sound_engine._row++;
+            // const char* rowc_2 = _fAudioGetDbg(&__state.sound_engine, i);
 
-            if (strcmp(rowc_1, rowc_2) != 0) {
-                TraceLog(LOG_INFO, "Data at %d -> %s", i, row.c_str());
-            }
+            // if (strcmp(rowc_1, rowc_2) != 0) {
+            //     TraceLog(LOG_INFO, "Data at %d -> %s", i, row.c_str());
+            // }
 
-            free((void *)rowc_1);
-            free((void *)rowc_2);
+            // free((void *)rowc_1);
+            // free((void *)rowc_2);
 
             if (should_shake) {
                 if (!_shake_lock[i]) {

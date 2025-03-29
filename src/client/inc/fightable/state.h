@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -54,6 +55,7 @@ struct fhttpserver;
 
 #define UI_MENU_MAIN        0
 #define UI_MENU_MPCREATE    1
+#define UI_MENU_EDITOR      2
 
 #ifdef TARGET_ANDROID
 struct android_app;
@@ -165,6 +167,13 @@ struct fightable_state {
     struct ftcpclient_delegate* mp_client_delegate;
 
     Vector2 mp_level_preview_offset;
+
+    float cf_level_x;
+
+    // camera2d stack
+    Camera2D c2dstack[R2D_STACK_SIZE];
+    // pointer to the `r2dstack` end
+    int c2dpointer;
 };
 
 extern struct fightable_state __state;

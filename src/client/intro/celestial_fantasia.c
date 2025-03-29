@@ -4,6 +4,9 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/intvec.h"
+#include "fightable/level.h"
+#include "raylib.h"
 #include <fightable/intro.h>
 #include <fraylib.h>
 #include <fightable/state.h>
@@ -11,11 +14,18 @@
 #include <fightable/debug.h>
 
 void _fIntroProcessCelestialFantasia() {
-    double t = _fAudioGetPlayTime(&__state.sound_engine);
-
+    float delta = GetFrameTime();
     int w =__state.framebuffer.texture.width;
     int h =__state.framebuffer.texture.height;
-    float delta = GetFrameTime();
+
+    __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 64 + (__state.cf_level_x / 6.f)};
+    __state.current_level->camera_size = (IVector2){w, h};
+    __state.cf_level_x += delta * 3.f;
+    _fLevelDraw(__state.current_level, (IVector2){0, 0});
+
+    double t = _fAudioGetPlayTime(&__state.sound_engine);
+
+    DrawRectangle(__state.gui_render_offset.x, __state.gui_render_offset.y, w, h, (Color){0,0,0,128});
 
     if (t >= 1.08f) {
         __state.title_song_stage = 1;

@@ -1,3 +1,5 @@
+#include "fightable/sound_library.h"
+#include "raylib.h"
 #include <fightable/intro.h>
 #include <fightable/state.h>
 
@@ -22,7 +24,14 @@ void _fIntroMenuDrawBackground() {
 
     Color bg_color = (Color){0, 0, 200, 255};
 
-    DrawTexturePro(__state.intro_temp_bg, source, dest, (Vector2){}, 0.f, bg_color);
+    if (__state.song_id != MUS_CELESTIAL_FANTASIA) {
+        DrawTexturePro(__state.intro_temp_bg, source, dest, (Vector2){}, 0.f, bg_color);
+    } else {
+        DrawRectangle(-10, 0, 10, wy, BLACK);
+        DrawRectangle(wx, 0, 10, wy, BLACK);
+        DrawRectangle(0, 10, -10, wx, BLACK);
+        DrawRectangle(0, wy, wx, 10, BLACK);
+    }
 
     Color begin = BLACK;
     begin.a = 200;

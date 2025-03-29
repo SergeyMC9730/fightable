@@ -48,7 +48,7 @@ void _fEntityMove(struct fentity *entity, Vector2 pos) {
         entity->hitbox.y += pos.y;
 
         // Stop motion on collision
-        if (prevY != pos.y) entity->speed.y = 0.f;  
+        if (prevY != pos.y) entity->speed.y = 0.f;
     }
 }
 
@@ -64,7 +64,7 @@ void _fEntityUpdate(struct fentity *entity) {
             entity->speed.x = max_speed_x;
         }
         entity->complete_px = 1;
-    } 
+    }
     if (entity->moving_horizontally && entity->moving_negative) {
         entity->speed.x -= delta * 180.f;
         if (entity->speed.x < -max_speed_x) {
@@ -203,7 +203,7 @@ int main() {
         ClearBackground(RAYWHITE);
 
         DrawRectangle(0, GetRenderHeight() - 24, GetRenderWidth(), 24, RED);
-        
+
         fhitbox h = test_entity.hitbox;
         RLRectangle r = { h.x, h.y, h.width, h.height };
 
