@@ -38,6 +38,7 @@ void _fIntroInit() {
             Image ibt = GenImageColor(__state.tilemap->tile_size.x, __state.tilemap->tile_size.y, SKYBLUE);
             __state.current_level->background_tile = LoadTextureFromImage(ibt);
             UnloadImage(ibt);
+            __state.sound_engine.do_not_shake = 1;
             break;
         }
     };

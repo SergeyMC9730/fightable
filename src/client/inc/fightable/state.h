@@ -171,6 +171,7 @@ struct fightable_state {
     float cf_level_x;
     float cf_timer;
     unsigned char cf_prepared;
+    unsigned char cf_prepared_2;
 
     // camera2d stack
     Camera2D c2dstack[R2D_STACK_SIZE];

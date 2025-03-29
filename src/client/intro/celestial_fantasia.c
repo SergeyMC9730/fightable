@@ -117,6 +117,10 @@ void _fIntroProcessCelestialFantasia() {
             c.a = 255.f * v;
 
             if (!__state.current_editor) {
+                if (!__state.cf_prepared_2) {
+                    __state.sound_engine.do_not_shake = 0;
+                    __state.cf_prepared_2 = 1;
+                }
                 _fIntroMenuDraw();
             }
 
@@ -125,4 +129,12 @@ void _fIntroProcessCelestialFantasia() {
 
         __state.intro_stage_completed = 1;
     }
+
+    float l = 1.f - __state.cf_timer;
+    Color c = BLACK;
+    c.a = (unsigned char)(255.f * l);
+    DrawRectangle(0, 0, w, h, c);
+
+    __state.cf_timer += delta / 4.f;
+    if (__state.cf_timer > 1.f) __state.cf_timer = 1.f;
 }
