@@ -27,13 +27,14 @@ void _fIntroMenuDrawBackground() {
     if (__state.song_id != MUS_CELESTIAL_FANTASIA) {
         DrawTexturePro(__state.intro_temp_bg, source, dest, (Vector2){}, 0.f, bg_color);
     } else {
-        DrawRectangle(-10, 0, 10, wy, BLACK);
-        DrawRectangle(wx, 0, 10, wy, BLACK);
-        DrawRectangle(0, 10, -10, wx, BLACK);
-        DrawRectangle(0, wy, wx, 10, BLACK);
+        int offset_area = 16;
+        DrawRectangle(-offset_area, 0, offset_area, wy, BLACK);
+        DrawRectangle(wx, 0, offset_area, wy, BLACK);
+        DrawRectangle(0, offset_area, -offset_area, wx, BLACK);
+        DrawRectangle(0, wy, wx, offset_area, BLACK);
     }
 
-    Color begin = BLACK;
+    Color begin = (__state.song_id != MUS_CELESTIAL_FANTASIA) ? BLACK : BLUE;
     begin.a = 200;
     Color end = WHITE;
     end.a = 128;

@@ -305,7 +305,7 @@ void _fEditorDraw(struct feditor *editor) {
             current_position_y += 2 + __state.tilemap->tile_size.y;
         }
 
-        Color grad_black = BLANK;
+        Color grad_black = {130, 130, 130, 0};
         Color grad_gray = GRAY;
 
         DrawRectangleGradientH(blackbox_startx, current_position_y + 2, space / 2, 1, grad_black, grad_gray);

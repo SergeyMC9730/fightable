@@ -6,6 +6,7 @@
 
 #include "fightable/intvec.h"
 #include "fightable/level.h"
+#include "fightable/text.h"
 #include "raylib.h"
 #include <fightable/intro.h>
 #include <fraylib.h>
@@ -27,20 +28,24 @@ void _fIntroProcessCelestialFantasia() {
 
     DrawRectangle(__state.gui_render_offset.x, __state.gui_render_offset.y, w, h, (Color){0,0,0,128});
 
-    if (t >= 1.08f) {
+    if (t < 2.f) {
         __state.title_song_stage = 1;
     }
-    if (t >= 1.8f) {
+    if (t >= 2.f) {
         __state.title_song_stage = 2;
     }
-    if (t >= 4.06f) {
+    if (t >= 5.8f) {
         __state.title_song_stage = 3;
+        if (!__state.cf_prepared) {
+            _fIntroMenuInit();
+            __state.cf_prepared = 1;
+        }
     }
-    if (t >= 4.45f) {
+    if (t >= 6.9f) {
         __state.title_song_stage = 4;
         if (__state.title_r0) {
             if (!__state.current_editor) {
-                _fIntroMenuInit();
+                // _fIntroMenuInit();
             } else {
                 __state.intro_can_continue = 1;
             }
@@ -60,13 +65,14 @@ void _fIntroProcessCelestialFantasia() {
 
     if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
         if (__state.title_song_stage >= 1) {
-            int size_x = 6 * __state.tilemap->tile_size.x;
-            int size_y = 1 * __state.tilemap->tile_size.y;
+            int size_x = _fTextMeasure(&__state.text_manager, "dogosoftware").x;
+            int size_y = _fTextMeasure(&__state.text_manager, "dogosoftware").y;
 
             int cx = (w - size_x) / 2;
             int cy = (h - size_y) / 2;
 
-            _fTilemapDrawMegatile(__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
+            _fTextDraw(&__state.text_manager, "dogosoftware", (IVector2){cx, cy}, WHITE, 1);
+            _fTextDraw(&__state.text_manager, "  presents  ", (IVector2){cx, cy + (__state.text_manager.tilemap.tile_size.y + 5)}, WHITE, 1);
         }
 
         if (__state.title_song_stage >= 2) {
@@ -83,13 +89,13 @@ void _fIntroProcessCelestialFantasia() {
 
             int offset = 6;
 
-            DrawRectangleGradientV(0, cy - offset, w, size_y + 2 + offset, BLACK, c);
+            DrawRectangleGradientV(0, cy - offset, w, size_y + 2 + offset, BLANK, c);
 
             DrawTexture(__state.raylib_logo, cx, cy, WHITE);
         }
 
         if (__state.title_song_stage == 3) {
-            __state.title_a += delta * 4.5f;
+            __state.title_a += delta * 1.5f;
 
             float v = fmax(1.f - __state.title_a, 0.f);
             Color c = BLACK;
@@ -102,7 +108,7 @@ void _fIntroProcessCelestialFantasia() {
             }
     }
     } else {
-        __state.title_a += delta * 6.f;
+        __state.title_a += delta * 4.f;
 
         float v = fmax(1.f - __state.title_a, 0.f);
 

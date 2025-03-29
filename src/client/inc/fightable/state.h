@@ -169,6 +169,8 @@ struct fightable_state {
     Vector2 mp_level_preview_offset;
 
     float cf_level_x;
+    float cf_timer;
+    unsigned char cf_prepared;
 
     // camera2d stack
     Camera2D c2dstack[R2D_STACK_SIZE];

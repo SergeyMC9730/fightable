@@ -95,7 +95,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     dest.x = actual_cam.target.x;
     dest.y = actual_cam.target.y;
 
-    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, DARKGRAY);
+    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, GRAY);
 
     level->objects_rendered = 0;
 

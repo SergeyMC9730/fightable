@@ -14,7 +14,6 @@
 #define SONGS_AVAILABLE 3
 
 void _fIntroInit2(void *u) {
-
     TraceLog(LOG_INFO, "Doing second fade effect");
 }
 
@@ -35,6 +34,10 @@ void _fIntroInit() {
         case MUS_CELESTIAL_FANTASIA: {
             file_to_load = "celestial_fantasia.s3m";
             __state.current_level = _fLevelLoadFromFile("cf_level.bin");
+            UnloadTexture(__state.current_level->background_tile);
+            Image ibt = GenImageColor(__state.tilemap->tile_size.x, __state.tilemap->tile_size.y, SKYBLUE);
+            __state.current_level->background_tile = LoadTextureFromImage(ibt);
+            UnloadImage(ibt);
             break;
         }
     };
