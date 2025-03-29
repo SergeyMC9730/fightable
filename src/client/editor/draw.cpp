@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -23,6 +24,7 @@
 #include <fightable/rect.h>
 #include <fightable/storage.h>
 #include <nfd.h>
+#include <climits>
 
 #define MAX_BUTTON_PAGES 2
 
@@ -445,8 +447,60 @@ void _fEditorDraw(struct feditor *editor) {
                 break;
             }
             case 1: {
-                if (_fButtonDrawSimple("Exit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Exit")) / 2), blackbox_starty + 66 }, WHITE)) {
+                if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
+                    TraceLog(LOG_INFO, "PERLIN GEN BEGIN");
 
+                    int clayer = editor->current_layer;
+                    editor->current_layer = 1;
+                    while (editor->objects.size() <= (editor->current_layer + 1)) {
+                        editor->objects.push_back({});
+                    }
+
+                    TraceLog(LOG_INFO, "LAYER SET");
+
+                    constexpr int chunks = 8;
+                    constexpr int chunk_width = 16;
+                    constexpr int chunk_height = 16;
+
+                    TraceLog(LOG_INFO, "CH SET");
+
+                    IVector2 basegenpos = {0, 0};
+                    for (int ci = 0; ci < chunks; ci++) {
+                        TraceLog(LOG_INFO, "PROCESSING CHUNK %d", ci);
+                        for (int cx = 0; cx < chunk_width; cx++) {
+                            int grassLevel = (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + cx) * 0.01f, 0) - rand() % 2;
+                            int stoneLevel = grassLevel + 4 + rand() % 3;
+
+                            TraceLog(LOG_INFO, "cx=%d, ci=%d, gl=%d, sl=%d", cx, ci, grassLevel, stoneLevel);
+
+                            for (int cy = 0u; cy < chunk_height; cy++) {
+                                TraceLog(LOG_INFO, "cy=%d", cy);
+                                if (cy == chunk_height - 1) {
+                                    _fEditorPlaceBlock(editor, 118, {basegenpos.x + cx, cy});
+                                    continue;
+                                }
+
+                                if (cy == grassLevel) {
+                                    _fEditorPlaceBlock(editor, 2, {basegenpos.x + cx, cy});
+                                    continue;
+                                }
+
+                                if (cy > grassLevel && cy < stoneLevel) {
+                                    _fEditorPlaceBlock(editor, 19, {basegenpos.x + cx, cy});
+                                    continue;
+                                }
+
+                                if (cy >= stoneLevel) {
+                                    _fEditorPlaceBlock(editor, 40, {basegenpos.x + cx, cy});
+                                    continue;
+                                }
+                            }
+                        }
+
+                        basegenpos.x += chunk_width;
+                    }
+
+                    editor->current_layer = clayer;
                 }
 
                 if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE)) {

@@ -15,6 +15,8 @@
 #include <map>
 #include <vector>
 
+#include <PerlinNoise.hpp>
+
 struct feditor {
     std::vector<std::map<int, std::map<int, fblock>>> objects;
     std::vector<fblock> render_objects;
@@ -52,4 +54,6 @@ struct feditor {
 
     Model test_model = {};
     float test_z = 16;
+
+    siv::PerlinNoise perlin;
 };

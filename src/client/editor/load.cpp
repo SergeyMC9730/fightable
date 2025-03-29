@@ -1,3 +1,4 @@
+#include "PerlinNoise.hpp"
 #include "fightable/level.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
@@ -12,6 +13,7 @@ struct feditor *_fEditorCreate() {
     feditor *editor = new feditor;
     editor->current_block_id = 0;
     editor->current_layer = -1;
+    editor->perlin = siv::PerlinNoise(GetRandomValue(16, 1024));
 
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;

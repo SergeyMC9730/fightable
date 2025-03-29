@@ -582,6 +582,7 @@ target_include_directories(fbase PRIVATE
     src/tcpclient/inc
     src/tcpsrv/inc
     ext/nativefiledialog-extended/src/include
+    ext/PerlinNoise
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
