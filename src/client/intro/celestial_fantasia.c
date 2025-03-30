@@ -19,10 +19,12 @@ void _fIntroProcessCelestialFantasia() {
     int w =__state.framebuffer.texture.width;
     int h =__state.framebuffer.texture.height;
 
-    __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 64 + (__state.cf_level_x / 6.f)};
-    __state.current_level->camera_size = (IVector2){w, h};
-    __state.cf_level_x += delta * 3.f;
-    _fLevelDraw(__state.current_level, (IVector2){0, 0});
+    if (__state.current_level) {
+        __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 64 + (__state.cf_level_x / 8.f)};
+        __state.current_level->camera_size = (IVector2){w, h};
+        __state.cf_level_x += delta * 3.f;
+        _fLevelDraw(__state.current_level, (IVector2){0, 0});
+    }
 
     double t = _fAudioGetPlayTime(&__state.sound_engine);
 
@@ -57,7 +59,7 @@ void _fIntroProcessCelestialFantasia() {
 
 #ifdef DEBUG
     if (IsKeyDown(KEY_SPACE)) {
-        printf("Step at %f\n", (float)t);
+        TraceLog(LOG_INFO, "Step at %f\n", (float)t);
 
         __state.title_song_stage++;
     }

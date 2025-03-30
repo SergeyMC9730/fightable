@@ -42,7 +42,7 @@ void _fIntroProcessEndlessDream() {
 
 #ifdef DEBUG
     if (IsKeyDown(KEY_SPACE)) {
-        printf("Step at %f\n", (float)t);
+        TraceLog(LOG_INFO, "Step at %f\n", (float)t);
 
         __state.title_song_stage++;
     }

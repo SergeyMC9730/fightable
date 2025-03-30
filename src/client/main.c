@@ -192,7 +192,8 @@ void _fInit(int argc, char **argv) {
         {"wave_warp_es3.fs"},
         {"test.obj"},
         {"celestial_fantasia.s3m"},
-        {"cf_level.bin"}
+        {"cf_level.bin"},
+        {"raylib_16x16.png"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));

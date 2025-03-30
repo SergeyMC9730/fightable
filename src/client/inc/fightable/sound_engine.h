@@ -51,7 +51,7 @@ struct faudio_engine {
 };
 
 void _fAudioBegin(struct faudio_engine *engine);
-void _fAudioPlayModule(struct faudio_engine *engine, const char *path);
+unsigned char _fAudioPlayModule(struct faudio_engine *engine, const char *path);
 void _fAudioStop(struct faudio_engine *engine);
 double _fAudioGetPlayTime(struct faudio_engine *engine);
 void _fAudioLoopCurrent(struct faudio_engine *engine);

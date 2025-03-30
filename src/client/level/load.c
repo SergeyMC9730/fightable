@@ -180,10 +180,15 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 		break;
 	}
 	case LEVEL_FORMAT_VERSION: {
+	    TraceLog(LOG_INFO, "Reopening level");
 		MemFree(data);
 		data = NULL;
 
 		FILE* file = fopen(filename, "rb");
+		if (!file) {
+		    TraceLog(LOG_INFO, "Could not reopen level");
+			break;
+		}
 
 		unsigned short lfv = 0;
 		unsigned short width = 0;
@@ -205,7 +210,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 #endif
 
 		if (!ie) {
-			MemFree(data);
+			fclose(file);
 			TraceLog(LOG_ERROR, "Level has been saved on a system with different byte order");
 
 			return NULL;

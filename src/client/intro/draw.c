@@ -8,6 +8,7 @@
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/debug.h>
+#include <stdio.h>
 
 #ifdef DEBUG
 static unsigned char __dbg_continue = 0;
@@ -31,7 +32,7 @@ void _fIntroDraw() {
      * Step at 3.960000
     */
 
-    _fTextDraw(&__state.text_manager, buffer, (IVector2){1, 1}, GREEN, 1);
+    // _fTextDraw(&__state.text_manager, buffer, (IVector2){1, 1}, GREEN, 1);
 
     if (IsKeyPressed(KEY_ENTER)) {
         __dbg_continue = 1;
@@ -40,7 +41,7 @@ void _fIntroDraw() {
     }
 
     if (!__dbg_continue) {
-        _fTextDraw(&__state.text_manager, "enter to continue", (IVector2){1, 20}, YELLOW, 1);
+        // _fTextDraw(&__state.text_manager, "enter to continue", (IVector2){1, 20}, YELLOW, 1);
 
         return;
     }
