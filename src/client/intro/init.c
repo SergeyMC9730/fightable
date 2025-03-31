@@ -35,13 +35,9 @@ void _fIntroInit() {
         }
         case MUS_CELESTIAL_FANTASIA: {
             file_to_load = "celestial_fantasia.s3m";
-            __state.current_level = _fLevelLoadFromFile("cf_level.bin");
-            if (!__state.current_level) {
-                char *buf = (char *)malloc(128);
-                snprintf(buf, 128, "%s/cf_level.bin", _fStorageGetWritable());
-                __state.current_level = _fLevelLoadFromFile(buf);
-                free(buf);
-            }
+            char *p = _fStorageFind("cf_level.bin");
+            __state.current_level = _fLevelLoadFromFile(p);
+            MemFree(p);
             if (__state.current_level) {
                 UnloadTexture(__state.current_level->background_tile);
                 Image ibt = GenImageColor(__state.tilemap->tile_size.x, __state.tilemap->tile_size.y, SKYBLUE);
@@ -53,25 +49,20 @@ void _fIntroInit() {
         }
     };
 
-    char *buf = (char *)malloc(128);
-    _fAudioPlayModule(&__state.sound_engine, file_to_load);
-    if (!__state.sound_engine.current_module) {
-        snprintf(buf, 128, "%s/%s", _fStorageGetWritable(), file_to_load);
-        _fAudioPlayModule(&__state.sound_engine, buf);
-    }
+    char *p = _fStorageFind(file_to_load);
+    _fAudioPlayModule(&__state.sound_engine, p);
+    MemFree(p);
+
+
     if (__state.sound_engine.current_module) {
         _fAudioLoopCurrent(&__state.sound_engine);
     } else {
         __state.song_id = -1;
     }
 
-    if (!FileExists("raylib_16x16.png")) {
-        snprintf(buf, 128, "%s/raylib_16x16.png", _fStorageGetWritable());
-    } else {
-        snprintf(buf, 128, "%s", "raylib_16x16.png");
-    }
-    __state.raylib_logo = LoadTexture(buf);
-    free(buf);
+    p = _fStorageFind("raylib_16x16.png");
+    __state.raylib_logo = LoadTexture(p);
+    MemFree(p);
 
     _fIntroGfxInit();
 }

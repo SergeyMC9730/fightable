@@ -259,10 +259,11 @@ void _fInit(int argc, char **argv) {
     _fConfigInit(&__state.config);
 
     {
-        snprintf(dbg_buffer, 2048, "%s/damage_overlay.png", _fStorageGetWritable());
-        __state.damage_overlay = LoadTexture(dbg_buffer);
-        snprintf(dbg_buffer, 2048, "%s/damage_overlay.json", _fStorageGetWritable());
-        __state.damage_overlay_anim = _ntRendererLoadAnimation(dbg_buffer);
+        char *p = _fStorageFind("damage_overlay.png");
+        __state.damage_overlay = LoadTexture(p);
+        MemFree(p); p = _fStorageFind("damage_overlay.json");
+        __state.damage_overlay_anim = _ntRendererLoadAnimation(p);
+        MemFree(p);
 
         SetTextureWrap(__state.damage_overlay, TEXTURE_WRAP_CLAMP);
     }
