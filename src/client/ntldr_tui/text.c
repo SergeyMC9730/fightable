@@ -33,7 +33,7 @@ extern struct nt_tui_environment _ntTuiEnvironment;
 void _ntTuiDrawText(const char *str, unsigned char x, unsigned char y, Color col) {
     if (str == NULL) return;
 
-    float scale = 1.f;
+    float scale = _ntTuiEnvironment.scaling;
 
     RlDrawTextEx(_ntTuiEnvironment.font, str, (Vector2){x * _ntTuiEnvironment.base_font_size.x, y * _ntTuiEnvironment.base_font_size.y}, 16.f * scale, 0.f, col);
 }

@@ -39,12 +39,8 @@ void _ntFileSelectorSetListing(struct nt_file_selector_menu *m) {
 
         i = 0;
 
-        while (m->listing->len != 0) {
-            RSBPopElement_cstr(m->listing);
-        }
-        while (m->colors->len != 0) {
-            RSBPopElementColor(m->colors);
-        }
+        RSBClear_cstr(m->listing);
+        RSBClearColor(m->colors);
 
         int has_prev = 0;
 

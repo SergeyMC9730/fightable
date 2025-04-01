@@ -31,6 +31,8 @@ struct nt_tui_environment {
     bool show_input_pointer;
 
     bool exists;
+
+    float scaling;
 };
 
 #ifdef __cplusplus

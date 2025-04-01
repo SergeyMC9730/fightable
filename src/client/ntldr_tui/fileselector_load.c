@@ -25,6 +25,7 @@
 struct nt_file_selector_menu *_ntLoadFileSelector(const char *path, int items_per_page) {
     // allocate file selector
     struct nt_file_selector_menu *m = (struct nt_file_selector_menu *)malloc(sizeof(struct nt_file_selector_menu));
+    memset(m, 0, sizeof(struct nt_file_selector_menu));
 
     // setup colors
     m->base.selected_background_color = WHITE;

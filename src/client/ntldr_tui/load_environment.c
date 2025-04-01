@@ -62,6 +62,8 @@ void _ntTuiLoadEnvironment(const char *font_path, Vector2 base_font_size, float 
     _ntTuiEnvironment.font = LoadFontEx(font_path, 16 * scaling, codepoints, codepointCount);
     // set base font size
     _ntTuiEnvironment.base_font_size = base_font_size;
+    // set scaling
+    _ntTuiEnvironment.scaling = scaling;
     // free allocation done by LoadCodepoints
     free(codepoints);
 }

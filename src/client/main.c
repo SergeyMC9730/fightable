@@ -203,7 +203,7 @@ void _fInit(int argc, char **argv) {
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
-    _ntTuiLoadEnvironmentDefault(2.f);
+    _ntTuiLoadEnvironmentDefault(1.25f);
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
