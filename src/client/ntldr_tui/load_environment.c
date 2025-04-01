@@ -69,7 +69,5 @@ void _ntTuiLoadEnvironment(const char *font_path, Vector2 base_font_size, float 
 }
 
 void _ntTuiLoadEnvironmentDefault(float scaling) {
-    char *p = _fStorageFind("Px437_IBM_VGA_8x16.ttf");
-    _ntTuiLoadEnvironment(p, (Vector2){8, 16}, scaling);
-    MemFree(p);
+    _ntTuiLoadEnvironment("Px437_IBM_VGA_8x16.ttf", (Vector2){8, 16}, scaling);
 }
