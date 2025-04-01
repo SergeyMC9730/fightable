@@ -180,6 +180,8 @@ struct fightable_state {
 
     struct nt_file_selector_menu *current_search_menu;
 
+    Texture2D test_midground;
+    unsigned char display_test_midground;
 };
 
 extern struct fightable_state __state;

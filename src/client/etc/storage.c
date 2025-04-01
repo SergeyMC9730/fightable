@@ -28,6 +28,14 @@ void _fStoragePrepareWritable() {
 #include <string.h>
 #include <stdio.h>
 
+unsigned char _fStorageFileExists(const char *file) {
+    if (!file) return 0;
+    FILE *p = fopen(file, "rb");
+    if (!p) return 0;
+    fclose(p);
+    return 1;
+}
+
 char *_fStorageFind(const char *path) {
     if (!path) goto _ret;
 
@@ -36,7 +44,7 @@ char *_fStorageFind(const char *path) {
     const char *storage_path = path;
     const char *pattern = "%s";
 
-    if (FileExists(path)) goto _begin;
+    if (_fStorageFileExists(path)) goto _begin;
 
     storage_path = _fStorageGetWritable();
     len += strlen(storage_path) + 1;

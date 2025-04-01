@@ -4,7 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "nt5emul/tui/environment.h"
+#include <nt5emul/tui/environment.h>
 #include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -197,6 +197,8 @@ void _fInit(int argc, char **argv) {
         {"cf_level.bin"},
         {"raylib_16x16.png"},
         {"Px437_IBM_VGA_8x16.ttf"}
+        {"downsky_16bit_2.png"},
+        {"config.json"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -205,6 +207,9 @@ void _fInit(int argc, char **argv) {
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
+
+    __state.test_midground = LoadTexture("downsky_16bit_2.png");
+    SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
 
     __state.text_manager = _fTextLoadDefault();
 

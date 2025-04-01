@@ -20,9 +20,12 @@ void _fIntroProcessCelestialFantasia() {
     int h =__state.framebuffer.texture.height;
 
     if (__state.current_level) {
-        __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 64 + (__state.cf_level_x / 8.f)};
+        __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 32};
         __state.current_level->camera_size = (IVector2){w, h};
-        __state.cf_level_x += delta * 3.f;
+        __state.cf_level_x += delta * 16.f;
+        if ((__state.cf_level_x + (float)w) >= (float)(16 * 16 * __state.tilemap->tile_size.x)) {
+            __state.cf_level_x = 0;
+        }
         _fLevelDraw(__state.current_level, (IVector2){0, 0});
     }
 
@@ -67,14 +70,24 @@ void _fIntroProcessCelestialFantasia() {
 
     if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
         if (__state.title_song_stage >= 1) {
-            int size_x = _fTextMeasure(&__state.text_manager, "dogosoftware").x;
-            int size_y = _fTextMeasure(&__state.text_manager, "dogosoftware").y;
+            {
+                int size_x = _fTextMeasure(&__state.text_manager, "dogotrigger").x;
+                int size_y = _fTextMeasure(&__state.text_manager, "dogotrigger").y;
 
-            int cx = (w - size_x) / 2;
-            int cy = (h - size_y) / 2;
+                int cx = (w - size_x) / 2;
+                int cy = (h - size_y) / 2;
 
-            _fTextDraw(&__state.text_manager, "dogosoftware", (IVector2){cx, cy}, WHITE, 1);
-            _fTextDraw(&__state.text_manager, "  presents  ", (IVector2){cx, cy + (__state.text_manager.tilemap.tile_size.y + 5)}, WHITE, 1);
+                _fTextDraw(&__state.text_manager, "dogotrigger", (IVector2){cx, cy}, WHITE, 1);
+            }
+            {
+                int size_x = _fTextMeasure(&__state.text_manager, "presents").x;
+                int size_y = _fTextMeasure(&__state.text_manager, "presents").y;
+
+                int cx = (w - size_x) / 2;
+                int cy = (h - size_y) / 2;
+
+                _fTextDraw(&__state.text_manager, "presents", (IVector2){cx, cy + (__state.text_manager.tilemap.tile_size.y + 5)}, WHITE, 1);
+            }
         }
 
         if (__state.title_song_stage >= 2) {
@@ -100,7 +113,7 @@ void _fIntroProcessCelestialFantasia() {
             __state.title_a += delta * 1.5f;
 
             float v = fmax(1.f - __state.title_a, 0.f);
-            Color c = BLACK;
+            Color c = WHITE;
             c.a = 255.f * (1.f - v);
 
             DrawRectangle(0, 0, w, h, c);
@@ -115,7 +128,7 @@ void _fIntroProcessCelestialFantasia() {
         float v = fmax(1.f - __state.title_a, 0.f);
 
         if (v <= 1.f) {
-            Color c = BLACK;
+            Color c = WHITE;
             c.a = 255.f * v;
 
             if (!__state.current_editor) {

@@ -8,9 +8,9 @@
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/debug.h>
-#include <stdio.h>
 
 #ifdef DEBUG
+#include <stdio.h>
 static unsigned char __dbg_continue = 0;
 #endif
 

@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/level.h>
@@ -85,17 +86,33 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     BeginMode2DStacked(actual_cam);
 
-    RLRectangle source = {0};
-    source.width = __state.framebuffer.texture.width;
-    source.height = __state.framebuffer.texture.height;
-    source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
-    source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
+    {
+        RLRectangle source = {0};
+        source.width = __state.framebuffer.texture.width;
+        source.height = __state.framebuffer.texture.height;
+        source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
+        source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
 
-    RLRectangle dest = source;
-    dest.x = actual_cam.target.x;
-    dest.y = actual_cam.target.y;
+        RLRectangle dest = source;
+        dest.x = actual_cam.target.x;
+        dest.y = actual_cam.target.y;
 
-    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, GRAY);
+        DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, GRAY);
+    }
+
+    if (__state.display_test_midground && IsTextureValid(__state.test_midground)) {
+        RLRectangle source = {0};
+        source.width = __state.framebuffer.texture.width;
+        source.height = __state.framebuffer.texture.height;
+        source.x = (int)(actual_cam.target.x / 1.5f) % __state.test_midground.width;
+        source.y = (int)(actual_cam.target.y / 1.5f) % __state.test_midground.height;
+
+        RLRectangle dest = source;
+        dest.x = actual_cam.target.x;
+        dest.y = actual_cam.target.y;
+
+        DrawTexturePro(__state.test_midground, source, dest, (Vector2){0}, 0.f, (Color){255, 255, 255, 128});
+    }
 
     level->objects_rendered = 0;
 
