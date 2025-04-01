@@ -20,9 +20,12 @@ void _fIntroProcessCelestialFantasia() {
     int h =__state.framebuffer.texture.height;
 
     if (__state.current_level) {
-        __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 64 + (__state.cf_level_x / 8.f)};
+        __state.current_level->camera.target = (Vector2){__state.cf_level_x, sin(GetTime()) * 8.f - 32};
         __state.current_level->camera_size = (IVector2){w, h};
-        __state.cf_level_x += delta * 3.f;
+        __state.cf_level_x += delta * 16.f;
+        if ((__state.cf_level_x + (float)w) >= (float)(16 * 16 * __state.tilemap->tile_size.x)) {
+            __state.cf_level_x = 0;
+        }
         _fLevelDraw(__state.current_level, (IVector2){0, 0});
     }
 

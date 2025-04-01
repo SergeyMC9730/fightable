@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
 #include <fightable/renderer.h>
@@ -193,13 +194,18 @@ void _fInit(int argc, char **argv) {
         {"test.obj"},
         {"celestial_fantasia.s3m"},
         {"cf_level.bin"},
-        {"raylib_16x16.png"}
+        {"raylib_16x16.png"},
+        {"downsky_16bit_2.png"},
+        {"config.json"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
+
+    __state.test_midground = LoadTexture("downsky_16bit_2.png");
+    SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
 
     __state.text_manager = _fTextLoadDefault();
 

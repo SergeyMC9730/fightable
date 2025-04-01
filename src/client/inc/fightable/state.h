@@ -177,6 +177,9 @@ struct fightable_state {
     Camera2D c2dstack[R2D_STACK_SIZE];
     // pointer to the `r2dstack` end
     int c2dpointer;
+
+    Texture2D test_midground;
+    unsigned char display_test_midground;
 };
 
 extern struct fightable_state __state;

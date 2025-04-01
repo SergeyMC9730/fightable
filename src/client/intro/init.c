@@ -45,6 +45,7 @@ void _fIntroInit() {
                 UnloadImage(ibt);
             }
             __state.sound_engine.do_not_shake = 1;
+            __state.display_test_midground = 1;
             break;
         }
     };

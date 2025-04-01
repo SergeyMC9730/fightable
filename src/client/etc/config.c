@@ -35,18 +35,16 @@ void _fConfigSave(struct fconfig* config) {
 void _fConfigRead(struct fconfig* config) {
 	if (!config) return;
 
-	char* buffer = (char*)MemAlloc(2048);
+	char *p = _fStorageFind("config.json");
 
-	snprintf(buffer, 2048, "%s/config.json", _fStorageGetWritable());
-
-	if (!FileExists(buffer)) {
-		MemFree(buffer);
+	if (!FileExists(p)) {
+	    free(p);
 		return;
 	}
 
-	char* str = LoadFileText(buffer);
+	char* str = LoadFileText(p);
+	free(p);
 	if (!str) {
-		MemFree(buffer);
 		return;
 	}
 
@@ -65,7 +63,6 @@ void _fConfigRead(struct fconfig* config) {
 		config->volume_slider.progress = volume->valuedouble;
 	}
 
-	MemFree(buffer);
 	MemFree(str);
 	cJSON_Delete(main);
 

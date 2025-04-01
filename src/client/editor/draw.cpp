@@ -448,41 +448,41 @@ void _fEditorDraw(struct feditor *editor) {
             }
             case 1: {
                 if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
-                    int clayer = editor->current_layer;
-                    editor->current_layer = 1;
-                    while (editor->objects.size() <= (editor->current_layer + 1)) {
-                        editor->objects.push_back({});
-                    }
+                    // int clayer = editor->current_layer;
+                    // editor->current_layer = 1;
+                    // while (editor->objects.size() <= (editor->current_layer + 1)) {
+                    //     editor->objects.push_back({});
+                    // }
 
-                    constexpr int chunks = 8;
+                    constexpr int chunks = 16;
                     constexpr int chunk_width = 16;
-                    constexpr int chunk_height = 16;
+                    constexpr int chunk_height = 64;
 
                     IVector2 basegenpos = {0, 0};
                     for (int ci = 0; ci < chunks; ci++) {
                         TraceLog(LOG_INFO, "Processing chunk %d", ci);
                         for (int cx = 0; cx < chunk_width; cx++) {
-                            int grassLevel = (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + cx) * 0.01f, 0) - rand() % 2;
+                            int grassLevel = chunk_height - (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + cx) * 0.01f, 0);
                             int stoneLevel = grassLevel + 4 + rand() % 3;
 
                             for (int cy = 0u; cy < chunk_height; cy++) {
                                 if (cy == chunk_height - 1) {
-                                    _fEditorPlaceBlock(editor, 118, {basegenpos.x + cx, cy});
+                                    _fEditorPlaceBlock(editor, 118, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
                                     continue;
                                 }
 
                                 if (cy == grassLevel) {
-                                    _fEditorPlaceBlock(editor, 2, {basegenpos.x + cx, cy});
+                                    _fEditorPlaceBlock(editor, 2, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
                                     continue;
                                 }
 
                                 if (cy > grassLevel && cy < stoneLevel) {
-                                    _fEditorPlaceBlock(editor, 19, {basegenpos.x + cx, cy});
+                                    _fEditorPlaceBlock(editor, 19, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
                                     continue;
                                 }
 
                                 if (cy >= stoneLevel) {
-                                    _fEditorPlaceBlock(editor, 40, {basegenpos.x + cx, cy});
+                                    _fEditorPlaceBlock(editor, 40, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
                                     continue;
                                 }
                             }
@@ -490,8 +490,6 @@ void _fEditorDraw(struct feditor *editor) {
 
                         basegenpos.x += chunk_width;
                     }
-
-                    editor->current_layer = clayer;
                 }
 
                 if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE)) {
