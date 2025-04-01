@@ -18,6 +18,7 @@
     Contact Sergei Baigerov -- @dogotrigger in Discord
 */
 
+#include <fightable/storage.h>
 #include <nt5emul/tui/environment.h>
 
 extern struct nt_tui_environment _ntTuiEnvironment;
@@ -66,5 +67,7 @@ void _ntTuiLoadEnvironment(const char *font_path, Vector2 base_font_size, float 
 }
 
 void _ntTuiLoadEnvironmentDefault(float scaling) {
-    return _ntTuiLoadEnvironment("ntresources/Px437_IBM_VGA_8x16.ttf", (Vector2){8, 16}, scaling);
+    char *p = _fStorageFind("Px437_IBM_VGA_8x16.ttf");
+    _ntTuiLoadEnvironment(p, (Vector2){8, 16}, scaling);
+    MemFree(p);
 }

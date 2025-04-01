@@ -318,6 +318,7 @@ set(FIGHTABLE_SRC
     src/client/ntldr_tui/state.c
     src/client/ntldr_tui/text.c
     src/client/etc/rsb_color.c
+    src/client/renderer/file_selector.c
     ${FIGHTABLE_GPU_SRC}
 )
 

@@ -23,15 +23,20 @@
 #include <string.h>
 
 void _ntUnloadFileSelector(struct nt_file_selector_menu *menu) {
-    size_t l = menu->listing->len;
+    if (!menu) return;
 
-    for (size_t i = 0; i < l; i++) {
-        free((char *)menu->listing->objects[i]);
+    if (menu->listing) {
+        size_t l = menu->listing->added_elements;
+
+        for (size_t i = 0; i < l; i++) {
+            if (menu->listing->objects[i]) free((char *)menu->listing->objects[i]);
+        }
+
+        RSBDestroy_cstr(menu->listing);
     }
 
-    RSBDestroy_cstr(menu->listing);
-    RSBDestroy_cstr(menu->wanted_fileformats);
-    RSBDestroyColor(menu->colors);
+    if (menu->wanted_fileformats) RSBDestroy_cstr(menu->wanted_fileformats);
+    if (menu->colors) RSBDestroyColor(menu->colors);
 
     free(menu);
 
