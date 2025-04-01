@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/level.h>
@@ -83,19 +84,35 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
     }
 
-    BeginMode2D(actual_cam);
+    BeginMode2DStacked(actual_cam);
 
-    RLRectangle source = {0};
-    source.width = __state.framebuffer.texture.width;
-    source.height = __state.framebuffer.texture.height;
-    source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
-    source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
+    {
+        RLRectangle source = {0};
+        source.width = __state.framebuffer.texture.width;
+        source.height = __state.framebuffer.texture.height;
+        source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
+        source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
 
-    RLRectangle dest = source;
-    dest.x = actual_cam.target.x;
-    dest.y = actual_cam.target.y;
+        RLRectangle dest = source;
+        dest.x = actual_cam.target.x;
+        dest.y = actual_cam.target.y;
 
-    DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, DARKGRAY);
+        DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, GRAY);
+    }
+
+    if (__state.display_test_midground && IsTextureValid(__state.test_midground)) {
+        RLRectangle source = {0};
+        source.width = __state.framebuffer.texture.width;
+        source.height = __state.framebuffer.texture.height;
+        source.x = (int)(actual_cam.target.x / 1.5f) % __state.test_midground.width;
+        source.y = (int)(actual_cam.target.y / 1.5f) % __state.test_midground.height;
+
+        RLRectangle dest = source;
+        dest.x = actual_cam.target.x;
+        dest.y = actual_cam.target.y;
+
+        DrawTexturePro(__state.test_midground, source, dest, (Vector2){0}, 0.f, (Color){255, 255, 255, 128});
+    }
 
     level->objects_rendered = 0;
 
@@ -227,12 +244,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             MemFree(player->obstacles);
             player->obstacles_length = 0;
 
-            EndMode2D();
+            EndMode2DStacked();
 
             actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
             actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
 
-            BeginMode2D(actual_cam);
+            BeginMode2DStacked(actual_cam);
         }
 
         for (int i = 0; i < level->entities->added_elements; i++) {
@@ -268,7 +285,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     EndBlendMode();
 
-    EndMode2D();
+    EndMode2DStacked();
 
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");
@@ -289,23 +306,25 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);
 
 #ifdef TARGET_SUPPORTS_3D
-    float camfov = 45.f;
+    // float camfov = 45.f;
 
-    Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
-    camera.position.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
-    camera.target.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
-    camera.position.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
-    camera.target.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
+    // Camera camera = { { 0.0f, 0.0f, 12.f / sin(camfov * (DEG2RAD))}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, camfov, 0 };
+    // camera.position.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
+    // camera.target.x = actual_cam.target.x / (float)level->tilemap->tile_size.x;
+    // camera.position.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
+    // camera.target.y = -actual_cam.target.y / (float)level->tilemap->tile_size.y;
 
-    BeginMode3D(camera);
+    // BeginMode3D(camera);
 
-    DrawGridEx(10, 1.0f, 0.f);
-    DrawGridEx(10, 1.0f, -4.f);
-    DrawGridEx(10, 1.0f, -8.f);
-    DrawGridEx(10, 1.0f, -12.f);
+    // DrawGridEx(10, 1.0f, 0.f);
+    // DrawGridEx(10, 1.0f, -4.f);
+    // DrawGridEx(10, 1.0f, -8.f);
+    // DrawGridEx(10, 1.0f, -12.f);
 
-    EndMode3D();
+    // EndMode3D();
 #endif
+
+    // DrawRectangleRec(area, (Color){255, 255, 255, 64});
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
 }

@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/renderer.h>
 #include <nt5emul/renderer_event.h>
 #include <fightable/state.h>
@@ -22,7 +28,7 @@ void _fSchedulerIterateOverlays() {
     for (const auto &callback : __overlay_callbacks) {
         if (std::holds_alternative<foverlay_callback>(callback)) {
             const auto &c = std::get<foverlay_callback>(callback);
-            
+
             if (c) {
                 c(mouse_pos);
             }
@@ -34,7 +40,7 @@ void _fSchedulerIterateOverlays() {
             }
         }
 
-        EndMode2D();
+        // EndMode2DStacked();
     }
 
     __overlay_callbacks.clear();

@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -23,6 +24,7 @@
 #include <fightable/rect.h>
 #include <fightable/storage.h>
 #include <nfd.h>
+#include <climits>
 
 #define MAX_BUTTON_PAGES 2
 
@@ -242,7 +244,7 @@ void _fEditorDraw(struct feditor *editor) {
         }
 
         {
-            BeginMode2D(actual_cam);
+            BeginMode2DStacked(actual_cam);
 
             if (!mouse_out_of_bounds) {
                 DrawRectangleV(mapped_block_pos, {tx, ty}, bouncing_color);
@@ -259,7 +261,7 @@ void _fEditorDraw(struct feditor *editor) {
             DrawRectangleRec(edit_sel, bouncing_color2);
             DrawRectangleLinesEx(edit_sel, 1.f, GREEN);
 
-            EndMode2D();
+            EndMode2DStacked();
 
             char buf[16] = {};
             snprintf(buf, 16, "%d:%d", (int)actual_cam.target.x, (int)actual_cam.target.y);
@@ -303,7 +305,7 @@ void _fEditorDraw(struct feditor *editor) {
             current_position_y += 2 + __state.tilemap->tile_size.y;
         }
 
-        Color grad_black = BLANK;
+        Color grad_black = {130, 130, 130, 0};
         Color grad_gray = GRAY;
 
         DrawRectangleGradientH(blackbox_startx, current_position_y + 2, space / 2, 1, grad_black, grad_gray);
@@ -326,20 +328,33 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 46, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 46, space / 2, 1, grad_gray, grad_black);
 
-        sel_block_len = _fTextMeasure(&__state.text_manager, "layer");
-        center = (space - sel_block_len.x) / 2;
-        _fTextDraw(&__state.text_manager, "layer", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
+        RLRectangle tab_area = {(float)blackbox_startx, (float)blackbox_starty + 46, (float)space, 11};
+        if (!CheckCollisionPointRec(mouse_pos, tab_area)) {
+            sel_block_len = _fTextMeasure(&__state.text_manager, "layer");
+            center = (space - sel_block_len.x) / 2;
+            _fTextDraw(&__state.text_manager, "layer", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
 
-        if (editor->current_layer < 0) {
-            memcpy(buf, "all", 3);
-        }
-        else {
-            snprintf(buf, 8, "%d", editor->current_layer);
-        }
-        sel_block_len = _fTextMeasure(&__state.text_manager, buf);
-        center = (space - sel_block_len.x) / 2;
+            if (editor->current_layer < 0) {
+                memcpy(buf, "all", 3);
+            }
+            else {
+                snprintf(buf, 8, "%d", editor->current_layer);
+            }
+            sel_block_len = _fTextMeasure(&__state.text_manager, buf);
+            center = (space - sel_block_len.x) / 2;
 
-        _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+            _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+        } else {
+            sel_block_len = _fTextMeasure(&__state.text_manager, "objects");
+            center = (space - sel_block_len.x) / 2;
+            _fTextDraw(&__state.text_manager, "objects", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
+
+            snprintf(buf, 8, "%d", editor->level->data_size);
+            sel_block_len = _fTextMeasure(&__state.text_manager, buf);
+            center = (space - sel_block_len.x) / 2;
+
+            _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+        }
 
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 64, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 64, space / 2, 1, grad_gray, grad_black);
@@ -445,8 +460,46 @@ void _fEditorDraw(struct feditor *editor) {
                 break;
             }
             case 1: {
-                if (_fButtonDrawSimple("Exit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Exit")) / 2), blackbox_starty + 66 }, WHITE)) {
+                if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
+                    editor->perlin = siv::PerlinNoise(editor->current_layer);
 
+                    constexpr int chunks = 8;
+                    constexpr int chunk_width = 16;
+                    constexpr int chunk_height = 64;
+
+                    int genoffset = (int)editor->level->camera.target.x / editor->level->tilemap->tile_size.x;
+                    IVector2 basegenpos = {genoffset, (int)editor->level->camera.target.y / editor->level->tilemap->tile_size.y};
+                    for (int ci = 0; ci < chunks; ci++) {
+                        TraceLog(LOG_INFO, "Processing chunk %d", ci);
+                        for (int cx = 0; cx < chunk_width; cx++) {
+                            int grassLevel = chunk_height - (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + (cx + genoffset)) * 0.01f, 0);
+                            int stoneLevel = grassLevel + 4 + rand() % 3;
+
+                            for (int cy = 0u; cy < chunk_height; cy++) {
+                                if (cy == chunk_height - 1) {
+                                    _fEditorPlaceBlock(editor, 118, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
+                                    continue;
+                                }
+
+                                if (cy == grassLevel) {
+                                    _fEditorPlaceBlock(editor, 2, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
+                                    continue;
+                                }
+
+                                if (cy > grassLevel && cy < stoneLevel) {
+                                    _fEditorPlaceBlock(editor, 19, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
+                                    continue;
+                                }
+
+                                if (cy >= stoneLevel) {
+                                    _fEditorPlaceBlock(editor, 40, {basegenpos.x + cx, cy - (int)((float)chunk_height / 1.5f)});
+                                    continue;
+                                }
+                            }
+                        }
+
+                        basegenpos.x += chunk_width;
+                    }
                 }
 
                 if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE)) {
@@ -460,7 +513,7 @@ void _fEditorDraw(struct feditor *editor) {
         bool flag = false;
 
 #ifndef TARGET_ANDROID
-        _fTextDraw(&__state.text_manager, "f1 to exit", {2, 2}, BLUE, 1);
+        _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
 #else
         flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE);
 #endif

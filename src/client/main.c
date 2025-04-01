@@ -1,3 +1,11 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+#include <nt5emul/tui/environment.h>
+#include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
 #include <fightable/renderer.h>
@@ -145,7 +153,7 @@ void _fInit(int argc, char **argv) {
     // SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-    // SetTargetFPS(30);
+    // SetTargetFPS(30); // TEMP
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
 
@@ -184,13 +192,24 @@ void _fInit(int argc, char **argv) {
         {"3g_crim.xm"},
         {"wave_warp.fs"},
         {"wave_warp_es3.fs"},
-        {"test.obj"}
+        {"test.obj"},
+        {"celestial_fantasia.s3m"},
+        {"cf_level.bin"},
+        {"raylib_16x16.png"},
+        {"Px437_IBM_VGA_8x16.ttf"}
+        {"downsky_16bit_2.png"},
+        {"config.json"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
+    _ntTuiLoadEnvironmentDefault(1.f);
+
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
+
+    __state.test_midground = LoadTexture("downsky_16bit_2.png");
+    SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -250,10 +269,11 @@ void _fInit(int argc, char **argv) {
     _fConfigInit(&__state.config);
 
     {
-        snprintf(dbg_buffer, 2048, "%s/damage_overlay.png", _fStorageGetWritable());
-        __state.damage_overlay = LoadTexture(dbg_buffer);
-        snprintf(dbg_buffer, 2048, "%s/damage_overlay.json", _fStorageGetWritable());
-        __state.damage_overlay_anim = _ntRendererLoadAnimation(dbg_buffer);
+        char *p = _fStorageFind("damage_overlay.png");
+        __state.damage_overlay = LoadTexture(p);
+        MemFree(p); p = _fStorageFind("damage_overlay.json");
+        __state.damage_overlay_anim = _ntRendererLoadAnimation(p);
+        MemFree(p);
 
         SetTextureWrap(__state.damage_overlay, TEXTURE_WRAP_CLAMP);
     }
@@ -306,6 +326,9 @@ void _fInit(int argc, char **argv) {
             // _fGfxShake(&__state.gfx, 4.f);
             _fGfxFadeInOut(&__state.gfx, BLACK, BLANK, 0.5f);
         }
+        if (IsKeyPressed(KEY_F)) {
+            _fOpenFileSelector(_fStorageGetWritable(), NULL);
+        }
 
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
@@ -355,7 +378,7 @@ void _fInit(int argc, char **argv) {
         if (__state.show_debug_info) {
             DrawFPS(32, 8);
 
-            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f",
+            snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f",
                 align_x,
                 (float)UI_SCALE,
                 (float)__state.window_scale,
@@ -367,7 +390,9 @@ void _fInit(int argc, char **argv) {
                 __state.framebuffer.texture.width / __state.tilemap->tile_size.x, __state.framebuffer.texture.height / __state.tilemap->tile_size.y,
                 __state.cuda_time,
                 __state.damage_overlay_timer,
-                __state.damage_overlay_timer2
+                __state.damage_overlay_timer2,
+                __state.gui_render_offset.x,
+                __state.gui_render_offset.y
             );
 
             RlDrawText(dbg_buffer, 8, 32, 20, RED);

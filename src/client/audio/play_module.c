@@ -24,7 +24,7 @@ int _fIntroMusError(int error, void *user) {
     return 0;
 }
 
-void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
+unsigned char _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
     if (engine->current_module) {
         engine->mod_lock = 1;
         openmpt_module_destroy(engine->current_module);
@@ -32,7 +32,7 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
         engine->mod_lock = 0;
     }
 
-    if (!path) return;
+    if (!path) return 0;
 
     int error = 0;
     const char *error_desc = NULL;
@@ -43,7 +43,7 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
     if (!data || sz == 0) {
         TraceLog(LOG_ERROR, "File %s could not be found", path);
 
-        return;
+        return 0;
     }
 
     engine->mod_lock = 1;
@@ -56,7 +56,7 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
 
         MemFree(data);
 
-        return;
+        return 0;
     }
 
     openmpt_module_set_position_seconds(module, 0);
@@ -65,4 +65,6 @@ void _fAudioPlayModule(struct faudio_engine *engine, const char *path) {
 
     engine->current_module = module;
     engine->mod_lock = 0;
+
+    return 1;
 }

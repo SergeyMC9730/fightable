@@ -38,6 +38,7 @@ struct fhttpserver;
 #endif
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
+#include <nt5emul/tui/file_selector.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -54,6 +55,7 @@ struct fhttpserver;
 
 #define UI_MENU_MAIN        0
 #define UI_MENU_MPCREATE    1
+#define UI_MENU_EDITOR      2
 
 #ifdef TARGET_ANDROID
 struct android_app;
@@ -165,6 +167,21 @@ struct fightable_state {
     struct ftcpclient_delegate* mp_client_delegate;
 
     Vector2 mp_level_preview_offset;
+
+    float cf_level_x;
+    float cf_timer;
+    unsigned char cf_prepared;
+    unsigned char cf_prepared_2;
+
+    // camera2d stack
+    Camera2D c2dstack[R2D_STACK_SIZE];
+    // pointer to the `r2dstack` end
+    int c2dpointer;
+
+    struct nt_file_selector_menu *current_search_menu;
+
+    Texture2D test_midground;
+    unsigned char display_test_midground;
 };
 
 extern struct fightable_state __state;

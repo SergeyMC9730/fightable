@@ -21,6 +21,8 @@ struct frenderer_sched {
 	int times;
 };
 
+struct nt_file_selector_menu;
+
 void _fDraw();
 
 // raylib additions
@@ -39,6 +41,21 @@ void BeginTextureModeStacked(RenderTexture2D txt);
 //
 // made for making some routines easier in implementation
 void EndTextureModeStacked();
+
+// switch to the camera mode in stack mode
+//
+// - stack mode means that cameras can be pushed and pulled out of the stack
+// - if there are gonna be more than R2D_STACK_SIZE textures inside this stack, this function would behave like a standard `BeginMode2D` function
+//
+// made for making some routines easier in implementation
+void BeginMode2DStacked(Camera2D cam);
+
+// move from the 2d mode in stack mode
+//
+// - stack mode means that cameras can be pushed and pulled out of the stack
+//
+// made for making some routines easier in implementation
+void EndMode2DStacked();
 
 // tries to find main framebuffer inside the rendertexture stack
 // if it fails, it returns -1
@@ -62,6 +79,9 @@ unsigned char _ntRendererInThread();
 
 // Draw a grid centered at (0, y, 0)
 void DrawGridEx(int slices, float spacing, float y);
+
+void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path));
+void _fCloseFileSelector();
 
 #ifdef COTARGET_PTX
 void _fPtxInit();

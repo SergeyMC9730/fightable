@@ -1,3 +1,10 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
+#include "PerlinNoise.hpp"
 #include "fightable/level.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
@@ -16,38 +23,44 @@ struct feditor *_fEditorCreate() {
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;
 
+    if (__state.current_level == NULL) {
 #ifndef TARGET_ANDROID
-    nfdu8char_t* out_path;
-    nfdu8filteritem_t filters[1] = { { "Level file", "bin" } };
-    nfdopendialogu8args_t args = { 0 };
-    args.filterList = nullptr;
-    args.filterCount = 0;
-    nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
+        nfdu8char_t* out_path;
+        nfdu8filteritem_t filters[1] = { { "Level file", "bin" } };
+        nfdopendialogu8args_t args = { 0 };
+        args.filterList = nullptr;
+        args.filterCount = 0;
+        nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
 
-    if (result != NFD_OKAY) {
-        TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
-        editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
-    }
-    else {
-        TraceLog(LOG_INFO, "Opening chosen level");
-        auto ref = _fLevelLoadFromFile(out_path);
-        if (!ref) {
-            TraceLog(LOG_INFO, "Could not open level");
+        if (result != NFD_OKAY) {
+            TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
             editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
         }
         else {
             TraceLog(LOG_INFO, "Opening chosen level");
+            auto ref = _fLevelLoadFromFile(out_path);
+            if (!ref) {
+                TraceLog(LOG_INFO, "Could not open level");
+                editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+            }
+            else {
+                TraceLog(LOG_INFO, "Opening chosen level");
 
-            editor->level = ref;
+                editor->level = ref;
+            }
+
+            __state.current_level = editor->level;
+
+            NFD_FreePathU8(out_path);
         }
-
-        __state.current_level = editor->level;
-
-        NFD_FreePathU8(out_path);
-    }
 #else
-    editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+        editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
 #endif
+    } else {
+        TraceLog(LOG_INFO, "Opening already loaded level");
+        editor->level = __state.current_level;
+    }
+
     editor->level->camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
     editor->select_block_label = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
@@ -86,6 +99,8 @@ struct feditor *_fEditorCreate() {
     if (editor->level->block_processor_thread == 0) {
         _fLevelLoadProcessor(editor->level);
     }
+
+    __state.current_ui_menu = UI_MENU_EDITOR;
 
     return editor;
 }

@@ -301,6 +301,24 @@ set(FIGHTABLE_SRC
     src/client/level/destroy.c
     src/client/level/block_processor.c
     src/client/entity/base/getters.c
+    src/client/intro/celestial_fantasia.c
+    src/client/camera/mode2d.c
+    src/client/ntldr_tui/fileselector_click.c
+    src/client/ntldr_tui/fileselector_load.c
+    src/client/ntldr_tui/fileselector_setlisting.c
+    src/client/ntldr_tui/fileselector_unload.c
+    src/client/ntldr_tui/fileselector_update.c
+    src/client/ntldr_tui/frame.c
+    src/client/ntldr_tui/get_environment.c
+    src/client/ntldr_tui/input.c
+    src/client/ntldr_tui/load_environment.c
+    src/client/ntldr_tui/menu.c
+    src/client/ntldr_tui/progress_bar.c
+    src/client/ntldr_tui/rectangle.c
+    src/client/ntldr_tui/state.c
+    src/client/ntldr_tui/text.c
+    src/client/etc/rsb_color.c
+    src/client/renderer/file_selector.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -582,6 +600,7 @@ target_include_directories(fbase PRIVATE
     src/tcpclient/inc
     src/tcpsrv/inc
     ext/nativefiledialog-extended/src/include
+    ext/PerlinNoise
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -679,4 +698,4 @@ message(STATUS "  Renderer: ${FIGHTABLE_RENDERER}")
 message(STATUS "")
 message(STATUS "")
 
-######
+#########
