@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <nt5emul/tui/environment.h>
 #include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -195,11 +196,14 @@ void _fInit(int argc, char **argv) {
         {"celestial_fantasia.s3m"},
         {"cf_level.bin"},
         {"raylib_16x16.png"},
+        {"Px437_IBM_VGA_8x16.ttf"}
         {"downsky_16bit_2.png"},
         {"config.json"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
+
+    _ntTuiLoadEnvironmentDefault(1.f);
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
@@ -321,6 +325,9 @@ void _fInit(int argc, char **argv) {
         if (IsKeyPressed(KEY_G)) {
             // _fGfxShake(&__state.gfx, 4.f);
             _fGfxFadeInOut(&__state.gfx, BLACK, BLANK, 0.5f);
+        }
+        if (IsKeyPressed(KEY_F)) {
+            _fOpenFileSelector(_fStorageGetWritable(), NULL);
         }
 
         BeginDrawing();

@@ -272,7 +272,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 			level->last_entry_id = id;
 
-			TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
+			// TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
 
 			unitype_t* root = __uni_create(NULL);
 

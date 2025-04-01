@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "raylib.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -39,6 +38,7 @@ struct fhttpserver;
 #endif
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
+#include <nt5emul/tui/file_selector.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -177,6 +177,8 @@ struct fightable_state {
     Camera2D c2dstack[R2D_STACK_SIZE];
     // pointer to the `r2dstack` end
     int c2dpointer;
+
+    struct nt_file_selector_menu *current_search_menu;
 
     Texture2D test_midground;
     unsigned char display_test_midground;

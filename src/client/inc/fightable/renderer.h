@@ -21,6 +21,8 @@ struct frenderer_sched {
 	int times;
 };
 
+struct nt_file_selector_menu;
+
 void _fDraw();
 
 // raylib additions
@@ -77,6 +79,9 @@ unsigned char _ntRendererInThread();
 
 // Draw a grid centered at (0, y, 0)
 void DrawGridEx(int slices, float spacing, float y);
+
+void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path));
+void _fCloseFileSelector();
 
 #ifdef COTARGET_PTX
 void _fPtxInit();

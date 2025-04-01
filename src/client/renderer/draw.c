@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "nt5emul/tui/file_selector.h"
+#include "nt5emul/tui/menu.h"
 #include <fightable/renderer.h>
 #include <fightable/state.h>
 #include <fightable/intvec.h>
@@ -15,8 +17,21 @@
 #include <stddef.h>
 #include <stdio.h>
 
+void _fDrawFileSelector() {
+    _ntUpdateFileSelector(__state.current_search_menu);
+    _ntTuiDrawMenu(__state.current_search_menu->base);
+}
+
 void _fDraw() {
     ClearBackground(BLACK);
+
+    if (__state.current_search_menu) {
+        renderer_event_t ev;
+        ev.user = NULL;
+        ev.callback = _fDrawFileSelector;
+        _fScheduleOverlayFunc(ev);
+        return;
+    }
 
     if (__state.intro_can_continue) {
         if (__state.current_editor != NULL) {
