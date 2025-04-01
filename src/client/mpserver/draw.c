@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include <fightable/mp_create_menu.h>
 #include <fightable/state.h>
 #include <stdio.h>
@@ -41,7 +42,7 @@ void _fMpCreateDraw() {
 	DrawTexturePro(__state.mp_create_bg1, r1, dest, (Vector2) {}, 0.f, WHITE);
 	DrawTexturePro(__state.mp_create_bg2, r2, dest, (Vector2) {}, 0.f, WHITE);
 
-	BeginShaderMode(__state.mp_create_wave_shader);
+	if (IsShaderValid(__state.mp_create_wave_shader)) BeginShaderMode(__state.mp_create_wave_shader);
 
 	r1 = (RLRectangle){
 		.x = -(float)__state.mp_create_time * 15.f,
@@ -55,7 +56,7 @@ void _fMpCreateDraw() {
 	DrawTexturePro(__state.mp_create_bg1, r1, dest, (Vector2) {}, 0.f, wavecol);
 	DrawTexturePro(__state.mp_create_bg2, r2, dest, (Vector2) {}, 0.f, wavecol);
 
-	EndShaderMode();
+	if (IsShaderValid(__state.mp_create_wave_shader)) EndShaderMode();
 	DrawRectangleGradientH(0, 0, w, __state.framebuffer.texture.height, rbcol, BLACK);
 	EndBlendMode();
 

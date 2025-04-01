@@ -19,7 +19,6 @@ struct feditor *_fEditorCreate() {
     feditor *editor = new feditor;
     editor->current_block_id = 0;
     editor->current_layer = -1;
-    editor->perlin = siv::PerlinNoise(time(0));
 
     editor->camera = _fCameraLoadDefault();
     // editor->camera.target.x = 261340;

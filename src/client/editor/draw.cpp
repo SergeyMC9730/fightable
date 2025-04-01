@@ -328,20 +328,33 @@ void _fEditorDraw(struct feditor *editor) {
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 46, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 46, space / 2, 1, grad_gray, grad_black);
 
-        sel_block_len = _fTextMeasure(&__state.text_manager, "layer");
-        center = (space - sel_block_len.x) / 2;
-        _fTextDraw(&__state.text_manager, "layer", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
+        RLRectangle tab_area = {(float)blackbox_startx, (float)blackbox_starty + 46, (float)space, 11};
+        if (!CheckCollisionPointRec(mouse_pos, tab_area)) {
+            sel_block_len = _fTextMeasure(&__state.text_manager, "layer");
+            center = (space - sel_block_len.x) / 2;
+            _fTextDraw(&__state.text_manager, "layer", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
 
-        if (editor->current_layer < 0) {
-            memcpy(buf, "all", 3);
-        }
-        else {
-            snprintf(buf, 8, "%d", editor->current_layer);
-        }
-        sel_block_len = _fTextMeasure(&__state.text_manager, buf);
-        center = (space - sel_block_len.x) / 2;
+            if (editor->current_layer < 0) {
+                memcpy(buf, "all", 3);
+            }
+            else {
+                snprintf(buf, 8, "%d", editor->current_layer);
+            }
+            sel_block_len = _fTextMeasure(&__state.text_manager, buf);
+            center = (space - sel_block_len.x) / 2;
 
-        _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+            _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+        } else {
+            sel_block_len = _fTextMeasure(&__state.text_manager, "objects");
+            center = (space - sel_block_len.x) / 2;
+            _fTextDraw(&__state.text_manager, "objects", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
+
+            snprintf(buf, 8, "%d", editor->level->data_size);
+            sel_block_len = _fTextMeasure(&__state.text_manager, buf);
+            center = (space - sel_block_len.x) / 2;
+
+            _fTextDraw(&__state.text_manager, buf, {blackbox_startx + center, blackbox_starty + 57}, DARKGRAY, 1);
+        }
 
         DrawRectangleGradientH(blackbox_startx, blackbox_starty + 64, space / 2, 1, grad_black, grad_gray);
         DrawRectangleGradientH(blackbox_startx + (space / 2), blackbox_starty + 64, space / 2, 1, grad_gray, grad_black);
@@ -448,21 +461,18 @@ void _fEditorDraw(struct feditor *editor) {
             }
             case 1: {
                 if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
-                    // int clayer = editor->current_layer;
-                    // editor->current_layer = 1;
-                    // while (editor->objects.size() <= (editor->current_layer + 1)) {
-                    //     editor->objects.push_back({});
-                    // }
+                    editor->perlin = siv::PerlinNoise(editor->current_layer);
 
-                    constexpr int chunks = 16;
+                    constexpr int chunks = 8;
                     constexpr int chunk_width = 16;
                     constexpr int chunk_height = 64;
 
-                    IVector2 basegenpos = {0, 0};
+                    int genoffset = (int)editor->level->camera.target.x / editor->level->tilemap->tile_size.x;
+                    IVector2 basegenpos = {genoffset, (int)editor->level->camera.target.y / editor->level->tilemap->tile_size.y};
                     for (int ci = 0; ci < chunks; ci++) {
                         TraceLog(LOG_INFO, "Processing chunk %d", ci);
                         for (int cx = 0; cx < chunk_width; cx++) {
-                            int grassLevel = chunk_height - (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + cx) * 0.01f, 0);
+                            int grassLevel = chunk_height - (chunk_height * 0.5f) * editor->perlin.noise2D_01(fabs(INT_MAX / 2 + ci * chunk_width + (cx + genoffset)) * 0.01f, 0);
                             int stoneLevel = grassLevel + 4 + rand() % 3;
 
                             for (int cy = 0u; cy < chunk_height; cy++) {
@@ -503,7 +513,7 @@ void _fEditorDraw(struct feditor *editor) {
         bool flag = false;
 
 #ifndef TARGET_ANDROID
-        _fTextDraw(&__state.text_manager, "f1 to exit", {2, 2}, BLUE, 1);
+        _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
 #else
         flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE);
 #endif
