@@ -17,6 +17,25 @@
 
 #include <PerlinNoise.hpp>
 
+struct feditor;
+
+template<unsigned int pages>
+class feditor_panel {
+protected:
+    unsigned int _pages = pages;
+    unsigned int _page = 0;
+
+    Vector2 _position = {};
+
+    virtual void setupPage(int page);
+public:
+
+    feditor_panel(feditor *instance);
+
+    void setPage(int page);
+    void draw();
+};
+
 struct feditor {
     std::vector<std::map<int, std::map<int, fblock>>> objects;
     std::vector<fblock> render_objects;

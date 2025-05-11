@@ -21,11 +21,17 @@ enum frasterizer_key_state {
 struct frasterizer_state {
 #ifdef TARGET_SUPPORTS_X11
     Display *display;
+    GC fb_context;
     Window window;
     enum frasterizer_key_state *key_state;
     int pressed_key;
     unsigned char events_checked : 1;
+    Color *main_fb;
+    XImage *window_image;
 #endif
+    unsigned int win_width;
+    unsigned int win_height;
+
     unsigned char ready : 1;
     unsigned char window_should_close : 1;
 };

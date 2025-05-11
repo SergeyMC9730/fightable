@@ -18,15 +18,13 @@
     Contact Sergei Baigerov -- @dogotrigger in Discord
 */
 
-// #define DEBUG 1
+#define DEBUG 1
 
 #include <nt5emul/renderer_keyframe.h>
 #include <nt5emul/renderer_animation.h>
 #include <nt5emul/renderer_ease.h>
 #include <stddef.h>
-#if DEBUG == 1
-#include <stdio.h>
-#endif
+#include <fraylib.h>
 
 void _ntRendererResetAnimationB(struct renderer_animation* animation) {
     if (!animation || !animation->valid) return;
@@ -45,12 +43,33 @@ void _ntRendererResetAnimationB(struct renderer_animation* animation) {
 }
 
 void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
+    if (!animation) {
+#if DEBUG == 1
+        TraceLog(LOG_INFO, "Animation is NULL");
+#endif
+        return;
+    }
+
     animation->valid = 0;
 
-    if (animation->count == 0) return;
-    if (animation->keyframes == NULL) return;
+    if (animation->count == 0) {
+#if DEBUG == 1
+        TraceLog(LOG_INFO, "[%d] animation do not have keyframes", animation->anim_id);
+#endif
+        return;
+    }
+    if (animation->keyframes == NULL) {
+#if DEBUG == 1
+        TraceLog(LOG_INFO, "[%d] keyframes are invalid", animation->anim_id);
+#endif
+        return;
+    }
 
     animation->valid = 1;
+
+#if DEBUG == 1
+    // TraceLog(LOG_INFO, "[%d] current keyframe: %d; time: %f", animation->anim_id, animation->current_keyframe, (float)animation->time);
+#endif
 
     if (animation->completed && animation->looping) {
 #if DEBUG == 1
@@ -80,6 +99,7 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
     if (animation->current_keyframe < animation->count) {
         if (animation->itime >= selected->length) {
             animation->itime = 0;
+            animation->time += selected->length;
             animation->current_keyframe++;
             animation->final_value = animation->starting_value + selected->ending_value;
 
@@ -146,7 +166,7 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
 
     animation->current_value = res;
 
-    animation->time += animation->delta;
+    // animation->time += animation->delta;
     animation->itime += animation->delta;
 }
 
@@ -164,4 +184,16 @@ void _ntRendererResetAnimation(struct renderer_animation* animation) {
     if (animation->linked_animation != NULL) {
         _ntRendererResetAnimation(animation->linked_animation);
     }
+}
+
+// unloads animation created by _ntRendererLoadAnimation
+void _ntRendererUnloadAnimation(struct renderer_animation *animation) {
+    if (!animation) return;
+
+    if (animation->keyframes) MemFree(animation->keyframes);
+    animation->keyframes = NULL;
+    animation->count = 0;
+    animation->current_keyframe = 0;
+
+    MemFree(animation);
 }

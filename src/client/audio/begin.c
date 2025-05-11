@@ -41,7 +41,7 @@ void _fAudioBegin(struct faudio_engine *engine) {
 
     PaError result = Pa_Initialize();
     if (result != paNoError) {
-        TraceLog(LOG_ERROR, "PortAudio failed to initialize itself: %d, %s", (int)result, Pa_GetErrorText(result));
+        TraceLog(LOG_ERROR, "PortAudio failed to initialize: %d, %s", (int)result, Pa_GetErrorText(result));
 
         return;
     }

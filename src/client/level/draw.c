@@ -80,18 +80,25 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
-        actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
+        actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + (int)__state.gui_render_offset.x;
+        actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + (int)__state.gui_render_offset.y;
     }
 
-    BeginMode2DStacked(actual_cam);
+    IVector2 cam_blocks = {
+        (int)actual_cam.target.x / tx,
+        (int)actual_cam.target.y / ty
+    };
+    actual_cam.target.x -= cam_blocks.x * tx;
+    actual_cam.target.y -= cam_blocks.y * ty;
+
+    // BeginMode2DStacked(actual_cam);
 
     {
         RLRectangle source = {0};
         source.width = __state.framebuffer.texture.width;
         source.height = __state.framebuffer.texture.height;
-        source.x = (int)(actual_cam.target.x / 1.5f) % level->background_tile.width;
-        source.y = (int)(actual_cam.target.y / 1.5f) % level->background_tile.height;
+        source.x = (int)((actual_cam.target.x + cam_blocks.x * tx) / 1.5f) % level->background_tile.width;
+        source.y = (int)((actual_cam.target.y + cam_blocks.y * ty) / 1.5f) % level->background_tile.height;
 
         RLRectangle dest = source;
         dest.x = actual_cam.target.x;
@@ -122,101 +129,108 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     // }
 
     RLRectangle area = (RLRectangle){
-        actual_cam.target.x - tx,
-        actual_cam.target.y - tx,
-        level->camera_size.x + tx,
-        level->camera_size.y + tx
+        -(actual_cam.target.x + (cam_blocks.x * tx)),
+        -(actual_cam.target.y + (cam_blocks.y * ty)),
+        level->camera_size.x,
+        level->camera_size.y
     };
+
+    DrawRectangleLinesEx(area, 1.f, YELLOW);
+
+    // TraceLog(LOG_INFO, "%d %d | %f %f | %f %f %f %f", cam_blocks.x, cam_blocks.y, actual_cam.target.x, actual_cam.target.y, area.x, area.y, area.width, area.height);
 
     if (level->render_crop_area.width * level->render_crop_area.height > 0.f) {
         BeginScissorMode(level->render_crop_area.x, level->render_crop_area.x, level->render_crop_area.width, level->render_crop_area.height);
     }
 
-#ifdef COTARGET_PTX
-    if (__state.can_use_gpu_accel) {
-        _fLevelPrepareCudaRender(level, area);
+// #ifdef COTARGET_PTX
+//     if (__state.can_use_gpu_accel) {
+//         _fLevelPrepareCudaRender(level, area);
 
-        if (level->in_workbench_mode) {
-            for (unsigned int i = 0; i < level->data_size; i++) {
-                struct fblock obj = level->objects[i];
+//         if (level->in_workbench_mode) {
+//             for (unsigned int i = 0; i < level->data_size; i++) {
+//                 struct fblock obj = level->objects[i];
 
-                if (!level->host_allow_pipeline[i]) continue;
+//                 if (!level->host_allow_pipeline[i]) continue;
 
-                int _x = initial_pos.x + (obj.base.block_x * tx);
-                int _y = initial_pos.y + (obj.base.block_y * ty);
+//                 int _x = initial_pos.x + (obj.base.block_x * tx);
+//                 int _y = initial_pos.y + (obj.base.block_y * ty);
 
-                _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
-            }
-        }
+//                 _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
+//             }
+//         }
 
-        for (unsigned int i = 0; i < level->data_size; i++) {
-            struct fblock obj = level->objects[i];
+//         for (unsigned int i = 0; i < level->data_size; i++) {
+//             struct fblock obj = level->objects[i];
 
-            if (!level->host_allow_pipeline[i]) continue;
+//             if (!level->host_allow_pipeline[i]) continue;
 
-            int _x = initial_pos.x + (obj.base.block_x * tx);
-            int _y = initial_pos.y + (obj.base.block_y * ty);
+//             int _x = initial_pos.x + (obj.base.block_x * tx);
+//             int _y = initial_pos.y + (obj.base.block_y * ty) ;
 
-            _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
+//             _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
 
-            if (player && player->damage_colddown > 0 && obj.dangerous) {
-                Color col = RED;
-                col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
+//             if (player && player->damage_colddown > 0 && obj.dangerous) {
+//                 Color col = RED;
+//                 col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
 
-                DrawRectangleLines(_x, _y, tx, ty, col);
-            }
-            if (obj.light_level != 0) {
-                Color col = WHITE;
-                col.a = obj.light_level;
+//                 DrawRectangleLines(_x, _y, tx, ty, col);
+//             }
+//             if (obj.light_level != 0) {
+//                 Color col = WHITE;
+//                 col.a = obj.light_level;
 
-                int cx = _x;
-                int cy = _y;
+//                 int cx = _x;
+//                 int cy = _y;
 
-                struct flevel_light_source source = {
-                    .pos = (IVector2){cx, cy},
-                    .tint = col
-                };
+//                 struct flevel_light_source source = {
+//                     .pos = (IVector2){cx, cy},
+//                     .tint = col
+//                 };
 
-                RSBAddElement_lls(level->light_sources, source);
-            }
+//                 RSBAddElement_lls(level->light_sources, source);
+//             }
 
-            level->objects_rendered++;
-        }
-    } else {
-#endif
-    if (level->in_workbench_mode) {
-        for (unsigned int i = 0; i < level->data_size; i++) {
-            struct fblock obj = level->objects[i];
+//             level->objects_rendered++;
+//         }
+//     } else {
+// #endif
+    // if (level->in_workbench_mode) {
+    //     for (unsigned int i = 0; i < level->data_size; i++) {
+    //         struct fblock obj = level->objects[i];
 
-            if (_fBlockIdFromRenderable(obj.base) == 0) continue;
-            if (!CheckCollisionPointRec((Vector2){obj.base.block_x * tx, obj.base.block_y * ty}, area)) continue;
+    //         if (_fBlockIdFromRenderable(obj.base) == 0) continue;
+    //         if (!CheckCollisionPointRec((Vector2){obj.base.block_x * tx, obj.base.block_y * ty}, area)) continue;
 
-            int _x = initial_pos.x + (obj.base.block_x * tx);
-            int _y = initial_pos.y + (obj.base.block_y * ty);
+    //         int _x = initial_pos.x + (obj.base.block_x * tx) - area.x;
+    //         int _y = initial_pos.y + (obj.base.block_y * ty) - area.y;
 
-            _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
-        }
-    }
+    //         _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, BLACK);
+    //     }
+    // }
 
     for (unsigned int i = 0; i < level->data_size; i++) {
-        struct fblock obj = level->objects[i];
+        struct fblock *obj = level->objects + i;
 
-        if (_fBlockIdFromRenderable(obj.base) == 0) continue;
-        if (!CheckCollisionPointRec((Vector2){(float)(obj.base.block_x * tx), (float)(obj.base.block_y * ty)}, area)) continue;
+        int _x = initial_pos.x + (obj->base.block_x * tx) + area.x;
+        int _y = initial_pos.y + (obj->base.block_y * ty) + area.y;
 
-        int _x = initial_pos.x + (obj.base.block_x * tx);
-        int _y = initial_pos.y + (obj.base.block_y * ty);
+        if (_x > __state.framebuffer.texture.width || _y > __state.framebuffer.texture.height || (_x + tx) < 0 || (_y + ty) < 0) continue;
+        if (_fBlockIdFromRenderable(obj->base) == 0) continue;
 
-        _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj.base.tile_x, obj.base.tile_y}, obj.base.flipped_x, obj.base.flipped_y, WHITE);
-        if (player && player->damage_colddown > 0 && obj.dangerous) {
+        if (level->in_workbench_mode) {
+            _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj->base.tile_x, obj->base.tile_y}, obj->base.flipped_x, obj->base.flipped_y, BLACK);
+        }
+        _fTilemapDraw(level->tilemap, (IVector2){_x, _y}, (IVector2){obj->base.tile_x, obj->base.tile_y}, obj->base.flipped_x, obj->base.flipped_y, WHITE);
+        if (player && player->damage_colddown > 0 && obj->dangerous) {
             Color col = RED;
             col.a = (unsigned char)(255.f * (1.f / player->max_damage_colddown) * player->damage_colddown * 0.85f);
 
             DrawRectangleLines(_x, _y, tx, ty, col);
         }
-        if (obj.light_level != 0) {
+        if (obj->light_level != 0) {
             Color col = WHITE;
-            col.a = obj.light_level;
+            col.a = obj->light_level;
 
             int cx = _x;
             int cy = _y;
@@ -231,9 +245,9 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         level->objects_rendered++;
     }
-#ifdef COTARGET_PTX
-    }
-#endif
+// #ifdef COTARGET_PTX
+//     }
+// #endif
 
     if (level->entities) {
         if (player) {
@@ -244,12 +258,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             MemFree(player->obstacles);
             player->obstacles_length = 0;
 
-            EndMode2DStacked();
+            // EndMode2DStacked();
 
-            actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + __state.gui_render_offset.x;
-            actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + __state.gui_render_offset.y;
+            // actual_cam.target.x = (int)(player->hitbox.x);
+            // actual_cam.target.y = (int)(player->hitbox.y);
 
-            BeginMode2DStacked(actual_cam);
+            // BeginMode2DStacked(actual_cam);
         }
 
         for (int i = 0; i < level->entities->added_elements; i++) {
@@ -285,7 +299,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     EndBlendMode();
 
-    EndMode2DStacked();
+    // EndMode2DStacked();
 
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");
@@ -327,4 +341,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     // DrawRectangleRec(area, (Color){255, 255, 255, 64});
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
+
+    TraceLog(LOG_INFO, "Rendered: %d", level->objects_rendered);
 }

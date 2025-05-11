@@ -9,6 +9,7 @@ project(fightable LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 include(ext/raylib/cmake/EnumOption.cmake)
 
@@ -33,15 +34,19 @@ if (FIGHTABLE_RENDERER STREQUAL "frasterizer")
 
     include(FindX11)
 
-    if (X11_FOUND)
-        add_compile_definitions(TARGET_SUPPORTS_X11)
-    endif()
-
     add_library(frfrontend STATIC
         src/rfrontend/frasterizer/window.c
         src/rfrontend/frasterizer/state.c
         src/rfrontend/frasterizer/raylib_char.c
+        src/rfrontend/frasterizer/draw.c
     )
+
+    if (X11_FOUND)
+        add_compile_definitions(TARGET_SUPPORTS_X11)
+        target_link_libraries(frfrontend ${X11_LIBRARIES})
+        set(FIGHTABLE_RENDERER_INC ${FIGHTABLE_RENDERER_INC} ${X11_INCLUDE_DIR})
+    endif()
+
     target_include_directories(frfrontend PRIVATE
         ${FIGHTABLE_RENDERER_INC}
     )
@@ -319,6 +324,8 @@ set(FIGHTABLE_SRC
     src/client/ntldr_tui/text.c
     src/client/etc/rsb_color.c
     src/client/renderer/file_selector.c
+    src/client/renderer/ui/notification.c
+    src/client/etc/notif_mgr.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -465,6 +472,14 @@ add_executable(ftcpclient-test src/tcpclient_test/main.c)
 target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS} md5-c)
 target_include_directories(ftcpclient-test PRIVATE
     src/tcpclient/inc
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+
+add_executable(fightable-simple-window src/simple_window/src/main.c)
+target_link_libraries(fightable-simple-window ${FIGHTABLE_RENDERER_LIB} ${FIGHTABLE_NATIVE_LIBS})
+target_include_directories(fightable-simple-window PRIVATE
+    ${FIGHTABLE_RENDERER_INC}
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
@@ -628,9 +643,9 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 if (ANDROID)
-	set(NFD_LINK )
+    set(NFD_LINK )
 else ()
-	set(NFD_LINK nfd)
+    set(NFD_LINK nfd)
 endif ()
 if (NOT DISABLE_PORTAUDIO)
     target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})

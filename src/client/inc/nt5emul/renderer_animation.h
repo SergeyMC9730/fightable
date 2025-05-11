@@ -95,6 +95,9 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation);
 // loads animation from json file.
 // all objects are allocated so they should be freed after use
 struct renderer_animation *_ntRendererLoadAnimation(const char *path);
+// unloads animation created by _ntRendererLoadAnimation
+// WARN: it does not unload linked animations
+void _ntRendererUnloadAnimation(struct renderer_animation *animation);
 // resets animation to initial state
 void _ntRendererResetAnimation(struct renderer_animation* animation);
 

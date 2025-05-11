@@ -146,7 +146,7 @@ void _fEditorDraw(struct feditor *editor) {
         float tx = editor->level->tilemap->tile_size.x;
         float ty = editor->level->tilemap->tile_size.y;
 
-        if (mouse_pos.x > 160 || mouse_pos.x < 0) {
+        if (mouse_pos.x > ((__state.framebuffer.texture.width) - 51) || mouse_pos.x < 0) {
             mouse_out_of_bounds = true;
         }
 
@@ -349,7 +349,12 @@ void _fEditorDraw(struct feditor *editor) {
             center = (space - sel_block_len.x) / 2;
             _fTextDraw(&__state.text_manager, "objects", {blackbox_startx + center, blackbox_starty + 50}, RED, 1);
 
-            snprintf(buf, 8, "%d", editor->level->data_size);
+            int value = editor->level->objects_rendered;
+            if (IsKeyDown(KEY_RIGHT_SHIFT)) {
+                value = editor->level->objects_rendered;
+            }
+
+            snprintf(buf, 8, "%d", value);
             sel_block_len = _fTextMeasure(&__state.text_manager, buf);
             center = (space - sel_block_len.x) / 2;
 
@@ -370,6 +375,8 @@ void _fEditorDraw(struct feditor *editor) {
                 if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
                     editor->should_display_selector = ~editor->should_display_selector;
                 }
+
+
 
                 if (_fEditorContainsId(editor, BLOCK_START)) {
                     struct fbutton btn = {};

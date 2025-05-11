@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
@@ -35,6 +36,11 @@ struct flevel_light_source {
 struct flevel_registry_entry {
     unsigned int id;
     unitype_t* entry;
+};
+
+struct flevel_chunk {
+    RenderTexture2D obj;
+    IVector2 chunk_offset;
 };
 
 RSB_ARRAY_DEF_GEN(struct flevel_light_source, _lls);
@@ -86,6 +92,8 @@ struct flevel {
 
     unsigned char pause_world;
     float tps;
+
+    IVector2 cam_offset;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);

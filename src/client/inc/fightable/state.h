@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "fightable/notif_mgr.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -56,6 +57,8 @@ struct fhttpserver;
 #define UI_MENU_MAIN        0
 #define UI_MENU_MPCREATE    1
 #define UI_MENU_EDITOR      2
+
+typedef struct rsb_array__fnotif_mgr_entry rsb_array__fnotif_mgr_entry;
 
 #ifdef TARGET_ANDROID
 struct android_app;
@@ -182,6 +185,8 @@ struct fightable_state {
 
     Texture2D test_midground;
     unsigned char display_test_midground;
+
+    rsb_array__fnotif_mgr_entry *notifications;
 };
 
 extern struct fightable_state __state;

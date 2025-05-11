@@ -5,7 +5,6 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <nt5emul/tui/environment.h>
-#include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
 #include <fightable/renderer.h>
@@ -346,6 +345,7 @@ void _fInit(int argc, char **argv) {
         BeginTextureModeStacked(__state.overlay_framebuffer);
         ClearBackground(BLANK);
         _fSchedulerIterateOverlays();
+        _fNotifMgrUpdate();
         EndTextureModeStacked();
 
         ClearBackground(BLACK);

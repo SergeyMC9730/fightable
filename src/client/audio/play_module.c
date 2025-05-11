@@ -5,6 +5,8 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <fightable/sound_engine.h>
+#include <fightable/notif_mgr.h>
+
 #include <libopenmpt/libopenmpt.h>
 #include <libopenmpt/libopenmpt_stream_callbacks_file.h>
 
@@ -61,9 +63,17 @@ unsigned char _fAudioPlayModule(struct faudio_engine *engine, const char *path) 
 
     openmpt_module_set_position_seconds(module, 0);
 
+    engine->current_module = module;
+
     TraceLog(LOG_INFO, "Opened mod file %s", path);
 
-    engine->current_module = module;
+    const char *name = _fAudioGetSongName(engine);
+    char *buf = (char *)malloc(2048);
+    snprintf(buf, 2048, "Playing %s", name);
+
+    _fNotifMgrSend(buf);
+    free(buf);
+
     engine->mod_lock = 0;
 
     return 1;

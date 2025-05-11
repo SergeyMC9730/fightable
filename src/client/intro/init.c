@@ -4,12 +4,9 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "fightable/gfx.h"
 #include "fightable/level.h"
 #include "fightable/sound_library.h"
 #include "fightable/storage.h"
-#include "raylib.h"
-#include <stdio.h>
 #include <fightable/intro.h>
 #include <fightable/state.h>
 
@@ -20,11 +17,11 @@ void _fIntroInit2(void *u) {
 }
 
 void _fIntroInit() {
-    static int song_ids[] = {
+    static const int song_ids[] = {
         MUS_ENDLESS_DREAM, MUS_ELECTRIC_DRUG, MUS_CELESTIAL_FANTASIA
     };
     __state.song_id = song_ids[GetRandomValue(0, (sizeof(song_ids) / sizeof(int)) - 1)];
-    __state.song_id = song_ids[2]; // TEMP
+    // __state.song_id = song_ids[2]; // TEMP
 
     const char *file_to_load = "EndlessDream.SymMOD";
 

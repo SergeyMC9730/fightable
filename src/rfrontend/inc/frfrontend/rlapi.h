@@ -7,6 +7,8 @@
 #pragma once
 #pragma pack(push, 1)
 
+// structure definitions are taken from original raylib
+
 typedef struct {
     unsigned char r;
     unsigned char g;
@@ -173,12 +175,14 @@ typedef struct {
     float y;
 } Vector2;
 
+#if defined(TARGET_SUPPORTS_2D)
 typedef struct {
     Vector2 offset;
     Vector2 target;
     float rotation;
     float zoom;
 } Camera2D;
+#endif
 
 #pragma pack(pop)
 
@@ -188,8 +192,12 @@ extern "C" {
 
 #if defined(TARGET_SUPPORTS_2D) || defined(TARGET_SUPPORTS_3D)
 void InitWindow(unsigned int width, unsigned int height, const char *title);
-unsigned char WindowShouldClose();
-unsigned char IsKeyPressed();
+void RlCloseWindow(void);
+unsigned char WindowShouldClose(void);
+
+void ClearBackground(Color color);
+
+unsigned char IsKeyPressed(void);
 #endif
 
 #ifdef __cplusplus
