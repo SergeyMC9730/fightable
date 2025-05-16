@@ -26,9 +26,5 @@ void _fLevelDestroy(struct flevel* level, unsigned char level_allocated, unsigne
 
     UnloadTexture(level->background_tile);
 
-#ifdef COTARGET_PTX
-    _fLevelDestroyPtx(level);
-#endif
-
     if (level_allocated) free(level);
 }

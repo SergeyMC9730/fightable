@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
@@ -66,15 +65,6 @@ struct flevel {
 
     rsb_array__fentity* entities;
 
-#ifdef COTARGET_PTX
-    struct fblock *dev_block_pipeline;
-
-    unsigned char *dev_allow_pipeline;
-    unsigned char *host_allow_pipeline;
-
-    int old_block_amount;
-#endif
-
     RLRectangle render_crop_area;
 
     float gameover_time;
@@ -112,12 +102,6 @@ void _fLevelLoadProcessor(struct flevel *level);
 void _fLevelDestroy(struct flevel* level, unsigned char level_allocated, unsigned char blocks_allocated, unsigned char entities_allocated);
 
 void _fLevelLightSourceDraw(struct flevel* env, struct flevel_light_source* source);
-
-#ifdef COTARGET_PTX
-void _fLevelReloadCudaCtx(struct flevel *level);
-void _fLevelPrepareCudaRender(struct flevel *level, RLRectangle area);
-void _fLevelDestroyPtx(struct flevel *level);
-#endif
 
 #ifdef __cplusplus
 }

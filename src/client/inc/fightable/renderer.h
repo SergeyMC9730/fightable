@@ -83,10 +83,6 @@ void DrawGridEx(int slices, float spacing, float y);
 void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path));
 void _fCloseFileSelector();
 
-#ifdef COTARGET_PTX
-void _fPtxInit();
-#endif
-
 extern unsigned int UI_SCALE;
 
 #ifdef __cplusplus

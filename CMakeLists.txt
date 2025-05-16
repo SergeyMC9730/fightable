@@ -82,37 +82,6 @@ if (LIBC_FD_SIZE)
     add_compile_definitions(FD_SETSIZE=${LIBC_FD_SIZE})
 endif()
 
-if (FIGHTABLE_CUDA OR DEFINED CMAKE_CUDA_ARCHITECTURES)
-    message(STATUS "Enabling PTX co-target")
-    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-        set(CMAKE_CUDA_ARCHITECTURES 52)
-    endif()
-    enable_language(CUDA)
-
-    set(FIGHTABLE_GPU_SRC
-        src/client/init_ptx.cu
-        src/client/level/prepare_render.cu
-        src/client/level/reload_cuda_ctx.cu
-        src/client/level/destroy.cu
-    )
-
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        if (FIGHTABLE_MASK_PTX_DBG)
-            message(STATUS "PTX debugger is masked")
-        else()
-            message(STATUS "Enabling PTX debugger")
-            set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
-        endif()
-    endif()
-
-    add_compile_definitions(COTARGET_PTX)
-
-    add_executable(cuda-test
-        src/cuda_test/gpu.cu
-        src/cuda_test/main.c
-    )
-endif()
-
 if (FIGHTABLE_IMGUI)
     add_compile_definitions(_FIGHTABLE_IMGUI_)
 endif()
@@ -695,10 +664,6 @@ if (OPENMPT_LIB_CUSTOM)
 endif()
 if (MICROHTTPD_LIB_CUSTOM)
     message(STATUS "  libmicrohttpd lib path: ${MICROHTTPD_LIB}")
-endif()
-
-if (FIGHTABLE_CUDA)
-    message(STATUS "  CUDA support: ${FIGHTABLE_CUDA}")
 endif()
 
 message(STATUS "  Compiler: ${FIGHTABLE_COMPILER}")
