@@ -1,4 +1,3 @@
-#include "raylib.h"
 #include <fightable/mp_create_menu.h>
 #include <fightable/state.h>
 #include <stdio.h>
@@ -6,7 +5,10 @@
 #include <fightable/level.h>
 #include <fightable/button.h>
 #include <fightable/renderer.h>
+#include <fightable/camera.h>
+#ifndef TARGET_ANDROID
 #include <nfd.h>
+#endif
 
 void _fMpCreateDraw() {
 #ifndef _DISABLE_MP_SERVER_

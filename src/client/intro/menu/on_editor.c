@@ -1,9 +1,12 @@
+#include "fightable/sound_engine.h"
 #include <fightable/editor.h>
 #include <fightable/state.h>
 #include <fightable/renderer.h>
 #include <fightable/level.h>
 
-void _fIntroMenuOnEditorCallback() {
+void _fIntroMenuOnEditorCallback(void *unused) {
+    _fAudioStop(&__state.sound_engine);
+
     __state.current_editor = _fEditorCreate();
 
     __state.initial_game_size.x += __state.editor_size.x;
@@ -31,6 +34,8 @@ void _fIntroMenuOnEditor() {
 
     _fGfxFadeOut(&__state.gfx, BLACK, 0.5);
     _fGfxSetFadeOutFunc(&__state.gfx, _fIntroMenuOnEditorCallback, 0);
+
+    _fAudioFxSlideVolume(&__state.sound_engine, 0.f, 0.4f);
 
     __state.menu_block_ui = 1;
 }

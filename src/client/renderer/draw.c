@@ -21,7 +21,7 @@
 #include <nt5emul/tui/frame.h>
 #include <nt5emul/tui/rectangle.h>
 
-void _fDrawFileSelector() {
+void _fDrawFileSelector(void *unused) {
     Color gray = (Color){ 30, 30, 30, 255 };
 
     RLRectangle r;

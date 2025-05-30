@@ -20,15 +20,15 @@ public:
     virtual void update() = 0;
 };
 
-template <int rows_to_check>
+template <int rows_to_check, int check_offset>
 class fintro_shaker : public fintro_shaker_base {
 protected:
-    std::array<bool, rows_to_check> _shake_lock = {};
+    std::array<bool, rows_to_check + check_offset + 1> _shake_lock = {};
     std::vector<std::string> _valid_instruments = {};
     int _check_offset = 0;
     float _shake_level = 1.f;
 public:
-    fintro_shaker(std::vector<std::string> valid_instruments, int check_offset = 0) {
+    fintro_shaker(const std::vector<std::string> &valid_instruments) {
         _valid_instruments = valid_instruments;
         _check_offset = check_offset;
 
@@ -54,7 +54,7 @@ public:
 
         // TraceLog(LOG_INFO, "rows: %s", rows.c_str());
 
-        for (int i = _check_offset; i < _shake_lock.size() + _check_offset; i++) {
+        for (int i = _check_offset; i < _shake_lock.size(); i++) {
             const char* rowc = _fAudioGetDbg(&__state.sound_engine, i);
 
             if (!rowc) {
@@ -98,17 +98,17 @@ public:
     }
 };
 
-class fintro_ed0_shaker : public fintro_shaker<1> {
+class fintro_ed0_shaker : public fintro_shaker<1, 5> {
 public:
-    fintro_ed0_shaker() : fintro_shaker({ "0D", "14" }, 5) {}
+    fintro_ed0_shaker() : fintro_shaker({ "0D", "14" }) {}
 };
-class fintro_ed1_shaker : public fintro_shaker<4> {
+class fintro_ed1_shaker : public fintro_shaker<4, 0> {
 public:
-    fintro_ed1_shaker() : fintro_shaker({ "08" }, 0) {}
+    fintro_ed1_shaker() : fintro_shaker({ "08" }) {}
 };
-class fintro_ed2_shaker : public fintro_shaker<10> {
+class fintro_ed2_shaker : public fintro_shaker<10, 1> {
 public:
-    fintro_ed2_shaker() : fintro_shaker({ "12", "04" }, 1) {_shake_level = 1.1f;}
+    fintro_ed2_shaker() : fintro_shaker({ "12", "04" }) {_shake_level = 1.1f;}
 };
 
 static fintro_shaker_base* __current_shaker = nullptr;
