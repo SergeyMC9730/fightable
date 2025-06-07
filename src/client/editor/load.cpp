@@ -6,6 +6,8 @@
 
 #include "PerlinNoise.hpp"
 #include "fightable/level.h"
+#include "fightable/notif_mgr.h"
+#include "raylib.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
 #include <fightable/state.h>
@@ -15,51 +17,35 @@
 #include <nfd.h>
 #include <stdio.h>
 
-struct feditor *_fEditorCreate() {
-    feditor *editor = new feditor;
-    editor->current_block_id = 0;
-    editor->current_layer = -1;
+void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path) {
+    feditor *editor = __state.current_editor;
 
-    editor->camera = _fCameraLoadDefault();
-    // editor->camera.target.x = 261340;
+    if (!path) {
+        TraceLog(LOG_INFO, "User aborted file selection");
 
-    if (__state.current_level == NULL) {
-#ifndef TARGET_ANDROID
-        nfdu8char_t* out_path;
-        nfdu8filteritem_t filters[1] = { { "Level file", "bin" } };
-        nfdopendialogu8args_t args = { 0 };
-        args.filterList = nullptr;
-        args.filterCount = 0;
-        nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
-
-        if (result != NFD_OKAY) {
-            TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
+        if (__state.current_level == NULL) {
+            TraceLog(LOG_INFO, "Opening already loaded level");
+            editor->level = __state.current_level;
+        } else {
+            TraceLog(LOG_INFO, "Opening template level");
+            editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
+        }
+    } else {
+        TraceLog(LOG_INFO, "Opening chosen level");
+        auto ref = _fLevelLoadFromFile(path);
+        if (!ref) {
+            TraceLog(LOG_INFO, "Could not open level. Opening template level");
+            _fNotifMgrSend("Could not open level");
             editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
         }
         else {
             TraceLog(LOG_INFO, "Opening chosen level");
-            auto ref = _fLevelLoadFromFile(out_path);
-            if (!ref) {
-                TraceLog(LOG_INFO, "Could not open level");
-                editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
-            }
-            else {
-                TraceLog(LOG_INFO, "Opening chosen level");
 
-                editor->level = ref;
-            }
-
-            __state.current_level = editor->level;
-
-            NFD_FreePathU8(out_path);
+            editor->level = ref;
         }
-#else
-        editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
-#endif
-    } else {
-        TraceLog(LOG_INFO, "Opening already loaded level");
-        editor->level = __state.current_level;
     }
+
+    __state.current_level = editor->level;
 
     editor->level->camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
 
@@ -101,6 +87,22 @@ struct feditor *_fEditorCreate() {
     }
 
     __state.current_ui_menu = UI_MENU_EDITOR;
+
+    _fCloseFileSelector();
+}
+
+struct feditor *_fEditorCreate() {
+    feditor *editor = new feditor;
+
+    editor->current_block_id = 0;
+    editor->current_layer = -1;
+
+    editor->camera = _fCameraLoadDefault();
+
+    __state.current_editor = editor;
+    // editor->camera.target.x = 261340;
+
+    _fOpenFileSelector(_fStorageGetWritable(), _fEditorOnFileSelected);
 
     return editor;
 }

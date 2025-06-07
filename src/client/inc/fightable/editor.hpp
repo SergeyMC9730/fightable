@@ -37,33 +37,33 @@ public:
 };
 
 struct feditor {
-    std::vector<std::map<int, std::map<int, fblock>>> objects;
-    std::vector<fblock> render_objects;
+    std::vector<std::map<int, std::map<int, fblock>>> objects = {};
+    std::vector<fblock> render_objects = {};
 
-    fblock_listing block_listing;
-    unsigned short current_block_id;
+    fblock_listing block_listing = {};
+    unsigned short current_block_id = 0;
 
-    Camera2D camera;
-    struct flevel *level;
+    Camera2D camera = {};
+    struct flevel *level = nullptr;
 
-    Texture2D select_block_label;
+    Texture2D select_block_label = {};
 
-    unsigned char should_process_interactions : 1;
-    unsigned char should_display_sidebar : 1;
-    unsigned char should_playback : 1;
-    unsigned char should_display_selector : 1;
-    unsigned char f1_lock : 1;
-    unsigned char swipe_enabled : 1;
-    unsigned char holded_previosly : 1;
-    unsigned char hp1 : 1;
+    unsigned char should_process_interactions : 1 = 1;
+    unsigned char should_display_sidebar : 1 = 1;
+    unsigned char should_playback : 1 = 0;
+    unsigned char should_display_selector : 1 = 1;
+    unsigned char f1_lock : 1 = 0;
+    unsigned char swipe_enabled : 1 = 0;
+    unsigned char holded_previosly : 1 = 0;
+    unsigned char hp1 : 1 = 0;
 
-    std::vector<fentity*> entities;
+    std::vector<fentity*> entities = {};
 
-    unsigned short current_object_page;
+    unsigned short current_object_page = 0;
 
     fslider test_slider = {};
 
-    int current_layer;
+    int current_layer = 0;
 
     bool in_edit_mode = false;
     RLRectangle edit_selection = {};
@@ -74,5 +74,5 @@ struct feditor {
     Model test_model = {};
     float test_z = 16;
 
-    siv::PerlinNoise perlin;
+    siv::PerlinNoise perlin = {};
 };
