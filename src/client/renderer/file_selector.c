@@ -35,5 +35,8 @@ void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_select
 }
 
 void _fCloseFileSelector() {
-    _ntUnloadFileSelector(__state.current_search_menu);
+    if (__state.current_search_menu) {
+        _ntUnloadFileSelector(__state.current_search_menu);
+        __state.current_search_menu = NULL;
+    }
 }

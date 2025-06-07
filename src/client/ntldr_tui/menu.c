@@ -82,6 +82,11 @@ void _ntTuiDrawMenu(struct nt_tui_menu menu) {
     int i = 0;
 
     while (i < menu.items_total) {
+        if (menu.objects[i] == NULL) {
+            i++;
+            continue;
+        }
+
         Color text_color = menu.unselected_text_color;
 
         if (menu.object_colors != NULL) {

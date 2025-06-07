@@ -43,7 +43,10 @@ void _fDrawFileSelector(void *unused) {
 
     _ntTuiDrawFrame(r, WHITE, NULL);
     _ntTuiDrawTextCentered("SELECT FILE", 0xFF, 1, WHITE);
-    _ntTuiDrawMenu(__state.current_search_menu->base);
+
+    if (__state.current_search_menu) {
+        _ntTuiDrawMenu(__state.current_search_menu->base);
+    }
 }
 
 void _fDraw() {

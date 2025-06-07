@@ -9,21 +9,36 @@
 #include <fightable/state.h>
 #include <variant>
 
-static std::vector<std::variant<foverlay_callback, renderer_event_t>> __overlay_callbacks = {};
+static std::vector<std::variant<foverlay_callback, renderer_event_t>>   __overlay_callbacks = {};
+static std::vector<std::variant<foverlay_callback, renderer_event_t>>   __overlay_callbacksB = {};
+static bool                                                             __overlay_inScheduler = false;
 
 void _fScheduleOverlayFunc(renderer_event_t func) {
     if (!func.callback) return;
 
-    __overlay_callbacks.push_back(func);
+    if (__overlay_inScheduler) {
+        __overlay_callbacksB.push_back(func);
+        TraceLog(LOG_INFO, "%d: scheduling inside scheduler", __LINE__);
+    } else {
+        __overlay_callbacks.push_back(func);
+    }
 }
 void _fScheduleOverlayFunc(const foverlay_callback &callback) {
     if (!callback) return;
 
-    __overlay_callbacks.push_back(callback);
+    if (__overlay_inScheduler) {
+        __overlay_callbacksB.push_back(callback);
+        TraceLog(LOG_INFO, "%d: scheduling inside scheduler", __LINE__);
+    } else {
+        __overlay_callbacks.push_back(callback);
+    }
 }
 
 void _fSchedulerIterateOverlays() {
     Vector2 mouse_pos = _fGetMousePosOverlay();
+
+    __overlay_inScheduler = true;
+    __overlay_callbacksB.clear();
 
     for (const auto &callback : __overlay_callbacks) {
         if (std::holds_alternative<foverlay_callback>(callback)) {
@@ -43,5 +58,8 @@ void _fSchedulerIterateOverlays() {
         // EndMode2DStacked();
     }
 
+    __overlay_inScheduler = false;
+
     __overlay_callbacks.clear();
+    __overlay_callbacks = __overlay_callbacksB;
 }
