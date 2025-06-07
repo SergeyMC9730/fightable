@@ -5,6 +5,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "nt5emul/tui/environment.h"
+#include "raylib.h"
 #include "rsb/rsb_array_cstr.h"
 #include <fightable/renderer.h>
 #include <fightable/state.h>
@@ -13,6 +14,12 @@ void _fFileSelectorCallback2(void *) {
     _fCloseFileSelector();
 }
 void _fFileSelectorCallback(struct nt_file_selector_menu *menu, const char *file_path) {
+    if (file_path) {
+        TraceLog(LOG_INFO, "User selected \"%s\"", file_path);
+    } else {
+        TraceLog(LOG_INFO, "User aborted file selection");
+    }
+
     renderer_event_t ev;
     ev.callback = _fFileSelectorCallback2;
     ev.user = NULL;

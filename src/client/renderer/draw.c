@@ -7,6 +7,7 @@
 #include "nt5emul/tui/environment.h"
 #include "nt5emul/tui/file_selector.h"
 #include "nt5emul/tui/menu.h"
+#include "raylib.h"
 #include <fightable/renderer.h>
 #include <fightable/state.h>
 #include <fightable/intvec.h>
@@ -53,13 +54,20 @@ void _fDraw() {
     ClearBackground(BLACK);
 
     if (__state.current_search_menu) {
-        _ntUpdateFileSelector(__state.current_search_menu);
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            __state.current_search_menu->callback(__state.current_search_menu, NULL);
+            _fCloseFileSelector();
+        } else {
+            _ntUpdateFileSelector(__state.current_search_menu);
 
-        renderer_event_t ev;
-        ev.user = NULL;
-        ev.callback = _fDrawFileSelector;
-        _fScheduleOverlayFunc(ev);
-        return;
+            renderer_event_t ev;
+            ev.user = NULL;
+            ev.callback = _fDrawFileSelector;
+
+            _fScheduleOverlayFunc(ev);
+
+            return;
+        }
     }
 
     if (__state.intro_can_continue) {
