@@ -1,3 +1,4 @@
+#include "fightable/storage.h"
 #include <fightable/mp_create_menu.h>
 #include <fightable/state.h>
 #include <stdio.h>
@@ -9,6 +10,19 @@
 #ifndef TARGET_ANDROID
 #include <nfd.h>
 #endif
+
+void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
+    struct flevel *lvl = _fLevelLoadFromFileSelector(path);
+    if (lvl != __state.current_level && __state.current_level) {
+        unsigned char src = __state.current_level->level_source;
+        _fLevelDestroy(__state.current_level, 1, (src != LEVEL_SOURCE_EDITOR), (src != LEVEL_SOURCE_EDITOR));
+        __state.current_level = NULL;
+    }
+
+    __state.current_level = lvl;
+
+    _fCloseFileSelector();
+}
 
 void _fMpCreateDraw() {
 #ifndef _DISABLE_MP_SERVER_
@@ -101,8 +115,6 @@ void _fMpCreateDraw() {
 	IVector2 sel_sz = _fTextMeasure(&__state.text_manager, "select level");
 	_fTextDraw(&__state.text_manager, "select level", (IVector2) { 96, 8 }, YELLOW, 1);
 
-	// void _fRectDraw(RLRectangle r, Color grad_top, Color grad_bottom, Color container);
-
 	RLRectangle area = { 96, 16, sel_sz.x, 16 };
 
 	Color container_color = BLACK;
@@ -123,33 +135,7 @@ void _fMpCreateDraw() {
 	}
 
 	if (_fButtonDrawSimple("Open", (IVector2) { 108, 17 + 15 + 2 }, WHITE)) {
-#ifndef TARGET_ANDROID
-		// NFD_Init();
-
-		nfdu8char_t* out_path = NULL;
-		nfdu8filteritem_t filters[1] = { { "Level file", "bin" } };
-		nfdopendialogu8args_t args = { 0 };
-		args.filterList = NULL;
-		args.filterCount = 0;
-		nfdresult_t result = NFD_OpenDialogU8_With(&out_path, &args);
-
-		if (result != NFD_OKAY) {
-			TraceLog(LOG_INFO, "Could not open file through file dialog (%d)", (int)result);
-		}
-		else {
-			struct flevel *ref = _fLevelLoadFromFile(out_path);
-			if (!ref) {
-				TraceLog(LOG_INFO, "Could not open level");
-			}
-			else {
-				TraceLog(LOG_INFO, "Opening chosen level");
-
-				__state.current_level = ref;
-			}
-
-			NFD_FreePathU8(out_path);
-		}
-#endif
+	    _fOpenFileSelector(_fStorageGetWritable(), _fMpOnOpenLevel);
 	}
 #endif
 }

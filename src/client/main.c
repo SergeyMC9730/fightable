@@ -202,7 +202,11 @@ void _fInit(int argc, char **argv) {
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
+#ifdef TARGET_ANDROID
     _ntTuiLoadEnvironmentDefault(1.25f);
+#else
+    _ntTuiLoadEnvironmentDefault(1.f);
+#endif
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;

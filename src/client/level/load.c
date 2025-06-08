@@ -322,6 +322,43 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 	}
 
 	if (data != NULL) MemFree(data);
+	if (level) level->level_source = LEVEL_SOURCE_FILE;
 
 	return level;
+}
+
+struct flevel* _fLevelLoadFromFileSelector(const char* filename) {
+    struct flevel *ret = NULL;
+
+    if (!filename) {
+        TraceLog(LOG_INFO, "User aborted file selection");
+
+        if (__state.current_level == NULL) {
+            TraceLog(LOG_INFO, "Opening already loaded level");
+            ret = __state.current_level;
+        } else {
+            TraceLog(LOG_INFO, "Opening template level");
+            ret = _fLevelLoadTest(__state.tilemap, (IVector2){ 28, 4 });
+        }
+    } else {
+        TraceLog(LOG_INFO, "Opening chosen level");
+        struct flevel *ref = _fLevelLoadFromFile(filename);
+        if (!ref) {
+            TraceLog(LOG_INFO, "Could not open level. Opening template level");
+            _fNotifMgrSend("Could not open level");
+            ret = _fLevelLoadTest(__state.tilemap, (IVector2){ 28, 4 });
+        }
+        else {
+            TraceLog(LOG_INFO, "Opening chosen level");
+
+            ret = ref;
+        }
+    }
+
+    if (!ret) {
+        TraceLog(LOG_INFO, "Could not open level because of unknown reasons");
+        _fNotifMgrSend("Could not open level");
+    }
+
+    return ret;
 }

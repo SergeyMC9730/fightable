@@ -44,6 +44,7 @@ void _fDrawFileSelector(void *unused) {
 
     _ntTuiDrawFrame(r, WHITE, NULL);
     _ntTuiDrawTextCentered("SELECT FILE", 0xFF, 1, WHITE);
+    _ntTuiDrawTextCentered("Press ESC to leave", 0xFF, r.height - 1 + 4, YELLOW);
 
     if (__state.current_search_menu) {
         _ntTuiDrawMenu(__state.current_search_menu->base);

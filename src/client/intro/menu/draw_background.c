@@ -15,8 +15,10 @@ void _fIntroMenuDrawBackground() {
     source.width = wx;
     source.height = wy;
 
-    source.x -= ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.width);
-    source.y += ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.height);
+    if (__state.intro_temp_bg.width * __state.intro_temp_bg.height > 0) {
+        source.x -= ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.width);
+        source.y += ((long)__state.intro_bg_offsetf % __state.intro_temp_bg.height);
+    }
 
     RLRectangle dest = source;
     dest.x = 0;

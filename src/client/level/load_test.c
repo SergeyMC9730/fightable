@@ -53,6 +53,8 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
     level->tps = 50.f;
     level->block_processor_thread = 0;
 
+    level->level_source = LEVEL_SOURCE_TEMPLATE;
+
     _fLevelLoadProcessor(level);
 
     return level;

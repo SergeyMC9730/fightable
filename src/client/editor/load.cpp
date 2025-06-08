@@ -20,37 +20,21 @@
 void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path) {
     feditor *editor = __state.current_editor;
 
-    if (!path) {
-        TraceLog(LOG_INFO, "User aborted file selection");
+    struct flevel *lvl = _fLevelLoadFromFileSelector(path);
 
-        if (__state.current_level == NULL) {
-            TraceLog(LOG_INFO, "Opening already loaded level");
-            editor->level = __state.current_level;
-        } else {
-            TraceLog(LOG_INFO, "Opening template level");
-            editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
-        }
-    } else {
-        TraceLog(LOG_INFO, "Opening chosen level");
-        auto ref = _fLevelLoadFromFile(path);
-        if (!ref) {
-            TraceLog(LOG_INFO, "Could not open level. Opening template level");
-            _fNotifMgrSend("Could not open level");
-            editor->level = _fLevelLoadTest(__state.tilemap, { 28, 4 });
-        }
-        else {
-            TraceLog(LOG_INFO, "Opening chosen level");
-
-            editor->level = ref;
-        }
+    if (lvl != __state.current_level && __state.current_level) {
+        unsigned char src = __state.current_level->level_source;
+        _fLevelDestroy(__state.current_level, 1, (src != LEVEL_SOURCE_EDITOR), (src != LEVEL_SOURCE_EDITOR));
+        __state.current_level = NULL;
     }
 
+    editor->level = lvl;
+
     __state.current_level = editor->level;
+    __state.current_level->level_source = LEVEL_SOURCE_EDITOR;
 
     editor->level->camera_size = {(int)((double)GetRenderWidth() / __state.window_scale), (int)((double)GetRenderHeight() / __state.window_scale)};
-
     editor->select_block_label = _fTextRenderGradientV(&__state.text_manager, "Select Block", WHITE, BLUE, 1);
-
     editor->render_objects.assign(editor->level->objects, editor->level->objects + editor->level->data_size);
 
     for (const fblock &obj : editor->render_objects) {

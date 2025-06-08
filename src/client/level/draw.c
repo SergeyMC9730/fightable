@@ -267,5 +267,5 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     // DrawTexture(level->background_tile, 0, 0, WHITE);
 
-    TraceLog(LOG_INFO, "Rendered: %d", level->objects_rendered);
+    // TraceLog(LOG_INFO, "Rendered: %d", level->objects_rendered);
 }

@@ -28,7 +28,10 @@ void _fFileSelectorCallback(struct nt_file_selector_menu *menu, const char *file
 }
 
 void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path)) {
-    _fCloseFileSelector();
+    if (__state.current_search_menu) {
+        TraceLog(LOG_ERROR, "Cannot open file selector because it's already loaded");
+        return;
+    }
 
     if (!path) return;
     if (!callback) callback = _fFileSelectorCallback;

@@ -15,6 +15,10 @@
 
 #include <pthread.h>
 
+#define LEVEL_SOURCE_TEMPLATE   0
+#define LEVEL_SOURCE_EDITOR     1
+#define LEVEL_SOURCE_FILE       2
+
 #define LEVEL_FORMAT_VERSION (uint16_t)4
 
 #ifdef __cplusplus
@@ -84,6 +88,8 @@ struct flevel {
     float tps;
 
     IVector2 cam_offset;
+
+    unsigned char level_source;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
@@ -96,6 +102,7 @@ void _fLevelTriggerGameOver(struct flevel* level);
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
 void _fLevelSave(struct flevel* level, const char* filename);
 struct flevel* _fLevelLoadFromFile(const char* filename);
+struct flevel* _fLevelLoadFromFileSelector(const char* filename);
 void _fLevelTick(struct flevel* level);
 void *_fLevelDoBlockUpdate(void* level);
 void _fLevelLoadProcessor(struct flevel *level);
