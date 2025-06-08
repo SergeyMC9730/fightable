@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/storage.h>
 #include <fightable/state.h>
 
@@ -29,11 +30,7 @@ void _fStoragePrepareWritable() {
 #include <stdio.h>
 
 unsigned char _fStorageFileExists(const char *file) {
-    if (!file) return 0;
-    FILE *p = fopen(file, "rb");
-    if (!p) return 0;
-    fclose(p);
-    return 1;
+    return FileExists(file);
 }
 
 char *_fStorageFind(const char *path) {

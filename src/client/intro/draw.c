@@ -52,6 +52,10 @@ void _fIntroDraw() {
     }
 
     switch (__state.song_id) {
+        case -1: {
+            _fIntroMenuDraw();
+            break;
+        }
         case 0: {
             _fIntroProcessEndlessDream();
             break;

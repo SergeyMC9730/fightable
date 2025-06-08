@@ -271,6 +271,12 @@ void _fInit(int argc, char **argv) {
 
     _fConfigInit(&__state.config);
 
+    if (__state.song_id == -1) {
+        TraceLog(LOG_ERROR, "Could not initialize intro properly");
+        _fNotifMgrSend("Could not initialize intro properly");
+        _fIntroMenuInit();
+    }
+
     {
         char *p = _fStorageFind("damage_overlay.png");
         __state.damage_overlay = LoadTexture(p);

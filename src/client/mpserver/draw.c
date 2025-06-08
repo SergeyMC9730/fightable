@@ -13,6 +13,7 @@
 
 void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
     struct flevel *lvl = _fLevelLoadFromFileSelector(path);
+
     if (lvl != __state.current_level && __state.current_level) {
         unsigned char src = __state.current_level->level_source;
         _fLevelDestroy(__state.current_level, 1, (src != LEVEL_SOURCE_EDITOR), (src != LEVEL_SOURCE_EDITOR));
