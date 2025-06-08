@@ -8,6 +8,7 @@
 #include <fightable/camera.h>
 #include <fightable/tilemap.h>
 #include <fightable/block.h>
+#include <fightable/pthread_compat.h>
 #include <pthread.h>
 #include <stdlib.h>
 
@@ -51,7 +52,7 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
     SetTextureWrap(level->background_tile, TEXTURE_WRAP_REPEAT);
 
     level->tps = 50.f;
-    level->block_processor_thread = 0;
+    level->block_processor_thread = (PTHREAD_TYPE)0;
 
     level->level_source = LEVEL_SOURCE_TEMPLATE;
 

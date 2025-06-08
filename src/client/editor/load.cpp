@@ -4,17 +4,14 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "PerlinNoise.hpp"
 #include "fightable/level.h"
-#include "fightable/notif_mgr.h"
-#include "raylib.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
 #include <fightable/state.h>
 #include <fightable/camera.h>
 #include <fightable/renderer.h>
 #include <fightable/storage.h>
-#include <nfd.h>
+#include <fightable/pthread_compat.h>
 #include <stdio.h>
 
 void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path) {
@@ -66,7 +63,7 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
 
     __state.sound_engine.do_not_shake = 1;
 
-    if (editor->level->block_processor_thread == 0) {
+    if (editor->level->block_processor_thread == (PTHREAD_TYPE)0) {
         _fLevelLoadProcessor(editor->level);
     }
 
