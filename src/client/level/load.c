@@ -333,8 +333,8 @@ struct flevel* _fLevelLoadFromFileSelector(const char* filename) {
     if (!filename) {
         TraceLog(LOG_INFO, "User aborted file selection");
 
-        if (__state.current_level == NULL) {
-            TraceLog(LOG_INFO, "Opening already loaded level");
+        if (__state.current_level != NULL) {
+            TraceLog(LOG_INFO, "Opening already loaded level (%p)", __state.current_level);
             ret = __state.current_level;
         } else {
             TraceLog(LOG_INFO, "Opening template level");

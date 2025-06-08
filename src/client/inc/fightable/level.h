@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
@@ -56,6 +57,7 @@ struct flevel {
     unsigned short height;
 
     Camera2D camera;
+    Camera2D render_cam;
     IVector2 camera_size;
 
     struct ftilemap *tilemap;

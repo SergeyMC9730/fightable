@@ -70,6 +70,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     actual_cam.rotation = gameover_rotation;
     actual_cam.zoom = gameover_zoom;
 
+    level->render_cam = actual_cam;
+
     int tx = level->tilemap->tile_size.x;
     int ty = level->tilemap->tile_size.y;
 
@@ -95,8 +97,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         source.y = (int)((actual_cam.target.y + cam_blocks.y * ty) / 1.5f) % level->background_tile.height;
 
         RLRectangle dest = source;
-        dest.x = actual_cam.target.x;
-        dest.y = actual_cam.target.y;
+        dest.x = actual_cam.target.x; dest.x = 0;
+        dest.y = actual_cam.target.y; dest.y = 0;
 
         DrawTexturePro(level->background_tile, source, dest, (Vector2){0}, 0.f, GRAY);
     }
@@ -109,8 +111,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         source.y = (int)(actual_cam.target.y / 1.5f) % __state.test_midground.height;
 
         RLRectangle dest = source;
-        dest.x = actual_cam.target.x;
-        dest.y = actual_cam.target.y;
+        dest.x = actual_cam.target.x; dest.x = 0;
+        dest.y = actual_cam.target.y; dest.y = 0;
 
         DrawTexturePro(__state.test_midground, source, dest, (Vector2){0}, 0.f, (Color){255, 255, 255, 128});
     }

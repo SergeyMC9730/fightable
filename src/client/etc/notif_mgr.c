@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/string.h"
 #include "raylib.h"
 #include <fightable/notif_mgr.h>
 #include <fightable/state.h>

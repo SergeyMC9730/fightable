@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/entity.h>
 #include <fightable/color.h>
 
@@ -5,10 +11,10 @@ void _fEntityDraw(struct fentity *entity) {
     if (!entity || entity->dead || entity->object_destroyed) return;
 
     fhitbox hitbox = entity->hitbox;
+    IVector2 pos = _fEntityGetDrawingPos(entity);
 
-    if ((entity->standing_object.width * entity->standing_object.height) > 0.f) {
-        hitbox.y = entity->standing_object.y - entity->hitbox.height;
-    }
+    hitbox.x = pos.x;
+    hitbox.y = pos.y;
 
     Color col = BLUE;
     if (entity->damage_colddown != 0.f) {
