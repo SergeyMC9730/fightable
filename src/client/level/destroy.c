@@ -6,12 +6,15 @@
 
 #include <fightable/level.h>
 #include <pthread.h>
+#include <fightable/pthread_compat.h>
 
 void _fLevelDestroy(struct flevel* level, unsigned char level_allocated, unsigned char blocks_allocated, unsigned char entities_allocated) {
     if (!level) return;
 
     level->block_p_close = true;
-    if (level->block_processor_thread) pthread_join(level->block_processor_thread, NULL);
+    if (!_fComparePthreadAndEmptyThread(level->block_processor_thread)) {
+        pthread_join(level->block_processor_thread, NULL);
+    }
 
     if (level->objects && blocks_allocated) free(level->objects);
     if (level->entities && entities_allocated) RSBDestroy_fentity(level->entities);

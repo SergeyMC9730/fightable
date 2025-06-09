@@ -63,7 +63,8 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
 
     __state.sound_engine.do_not_shake = 1;
 
-    if (editor->level->block_processor_thread == (PTHREAD_TYPE)0) {
+    if (_fComparePthreadAndEmptyThread(editor->level->block_processor_thread)) {
+        TraceLog(LOG_WARNING, "Tick thread was not allocated for this level");
         _fLevelLoadProcessor(editor->level);
     }
 

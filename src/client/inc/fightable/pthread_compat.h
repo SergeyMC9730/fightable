@@ -7,8 +7,12 @@
 #pragma once
 
 #if defined(TARGET_WIN32)
-#define PTHREAD_TYPE int
+#include <pthread.h>
+#define PTHREAD_TYPE pthread_t
 #elif defined(TARGET_UNIX)
 #include <pthread.h>
 #define PTHREAD_TYPE pthread_t
 #endif
+
+unsigned char _fComparePthreads(PTHREAD_TYPE a, PTHREAD_TYPE b);
+unsigned char _fComparePthreadAndEmptyThread(PTHREAD_TYPE a);

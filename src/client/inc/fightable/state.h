@@ -37,8 +37,10 @@ struct fhttpserver;
 #include <fightable/tcpsrv/daemon.h>
 #include <fightable/tcpsrv/delegate.h>
 #endif
+#ifndef FIGHTABLE_NO_MULTIPLAYER
 #include <fightable/tcpcln/client.h>
 #include <fightable/tcpcln/delegate.h>
+#endif
 #include <nt5emul/tui/file_selector.h>
 #if _WIN32
     #define NOUSER
@@ -166,8 +168,10 @@ struct fightable_state {
     unsigned short mp_server_port;
 #endif
 
+#ifndef FIGHTABLE_NO_MULTIPLAYER
     struct ftcpclient* mp_client;
     struct ftcpclient_delegate* mp_client_delegate;
+#endif
 
     Vector2 mp_level_preview_offset;
 

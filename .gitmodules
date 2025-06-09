@@ -3,16 +3,16 @@
 	url = https://github.com/DaveGamble/cJSON.git
 [submodule "ext/portaudio_opensles"]
 	path = ext/portaudio_opensles
-	url = https://github.com/croissanne/portaudio_opensles.git
+	url = https://github.com/SergeyMC9730/portaudio_opensles.git
 [submodule "ext/libhttpserver"]
 	path = ext/libhttpserver
 	url = https://github.com/etr/libhttpserver.git
 [submodule "ext/pthread-win32"]
 	path = ext/pthread-win32
-	url = https://github.com/GerHobbelt/pthread-win32.git
+	url = https://github.com/SergeyMC9730/pthread-win32.git
 [submodule "ext/strings_h"]
 	path = ext/strings_h
-	url = https://github.com/win32ports/strings_h.git
+	url = https://github.com/SergeyMC9730/strings_h.git
 [submodule "ext/libhttpserver-win32"]
 	path = ext/libhttpserver-win32
 	url = https://github.com/SergeyMC9730/libhttpserver-win32.git
@@ -37,3 +37,6 @@
 [submodule "ext/PerlinNoise"]
 	path = ext/PerlinNoise
 	url = https://github.com/Reputeless/PerlinNoise.git
+[submodule "ext/dirent"]
+	path = ext/dirent
+	url = https://github.com/tronkko/dirent.git

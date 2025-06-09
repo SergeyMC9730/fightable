@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
