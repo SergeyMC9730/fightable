@@ -427,7 +427,7 @@ if (UNIX OR LINUX)
     target_sources(fshared PRIVATE src/shared/src/assert.c)
     add_subdirectory(ext/safestringlib)
 
-    set(FIGHTABLE_NATIVE_LIBS "${FIGHTABLE_NATIVE_LIBS} safestring_static")
+    set(FIGHTABLE_NATIVE_LIBS ${FIGHTABLE_NATIVE_LIBS} safestring_static)
 endif()
 
 include (TestBigEndian)

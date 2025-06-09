@@ -4,8 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "fightable/notif_mgr.h"
-#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>

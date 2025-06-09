@@ -14,5 +14,13 @@
 #define PTHREAD_TYPE pthread_t
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 unsigned char _fComparePthreads(PTHREAD_TYPE a, PTHREAD_TYPE b);
 unsigned char _fComparePthreadAndEmptyThread(PTHREAD_TYPE a);
+
+#ifdef __cplusplus
+}
+#endif
