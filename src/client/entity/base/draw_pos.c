@@ -13,16 +13,16 @@ IVector2 _fEntityGetDrawingPos(struct fentity* entity) {
     fhitbox hitbox = entity->hitbox;
 
     if (entity->level) {
-        hitbox.x += entity->level->render_cam.target.x;
-        hitbox.y += entity->level->render_cam.target.y;
+        hitbox.x += entity->level->cam_offset.x;
+        hitbox.y += entity->level->cam_offset.y;
     }
 
-    if ((entity->standing_object.width * entity->standing_object.height) > 0.f) {
-        hitbox.y = entity->standing_object.y - entity->hitbox.height;
-        if (entity->level) {
-            hitbox.y += entity->level->render_cam.target.y;
-        }
-    }
+    // if ((entity->standing_object.width * entity->standing_object.height) > 0.f) {
+    //     hitbox.y = entity->standing_object.y - entity->hitbox.height;
+    //     if (entity->level) {
+    //         hitbox.y -= entity->level->render_cam.target.y;
+    //     }
+    // }
 
-    return (IVector2) { hitbox.x, hitbox.y };
+    return (IVector2) { (int)hitbox.x, (int)hitbox.y };
 }

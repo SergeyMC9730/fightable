@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/level.h>
@@ -15,7 +14,6 @@
 #include <fightable/color.h>
 #include <fightable/sanitizer.h>
 #include <fightable/renderer.h>
-#include <math.h>
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
 RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
@@ -125,11 +123,14 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     // }
 
     RLRectangle area = (RLRectangle){
-        -(actual_cam.target.x + (cam_blocks.x * tx)),
-        -(actual_cam.target.y + (cam_blocks.y * ty)),
+        (int)(-(actual_cam.target.x + (cam_blocks.x * tx))),
+        (int)(-(actual_cam.target.y + (cam_blocks.y * ty))),
         level->camera_size.x,
         level->camera_size.y
     };
+
+    level->cam_offset.x = area.x;
+    level->cam_offset.y = area.y;
 
     DrawRectangleLinesEx(area, 1.f, YELLOW);
 
@@ -176,13 +177,12 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         level->objects_rendered++;
     }
 
-    if (level->entities) {
+    if (level->entities && level->hitboxes) {
         if (player) {
             player->custom_delta = 0.f;
-            player->obstacles = _fLevelGetHitboxes(level);
+            player->obstacles = level->hitboxes;
             player->obstacles_length = level->data_size;
             player->update(player);
-            MemFree(player->obstacles);
             player->obstacles_length = 0;
 
             // EndMode2DStacked();

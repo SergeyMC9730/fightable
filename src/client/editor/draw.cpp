@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/level.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -391,6 +392,11 @@ void _fEditorDraw(struct feditor *editor) {
                         editor->should_display_sidebar = false;
                         editor->should_process_interactions = false;
                         editor->should_playback = true;
+
+                        if (editor->level->hitboxes) {
+                            free(editor->level->hitboxes);
+                            editor->level->hitboxes = _fLevelGetHitboxes(editor->level);
+                        }
 
                         felplayer* player = (felplayer*)MemAlloc(sizeof(felplayer));
 

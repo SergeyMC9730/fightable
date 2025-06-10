@@ -358,6 +358,8 @@ struct flevel* _fLevelLoadFromFileSelector(const char* filename) {
     if (!ret) {
         TraceLog(LOG_INFO, "Could not open level because of unknown reasons");
         _fNotifMgrSend("Could not open level");
+    } else {
+        ret->hitboxes = _fLevelGetHitboxes(ret);
     }
 
     return ret;

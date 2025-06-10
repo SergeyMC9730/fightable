@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
@@ -91,6 +92,8 @@ struct flevel {
     IVector2 cam_offset;
 
     unsigned char level_source;
+
+    RLRectangle *hitboxes;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);

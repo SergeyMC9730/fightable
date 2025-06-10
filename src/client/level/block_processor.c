@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #define WITH_PLACEHOLDERS
 
 #include <fightable/level.h>
@@ -39,22 +45,20 @@ void _fLevelTick(struct flevel* level) {
         _fBlockUpdate(level->objects + i, level);
     }
 
-    RLRectangle *rects = 0;
     struct fentity *player = 0;
 
     float delta = 1.f / level->tps;
 
     if (level->entities) {
-        rects = _fLevelGetHitboxes(level);
         player = _fLevelFindPlayer(level);
     }
 
-    if (level->entities && rects) {
+    if (level->entities && level->hitboxes) {
         for (int i = 0; i < level->entities->added_elements; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity || entity == player) continue;
 
-            entity->obstacles = rects;
+            entity->obstacles = level->hitboxes;
             entity->obstacles_length = level->data_size;
             entity->custom_delta = delta;
 
@@ -66,8 +70,6 @@ void _fLevelTick(struct flevel* level) {
             }
         }
     }
-
-    if (rects) MemFree(rects);
 }
 void _fLevelLoadProcessor(struct flevel *level) {
     TraceLog(LOG_INFO, "Loading level's tick thread");
