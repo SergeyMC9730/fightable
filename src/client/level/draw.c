@@ -183,14 +183,6 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             player->obstacles = level->hitboxes;
             player->obstacles_length = level->data_size;
             player->update(player);
-            player->obstacles_length = 0;
-
-            // EndMode2DStacked();
-
-            // actual_cam.target.x = (int)(player->hitbox.x);
-            // actual_cam.target.y = (int)(player->hitbox.y);
-
-            // BeginMode2DStacked(actual_cam);
         }
 
         for (int i = 0; i < level->entities->added_elements; i++) {
