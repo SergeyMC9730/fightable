@@ -1,10 +1,10 @@
 export SDK=/usr/lib/android-sdk
-export NDK=/usr/lib/android-sdk/ndk/28.0.13004108
+export NDK=/usr/lib/android-sdk/ndk/21.4.7075529
 
 export ANDROID_SDK=$SDK
 export ANDROID_NDK=$NDK
 
-export ANDROID_API=26
+export ANDROID_API=22
 
 export APK_NAME=Fightable
 export PACKAGE_NAME=dogotrigger.fightable
