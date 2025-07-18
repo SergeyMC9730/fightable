@@ -71,7 +71,7 @@ void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color
             }
 
             _fTilemapDraw(&man->tilemap, cur_pos, tile_pos, 0, 0, color);
-            
+
             cur_pos.x += man->tilemap.tile_size.x + man->char_padding;
         }
     }
@@ -79,7 +79,7 @@ void _fTextDraw(struct ftext_manager *man, const char *text, IVector2 pos, Color
 
 struct ftext_manager _fTextLoadDefault() {
     struct ftext_manager man = {0};
- 
+
     man.char_padding = 1;
     man.tilemap = _fTilemapCreate("text.png", (IVector2){3, 5});
     man.char_mapping = __default_font_data;
@@ -196,4 +196,8 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     UnloadRenderTexture(helper_txt);
 
     return txt;
+}
+
+void _fTextDrawGradient(struct ftext_manager *man, const char *text, Color top, Color bottom, unsigned char with_shadow) {
+
 }

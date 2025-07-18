@@ -63,3 +63,7 @@ void _fSchedulerIterateOverlays() {
     __overlay_callbacks.clear();
     __overlay_callbacks = __overlay_callbacksB;
 }
+
+unsigned char _fSchedulerInOverlay() {
+    return (unsigned char)__overlay_inScheduler;
+}

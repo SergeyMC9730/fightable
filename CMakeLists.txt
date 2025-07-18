@@ -329,6 +329,9 @@ set(FIGHTABLE_SRC
     src/client/renderer/ui/notification.c
     src/client/etc/notif_mgr.c
     src/client/etc/pthread_compat.c
+    src/client/renderer/texture_draw.c
+    src/client/etc/middle.c
+    src/client/renderer/framebuffer.c
     ${FIGHTABLE_GPU_SRC}
 )
 

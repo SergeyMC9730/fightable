@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fraylib.h>
 
 #ifdef __cplusplus
@@ -65,6 +66,7 @@ int _ntRendererGetMainIdxInStack();
 void _fScheduleOverlayFunc(renderer_event_t on_draw);
 void _fSchedulerIterateOverlays();
 void _fSchedulerVisit();
+unsigned char _fSchedulerInOverlay();
 // schedules a `func` to be called before draw after `delay` seconds.
 // required function will be called `n` times.
 // ! timer accuracity depends on framerate !
@@ -82,6 +84,13 @@ void DrawGridEx(int slices, float spacing, float y);
 
 void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path));
 void _fCloseFileSelector();
+
+void _fDrawRenderTexture(RenderTexture2D rtx, Vector2 pos, Color tint, float scale, Vector2 portion_pos, Vector2 portion_sz);
+
+void _ntRendererDrawStretchedTexture(Texture2D texture, bool x_stretched, bool y_stretched, float xstretchmul, float ysctretchmul, Vector2 pos, Vector2 origin);
+void _ntRendererDrawSizedTexture(Texture2D texture, Vector2 size, Vector2 pos, Vector2 origin, bool inside_scale);
+
+Vector2 _fGetCurrentFramebufferSize();
 
 extern unsigned int UI_SCALE;
 
