@@ -25,6 +25,7 @@
 typedef void renderer_event_callback_t(void*);
 
 #define REVENT_CALLBACK_CAST(func) (renderer_event_callback_t *)(func)
+#define REVENT_C(func, context) (renderer_event_t){ REVENT_CALLBACK_CAST(func), context }
 
 typedef struct renderer_event_t {
 	void (*callback)(void *user);
