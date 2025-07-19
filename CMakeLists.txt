@@ -332,6 +332,7 @@ set(FIGHTABLE_SRC
     src/client/renderer/texture_draw.c
     src/client/etc/middle.c
     src/client/renderer/framebuffer.c
+    src/client/renderer/ui/text_instance.c
     ${FIGHTABLE_GPU_SRC}
 )
 

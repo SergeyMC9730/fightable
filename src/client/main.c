@@ -4,11 +4,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
 #include <fightable/renderer.h>
 #include <fightable/level.h>
+#include <fightable/text_instance.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fightable/editor.h>
@@ -319,6 +321,8 @@ void _fInit(int argc, char **argv) {
 
     SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
+    struct ftext_instance test_text = _fTextInstanceCreateWithFont("hello, <cyellow,white>world</>!", GetFontDefault(), 40.f, 1.f);
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -356,6 +360,7 @@ void _fInit(int argc, char **argv) {
         ClearBackground(BLANK);
         _fSchedulerIterateOverlays();
         _fNotifMgrUpdate();
+        _fTextInstanceDraw(&test_text, (Vector2){0.f, 0.f});
         EndTextureModeStacked();
 
         ClearBackground(BLACK);

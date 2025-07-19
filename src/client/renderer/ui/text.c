@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/text.h>
 #include <string.h>
 #include <fightable/tilemap.h>
@@ -125,6 +131,13 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
 
                 if (c1.a != 0) {
                     Color c2 = GetImageColor(gradient, x, y);
+
+                    float a1 = (float)c1.a / 255.f;
+                    float a2 = (float)c2.a / 255.f;
+                    float new_alpha = a1 * a2 * 255.f;
+
+                    c2.a = (unsigned char)new_alpha % 256;
+
                     ImageDrawPixel(&img, x, y, c2);
                 }
             }
@@ -198,6 +211,29 @@ Texture2D _fTextRenderGradientV(struct ftext_manager *man, const char *text, Col
     return txt;
 }
 
-void _fTextDrawGradient(struct ftext_manager *man, const char *text, Color top, Color bottom, unsigned char with_shadow) {
+Texture2D _fTextRenderGradientVRl(RLFont font, float size, float spacing, const char *text, Color top, Color bottom, unsigned char with_shadow) {
+    if (!text) return (Texture2D){0};
 
+    Image timg = ImageTextEx(font, text, size, spacing, WHITE);
+    Image grad = GenImageGradientLinear(timg.width, timg.height, 0, top, bottom);
+
+    for (int x = 0; x < timg.width; x++) {
+        for (int y = 0; y < timg.height; y++) {
+            Color c1 = GetImageColor(timg, x, y);
+
+            if (c1.a != 0) {
+                Color c2 = GetImageColor(grad, x, y);
+
+                float a1 = (float)c1.a / 255.f;
+                float a2 = (float)c2.a / 255.f;
+                float new_alpha = a1 * a2 * 255.f;
+
+                c2.a = (unsigned char)new_alpha % 256;
+
+                ImageDrawPixel(&timg, x, y, c2);
+            }
+        }
+    }
+
+    return LoadTextureFromImage(timg);
 }

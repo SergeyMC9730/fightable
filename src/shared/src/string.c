@@ -7,7 +7,7 @@ rsb_array__pchar *_fSplitString(const char *string, const char delimiter) {
     unsigned int len = strlen(string);
 
     unsigned int j = 0;
-    
+
     rsb_array__char *temp = RSBCreateArray_char();
 
     for (unsigned int i = 0; i < len; i++) {
@@ -38,13 +38,7 @@ rsb_array__pchar *_fSplitString(const char *string, const char delimiter) {
 char *_fCopyString(const char *c) {
     if (!c) return NULL;
 
-    unsigned int len = strlen(c) + 1;
-    char *res = (char *)malloc(len);
-
-    memcpy(res, c, len);
-    res[len - 1] = 0;
-
-    return res;
+    return _fCopyStringWithLen(c, strlen(c));
 }
 
 void _fCleanupSplittedString(rsb_array__pchar *array) {
@@ -56,4 +50,13 @@ void _fCleanupSplittedString(rsb_array__pchar *array) {
     }
 
     RSBDestroy_pchar(array);
+}
+
+char *_fCopyStringWithLen(const char *c, unsigned int len) {
+    char *res = (char *)malloc(len + 1);
+
+    memcpy(res, c, len);
+    res[len] = 0;
+
+    return res;
 }
