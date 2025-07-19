@@ -270,5 +270,5 @@ fightable::viewpoint_tab::~viewpoint_tab() {
     TraceLog(LOG_INFO, "Closing viewpoint thread");
 
     this->_stopCalcThread = true;
-    if (_calcThread.joinable()) _calcThread.join();
+    _calcThread.join();
 }
