@@ -83,6 +83,7 @@ struct flevel {
     unsigned int last_entry_id;
 
     pthread_t block_processor_thread;
+    unsigned char block_p_loaded;
     unsigned char block_p_close;
     unsigned char block_p_profile;
 

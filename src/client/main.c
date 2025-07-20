@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -26,8 +25,8 @@
 #include <fightable/flags.h>
 #include <time.h>
 #include <pthread.h>
-#include <math.h>
 #include <nfd.h>
+#include <fightable/notif_mgr.h>
 
 struct ftilemap __tilemap;
 

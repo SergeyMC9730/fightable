@@ -8,6 +8,7 @@
 #include <fightable/block.h>
 #include <fightable/block_library.h>
 #include <fightable/state.h>
+#include <fightable/notif_mgr.h>
 #include <stdio.h>
 
 struct flevel* _fLevelLoadFromFile(const char* filename) {

@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #define WITH_PLACEHOLDERS
 #include <fightable/player.h>
 #include <fightable/gfx.h>
@@ -7,7 +13,11 @@
 #include <stdio.h>
 
 void _flPlayerDamage(struct felplayer* instance, float hp) {
+    if (!instance || instance->base.damage_colddown > 0) return;
+
+    int old_hp = (int)instance->base.hp;
 	_fEntityDamage(&instance->base, hp);
+	int delta_hp = old_hp - (int)instance->base.hp;
 
 	if (instance->base.damage_colddown == instance->base.max_damage_colddown) {
 		TraceLog(LOG_INFO, "Applied damage to local player");
@@ -29,10 +39,10 @@ void _flPlayerDamage(struct felplayer* instance, float hp) {
 			}
 		}
 
-		TraceLog(LOG_INFO, "Spawning label \"%d\"", (int)hp);
+		TraceLog(LOG_INFO, "Spawning label \"%d\"", (int)delta_hp);
 
 		char buffer[16] = {};
-		snprintf(buffer, 16, "%d", (int)hp);
+		snprintf(buffer, 16, "%d", (int)delta_hp);
 
 		struct fentity_text* label = (struct fentity_text*)MemAlloc(sizeof(struct fentity_text));
 		_feTextInit(label, buffer);

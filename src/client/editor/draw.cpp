@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "fightable/level.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -25,6 +24,7 @@
 #include <fightable/storage.h>
 #include <nfd.h>
 #include <climits>
+#include <fightable/notif_mgr.h>
 
 #define MAX_BUTTON_PAGES 2
 

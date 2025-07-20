@@ -18,6 +18,12 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
     feditor *editor = __state.current_editor;
 
     struct flevel *lvl = _fLevelLoadFromFileSelector(path);
+    if (!lvl) {
+        __state.current_editor = NULL;
+        return;
+    }
+
+    _fLevelLoadProcessor(lvl);
 
     if (lvl != __state.current_level && __state.current_level) {
         unsigned char src = __state.current_level->level_source;
@@ -55,8 +61,6 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
     slider.movable_width = 4.f;
 
     editor->test_slider = slider;
-
-    editor->test_model = LoadModel(".fightable/test.obj");
 
     TraceLog(LOG_INFO, "Loaded %ld objects (%ld)", editor->render_objects.size(), editor->objects.size());
     TraceLog(LOG_INFO, "Viewable area: %d:%d virtual pixels", editor->level->camera_size.x, editor->level->camera_size.y);

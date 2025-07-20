@@ -72,9 +72,12 @@ void _fLevelTick(struct flevel* level) {
     }
 }
 void _fLevelLoadProcessor(struct flevel *level) {
+    if (level->block_p_loaded) return;
+
     TraceLog(LOG_INFO, "Loading level's tick thread");
 
     level->block_p_profile = 0;
+    level->block_p_loaded = 1;
 
     pthread_create(&level->block_processor_thread, NULL, _fLevelDoBlockUpdate, level);
 }

@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "fightable/notif_mgr.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -42,6 +41,7 @@ struct fhttpserver;
 #include <fightable/tcpcln/delegate.h>
 #endif
 #include <nt5emul/tui/file_selector.h>
+#include <fightable/text_instance.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -70,7 +70,7 @@ struct fightable_state {
 
     struct flevel *current_level;
 
-    unsigned long frames_rendered;
+    unsigned long long frames_rendered;
     long double time;
 
     RenderTexture2D framebuffer;
