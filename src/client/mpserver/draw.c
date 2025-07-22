@@ -87,7 +87,7 @@ void _fMpCreateDraw() {
 
 	__state.mp_create_time += (long double)GetFrameTime();
 
-	if (!_fTcpSrvReady(__state.mp_server_instance)) return;
+
 
 	char buffer[32] = {};
 	snprintf(buffer, 32, "running on port\n %d", __state.mp_server_port);

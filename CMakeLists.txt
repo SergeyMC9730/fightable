@@ -333,22 +333,17 @@ set(FIGHTABLE_SRC
     src/client/etc/middle.c
     src/client/renderer/framebuffer.c
     src/client/renderer/ui/text_instance.c
-    src/client/net/nbnet_impl.c
     ${FIGHTABLE_GPU_SRC}
 )
 
-set(FIGHTABLE_TCP_SERVER_SRC
-    src/tcpsrv/src/daemon.cpp
-    src/tcpsrv/src/message.cpp
-    src/tcpsrv/src/user.cpp
-)
-set(FIGHTABLE_TCP_CLIENT_SRC
-    "src/tcpclient/src/create.cpp"
-    src/tcpclient/src/thread.cpp
-    "src/tcpclient/src/destroy.cpp"
-    "src/tcpclient/src/send_msg.cpp"
-    src/tcpclient/src/disconnect.c
-)
+if (NOT DISABLE_MP_SERVER)
+    set(FIGHTABLE_SRC
+        ${FIGHTABLE_SRC}
+        src/client/net/nbnet_impl.c
+        src/client/mpserver/handle.c
+        src/client/mpserver/tick.c
+    )
+endif()
 
 if (ANDROID)
     message(STATUS "Compiling for Android")
@@ -449,61 +444,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} ${FIGHTABLE_COPTS}")
 # add_compile_options(${FIGHTABLE_COPTS})
 
-if (NOT DISABLE_MP_SERVER)
-    add_library(ftcpsrv STATIC ${FIGHTABLE_TCP_SERVER_SRC})
-    target_link_libraries(ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared md5-c)
-    target_include_directories(ftcpsrv PRIVATE
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-        ext/md5-c
-    )
-
-    add_executable(ftcpsrv-test src/tcpsrv_test/main.c)
-    target_link_libraries(ftcpsrv-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
-    target_include_directories(ftcpsrv-test PRIVATE
-        src/tcpsrv/inc
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-    )
-
-    add_executable(tcpserver-raylib-test src/tcpserver_raylib/main.c)
-    target_link_libraries(tcpserver-raylib-test ftcpsrv ${FIGHTABLE_NATIVE_LIBS} fshared)
-    target_include_directories(tcpserver-raylib-test PRIVATE
-        src/tcpsrv/inc
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-        ${FIGHTABLE_RENDERER_INC}
-    )
-endif()
-
-if (NOT DISABLE_MP_FUNCTIONALITY)
-    add_library(ftcpclient STATIC ${FIGHTABLE_TCP_CLIENT_SRC})
-    target_link_libraries(ftcpclient fshared ${FIGHTABLE_NATIVE_LIBS} md5-c)
-    target_include_directories(ftcpclient PRIVATE
-        src/tcpclient/inc
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-        ext/md5-c
-    )
-
-    add_executable(ftcpclient-test src/tcpclient_test/main.c)
-    target_link_libraries(ftcpclient-test ftcpclient ${FIGHTABLE_NATIVE_LIBS} md5-c)
-    target_include_directories(ftcpclient-test PRIVATE
-        src/tcpclient/inc
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-    )
-
-    add_executable(tcpclient-raylib-test src/tcpclient_raylib/main.c)
-    target_link_libraries(tcpclient-raylib-test ${FIGHTABLE_RENDERER_LIB} ftcpclient ${FIGHTABLE_NATIVE_LIBS})
-    target_include_directories(tcpclient-raylib-test PRIVATE
-        src/tcpclient/inc
-        ${FIGHTABLE_RENDERER_INC}
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-    )
-endif()
-
 add_executable(fightable-simple-window src/simple_window/src/main.c)
 target_link_libraries(fightable-simple-window ${FIGHTABLE_RENDERER_LIB} ${FIGHTABLE_NATIVE_LIBS})
 target_include_directories(fightable-simple-window PRIVATE
@@ -597,24 +537,6 @@ if (NOT DISABLE_MP_SERVER)
     set(FIGHTABLE_HTTP_LINK fightable-http)
     set(FIGHTABLE_HTTP_INC src/http/inc)
 
-    target_include_directories(ftcpsrv PRIVATE
-        src/tcpsrv/inc
-        ext/base64/include
-        ${FIGHTABLE_NATIVE_INCLUDES}
-        ${FIGHTABLE_SHARED_INC}
-    )
-
-    add_executable(mp-rect-test
-        src/mp_rect_test/src/main.cpp
-    )
-    target_include_directories(mp-rect-test PRIVATE
-        ${FIGHTABLE_RENDERER_INC}
-        ${FIGHTABLE_SHARED_INC}
-        ${FIGHTABLE_NATIVE_INCLUDES}
-        src/tcpclient/inc
-        src/tcpsrv/inc
-    )
-    target_link_libraries(mp-rect-test ${FIGHTABLE_RENDERER_LIB} ftcpclient ${FIGHTABLE_NATIVE_LIBS} fshared)
 endif()
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
@@ -643,8 +565,6 @@ target_include_directories(fbase PRIVATE
     ${FIGHTABLE_RENDERER_INC}
     ext/cJSON
     ext/portaudio_opensles/include
-    src/tcpclient/inc
-    src/tcpsrv/inc
     ext/nativefiledialog-extended/src/include
     ext/PerlinNoise
     ext/nbnet
@@ -680,18 +600,14 @@ else ()
     set(NFD_LINK nfd)
 endif ()
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared ${NFD_LINK})
 else()
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} ftcpsrv fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared ${NFD_LINK})
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )
 target_link_libraries(collide-test ${FIGHTABLE_RENDERER_LIB} )
 target_link_libraries(gun-test ${FIGHTABLE_RENDERER_LIB} )
-
-if (NOT DISABLE_MP_SERVER)
-    target_link_libraries(mp-rect-test ftcpsrv)
-endif()
 
 message(STATUS "")
 message(STATUS "")

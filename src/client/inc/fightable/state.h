@@ -20,7 +20,7 @@ struct feditor;
 struct renderer_animation;
 typedef struct openmpt_module openmpt_module;
 #ifndef _DISABLE_MP_SERVER_
-struct fhttpserver;
+
 #endif
 
 #define IAUDIO_ENGINE
@@ -33,12 +33,10 @@ struct fhttpserver;
 #include <fightable/config.h>
 #include <nt5emul/renderer_animation.h>
 #ifndef _DISABLE_MP_SERVER_
-#include <fightable/tcpsrv/daemon.h>
-#include <fightable/tcpsrv/delegate.h>
+#include <nbnet.h>
 #endif
 #ifndef FIGHTABLE_NO_MULTIPLAYER
-#include <fightable/tcpcln/client.h>
-#include <fightable/tcpcln/delegate.h>
+#include <nbnet.h>
 #endif
 #include <nt5emul/tui/file_selector.h>
 #include <fightable/text_instance.h>
@@ -163,9 +161,13 @@ struct fightable_state {
 
     long double mp_create_time;
 
-    struct ftcp_server_daemon* mp_server_instance;
-    struct ftcp_server_delegate mp_server_delegate;
     unsigned short mp_server_port;
+    unsigned short mp_server_http_port;
+
+    NBN_ConnectionHandle *mp_server_handles;
+    unsigned int mp_server_handle_amount;
+
+    unsigned char mp_server_ready;
 #endif
 
 #ifndef FIGHTABLE_NO_MULTIPLAYER

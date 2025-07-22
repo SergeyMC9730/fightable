@@ -1,11 +1,11 @@
 #include <fightable/state.h>
-#include <fightable/mp_create_menu.h>
+#include <fightable/mp_server.h>
 #include <fightable/storage.h>
-#include <stdio.h>
+#include <net_drivers/udp.h>
 
 #ifndef _DISABLE_MP_SERVER_
 #include <fightable/http/http_server.h>
-#include <fightable/tcpsrv/user.h>
+#include <nbnet.h>
 #endif
 
 #ifdef TARGET_ANDROID
@@ -19,118 +19,77 @@ extern void _fMainLog(const char* msg);
 #define COMMAND_ACKNOWLEDGE     '$'
 
 #ifndef _DISABLE_MP_SERVER_
-void _fMpCreateOnConnect(struct ftcp_server_delegate* self, struct ftcp_server_user* user) {
-	TraceLog(LOG_INFO, "Connection happened");
+struct fmp_metadata_req *_fMpMetadataReqCreate(void) {
+    return (struct fmp_metadata_req *)NBN_Allocator(sizeof(struct fmp_metadata_req));
 }
-void _fMpCreateOnDisconnect(struct ftcp_server_delegate* self, struct ftcp_server_user* user) {
-	TraceLog(LOG_INFO, "Disconnection happened");
+void _fMpMetadataReqDestroy(struct fmp_metadata_req *obj) {
+    if (obj) NBN_Deallocator(obj);
 }
-void _fMpCreateOnMessage(struct ftcp_server_delegate* self, struct ftcp_server_user* user, unsigned char* message, unsigned int len) {
-	TraceLog(LOG_INFO, "TCP message: \"%s\" (%d)", message, len);
+int _fMpMetadataReqSerialize(struct fmp_metadata_req *obj, NBN_Stream *stream) {
+    if (!obj || !stream) return 0;
 
-    char command = message[0];
-    if (command == COMMAND_ACKNOWLEDGE) return;
+    NBN_SerializeUInt(stream, obj->http_port, 1024, 8000);
+    NBN_SerializeUInt(stream, obj->max_players, 1, MP_MAX_CLIENTS);
 
-    switch (command) {
-    case COMMAND_GET_UID: {
-        char buffer[16] = {};
-        snprintf(buffer, 16, "%c%d", command, _fTcpSrvUserGetId(user));
-
-        _fTcpSrvUserSendMessage(user, buffer);
-
-        break;
-    }
-    case COMMAND_GET_USERS: {
-        //int i = 0;
-        //struct ftcp_server_user* remuser = _fTcpSrvGetUserByIndex(self->daemon, i);
-
-        //size_t min_alloc_size = 64;
-        //size_t cur_alloc_size = min_alloc_size;
-
-        //char* result = (char*)MemAlloc(cur_alloc_size);
-        //result[0] = command;
-
-        //while (remuser != NULL) {
-        //    Vector2 pos = { 0, 0 };
-        //    int uid = _fTcpSrvUserGetId(remuser);
-        //    int pl_idx = SrvGetPlayerIndex(uid);
-
-        //    if (pl_idx >= 0) {
-        //        struct example_player player = RSBGetAtIndex_example_player(__server_players, pl_idx);
-        //        pos = player.pos;
-        //    }
-        //    else {
-        //        printf("[SERVER] player %d not found (%d)\n", uid, pl_idx);
-        //    }
-
-        //    char* buf = (char*)MemAlloc(256);
-        //    snprintf(buf, 256, "%d,%s,%d,%d;", uid, _fTcpSrvUserGetNameEncrypted(remuser), (int)pos.x, (int)pos.y);
-
-        //    while (strlen(buf) >= cur_alloc_size) {
-        //        cur_alloc_size += min_alloc_size;
-        //        result = (char*)MemRealloc(result, cur_alloc_size);
-        //    }
-
-        //    strcat(result, buf);
-
-        //    MemFree(buf);
-
-        //    remuser = _fTcpSrvGetUserByIndex(self->daemon, ++i);
-        //}
-
-        //result[strlen(result) - 1] = 0; // remove last character
-
-        //_fTcpSrvUserSendMessage(user, result);
-
-        //MemFree(result);
-
-        break;
-    }
-    default: {
-        printf("[SERVER] unknown command %d\n", command);
-        break;
-    }
-    }
+    return 0;
 }
 #endif
 
-void _fMpCreateOpenServer() {
+unsigned char _fMpServerOpen() {
 #ifndef _DISABLE_MP_SERVER_
-	__state.mp_server_delegate.processConnect = _fMpCreateOnConnect;
-	__state.mp_server_delegate.processDisconnect = _fMpCreateOnDisconnect;
-	__state.mp_server_delegate.processMessage = _fMpCreateOnMessage;
+    __state.mp_server_ready = 0;
 
-	unsigned char create_successful = false;
+    if (__state.mp_server_handles) {
+        NBN_Deallocator(__state.mp_server_handles);
+    }
+    __state.mp_server_handle_amount = MP_MAX_CLIENTS;
+    __state.mp_server_handles = (NBN_ConnectionHandle *)NBN_Allocator(sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
+    memset(__state.mp_server_handles, 0, sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
 
-	for (int i = 0; i < 16; i++) {
+    NBN_UDP_Register();
+
+    unsigned char opened = 0;
+    for (int i = 0; i < 16; i++) {
         __state.mp_server_port = GetRandomValue(1024, 8000);
-		__state.mp_server_instance = _fTcpSrvCreate(__state.mp_server_port, &__state.mp_server_delegate);
+        int status = NBN_GameServer_StartEx("fightable-0", __state.mp_server_port);
 
-		if (!__state.mp_server_instance || !_fTcpSrvReady(__state.mp_server_instance)) {
-			TraceLog(LOG_WARNING, "Failed to open TCP server. Attempt %d", i + 1);
+        if (status < 0) {
+            TraceLog(LOG_ERROR, "Cannot start server on 0.0.0.0:%d (attempt %d) -> status=%d", (int)__state.mp_server_port, i, status);
+        } else {
+            TraceLog(LOG_INFO, "UDP server created successfully on 0.0.0.0:%d", __state.mp_server_port);
+            opened = 1;
+            break;
+        }
+    }
 
-			if (__state.mp_server_instance) {
-				_fTcpSrvDestroy(__state.mp_server_instance);
-			}
-		}
-		else {
-			create_successful = true;
-			break;
-		}
-	}
+    if (!opened) {
+        TraceLog(LOG_ERROR, "Critical failure on server creation");
+        NBN_Deallocator(__state.mp_server_handles);
+        __state.mp_server_handles = NULL;
+        __state.mp_server_handle_amount = 0;
+        return 0;
+    }
 
-	if (!create_successful) {
-		TraceLog(LOG_ERROR, "Could not start TCP server with 16 attempts");
+    TraceLog(LOG_INFO, "Registering UDP messages");
 
-		return;
-	}
+    NBN_GameServer_RegisterMessage(MP_METADATA_REQ_ID,
+        (NBN_MessageBuilder)_fMpMetadataReqCreate,
+        (NBN_MessageDestructor)_fMpMetadataReqDestroy,
+        (NBN_MessageSerializer)_fMpMetadataReqSerialize
+    );
 
-	__state.webserver = _fHttpServerCreate(3000, _fMainLog);
-
+    TraceLog(LOG_INFO, "Creating HTTP server for resource downloading");
+    __state.mp_server_http_port = __state.mp_server_port + 1;
+    __state.webserver = _fHttpServerCreate(__state.mp_server_http_port, _fMainLog);
 #ifdef TARGET_ANDROID
-	_fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
+    _fHttpSetAllowedResourceDir(__state.webserver, __state.system->activity->internalDataPath);
 #else
-	_fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
+    _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
 #endif
+
+    __state.mp_server_ready = 1;
+    return 1;
 #endif
+
+    return 0;
 }

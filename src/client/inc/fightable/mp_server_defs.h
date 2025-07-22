@@ -6,12 +6,15 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct fmp_metadata_req {
+    unsigned int http_port;
+    unsigned int max_players;
+};
 
-void _fMpCreateDraw();
+#define MP_METADATA_REQ_ID 0x00
 
-#ifdef __cplusplus
-}
-#endif
+
+#define MP_CON_REJECT_BUSY 0x00
+
+
+#define MP_MAX_CLIENTS 8

@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/mp_server.h"
 #include <fraylib.h>
 #include <fightable/intro.h>
 #include <fightable/state.h>
@@ -21,6 +22,8 @@
 
 #ifndef _DISABLE_MP_SERVER_
 void _fIntroMenuOnMpCreateCallback(void *ctx) {
+    if (!_fMpServerOpen()) return;
+
     float* old_vol = (float*)ctx;
     if (!old_vol) return;
 
@@ -89,8 +92,6 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
     __state.song_id = MUS_3G_ANTS;
     __state.current_ui_menu = UI_MENU_MPCREATE;
     __state.mp_create_time = 0;
-
-    _fMpCreateOpenServer();
 }
 #endif
 
