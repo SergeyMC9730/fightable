@@ -333,6 +333,7 @@ set(FIGHTABLE_SRC
     src/client/etc/middle.c
     src/client/renderer/framebuffer.c
     src/client/renderer/ui/text_instance.c
+    src/client/net/nbnet_impl.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -646,6 +647,7 @@ target_include_directories(fbase PRIVATE
     src/tcpsrv/inc
     ext/nativefiledialog-extended/src/include
     ext/PerlinNoise
+    ext/nbnet
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}

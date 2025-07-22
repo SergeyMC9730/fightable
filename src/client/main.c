@@ -320,7 +320,7 @@ void _fInit(int argc, char **argv) {
 
     SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
-    struct ftext_instance test_text = _fTextInstanceCreateWithFont("hello, <cyellow,white>world</>!", GetFontDefault(), 40.f, 1.f);
+    struct ftext_instance test_text = _fTextInstanceCreateWithFont("hello, <cyellow,white>world</pizda>!", GetFontDefault(), 40.f, 1.f);
 
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();

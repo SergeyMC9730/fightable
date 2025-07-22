@@ -164,13 +164,6 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
             current_text_start = instance->original_string + i;
 
             continue;
-        } else if (c == '/') {
-            if (current_command == TC_UNKNOWN) {
-                current_command = TC_NONE;
-            } else {
-                temp_buffer[temp_buffer_i++] = instance->original_string[i];
-            }
-            continue;
         } else if (c == '>') {
             continue;
         }

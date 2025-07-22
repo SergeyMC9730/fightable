@@ -40,3 +40,6 @@
 [submodule "ext/dirent"]
 	path = ext/dirent
 	url = https://github.com/tronkko/dirent.git
+[submodule "ext/nbnet"]
+	path = ext/nbnet
+	url = https://github.com/nathhB/nbnet

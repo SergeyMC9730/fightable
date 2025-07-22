@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "raylib.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
