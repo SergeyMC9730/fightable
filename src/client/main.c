@@ -25,8 +25,8 @@
 #include <fightable/flags.h>
 #include <time.h>
 #include <pthread.h>
-#include <nfd.h>
 #include <fightable/notif_mgr.h>
+#include <fightable/sort.h>
 
 struct ftilemap __tilemap;
 
@@ -118,7 +118,7 @@ void _fInit(int argc, char **argv) {
 #ifdef TARGET_ANDROID
     __state.system = GetAndroidApp();
 #else
-    NFD_Init();
+    // NFD_Init();
 #endif
     char *dbg_buffer = (char *)MemAlloc(2048);
 
@@ -147,13 +147,22 @@ void _fInit(int argc, char **argv) {
 
     // __state.can_use_gpu_accel = 0;
 #endif
-    // flags = 0;
-    // v_sync_flag = 1;
-    // if(v_sync_flag) flags |= FLAG_VSYNC_HINT;
-    // SetConfigFlags(flags);
     InitWindow(actual_sz.x, actual_sz.y, "Fightable");
-    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
-    // SetTargetFPS(30); // TEMP
+
+#define MAX_MONITORS 8
+    int monitor_refresh_rates[MAX_MONITORS] = {};
+    for (unsigned int i = 0; i < GetMonitorCount(); i++) {
+        monitor_refresh_rates[i] = GetMonitorRefreshRate(i);
+    }
+    _fSortIntDescending(monitor_refresh_rates, MAX_MONITORS);
+    int highest_refresh_rate = monitor_refresh_rates[0];
+    if (highest_refresh_rate == 0) {
+        TraceLog(LOG_INFO, "Cannot get highest refresh rate");
+        highest_refresh_rate = 60;
+    }
+    TraceLog(LOG_INFO, "Highest refresh rate: %d", highest_refresh_rate);
+    SetTargetFPS(highest_refresh_rate);
+
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetExitKey(KEY_NULL);
 

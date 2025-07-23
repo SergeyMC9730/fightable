@@ -87,6 +87,7 @@ add_library(fshared STATIC
     src/shared/src/char.c
     src/shared/src/pchar.c
     src/shared/src/tools.cpp
+    src/shared/src/sort.c
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
