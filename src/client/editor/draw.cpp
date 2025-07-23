@@ -22,7 +22,6 @@
 #include <fightable/player.h>
 #include <fightable/rect.h>
 #include <fightable/storage.h>
-#include <nfd.h>
 #include <climits>
 #include <fightable/notif_mgr.h>
 
@@ -434,23 +433,8 @@ void _fEditorDraw(struct feditor *editor) {
                     std::string path;
                     std::string filename;
 
-        #ifdef TARGET_ANDROID
                     filename = "session_" + std::to_string(time(0)) + ".bin";
                     path = writable + "/" + filename;
-        #else
-                    nfdu8char_t* out_path = nullptr;
-                    auto result = NFD_SaveDialogU8(&out_path, nullptr, 0, writable.c_str(), "level->bin");
-
-                    if (!out_path || result != NFD_OKAY) {
-                        filename = "session_" + std::to_string(time(0)) + ".bin";
-                        path = writable + "/" + filename;
-                    }
-                    else {
-                        filename = out_path;
-                        path = filename;
-                        NFD_FreePathU8(out_path);
-                    }
-        #endif
 
                     _fLevelSave(editor->level, filename.c_str());
 

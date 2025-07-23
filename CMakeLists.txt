@@ -71,13 +71,6 @@ set(FIGHTABLE_SHARED_INC
     src/shared/inc
 )
 
-add_library(md5-c STATIC
-    ext/md5-c/md5.c
-)
-target_include_directories(md5-c PRIVATE
-    ext/md5-c
-)
-
 add_library(fshared STATIC
     src/shared/src/cstr.c
     src/shared/src/uchar.c
@@ -195,9 +188,6 @@ endif()
 add_subdirectory(ext/cJSON)
 if (FIGHTABLE_RENDERER STREQUAL "raylib")
     add_subdirectory(ext/raylib)
-endif()
-if (NOT ANDROID)
-    add_subdirectory(ext/nativefiledialog-extended)
 endif()
 
 set(FIGHTABLE_SRC
@@ -595,15 +585,10 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-if (ANDROID)
-    set(NFD_LINK )
-else ()
-    set(NFD_LINK nfd)
-endif ()
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared )
 else()
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared ${NFD_LINK})
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared)
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )

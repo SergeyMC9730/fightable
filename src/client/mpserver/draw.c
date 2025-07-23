@@ -13,9 +13,6 @@
 #include <fightable/button.h>
 #include <fightable/renderer.h>
 #include <fightable/camera.h>
-#ifndef TARGET_ANDROID
-#include <nfd.h>
-#endif
 
 void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
     struct flevel *lvl = _fLevelLoadFromFileSelector(path);
