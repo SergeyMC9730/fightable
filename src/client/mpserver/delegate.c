@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/state.h>
 #include <fightable/mp_server.h>
 #include <fightable/storage.h>
@@ -8,32 +14,18 @@
 #include <nbnet.h>
 #endif
 
-#ifdef TARGET_ANDROID
-#include <android_native_app_glue.h>
-#endif
-
-extern void _fMainLog(const char* msg);
-
-#define COMMAND_GET_UID         0x01
-#define COMMAND_GET_USERS       0x02
-#define COMMAND_ACKNOWLEDGE     '$'
-
 #ifndef _DISABLE_MP_SERVER_
-struct fmp_metadata_req *_fMpMetadataReqCreate(void) {
-    return (struct fmp_metadata_req *)NBN_Allocator(sizeof(struct fmp_metadata_req));
-}
-void _fMpMetadataReqDestroy(struct fmp_metadata_req *obj) {
-    if (obj) NBN_Deallocator(obj);
-}
-int _fMpMetadataReqSerialize(struct fmp_metadata_req *obj, NBN_Stream *stream) {
-    if (!obj || !stream) return 0;
-
+MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_req, MetadataReq,
     NBN_SerializeUInt(stream, obj->http_port, 1024, 8000);
     NBN_SerializeUInt(stream, obj->max_players, 1, MP_MAX_CLIENTS);
-
-    return 0;
-}
+    NBN_SerializeUInt(stream, obj->players_connected, 0, MP_MAX_CLIENTS);
+)
+MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_acquire, MetadataAcquire,
+    NBN_SerializeBytes(stream, &obj->pad, 1);
+)
 #endif
+
+extern void _fMainLog(const char *msg);
 
 unsigned char _fMpServerOpen() {
 #ifndef _DISABLE_MP_SERVER_
@@ -51,6 +43,7 @@ unsigned char _fMpServerOpen() {
     unsigned char opened = 0;
     for (int i = 0; i < 16; i++) {
         __state.mp_server_port = GetRandomValue(1024, 8000);
+        __state.mp_server_port = 3000; // TEMP
         int status = NBN_GameServer_StartEx("fightable-0", __state.mp_server_port);
 
         if (status < 0) {
@@ -72,11 +65,8 @@ unsigned char _fMpServerOpen() {
 
     TraceLog(LOG_INFO, "Registering UDP messages");
 
-    NBN_GameServer_RegisterMessage(MP_METADATA_REQ_ID,
-        (NBN_MessageBuilder)_fMpMetadataReqCreate,
-        (NBN_MessageDestructor)_fMpMetadataReqDestroy,
-        (NBN_MessageSerializer)_fMpMetadataReqSerialize
-    );
+    MP_PACKET_CLASS_ATTACH(MP_METADATA_REQ_ID, MetadataReq);
+    MP_PACKET_CLASS_ATTACH(MP_METADATA_ACQUIRE_ID, MetadataAcquire);
 
     TraceLog(LOG_INFO, "Creating HTTP server for resource downloading");
     __state.mp_server_http_port = __state.mp_server_port + 1;

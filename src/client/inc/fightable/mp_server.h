@@ -13,14 +13,11 @@
 extern "C" {
 #endif
 
-struct fmp_metadata_req *_fMpMetadataReqCreate(void);
-void _fMpMetadataReqDestroy(struct fmp_metadata_req *obj);
-int _fMpMetadataReqSerialize(struct fmp_metadata_req *obj, NBN_Stream *stream);
+MP_CREATE_PACKET_CLASS_DEF(fmp_metadata_req, MetadataReq)
+MP_CREATE_PACKET_CLASS_DEF(fmp_metadata_acquire, MetadataAcquire)
 
 NBN_ConnectionHandle *_fMpServerFindHandle(NBN_ConnectionHandle ref);
-
 unsigned char _fMpServerOpen();
-
 void _fMpServerTick();
 
 #ifdef __cplusplus

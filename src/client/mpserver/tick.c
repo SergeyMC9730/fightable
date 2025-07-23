@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
+#include <fightable/mp_server_defs.h>
 #include <fightable/mp_server.h>
 #include <fightable/state.h>
 
@@ -30,6 +32,26 @@ void _fMpServerTickAcceptDisconnect() {
     }
 
     *handle_ref = 0;
+}
+
+void _fMpServerTickOnMessage() {
+    NBN_MessageInfo info = NBN_GameServer_GetMessageInfo();
+
+    switch (info.type) {
+        case MP_METADATA_ACQUIRE_ID: {
+            struct fmp_metadata_req *r = _fMpPacketCreateMetadataReq();
+            r->http_port = __state.mp_server_http_port;
+            r->max_players = MP_MAX_CLIENTS;
+
+            NBN_GameServer_SendUnreliableMessageTo(info.sender, MP_METADATA_REQ_ID, r);
+            _fMpPacketDestroyMetadataReq(r);
+            break;
+        }
+        default: {
+            TraceLog(LOG_WARNING, "Unknown packet %d", (int)info.type);
+            break;
+        }
+    }
 }
 
 void _fMpServerTick() {
