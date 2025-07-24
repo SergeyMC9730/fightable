@@ -4,10 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "nt5emul/tui/environment.h"
-#include "nt5emul/tui/file_selector.h"
-#include "nt5emul/tui/menu.h"
-#include "raylib.h"
 #include <fightable/renderer.h>
 #include <fightable/state.h>
 #include <fightable/intvec.h>
@@ -16,44 +12,13 @@
 #include <fightable/editor.h>
 #include <fightable/intro.h>
 #include <fightable/mp_create_menu.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <nt5emul/tui/text.h>
-#include <nt5emul/tui/frame.h>
-#include <nt5emul/tui/rectangle.h>
 
-void _fDrawFileSelector(void *unused) {
-    Color gray = (Color){ 30, 30, 30, 255 };
-
-    RLRectangle r;
-
-    struct nt_tui_environment *env = _ntGetTuiEnvironment();
-    float sc = env->scaling;
-
-    r.x = 0;
-    r.y = 0;
-    r.width = (int)((float)__state.overlay_framebuffer.texture.width / 8.f / sc + (1.f));
-    r.height = (int)((float)__state.overlay_framebuffer.texture.height / 16 / sc + (1.f));
-
-    _ntTuiDrawRectangleGr(r, BLACK, gray);
-
-    r.x = 2;
-    r.y = 2;
-    r.width = (int)((float)__state.overlay_framebuffer.texture.width / 8 / sc - (6.f));
-    r.height = (int)((float)__state.overlay_framebuffer.texture.height / 16 / sc - (4.f));
-
-    _ntTuiDrawFrame(r, WHITE, NULL);
-    _ntTuiDrawTextCentered("SELECT FILE", 0xFF, 1, WHITE);
-    _ntTuiDrawTextCentered("Press ESC to leave", 0xFF, r.height - 1 + 4, YELLOW);
-
-    if (__state.current_search_menu) {
-        _ntTuiDrawMenu(__state.current_search_menu->base);
-    }
-}
+void _fDrawFileSelector(void *unused);
 
 void _fDraw() {
     ClearBackground(BLACK);
 
+    unsigned char fs_should_skip = 0;
     if (__state.current_search_menu) {
         if (IsKeyPressed(KEY_ESCAPE)) {
             __state.current_search_menu->callback(__state.current_search_menu, NULL);

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "nt5emul/renderer_event.h"
+#include "raylib.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -63,6 +65,9 @@ typedef struct rsb_array__fnotif_mgr_entry rsb_array__fnotif_mgr_entry;
 #ifdef TARGET_ANDROID
 struct android_app;
 #endif
+
+struct fosk_row;
+
 struct fightable_state {
     struct ftilemap *tilemap;
 
@@ -170,11 +175,6 @@ struct fightable_state {
     unsigned char mp_server_ready;
 #endif
 
-#ifndef FIGHTABLE_NO_MULTIPLAYER
-    struct ftcpclient* mp_client;
-    struct ftcpclient_delegate* mp_client_delegate;
-#endif
-
     Vector2 mp_level_preview_offset;
 
     float cf_level_x;
@@ -188,6 +188,13 @@ struct fightable_state {
     int c2dpointer;
 
     struct nt_file_selector_menu *current_search_menu;
+    char *osk_buffer;
+    unsigned int osk_buffer_size;
+    struct renderer_animation osk_current_animation;
+    RLRectangle osk_input_field;
+    renderer_event_t osk_callback;
+    struct fosk_row *osk_rows;
+    unsigned int osk_rows_size;
 
     Texture2D test_midground;
     unsigned char display_test_midground;

@@ -85,6 +85,10 @@ void DrawGridEx(int slices, float spacing, float y);
 void _fOpenFileSelector(const char *path, void (*callback)(struct nt_file_selector_menu *menu, const char *file_path));
 void _fCloseFileSelector();
 
+void _fOpenOnScreenKeyboard(RLRectangle input_field, char *buffer, unsigned int buffer_size, renderer_event_t on_complete);
+void _fCloseOnScreenKeyboard();
+void _fDrawOnScreenKeyboard();
+
 void _fDrawRenderTexture(RenderTexture2D rtx, Vector2 pos, Color tint, float scale, Vector2 portion_pos, Vector2 portion_sz);
 
 void _ntRendererDrawStretchedTexture(Texture2D texture, bool x_stretched, bool y_stretched, float xstretchmul, float ysctretchmul, Vector2 pos, Vector2 origin);

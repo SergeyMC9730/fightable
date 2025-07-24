@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "nt5emul/renderer_event.h"
+#include "raylib.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -161,6 +163,7 @@ void _fInit(int argc, char **argv) {
         highest_refresh_rate = 60;
     }
     TraceLog(LOG_INFO, "Highest refresh rate: %d", highest_refresh_rate);
+    highest_refresh_rate = 30; // TEMP
     SetTargetFPS(highest_refresh_rate);
 
     SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -329,7 +332,8 @@ void _fInit(int argc, char **argv) {
 
     SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
-    struct ftext_instance test_text = _fTextInstanceCreateWithFont("hello, <cyellow,white>world</pizda>!", GetFontDefault(), 40.f, 1.f);
+    char test_buffer[16] = {};
+    _fOpenOnScreenKeyboard((RLRectangle){}, test_buffer, 16, (renderer_event_t){});
 
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
@@ -368,7 +372,6 @@ void _fInit(int argc, char **argv) {
         ClearBackground(BLANK);
         _fSchedulerIterateOverlays();
         _fNotifMgrUpdate();
-        _fTextInstanceDraw(&test_text, (Vector2){0.f, 0.f});
         EndTextureModeStacked();
 
         ClearBackground(BLACK);
@@ -420,6 +423,8 @@ void _fInit(int argc, char **argv) {
 
             RlDrawText(dbg_buffer, 8, 32, 20, RED);
         }
+
+        _fDrawOnScreenKeyboard();
 
         EndDrawing();
 
