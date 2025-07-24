@@ -5,9 +5,17 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <fraylib.h>
+#include <stdio.h>
 
 int main() {
     InitWindow(640, 480, "Test");
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        _fRasterizerTest();
+        EndDrawing();
+    }
 
     RlCloseWindow();
 

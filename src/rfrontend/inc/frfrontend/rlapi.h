@@ -16,6 +16,15 @@ typedef struct {
     unsigned char a;
 } Color;
 
+// NOTE: MSVC C++ compiler does not support compound literals (C99 feature)
+// Plain structures in C++ (without constructors) can be initialized with { }
+// This is called aggregate initialization (C++11 feature)
+#if defined(__cplusplus)
+    #define CLITERAL(type)      type
+#else
+    #define CLITERAL(type)      (type)
+#endif
+
 // Some Basic Colors
 // NOTE: Custom raylib color palette for amazing visuals on WHITE background
 #define LIGHTGRAY  CLITERAL(Color){ 200, 200, 200, 255 }   // Light Gray
@@ -190,7 +199,7 @@ typedef struct {
 extern "C" {
 #endif
 
-#if defined(TARGET_SUPPORTS_2D) || defined(TARGET_SUPPORTS_3D)
+#if defined(TARGET_SUPPORTS_2D)
 void InitWindow(unsigned int width, unsigned int height, const char *title);
 void RlCloseWindow(void);
 unsigned char WindowShouldClose(void);
@@ -198,6 +207,9 @@ unsigned char WindowShouldClose(void);
 void ClearBackground(Color color);
 
 unsigned char IsKeyPressed(void);
+
+void BeginDrawing(void);
+void EndDrawing(void);
 #endif
 
 #ifdef __cplusplus

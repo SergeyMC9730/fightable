@@ -7,15 +7,16 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <fraylib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-extern int *__char_table;
+extern int __char_table[];
 extern int __char_table_size;
 
-void _fRasterizerProcessEvents() {
+void _fRasterizerProcessEvents(void) {
     if (__frstate.events_checked) return;
     __frstate.events_checked = 1;
 
@@ -29,7 +30,7 @@ void _fRasterizerProcessEvents() {
             case KeyPress: {
                 printf("keypress\n");
 
-                KeySym ks = XLookupKeysym(&(e.xkey), 0);
+                KeySym ks = XLookupKeysym(&e.xkey, 0);
                 int idx = _fRasterizerNativeCharToIndex(ks);
 
                 if (__frstate.key_state[idx] == KsPressed) {
@@ -37,6 +38,8 @@ void _fRasterizerProcessEvents() {
                 } else {
                     __frstate.key_state[idx] = KsPressed;
                 }
+
+                printf("idx=%d\n", idx);
 
                 __frstate.pressed_key = __char_table[idx];
 
@@ -111,17 +114,17 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
 
         XVisualInfo *visual_list = XGetVisualInfo(__frstate.display, VisualScreenMask, &visual_temp, &visual_amount);
 
-        printf("frasterizer: Xlib provides these rendering modes:\n");
-        for (int i = 0; i < visual_amount; i++) {
-            printf("frasterizer:  %3d: visual 0x%lx class %d (%s) depth %d\n", i, visual_list[i].visualid, visual_list[i].class, visual_list[i].class == TrueColor ? "TrueColor" : "unknown", visual_list[i].depth);
-        }
 
         printf("\nfrasterizer: trying to get access to 32-bit TrueColor mode\n");
         if (!XMatchVisualInfo(__frstate.display, XDefaultScreen(__frstate.display), 32, TrueColor, &vinfo)) {
             printf("frasterizer: mode does not exist\n");
+            printf("frasterizer: Xlib provides these rendering modes:\n");
+            for (int i = 0; i < visual_amount; i++) {
+                printf("frasterizer:  %3d: visual 0x%lx class %d (%s) depth %d\n", i, visual_list[i].visualid, visual_list[i].class, visual_list[i].class == TrueColor ? "TrueColor" : "unknown", visual_list[i].depth);
+            }
             return;
         } else {
-            printf("frasterizer: mode with id of %3ld can be used", vinfo.visualid);
+            printf("frasterizer: mode with id of %3ld can be used\n", vinfo.visualid);
         }
 
         XSync(__frstate.display, True);
@@ -134,8 +137,6 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
         __frstate.win_height = height;
 
         attributes.colormap = XCreateColormap(__frstate.display, XDefaultRootWindow(__frstate.display), vinfo.visual, AllocNone);
-        attributes.background_pixel = 0;
-        attributes.border_pixel = 0;
 
         visual = vinfo.visual;
         visual_depth = vinfo.depth;
@@ -145,6 +146,12 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
     memset(__frstate.key_state, 0, sizeof(enum frasterizer_key_state) * __char_table_size);
 
     int screen = DefaultScreen(__frstate.display);
+
+    attributes.background_pixel = WhitePixel(__frstate.display, screen);
+    attributes.border_pixel = BlackPixel(__frstate.display, screen);
+    attributes.event_mask = ExposureMask | KeyPressMask | StructureNotifyMask;
+    attributes.override_redirect = False;
+
     __frstate.window = XCreateWindow(
         __frstate.display,
         XDefaultRootWindow(__frstate.display),
@@ -162,7 +169,7 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
         __frstate.display,
         visual,
         32,
-        XYPixmap,
+        ZPixmap,
         0,
         (char *)__frstate.main_fb,
         width,
@@ -180,8 +187,8 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
 
     XGCValues values = {};
     __frstate.fb_context = XCreateGC(__frstate.display, __frstate.window, 0, &values);
-    XSetForeground(__frstate.display, __frstate.fb_context, WhitePixel(__frstate.display, screen));
-    XSetBackground(__frstate.display, __frstate.fb_context, BlackPixel(__frstate.display, screen));
+    XSetForeground(__frstate.display, __frstate.fb_context, BlackPixel(__frstate.display, screen));
+    XSetBackground(__frstate.display, __frstate.fb_context, WhitePixel(__frstate.display, screen));
 
     XSetLineAttributes(__frstate.display, __frstate.fb_context, 1, LineSolid, CapButt, JoinBevel);
     XSetFillStyle(__frstate.display, __frstate.fb_context, FillSolid);
@@ -194,6 +201,8 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
     XMapWindow(__frstate.display, __frstate.window);
     XFlush(__frstate.display);
 
+    XStoreName(__frstate.display, __frstate.window, title);
+
     printf("frasterizer: mapped window to the display\n");
 #else
     printf("frasterizer: frasterizer is not implemented for this platform\n");
@@ -204,8 +213,6 @@ void InitWindow(unsigned int width, unsigned int height, const char *title) {
 }
 
 unsigned char WindowShouldClose(void) {
-    _fRasterizerProcessEvents();
-
     return __frstate.window_should_close;
 }
 

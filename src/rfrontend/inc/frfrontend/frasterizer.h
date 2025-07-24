@@ -13,6 +13,10 @@
 #include <X11/Xlib.h>
 #endif
 
+#ifdef TARGET_UNIX
+#include <sys/time.h>
+#endif
+
 enum frasterizer_key_state {
     KsIdle = 0,
     KsPressed, KsHeld, KsReleased
@@ -32,6 +36,10 @@ struct frasterizer_state {
     unsigned int win_width;
     unsigned int win_height;
 
+#ifdef TARGET_UNIX
+    struct timeval frame_begin_time;
+#endif
+
     unsigned char ready : 1;
     unsigned char window_should_close : 1;
 };
@@ -43,6 +51,10 @@ extern struct frasterizer_state __frstate;
 
 int _fRasterizerRaylibCharToNative(int rc);
 int _fRasterizerNativeCharToIndex(int nc);
+
+void _fRasterizerTest();
+
+void _fRasterizerProcessEvents(void);
 
 #ifdef __cplusplus
 }
