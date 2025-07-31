@@ -169,13 +169,6 @@ if (ANDROID)
     message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
 
-if (NOT DISABLE_PORTAUDIO)
-    set(WDMKS OFF)
-    add_subdirectory(ext/portaudio_opensles)
-else()
-    add_compile_definitions(_DISABLE_PORTAUDIO_)
-endif()
-
 set(BUILD_SHARED_LIBS OFF)
 set(ENABLE_CJSON_UNINSTALL OFF)
 set(ENABLE_CJSON_TEST OFF)
@@ -188,6 +181,13 @@ endif()
 add_subdirectory(ext/cJSON)
 if (FIGHTABLE_RENDERER STREQUAL "raylib")
     add_subdirectory(ext/raylib)
+endif()
+
+if (NOT DISABLE_PORTAUDIO)
+    set(WDMKS OFF)
+    add_subdirectory(ext/portaudio_opensles)
+else()
+    add_compile_definitions(_DISABLE_PORTAUDIO_)
 endif()
 
 set(FIGHTABLE_SRC

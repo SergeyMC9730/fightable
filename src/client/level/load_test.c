@@ -11,6 +11,7 @@
 #include <fightable/pthread_compat.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile){
     struct flevel *level = (struct flevel *)malloc(sizeof(struct flevel));

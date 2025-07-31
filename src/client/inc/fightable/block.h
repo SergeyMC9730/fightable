@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fightable/rendered_object.h>
-#include <fightable/serializable.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,8 +44,6 @@ struct fblock_listing {
 };
 
 struct fblock_listing _fBlockGetAvailable();
-fserializable _fBlockSerialize(struct fblock block);
-struct fblock _fBlockLoad(fserializable *serializable, uint16_t level_version);
 
 void _fBlockRecoverBitfield(struct fblock *block, unsigned char original);
 unsigned char _fBlockGetBitfield(struct fblock* block);

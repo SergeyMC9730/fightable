@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include "raylib.h"
 #include <fightable/rendered_object.h>
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
-#include <fightable/serializable.h>
 #include <rsb/rsb_array_gen.h>
 #include <tunnelos/unitype.h>
 
@@ -102,7 +100,6 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
 struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
 RLRectangle *_fLevelGetHitboxes(struct flevel *level);
 struct fentity *_fLevelFindPlayer(struct flevel *level);
-fserializable _fLevelSerialize(struct flevel *level);
 void _fLevelTriggerGameOver(struct flevel* level);
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
 void _fLevelSave(struct flevel* level, const char* filename);

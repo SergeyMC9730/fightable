@@ -13,7 +13,7 @@ int main() {
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        _fRasterizerTest();
+        // _fRasterizerTest();
         EndDrawing();
     }
 
