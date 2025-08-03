@@ -4,8 +4,11 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/text_instance.h"
+#include "raylib.h"
 #include <fightable/multiline_text_instance.h>
 #include <fightable/string.h>
+#include <string.h>
 
 struct fmultiline_text_instance _fMultilineTextInstanceCreateWithFont(const char *text, RLFont font, float size, float spacing) {
     struct fmultiline_text_instance i = {};
@@ -21,17 +24,22 @@ struct fmultiline_text_instance _fMultilineTextInstanceCreateWithFont(const char
 
     for (unsigned int ii = 0; ii < i.line_amount; ii++) {
         char *text_entry = lines->objects[ii];
-        TraceLog(LOG_INFO, "GOVNO: %s", (const char *)text_entry);
         struct fmultiline_text_instance_entry *entry = i.lines + ii;
 
-        entry->text = _fTextInstanceCreateWithFont(text_entry, font, size, spacing);
+        struct ftext_instance singleline_instance = _fTextInstanceCreateWithFont(text_entry, font, size, spacing);
+        if (strcmp(singleline_instance.original_string, text_entry) != 0) {
+            TraceLog(LOG_ERROR, "fmultiline_text_instance: failed to create line: corrupted string");
+            continue;
+        }
+
+        memcpy(&entry->text, &singleline_instance, sizeof(struct ftext_instance));
         entry->offset = next_offset;
 
         Vector2 sz = _fTextInstanceGetSize(&entry->text);
         next_offset.y += sz.y + spacing;
     }
 
-    // _fCleanupSplittedString(lines);
+    _fCleanupSplittedString(lines);
 
     return i;
 }
@@ -51,7 +59,13 @@ struct fmultiline_text_instance _fMultilineTextInstanceCreateWithTextMan(const c
         char *text_entry = lines->objects[ii];
         struct fmultiline_text_instance_entry *entry = i.lines + ii;
 
-        entry->text = _fTextInstanceCreateWithTextMan(text_entry, man);
+        struct ftext_instance singleline_instance = _fTextInstanceCreateWithTextMan(text_entry, man);
+        if (strcmp(singleline_instance.original_string, text_entry) != 0) {
+            TraceLog(LOG_ERROR, "fmultiline_text_instance: failed to create line: corrupted string");
+            continue;
+        }
+
+        memcpy(&entry->text, &singleline_instance, sizeof(struct ftext_instance));
         entry->offset = next_offset;
 
         Vector2 sz = _fTextInstanceGetSize(&entry->text);
@@ -91,5 +105,22 @@ void _fMultilineTextInstanceDraw(struct fmultiline_text_instance *instance, Vect
 
 Vector2 _fMultilineTextInstanceGetSize(struct fmultiline_text_instance *instance) {
     if (!instance || !instance->lines) {}
-    return (Vector2){};
+
+    Vector2 vec = {};
+
+    for (unsigned int i = 0; i < instance->line_amount; i++) {
+        struct fmultiline_text_instance_entry *entry = instance->lines + i;
+
+        Vector2 sz = _fTextInstanceGetSize(&entry->text);
+        float height = entry->offset.y + sz.y;
+
+        if (height > vec.y) {
+            vec.y = height;
+        }
+        if (sz.x > vec.x) {
+            vec.x = sz.x;
+        }
+    }
+
+    return vec;
 }

@@ -12,6 +12,17 @@
 
 RSB_ARRAY_IMPL_GEN(struct ftext_instance_entry, _tie);
 
+void _fTextInstanceAddEntry(struct ftext_instance *instance, struct ftext_instance_entry e) {
+    if (!instance->elements) {
+        instance->elements_size = 1;
+        instance->elements = (struct ftext_instance_entry *)MemAlloc(sizeof(struct ftext_instance_entry));
+    } else {
+        instance->elements_size++;
+        instance->elements = (struct ftext_instance_entry *)MemRealloc(instance->elements, sizeof(struct ftext_instance_entry));
+    }
+    instance->elements[instance->elements_size - 1] = e;
+}
+
 void _fTextInstanceProcessEntry(struct ftext_instance *instance, struct ftext_instance_entry *e) {
     if (!instance || !e || !e->text) return;
 
@@ -39,10 +50,7 @@ void _fTextInstanceProcessEntry(struct ftext_instance *instance, struct ftext_in
         default: {}
     }
 
-    if (!instance->text_elements) {
-        instance->text_elements = RSBCreateArray_tie();
-    }
-    RSBAddElement_tie(instance->text_elements, *e);
+    _fTextInstanceAddEntry(instance, *e);
 }
 
 Color _fTextInstanceStringToColor(const char *text) {
@@ -228,23 +236,22 @@ void _fTextInstanceDestroy(struct ftext_instance *instance) {
     if (!instance) return;
 
     if (instance->original_string) {
-        free(instance->original_string);
         instance->original_string = NULL;
     }
-    if (instance->text_elements) {
-        for (size_t i = 0; i < instance->text_elements->added_elements; i++) {
-            struct ftext_instance_entry entry = RSBGetAtIndex_tie(instance->text_elements, i);
+    if (instance->elements) {
+        for (size_t i = 0; i < instance->elements_size; i++) {
+            struct ftext_instance_entry *entry = instance->elements + i;
 
-            if (IsTextureValid(entry.prerendered_text)) {
-                UnloadTexture(entry.prerendered_text);
+            if (IsTextureValid(entry->prerendered_text)) {
+                UnloadTexture(entry->prerendered_text);
             }
-            if (entry.text) {
-                free(entry.text);
+            if (entry->text) {
+                free(entry->text);
             }
         }
 
-        RSBDestroy_tie(instance->text_elements);
-        instance->text_elements = NULL;
+        free(instance->elements);
+        instance->elements = NULL;
     }
 }
 
@@ -268,12 +275,14 @@ void _fTextInstanceDrawPrivateR(struct ftext_instance *instance, struct ftext_in
 
     if (entry.command == TC_COLOR_BASIC_TINT) color = entry.color_a;
 
+    TraceLog(LOG_INFO, "%s", entry.text);
+
     RlDrawTextEx(instance->applicable_raylib_font, entry.text, *position, instance->raylib_size, instance->raylib_spacing, color);
     position->x += m.x;
 }
 
 void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
-    if (!instance || !instance->text_elements) return;
+    if (!instance || !instance->elements) return;
 
     Vector2 cur_position = position;
     void (*draw_private)(struct ftext_instance*, struct ftext_instance_entry, Vector2*) = NULL;
@@ -291,8 +300,8 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
 
     if (!draw_private) return;
 
-    for (size_t i = 0; i < instance->text_elements->added_elements; i++) {
-        struct ftext_instance_entry entry = instance->text_elements->objects[i];
+    for (size_t i = 0; i < instance->elements_size; i++) {
+        struct ftext_instance_entry entry = instance->elements[i];
 
         switch (entry.command) {
             case TC_NONE:
@@ -314,12 +323,12 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
 }
 
 Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
-    if (!instance || !instance->text_elements) return (Vector2){};
+    if (!instance || !instance->elements) return (Vector2){};
 
     Vector2 cur_position = (Vector2){};
 
-    for (size_t i = 0; i < instance->text_elements->added_elements; i++) {
-        struct ftext_instance_entry entry = RSBGetAtIndex_tie(instance->text_elements, i);
+    for (size_t i = 0; i < instance->elements_size; i++) {
+        struct ftext_instance_entry entry = instance->elements[i];
 
         switch (entry.command) {
             case TC_NONE:
@@ -359,4 +368,10 @@ Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
     }
 
     return cur_position;
+}
+
+char *_fTextInstanceGetText(struct ftext_instance *instance) {
+    if (!instance) return NULL;
+
+    return instance->original_string;
 }

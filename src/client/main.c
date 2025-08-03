@@ -335,8 +335,6 @@ void _fInit(int argc, char **argv) {
     char test_buffer[16] = {};
     _fOpenOnScreenKeyboard((RLRectangle){}, test_buffer, 16, (renderer_event_t){});
 
-    struct fmultiline_text_instance text_test = _fMultilineTextInstanceCreateWithFont("Blyaha\nmuha\nya ne ponimayu\n eto govno", GetFontDefault(), 20.f, 2.f);
-
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -427,8 +425,6 @@ void _fInit(int argc, char **argv) {
         }
 
         _fDrawOnScreenKeyboard();
-
-        _fMultilineTextInstanceDraw(&text_test, (Vector2){2, 2});
 
         EndDrawing();
 

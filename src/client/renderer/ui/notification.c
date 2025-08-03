@@ -22,22 +22,19 @@ struct fnotif_object *_fNotifObjectCreate(const char *content) {
 
     RLFont font = GetFontDefault();
 
-    o->copied_message = _fCopyString(content);
-    if (!o->copied_message) {
-        o->box.width = 50;
-        o->box.height = font.baseSize + (POPUP_SAFE_AREA * 2);
-    } else {
-        Vector2 sz = MeasureTextEx(font, o->copied_message, 20.f, 1.f);
-        o->box.width = sz.x + (POPUP_SAFE_AREA * 2);
-        o->box.height = sz.y + (POPUP_SAFE_AREA * 2);
-    }
+    o->text = _fMultilineTextInstanceCreateWithFont(content, font, 20.f, 1.f);
+
+    o->text_size = _fMultilineTextInstanceGetSize(&o->text);
+    o->box.width = o->text_size.x + (POPUP_SAFE_AREA * 2);
+    o->box.height = o->text_size.y + (POPUP_SAFE_AREA * 2);
 
     return o;
 }
 void _fNotifObjectDestroy(struct fnotif_object *o, unsigned char object_allocated) {
     if (!o) return;
 
-    if (o->copied_message) free((void *)o->copied_message); o->copied_message = NULL;
+    _fMultilineTextInstanceDestroy(&o->text);
+
     _ntRendererUnloadAnimation(o->open_anim); o->open_anim = NULL;
     _ntRendererUnloadAnimation(o->close_anim); o->close_anim = NULL;
     _ntRendererUnloadAnimation(o->move_anim); o->move_anim = NULL;
@@ -203,12 +200,8 @@ void _fNotifObjectDraw(struct fnotif_object *o) {
     DrawRectangle(o->box.x + offset.x, o->box.y + offset.y, o->box.width, o->box.height, (Color){0,0,0,200});
     DrawRectangleLinesEx((RLRectangle){o->box.x + offset.x, o->box.y + offset.y, o->box.width, o->box.height}, 2.f, YELLOW);
 
-    if (!o->copied_message) return;
-
-    RLFont font = GetFontDefault();
-    Vector2 sz = MeasureTextEx(font, o->copied_message, 20.f, 1.f);
+    Vector2 sz = o->text_size;
 
     Vector2 center = {(o->box.width - sz.x) / 2.f, (o->box.height - sz.y) / 2.f};
-    RlDrawTextEx(font, o->copied_message, (Vector2){center.x + o->box.x + offset.x + 2, center.y + o->box.y + offset.y + 2}, 20.f, 1.f, BLACK);
-    RlDrawTextEx(font, o->copied_message, (Vector2){center.x + o->box.x + offset.x, center.y + o->box.y + offset.y}, 20.f, 1.f, WHITE);
+    _fMultilineTextInstanceDraw(&o->text, (Vector2){center.x + o->box.x + offset.x, center.y + o->box.y + offset.y});
 }

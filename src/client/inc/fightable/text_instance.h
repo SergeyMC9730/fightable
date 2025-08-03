@@ -38,7 +38,9 @@ enum ftext_instance_backend {
     TIB_FIGHTABLE
 };
 struct ftext_instance {
-    rsb_array__tie *text_elements;
+    struct ftext_instance_entry *elements;
+    size_t elements_size;
+
     char *original_string;
 
     RLFont applicable_raylib_font;
@@ -55,6 +57,7 @@ struct ftext_instance _fTextInstanceCreateWithTextMan(const char *text, struct f
 void _fTextInstanceDestroy(struct ftext_instance *instance);
 void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position);
 Vector2 _fTextInstanceGetSize(struct ftext_instance *instance);
+char *_fTextInstanceGetText(struct ftext_instance *instance);
 
 #ifdef __cplusplus
 }

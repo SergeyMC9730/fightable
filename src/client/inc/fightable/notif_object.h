@@ -11,13 +11,13 @@
 #include <fightable/multiline_text_instance.h>
 
 struct fnotif_object {
-    const char *copied_message;
     RLRectangle box;
     struct renderer_animation *open_anim;
     struct renderer_animation *close_anim;
     struct renderer_animation *move_anim;
     unsigned char closed;
     struct fmultiline_text_instance text;
+    Vector2 text_size;
 };
 
 #ifdef __cplusplus

@@ -69,7 +69,7 @@ void _fNotifMgrUpdate() {
             e->time += delta;
 
             if (e->time > POPUP_TIMEOUT) {
-                TraceLog(LOG_INFO, "Closing notification %s", e->popup->copied_message);
+                TraceLog(LOG_INFO, "Closing notification");
                 _fNotifObjectApplyCloseAnimation(e->popup);
                 e->closing = 1;
             }
