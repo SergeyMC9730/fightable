@@ -66,7 +66,7 @@ void _fOskDrawRow(struct fosk_row *r) {
         RLRectangle real_rect = r->row_keys_sized[i];
         real_rect.y = screen_size.y - real_rect.y - real_rect.height;
 
-        TraceLog(LOG_INFO, "(%d) %f %f %f %f", i, real_rect.x, real_rect.y, real_rect.width, real_rect.height);
+        // sTraceLog(LOG_INFO, "(%d) %f %f %f %f", i, real_rect.x, real_rect.y, real_rect.width, real_rect.height);
 
         DrawRectangleRec(real_rect, RAYWHITE);
         DrawRectangleLinesEx(real_rect, 2.f, BLACK);

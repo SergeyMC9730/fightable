@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "nt5emul/renderer_event.h"
 #include "raylib.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
@@ -29,6 +28,7 @@
 #include <pthread.h>
 #include <fightable/notif_mgr.h>
 #include <fightable/sort.h>
+#include <fightable/multiline_text_instance.h>
 
 struct ftilemap __tilemap;
 
@@ -163,7 +163,7 @@ void _fInit(int argc, char **argv) {
         highest_refresh_rate = 60;
     }
     TraceLog(LOG_INFO, "Highest refresh rate: %d", highest_refresh_rate);
-    highest_refresh_rate = 30; // TEMP
+    // highest_refresh_rate = 30; // TEMP
     SetTargetFPS(highest_refresh_rate);
 
     SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -335,6 +335,8 @@ void _fInit(int argc, char **argv) {
     char test_buffer[16] = {};
     _fOpenOnScreenKeyboard((RLRectangle){}, test_buffer, 16, (renderer_event_t){});
 
+    struct fmultiline_text_instance text_test = _fMultilineTextInstanceCreateWithFont("Blyaha\nmuha\nya ne ponimayu\n eto govno", GetFontDefault(), 20.f, 2.f);
+
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
         actual_sz.y = GetRenderHeight();
@@ -425,6 +427,8 @@ void _fInit(int argc, char **argv) {
         }
 
         _fDrawOnScreenKeyboard();
+
+        _fMultilineTextInstanceDraw(&text_test, (Vector2){2, 2});
 
         EndDrawing();
 

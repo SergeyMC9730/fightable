@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/text.h"
+#include "raylib.h"
 #include <fightable/string.h>
 #include <fightable/text_instance.h>
 #include <string.h>
@@ -290,7 +292,7 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
     if (!draw_private) return;
 
     for (size_t i = 0; i < instance->text_elements->added_elements; i++) {
-        struct ftext_instance_entry entry = RSBGetAtIndex_tie(instance->text_elements, i);
+        struct ftext_instance_entry entry = instance->text_elements->objects[i];
 
         switch (entry.command) {
             case TC_NONE:
@@ -309,4 +311,52 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
             }
         }
     }
+}
+
+Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
+    if (!instance || !instance->text_elements) return (Vector2){};
+
+    Vector2 cur_position = (Vector2){};
+
+    for (size_t i = 0; i < instance->text_elements->added_elements; i++) {
+        struct ftext_instance_entry entry = RSBGetAtIndex_tie(instance->text_elements, i);
+
+        switch (entry.command) {
+            case TC_NONE:
+            case TC_UNKNOWN:
+            case TC_COLOR_BASIC_TINT: {
+                switch (instance->used_font_backend) {
+                    case TIB_FIGHTABLE: {
+                        IVector2 sz = _fTextMeasure(instance->applicable_fightable_font, entry.text);
+                        cur_position.x += (float)sz.x;
+                        if (cur_position.y < (float)sz.y) {
+                            cur_position.y = (float)sz.y;
+                        }
+                        break;
+                    }
+                    case TIB_RAYLIB: {
+                        Vector2 sz = MeasureTextEx(instance->applicable_raylib_font, entry.text, instance->raylib_size, instance->raylib_spacing);
+                        cur_position.x += sz.x;
+                        if (cur_position.y < sz.y) {
+                            cur_position.y = sz.y;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+            case TC_COLOR_GRADIENT: {
+                if (!IsTextureValid(entry.prerendered_text)) break;
+
+                cur_position.x += entry.prerendered_text.width;
+                if (cur_position.y < (float)entry.prerendered_text.height) {
+                    cur_position.y = (float)entry.prerendered_text.height;
+                }
+
+                break;
+            }
+        }
+    }
+
+    return cur_position;
 }

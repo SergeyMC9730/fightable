@@ -8,6 +8,7 @@
 
 #include <fraylib.h>
 #include <nt5emul/renderer_animation.h>
+#include <fightable/multiline_text_instance.h>
 
 struct fnotif_object {
     const char *copied_message;
@@ -16,6 +17,7 @@ struct fnotif_object {
     struct renderer_animation *close_anim;
     struct renderer_animation *move_anim;
     unsigned char closed;
+    struct fmultiline_text_instance text;
 };
 
 #ifdef __cplusplus

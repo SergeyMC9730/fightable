@@ -53,8 +53,8 @@ struct ftext_instance _fTextInstanceCreateWithFont(const char *text, RLFont font
 struct ftext_instance _fTextInstanceCreateWithTextMan(const char *text, struct ftext_manager *man);
 
 void _fTextInstanceDestroy(struct ftext_instance *instance);
-
 void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position);
+Vector2 _fTextInstanceGetSize(struct ftext_instance *instance);
 
 #ifdef __cplusplus
 }
