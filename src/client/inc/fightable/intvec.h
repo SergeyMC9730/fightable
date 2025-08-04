@@ -18,6 +18,7 @@ typedef struct IVector2 {
 #include <fraylib.h>
 
 Vector2 _fImathToVFloat(IVector2 v);
+IVector2 _fVFloatToI(Vector2 v);
 
 void _fImathAddI(IVector2 in, IVector2* out);
 void _fImathAddV(int ix, int iy, IVector2* out);

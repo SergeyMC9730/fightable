@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fightable/entity.h>
+#include <fightable/multiline_text_instance.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
 
 struct fentity_text {
 	struct fentity base;
-	char* text;
+	struct fmultiline_text_instance *text;
 };
 
 void _feTextInit(struct fentity_text* instance, const char *text);

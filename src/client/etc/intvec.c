@@ -1,8 +1,18 @@
-#include <raylib.h>
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/intvec.h>
 
 Vector2 _fImathToVFloat(IVector2 v) {
     Vector2 _v = {(float)v.x, (float)v.y};
+
+    return _v;
+}
+IVector2 _fVFloatToI(Vector2 v) {
+    IVector2 _v = {(int)v.x, (int)v.y};
 
     return _v;
 }

@@ -200,7 +200,6 @@ struct ftext_instance *_fTextInstanceCreateWithTextMan(const char *text, struct 
     }
 
     instance->original_string = text;
-
     _fTextInstanceCreatePrivate(instance);
 
     return instance;
@@ -238,7 +237,7 @@ void _fTextInstanceDestroy(struct ftext_instance *instance) {
 }
 
 void _fTextInstanceDrawPrivateF(struct ftext_instance *instance, const struct ftext_instance_entry &entry, Vector2 *position) {
-    if (!instance || instance->applicable_fightable_font) return;
+    if (!instance || !instance->applicable_fightable_font) return;
 
     IVector2 m = _fTextMeasure(instance->applicable_fightable_font, entry.text.c_str());
     Color color = WHITE;

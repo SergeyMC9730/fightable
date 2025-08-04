@@ -1,3 +1,5 @@
+#include "fightable/intvec.h"
+#include "fightable/multiline_text_instance.h"
 #define WITH_PLACEHOLDERS
 #include <fightable/etext.h>
 #include <fightable/text.h>
@@ -6,18 +8,19 @@
 #include <fightable/entity_library.h>
 
 void _feTextInit(struct fentity_text* instance, const char* text) {
-	if (text == NULL) return _feTextInit(instance, "?");
+	if (text == NULL) return _feTextInit(instance, "<cred>?");
 	if (instance == NULL) return;
 
 	_fEntityInit(&instance->base);
 
-	IVector2 v = _fTextMeasure(&__state.text_manager, text);
+	instance->text = _fMultilineTextInstanceCreateWithTextMan(text, &__state.text_manager);
+
+	Vector2 v = _fMultilineTextInstanceGetSize(instance->text);
 	fhitbox hitbox = instance->base.hitbox;
-	hitbox.width = (float)v.x; hitbox.height = (float)v.y;
-	
+	hitbox.width = v.x; hitbox.height = v.y;
+
 	instance->base.can_be_damaged = 0;
 	instance->base.hitbox = hitbox;
-	instance->text = _fCopyString(text);
 	instance->base.global_entity_id = ENTITY_TEXT;
 	instance->base.draw = (void(*)(struct fentity*))_feTextDraw;
 	instance->base.cleanup = (void(*)(struct fentity*))_feTextCleanup;
@@ -26,11 +29,12 @@ void _feTextDraw(struct fentity_text* instance) {
 	if (!instance || !instance->text) return;
 
 	IVector2 pos = _fEntityGetDrawingPos(&instance->base);
-	_fTextDraw(&__state.text_manager, (const char*)instance->text, pos, instance->base.tint, 0);
+	// _fTextDraw(&__state.text_manager, (const char*)instance->text, pos, instance->base.tint, 0);
+	_fMultilineTextInstanceDraw(instance->text, _fImathToVFloat(pos));
 }
 void _feTextCleanup(struct fentity_text* instance) {
 	if (!instance || !instance->text) return;
 
-	free(instance->text);
+	_fMultilineTextInstanceDestroy(instance->text);
 	instance->text = NULL;
 }
