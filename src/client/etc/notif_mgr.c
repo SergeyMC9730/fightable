@@ -24,7 +24,7 @@ void _fNotifMgrRealign() {
 
     for (int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
-        if (e->popup->closed || e->closing) continue;
+        if (e->popup->closed) continue;
 
         new_offsets[i] = x;
         x += e->popup->box.width;
@@ -66,7 +66,7 @@ void _fNotifMgrSendWithTime(const char *message, double tlength) {
 
     int used_offset = -1;
 
-    for (int i = 0; i < ((__state.overlay_framebuffer.texture.width * 3) / POPUP_GAP) + 1; i++) {
+    for (int i = 0; i < (0xFFFF / POPUP_GAP) + 1; i++) {
         int offset = POPUP_GAP * i;
         unsigned char has_offset = 0;
 
@@ -121,7 +121,7 @@ void _fNotifMgrUpdate() {
                 e->popup->complete_progress = e->time / e->max_time;
             }
 
-            TraceLog(LOG_INFO, "%f %f %d", (float)e->time, (float)e->max_time, e->offscreen);
+            // TraceLog(LOG_INFO, "%f %f %d", (float)e->time, (float)e->max_time, e->offscreen);
 
             if (e->time >= e->max_time) {
                 TraceLog(LOG_INFO, "Closing notification %s", _fMultilineTextInstanceGetText(e->popup->text));
