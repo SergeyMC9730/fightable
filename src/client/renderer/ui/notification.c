@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/notif_object.h>
 #include <fightable/string.h>
 #include <nt5emul/renderer_animation.h>
@@ -204,4 +205,6 @@ void _fNotifObjectDraw(struct fnotif_object *o) {
 
     Vector2 center = {(o->box.width - sz.x) / 2.f, (o->box.height - sz.y) / 2.f};
     _fMultilineTextInstanceDraw(o->text, (Vector2){center.x + o->box.x + offset.x, center.y + o->box.y + offset.y});
+
+    DrawRectangle(o->box.x + offset.x, o->box.y + o->box.height - (POPUP_SAFE_AREA / 2) + offset.y, o->box.width * o->complete_progress, POPUP_SAFE_AREA / 2, ORANGE);
 }

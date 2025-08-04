@@ -25,7 +25,7 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
 
 		// TraceLog(LOG_INFO, "%f %f %f %f", r.x, r.y, r.width, r.height);
 
-		for (unsigned int i = 0; i < env->entities->added_elements; i++) {
+		for (unsigned int i = 0; i < env->entities->len; i++) {
 			struct fentity* entity = RSBGetAtIndex_fentity(env->entities, i);
 			if (!entity) continue;
 

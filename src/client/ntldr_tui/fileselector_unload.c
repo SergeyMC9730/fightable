@@ -26,7 +26,7 @@ void _ntUnloadFileSelector(struct nt_file_selector_menu *menu) {
     if (!menu) return;
 
     if (menu->listing) {
-        size_t l = menu->listing->added_elements;
+        size_t l = menu->listing->len;
 
         for (size_t i = 0; i < l; i++) {
             if (menu->listing->objects[i]) free((char *)menu->listing->objects[i]);

@@ -29,7 +29,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     }
 
     if (level->light_sources) {
-        level->light_sources->added_elements = 0;
+        level->light_sources->len = 0;
         level->light_sources->current_index = 0;
     }
     else {
@@ -185,8 +185,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             player->update(player);
         }
 
-        for (int i = 0; i < level->entities->added_elements; i++) {
-            struct fentity* entity = level->entities->objects[i];
+        for (int i = 0; i < level->entities->len; i++) {
+            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
             if (!entity->draw) {
@@ -204,7 +204,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
     BeginBlendMode(BLEND_ADDITIVE);
 
-    for (unsigned int i = 0; i < level->light_sources->added_elements; i++) {
+    for (unsigned int i = 0; i < level->light_sources->len; i++) {
         struct flevel_light_source* source = level->light_sources->objects + i;
         if (player) {
             if (!CheckCollisionPointRec((Vector2) { source->pos.x, source->pos.y }, player->hitbox)) {
@@ -223,7 +223,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0%");
 
-        for (int i = 0; i < level->entities->added_elements; i++) {
+        for (int i = 0; i < level->entities->len; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 

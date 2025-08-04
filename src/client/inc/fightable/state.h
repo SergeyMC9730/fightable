@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "nt5emul/renderer_event.h"
-#include "raylib.h"
 #include <fraylib.h>
 
 #include <pthread.h>

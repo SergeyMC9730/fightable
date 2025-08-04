@@ -539,7 +539,7 @@ void _fEditorDraw(struct feditor *editor) {
             __state.overlay_framebuffer = LoadRenderTexture(800 + pix, 600);
 
             if (editor->level->entities != NULL) {
-                for (unsigned int i = 0; i < editor->level->entities->added_elements; i++) {
+                for (unsigned int i = 0; i < editor->level->entities->len; i++) {
                     fentity* e = RSBGetAtIndex_fentity(editor->level->entities, i);
                     if (!e) continue;
 

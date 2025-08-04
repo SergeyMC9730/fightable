@@ -26,6 +26,20 @@
 #include <stddef.h>
 #include <fraylib.h>
 
+static double (*easings[TOEnd])(double) = {
+    _rendererLinear, _rendererInSine, _rendererOutSine,
+    _rendererInOutSine, _rendererInQuad, _rendererOutQuad,
+    _rendererInOutQuad, _rendererInCubic, _rendererOutCubic,
+    _rendererInOutCubic, _rendererInQuart, _rendererOutQuart,
+    _rendererInOutQuart, _rendererInQuint, _rendererOutQuint,
+    _rendererInOutQuint, _rendererInExpo, _rendererOutExpo,
+    _rendererInOutExpo, _rendererInCirc, _rendererOutCirc,
+    _rendererInOutCirc, _rendererInBack, _rendererOutBack,
+    _rendererInOutBack, _rendererInElastic, _rendererOutElastic,
+    _rendererInOutElastic, _rendererInBounce, _rendererOutBounce,
+    _rendererInOutBounce
+};
+
 void _ntRendererResetAnimationB(struct renderer_animation* animation) {
     if (!animation || !animation->valid) return;
 
@@ -121,20 +135,6 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
         }
     }
 
-    static double (*easings[TOEnd])(double) = {
-        _rendererLinear, _rendererInSine, _rendererOutSine,
-        _rendererInOutSine, _rendererInQuad, _rendererOutQuad,
-        _rendererInOutQuad, _rendererInCubic, _rendererOutCubic,
-        _rendererInOutCubic, _rendererInQuart, _rendererOutQuart,
-        _rendererInOutQuart, _rendererInQuint, _rendererOutQuint,
-        _rendererInOutQuint, _rendererInExpo, _rendererOutExpo,
-        _rendererInOutExpo, _rendererInCirc, _rendererOutCirc,
-        _rendererInOutCirc, _rendererInBack, _rendererOutBack,
-        _rendererInOutBack, _rendererInElastic, _rendererOutElastic,
-        _rendererInOutElastic, _rendererInBounce, _rendererOutBounce,
-        _rendererInOutBounce
-    };
-
     double _res = 0;
     double res = 0;
 
@@ -143,7 +143,11 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
         TraceLog(LOG_INFO, "[%d] processing keyframe %d", animation->anim_id, animation->current_keyframe);
 #endif
 
+        if (selected->easing > TOEnd) selected->easing = TOLinear;
         double (*selected_easing)(double) = easings[selected->easing];
+        if (selected_easing > _rendererInOutBounce || !selected_easing) {
+            selected_easing = _rendererLinear;
+        }
 
         _res = selected_easing(animation->itime / selected->length);
 

@@ -18,6 +18,7 @@ struct fnotif_object {
     unsigned char closed;
     struct fmultiline_text_instance *text;
     Vector2 text_size;
+    float complete_progress; // from 0 to 1
 };
 
 #ifdef __cplusplus

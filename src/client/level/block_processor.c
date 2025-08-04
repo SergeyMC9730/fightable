@@ -54,7 +54,7 @@ void _fLevelTick(struct flevel* level) {
     }
 
     if (level->entities && level->hitboxes) {
-        for (int i = 0; i < level->entities->added_elements; i++) {
+        for (int i = 0; i < level->entities->len; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity || entity == player) continue;
 
