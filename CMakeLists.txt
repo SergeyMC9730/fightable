@@ -326,6 +326,7 @@ set(FIGHTABLE_SRC
     src/client/renderer/ui/text_instance.cpp
     src/client/renderer/on_screen_keyboard.c
     src/client/renderer/ui/multiline_text_instance.cpp
+    src/client/intro/menu/process_mp_join.c
     ${FIGHTABLE_GPU_SRC}
 )
 

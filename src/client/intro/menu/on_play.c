@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/state.h>
 #include <fightable/intro.h>
 #include <fightable/renderer.h>
@@ -8,8 +14,8 @@ void _fIntroMenuOnPlay() {
 
     __state.menu_state = INTRO_MENU_PLAY;
 
-    Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Create", WHITE, GREEN, 1);
-    Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Join", WHITE, BLUE, 1);
+    Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Create New", WHITE, GREEN, 1);
+    Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Join Server", WHITE, BLUE, 1);
 
     int wx = __state.framebuffer.texture.width;
     int wy = __state.framebuffer.texture.height;
@@ -32,16 +38,16 @@ void _fIntroMenuOnPlay() {
     // DrawRectanglePro((RLRectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
     // DrawRectanglePro((RLRectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
     // DrawRectanglePro((RLRectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
-    DrawTexture(multiplayer_label, 27, 6 + offset, WHITE);
+    DrawTexture(multiplayer_label, 25, 6 + offset, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
-    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){33, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     offset -= 2;
 
     // DrawRectanglePro((RLRectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
     DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
-    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){33, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     DrawLine(2, 23 + offset, area.width - 2, 23 + offset, (Color){0x71, 0xaf, 0xfb, 0xff});
 
@@ -54,9 +60,9 @@ void _fIntroMenuOnPlay() {
 
     Image img = LoadImageFromTexture(rt2d.texture);
     ImageFlipVertical(&img);
-    
+
     __state.playbtn_container = LoadTextureFromImage(img);
-        
+
     UnloadImage(img);
     UnloadRenderTexture(rt2d);
 }

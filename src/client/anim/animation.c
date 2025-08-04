@@ -145,9 +145,6 @@ void _ntRendererUpdateAnimation(struct renderer_animation *animation) {
 
         if (selected->easing > TOEnd) selected->easing = TOLinear;
         double (*selected_easing)(double) = easings[selected->easing];
-        if (selected_easing > _rendererInOutBounce || !selected_easing) {
-            selected_easing = _rendererLinear;
-        }
 
         _res = selected_easing(animation->itime / selected->length);
 

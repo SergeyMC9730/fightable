@@ -98,6 +98,7 @@ struct fightable_state {
     Texture2D intro_temp_bg;
     double intro_bg_offsetf;
     int intro_bg_offseti;
+    Color intro_text_tint;
 
     Vector2 gui_render_offset;
 

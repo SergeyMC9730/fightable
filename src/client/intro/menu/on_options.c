@@ -24,8 +24,8 @@ void _fIntroMenuOnOptions() {
 
     RenderTexture2D rt2d = LoadRenderTexture(wx, wy);
 
-    Texture2D v_sync = _fTextRenderGradientV(&__state.text_manager, "V-Sync", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
-    Texture2D fullscreen = _fTextRenderGradientV(&__state.text_manager, "FullScreen", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
+    Texture2D v_sync = _fTextRenderGradientV(&__state.text_manager, "V-Sync", WHITE, __state.intro_text_tint, 1);
+    Texture2D fullscreen = _fTextRenderGradientV(&__state.text_manager, "FullScreen", WHITE, __state.intro_text_tint, 1);
 
     RLRectangle area = (RLRectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 

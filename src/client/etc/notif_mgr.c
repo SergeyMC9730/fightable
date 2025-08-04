@@ -143,6 +143,8 @@ void _fNotifMgrUpdate() {
     for (int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
 
+        if (e->offscreen) continue;
+
         if (e->move_anim.valid && !e->move_anim.completed) {
             _ntRendererUpdateAnimation(&e->move_anim);
             e->popup->box.x = _ntRendererGetAnimationResult(&e->move_anim, 0);

@@ -35,6 +35,11 @@ void _fIntroMenuDraw() {
 
             break;
         }
+        case INTRO_MENU_MULTIPLAYER_JOIN: {
+            _fIntroMenuProcessMultiplayerJoin();
+
+            break;
+        }
 
         default: {}
     }

@@ -35,8 +35,8 @@ void _fIntroMenuOnMpJoin();
 void _fIntroMenuProcessPlay();
 void _fIntroMenuProcessBase();
 void _fIntroMenuProcessOptions();
-
 void _fIntroMenuProcessMultiplayer();
+void _fIntroMenuProcessMultiplayerJoin();
 
 void _fIntroMenuDrawBackground();
 
@@ -44,6 +44,7 @@ void _fIntroMenuDrawBackground();
 #define INTRO_MENU_PLAY             1
 #define INTRO_MENU_MULTIPLAYER      2
 #define INTRO_MENU_OPTIONS          3
+#define INTRO_MENU_MULTIPLAYER_JOIN 4
 
 #ifdef __cplusplus
 }

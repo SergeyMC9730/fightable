@@ -25,6 +25,8 @@ void _fIntroMenuInit() {
         text_tint = GREEN;
     }
 
+    __state.intro_text_tint = text_tint;
+
     Texture2D version_label = _fTextRenderGradientV(&__state.text_manager, "alpha 1.0.0", WHITE, text_tint, 1);
     RenderTexture2D borders_rt = LoadRenderTexture(wx, wy);
 
