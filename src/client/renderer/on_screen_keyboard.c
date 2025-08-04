@@ -74,6 +74,8 @@ void _fOskDrawRow(struct fosk_row *r) {
 }
 
 void _fDrawOnScreenKeyboard() {
+    return;
+
     float height_ratio = 0.4;
     Vector2 screen_size = {(float)GetScreenWidth(), (float)GetScreenHeight()};
     float keyboard_height = screen_size.y * height_ratio;
