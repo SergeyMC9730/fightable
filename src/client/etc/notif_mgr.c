@@ -56,7 +56,7 @@ void _fNotifMgrUpdate() {
     if (!__state.notifications) _fNotifMgrInit();
 
     if (IsKeyPressed(KEY_T)) {
-        _fNotifMgrSend("Hello, World!\nMultiline text is\nsupported too");
+        _fNotifMgrSend("<cyellow,white>Hello, World!\n<cyellow,red>Multiline text is\n<cgreen>supported<cwhite> too.");
     }
 
     float delta = GetFrameTime();

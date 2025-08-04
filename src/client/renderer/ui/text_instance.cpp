@@ -161,7 +161,7 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
             memset(temp_buffer, 0, text_len);
             temp_buffer_i = 0;
 
-            current_text_start = instance->original_string.c_str() + i;
+            current_text_start = instance->original_string.c_str() + i + 2;
 
             continue;
         } else if (c == '>') {
