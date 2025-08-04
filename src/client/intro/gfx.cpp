@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <cstring>
 #include <fightable/intro.h>
 #include <fightable/sound_library.h>

@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/state.h>
 #include <fightable/intro.h>
 #include <fightable/renderer.h>
@@ -36,11 +42,11 @@ void _fIntroMenuOnOptions() {
 
     Image img = LoadImageFromTexture(rt2d.texture);
     ImageFlipVertical(&img);
-    
+
     __state.playbtn_container = LoadTextureFromImage(img);
-        
+
     UnloadImage(img);
     UnloadRenderTexture(rt2d);
 
-    _fConfigInit(&__state.config);
+    // _fConfigInit(&__state.config);
 }

@@ -1,10 +1,9 @@
+#include "fightable/config.h"
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/button.h>
 #include <fightable/flags.h>
 #include <fightable/slider.h>
-#include <stdlib.h>
-
 
 void _fIntroMenuProcessOptions() {
     int wx = 130;
@@ -24,6 +23,8 @@ void _fIntroMenuProcessOptions() {
     unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint);
 
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
+        _fConfigSave(&__state.config);
+
         __state.menu_state = INTRO_MENU_BASE_SELECTOR;
         UnloadTexture(__state.playbtn_container);
 
@@ -34,18 +35,18 @@ void _fIntroMenuProcessOptions() {
  		int display = GetCurrentMonitor();
         if(!IsWindowFullscreen()) {
             SetWindowSize(GetMonitorWidth(display), GetMonitorHeight(display));
-            ToggleFullscreen();     
+            ToggleFullscreen();
         } else {
             ToggleFullscreen();
             SetWindowSize(800, 600);
         }
     }
-    
+
     if(_fSquareButtonDraw(&__state.config.vsync_btn)) {
         if (IsWindowState(FLAG_VSYNC_HINT)) ClearWindowState(FLAG_VSYNC_HINT);
-        else SetWindowState(FLAG_VSYNC_HINT);    
+        else SetWindowState(FLAG_VSYNC_HINT);
     }
-    
+
     DrawTexture(__state.playbtn_container, area.x, area.y, tint);
 
     _fSliderDraw(&__state.config.volume_slider);

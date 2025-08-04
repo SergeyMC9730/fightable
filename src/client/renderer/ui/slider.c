@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/slider.h>
 #include <fightable/renderer.h>
 #include <fightable/color.h>
@@ -43,7 +49,7 @@ void _fSliderDraw(struct fslider *slider) {
 
             slider->moving = 1;
         }
-    } else if (slider->moving && CheckCollisionPointRec(mouse, static_rect)) {
+    } else if (slider->moving) {
         float mdelta = GetMouseDelta().x;
         mdelta /= __state.window_scale / slider->scaling;
 
@@ -60,6 +66,10 @@ void _fSliderDraw(struct fslider *slider) {
         _fFColorSanitize(&fc);
 
         slider->moving = 1;
+    } else if (CheckCollisionPointRec(mouse, static_rect) && !CheckCollisionPointRec(mouse, movable_rect) && IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        TraceLog(LOG_INFO, "resetting 5");
+        Vector2 relative_pos = (Vector2){static_rect.x - mouse.x, static_rect.y - mouse.y};
+        movable_rect.x = static_rect.x - relative_pos.x;
     }
 
     if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)) {
