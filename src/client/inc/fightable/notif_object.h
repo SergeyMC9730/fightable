@@ -16,7 +16,7 @@ struct fnotif_object {
     struct renderer_animation *close_anim;
     struct renderer_animation *move_anim;
     unsigned char closed;
-    struct fmultiline_text_instance text;
+    struct fmultiline_text_instance *text;
     Vector2 text_size;
 };
 

@@ -20,44 +20,22 @@ enum ftext_instance_command {
     TC_COLOR_GRADIENT
 };
 
-struct ftext_instance_entry {
-    char *text;
-
-    Texture2D prerendered_text;
-
-    Color color_a;
-    Color color_b;
-
-    enum ftext_instance_command command;
-};
-
-RSB_ARRAY_DEF_GEN(struct ftext_instance_entry, _tie);
+struct ftext_instance_entry;
 
 enum ftext_instance_backend {
     TIB_RAYLIB = 0,
     TIB_FIGHTABLE
 };
-struct ftext_instance {
-    struct ftext_instance_entry *elements;
-    size_t elements_size;
 
-    char *original_string;
+struct ftext_instance;
 
-    RLFont applicable_raylib_font;
-    float raylib_size;
-    float raylib_spacing;
-    struct ftext_manager *applicable_fightable_font;
-
-    enum ftext_instance_backend used_font_backend;
-};
-
-struct ftext_instance _fTextInstanceCreateWithFont(const char *text, RLFont font, float size, float spacing);
-struct ftext_instance _fTextInstanceCreateWithTextMan(const char *text, struct ftext_manager *man);
+struct ftext_instance *_fTextInstanceCreateWithFont(const char *text, RLFont font, float size, float spacing);
+struct ftext_instance *_fTextInstanceCreateWithTextMan(const char *text, struct ftext_manager *man);
 
 void _fTextInstanceDestroy(struct ftext_instance *instance);
 void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position);
 Vector2 _fTextInstanceGetSize(struct ftext_instance *instance);
-char *_fTextInstanceGetText(struct ftext_instance *instance);
+const char *_fTextInstanceGetText(struct ftext_instance *instance);
 
 #ifdef __cplusplus
 }

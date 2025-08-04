@@ -24,7 +24,7 @@ struct fnotif_object *_fNotifObjectCreate(const char *content) {
 
     o->text = _fMultilineTextInstanceCreateWithFont(content, font, 20.f, 1.f);
 
-    o->text_size = _fMultilineTextInstanceGetSize(&o->text);
+    o->text_size = _fMultilineTextInstanceGetSize(o->text);
     o->box.width = o->text_size.x + (POPUP_SAFE_AREA * 2);
     o->box.height = o->text_size.y + (POPUP_SAFE_AREA * 2);
 
@@ -33,7 +33,7 @@ struct fnotif_object *_fNotifObjectCreate(const char *content) {
 void _fNotifObjectDestroy(struct fnotif_object *o, unsigned char object_allocated) {
     if (!o) return;
 
-    _fMultilineTextInstanceDestroy(&o->text);
+    _fMultilineTextInstanceDestroy(o->text);
 
     _ntRendererUnloadAnimation(o->open_anim); o->open_anim = NULL;
     _ntRendererUnloadAnimation(o->close_anim); o->close_anim = NULL;
@@ -203,5 +203,5 @@ void _fNotifObjectDraw(struct fnotif_object *o) {
     Vector2 sz = o->text_size;
 
     Vector2 center = {(o->box.width - sz.x) / 2.f, (o->box.height - sz.y) / 2.f};
-    _fMultilineTextInstanceDraw(&o->text, (Vector2){center.x + o->box.x + offset.x, center.y + o->box.y + offset.y});
+    _fMultilineTextInstanceDraw(o->text, (Vector2){center.x + o->box.x + offset.x, center.y + o->box.y + offset.y});
 }

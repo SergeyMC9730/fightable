@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>

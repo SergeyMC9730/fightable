@@ -4,8 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "fightable/string.h"
-#include "raylib.h"
 #include <fightable/notif_mgr.h>
 #include <fightable/state.h>
 
@@ -69,7 +67,7 @@ void _fNotifMgrUpdate() {
             e->time += delta;
 
             if (e->time > POPUP_TIMEOUT) {
-                TraceLog(LOG_INFO, "Closing notification");
+                TraceLog(LOG_INFO, "Closing notification %s", _fMultilineTextInstanceGetText(e->popup->text));
                 _fNotifObjectApplyCloseAnimation(e->popup);
                 e->closing = 1;
             }

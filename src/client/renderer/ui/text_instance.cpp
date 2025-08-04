@@ -3,28 +3,18 @@
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
-
-#include "fightable/text.h"
-#include "raylib.h"
+//
 #include <fightable/string.h>
-#include <fightable/text_instance.h>
+#include <fightable/text_instance.hpp>
 #include <string.h>
-
-RSB_ARRAY_IMPL_GEN(struct ftext_instance_entry, _tie);
+#include <fightable/generic_tools.hpp>
 
 void _fTextInstanceAddEntry(struct ftext_instance *instance, struct ftext_instance_entry e) {
-    if (!instance->elements) {
-        instance->elements_size = 1;
-        instance->elements = (struct ftext_instance_entry *)MemAlloc(sizeof(struct ftext_instance_entry));
-    } else {
-        instance->elements_size++;
-        instance->elements = (struct ftext_instance_entry *)MemRealloc(instance->elements, sizeof(struct ftext_instance_entry));
-    }
-    instance->elements[instance->elements_size - 1] = e;
+    instance->text_elements.push_back(e);
 }
 
 void _fTextInstanceProcessEntry(struct ftext_instance *instance, struct ftext_instance_entry *e) {
-    if (!instance || !e || !e->text) return;
+    if (!instance || !e) return;
 
     switch (e->command) {
         case TC_COLOR_GRADIENT: {
@@ -32,14 +22,14 @@ void _fTextInstanceProcessEntry(struct ftext_instance *instance, struct ftext_in
                 case TIB_FIGHTABLE: {
                     if (!instance->applicable_fightable_font) break;
 
-                    e->prerendered_text = _fTextRenderGradientV(instance->applicable_fightable_font, e->text, e->color_a, e->color_b, 1);
+                    e->prerendered_text = _fTextRenderGradientV(instance->applicable_fightable_font, e->text.c_str(), e->color_a, e->color_b, 1);
 
                     break;
                 }
                 case TIB_RAYLIB: {
                     if (!IsFontValid(instance->applicable_raylib_font)) break;
 
-                    e->prerendered_text = _fTextRenderGradientVRl(instance->applicable_raylib_font, instance->raylib_size, instance->raylib_spacing, e->text, e->color_a, e->color_b, 1);
+                    e->prerendered_text = _fTextRenderGradientVRl(instance->applicable_raylib_font, instance->raylib_size, instance->raylib_spacing, e->text.c_str(), e->color_a, e->color_b, 1);
 
                     break;
                 }
@@ -91,29 +81,30 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
     Color current_text_colorA = WHITE;
     Color current_text_colorB = WHITE;
 
-    size_t text_len = strlen(instance->original_string);
-    char *temp_buffer = (char *)malloc(text_len + 1);
+    size_t text_len = instance->original_string.length();
+    char *temp_buffer = (char *)MemAlloc(text_len);
     size_t temp_buffer_i = 0;
-    memset(temp_buffer, 0, text_len + 1);
 
-    char *current_text_start = instance->original_string + 0;
+    char *tmp;
+    const char *current_text_start = instance->original_string.c_str() + 0;
 
     for (size_t i = 0; i < text_len; i++) {
         char c = instance->original_string[i];
 
-        // current_text_start = instance->original_string + i;
-
         if (c == '<') {
             if (temp_buffer_i > 0) {
                 struct ftext_instance_entry e = {};
-                e.text = _fCopyStringWithLen(temp_buffer, strlen(temp_buffer));
+                tmp = _fCopyStringWithLen(current_text_start, strlen(temp_buffer));
+                e.text = tmp;
                 e.color_a = current_text_colorA;
                 e.color_b = current_text_colorB;
                 e.command = current_command;
                 _fTextInstanceProcessEntry(instance, &e);
 
+                free(tmp);
+
                 temp_buffer_i = 0;
-                current_text_start = instance->original_string + i;
+                current_text_start = instance->original_string.c_str() + i;
             }
 
             if (i + 1 < text_len && instance->original_string[i + 1] == '/') {
@@ -125,7 +116,7 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
             if (current_command == TC_UNKNOWN) continue;
 
             current_command = TC_UNKNOWN;
-            memset(temp_buffer, 0, text_len + 1);
+            memset(temp_buffer, 0, text_len);
             temp_buffer_i = 0;
 
             for (size_t j = i + 1; j < text_len; j++) {
@@ -145,18 +136,17 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
                         break;
                     }
 
-                    rsb_array__pchar *splitted = _fSplitString(temp_buffer + 1, ',');
+                    // rsb_array__pchar *splitted = _fSplitString(temp_buffer + 1, ',');
+                    auto splitted = GenericTools::splitString(temp_buffer + 1, ',');
 
-                    if (splitted->added_elements == 1) {
+                    if (splitted.size() == 1) {
                         current_command = TC_COLOR_BASIC_TINT;
-                        current_text_colorA = _fTextInstanceStringToColor(RSBGetAtIndex_pchar(splitted, 0));
-                    } else if (splitted->added_elements > 1) {
+                        current_text_colorA = _fTextInstanceStringToColor(splitted[0].c_str());
+                    } else if (splitted.size() > 1) {
                         current_command = TC_COLOR_GRADIENT;
-                        current_text_colorA = _fTextInstanceStringToColor(RSBGetAtIndex_pchar(splitted, 0));
-                        current_text_colorB = _fTextInstanceStringToColor(RSBGetAtIndex_pchar(splitted, 1));
+                        current_text_colorA = _fTextInstanceStringToColor(splitted[0].c_str());
+                        current_text_colorB = _fTextInstanceStringToColor(splitted[1].c_str());
                     }
-
-                    _fCleanupSplittedString(splitted);
 
                     break;
                 }
@@ -168,10 +158,10 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
 
             i += strlen(temp_buffer);
 
-            memset(temp_buffer, 0, text_len + 1);
+            memset(temp_buffer, 0, text_len);
             temp_buffer_i = 0;
 
-            current_text_start = instance->original_string + i;
+            current_text_start = instance->original_string.c_str() + i;
 
             continue;
         } else if (c == '>') {
@@ -183,20 +173,23 @@ void _fTextInstanceCreatePrivate(struct ftext_instance *instance) {
 
     struct ftext_instance_entry e = {};
 
-    e.text = _fCopyStringWithLen(current_text_start, strlen(temp_buffer));
+    tmp = _fCopyStringWithLen(current_text_start, strlen(temp_buffer));
+    e.text = tmp;
     e.color_a = current_text_colorA;
     e.color_b = current_text_colorB;
     e.command = current_command;
 
+    free(tmp);
+
     _fTextInstanceProcessEntry(instance, &e);
 }
 
-struct ftext_instance _fTextInstanceCreateWithTextMan(const char *text, struct ftext_manager *man) {
-    struct ftext_instance instance = {};
-    instance.used_font_backend = TIB_FIGHTABLE;
-    instance.applicable_fightable_font = man;
+struct ftext_instance *_fTextInstanceCreateWithTextMan(const char *text, struct ftext_manager *man) {
+    struct ftext_instance *instance = new struct ftext_instance;
+    instance->used_font_backend = TIB_FIGHTABLE;
+    instance->applicable_fightable_font = man;
 
-    if (!instance.applicable_fightable_font) {
+    if (!instance->applicable_fightable_font) {
         TraceLog(LOG_ERROR, "Text manager is not loaded");
 
         return instance;
@@ -206,28 +199,28 @@ struct ftext_instance _fTextInstanceCreateWithTextMan(const char *text, struct f
         return instance;
     }
 
-    instance.original_string = _fCopyString(text);
+    instance->original_string = text;
 
-    _fTextInstanceCreatePrivate(&instance);
+    _fTextInstanceCreatePrivate(instance);
 
     return instance;
 }
 
-struct ftext_instance _fTextInstanceCreateWithFont(const char *text, RLFont font, float size, float spacing) {
-    struct ftext_instance instance = {};
-    instance.used_font_backend = TIB_RAYLIB;
-    instance.applicable_raylib_font = font;
-    instance.raylib_size = size;
-    instance.raylib_spacing = spacing;
+struct ftext_instance *_fTextInstanceCreateWithFont(const char *text, RLFont font, float size, float spacing) {
+    struct ftext_instance *instance = new struct ftext_instance;
+    instance->used_font_backend = TIB_RAYLIB;
+    instance->applicable_raylib_font = font;
+    instance->raylib_size = size;
+    instance->raylib_spacing = spacing;
 
     if (!text) {
         TraceLog(LOG_ERROR, "Text is not loaded");
         return instance;
     }
 
-    instance.original_string = _fCopyString(text);
+    instance->original_string = text;
 
-    _fTextInstanceCreatePrivate(&instance);
+    _fTextInstanceCreatePrivate(instance);
 
     return instance;
 }
@@ -235,57 +228,45 @@ struct ftext_instance _fTextInstanceCreateWithFont(const char *text, RLFont font
 void _fTextInstanceDestroy(struct ftext_instance *instance) {
     if (!instance) return;
 
-    if (instance->original_string) {
-        instance->original_string = NULL;
-    }
-    if (instance->elements) {
-        for (size_t i = 0; i < instance->elements_size; i++) {
-            struct ftext_instance_entry *entry = instance->elements + i;
-
-            if (IsTextureValid(entry->prerendered_text)) {
-                UnloadTexture(entry->prerendered_text);
-            }
-            if (entry->text) {
-                free(entry->text);
-            }
+    for (const auto &entry : instance->text_elements) {
+        if (IsTextureValid(entry.prerendered_text)) {
+            UnloadTexture(entry.prerendered_text);
         }
-
-        free(instance->elements);
-        instance->elements = NULL;
     }
+
+    delete instance;
 }
 
-void _fTextInstanceDrawPrivateF(struct ftext_instance *instance, struct ftext_instance_entry entry, Vector2 *position) {
-    if (!instance || instance->applicable_fightable_font || !entry.text) return;
+void _fTextInstanceDrawPrivateF(struct ftext_instance *instance, const struct ftext_instance_entry &entry, Vector2 *position) {
+    if (!instance || instance->applicable_fightable_font) return;
 
-    IVector2 m = _fTextMeasure(instance->applicable_fightable_font, entry.text);
+    IVector2 m = _fTextMeasure(instance->applicable_fightable_font, entry.text.c_str());
     Color color = WHITE;
 
     if (entry.command == TC_COLOR_BASIC_TINT) color = entry.color_a;
 
-    _fTextDraw(instance->applicable_fightable_font, entry.text, (IVector2){(int)position->x, (int)position->y}, color, 1);
+    _fTextDraw(instance->applicable_fightable_font, entry.text.c_str(), (IVector2){(int)position->x, (int)position->y}, color, 1);
     position->x += m.x;
-    // position->y += m.y;
 }
-void _fTextInstanceDrawPrivateR(struct ftext_instance *instance, struct ftext_instance_entry entry, Vector2 *position) {
-    if (!instance || !IsFontValid(instance->applicable_raylib_font) || !entry.text) return;
+void _fTextInstanceDrawPrivateR(struct ftext_instance *instance, const struct ftext_instance_entry &entry, Vector2 *position) {
+    if (!instance || !IsFontValid(instance->applicable_raylib_font)) return;
 
-    Vector2 m = MeasureTextEx(instance->applicable_raylib_font, entry.text, instance->raylib_size, instance->raylib_spacing);
+    Vector2 m = MeasureTextEx(instance->applicable_raylib_font, entry.text.c_str(), instance->raylib_size, instance->raylib_spacing);
     Color color = WHITE;
 
     if (entry.command == TC_COLOR_BASIC_TINT) color = entry.color_a;
 
-    TraceLog(LOG_INFO, "%s", entry.text);
-
-    RlDrawTextEx(instance->applicable_raylib_font, entry.text, *position, instance->raylib_size, instance->raylib_spacing, color);
+    RlDrawTextEx(instance->applicable_raylib_font, entry.text.c_str(), *position, instance->raylib_size, instance->raylib_spacing, color);
     position->x += m.x;
 }
 
 void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
-    if (!instance || !instance->elements) return;
+    if (!instance) return;
 
     Vector2 cur_position = position;
-    void (*draw_private)(struct ftext_instance*, struct ftext_instance_entry, Vector2*) = NULL;
+    void (*draw_private)(struct ftext_instance*, const struct ftext_instance_entry&, Vector2*) = NULL;
+
+    // TraceLog(LOG_INFO, "TEXT ENTRIES: %ld", instance->text_elements.size());
 
     switch (instance->used_font_backend) {
         case TIB_FIGHTABLE: {
@@ -300,9 +281,7 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
 
     if (!draw_private) return;
 
-    for (size_t i = 0; i < instance->elements_size; i++) {
-        struct ftext_instance_entry entry = instance->elements[i];
-
+    for (const auto &entry : instance->text_elements) {
         switch (entry.command) {
             case TC_NONE:
             case TC_UNKNOWN:
@@ -323,20 +302,18 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
 }
 
 Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
-    if (!instance || !instance->elements) return (Vector2){};
+    if (!instance) return (Vector2){};
 
     Vector2 cur_position = (Vector2){};
 
-    for (size_t i = 0; i < instance->elements_size; i++) {
-        struct ftext_instance_entry entry = instance->elements[i];
-
+    for (const auto &entry : instance->text_elements) {
         switch (entry.command) {
             case TC_NONE:
             case TC_UNKNOWN:
             case TC_COLOR_BASIC_TINT: {
                 switch (instance->used_font_backend) {
                     case TIB_FIGHTABLE: {
-                        IVector2 sz = _fTextMeasure(instance->applicable_fightable_font, entry.text);
+                        IVector2 sz = _fTextMeasure(instance->applicable_fightable_font, entry.text.c_str());
                         cur_position.x += (float)sz.x;
                         if (cur_position.y < (float)sz.y) {
                             cur_position.y = (float)sz.y;
@@ -344,7 +321,7 @@ Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
                         break;
                     }
                     case TIB_RAYLIB: {
-                        Vector2 sz = MeasureTextEx(instance->applicable_raylib_font, entry.text, instance->raylib_size, instance->raylib_spacing);
+                        Vector2 sz = MeasureTextEx(instance->applicable_raylib_font, entry.text.c_str(), instance->raylib_size, instance->raylib_spacing);
                         cur_position.x += sz.x;
                         if (cur_position.y < sz.y) {
                             cur_position.y = sz.y;
@@ -370,8 +347,8 @@ Vector2 _fTextInstanceGetSize(struct ftext_instance *instance) {
     return cur_position;
 }
 
-char *_fTextInstanceGetText(struct ftext_instance *instance) {
+const char *_fTextInstanceGetText(struct ftext_instance *instance) {
     if (!instance) return NULL;
 
-    return instance->original_string;
+    return instance->original_string.c_str();
 }
