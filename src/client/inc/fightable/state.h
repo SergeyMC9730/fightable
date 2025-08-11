@@ -32,6 +32,7 @@ typedef struct openmpt_module openmpt_module;
 #include <fightable/button.h>
 #include <fightable/config.h>
 #include <nt5emul/renderer_animation.h>
+#include <fightable/text_input.h>
 #ifndef _DISABLE_MP_SERVER_
 #include <nbnet.h>
 #endif
@@ -39,7 +40,7 @@ typedef struct openmpt_module openmpt_module;
 #include <nbnet.h>
 #endif
 #include <nt5emul/tui/file_selector.h>
-#include <fightable/text_instance.h>
+#include <fightable/multiline_text_instance.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -199,6 +200,10 @@ struct fightable_state {
     unsigned char display_test_midground;
 
     rsb_array__fnotif_mgr_entry *notifications;
+
+    RLFont unifont16;
+
+    struct ftext_input *ip_input;
 };
 
 extern struct fightable_state __state;

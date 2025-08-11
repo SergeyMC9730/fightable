@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/text_input.h"
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/button.h>
@@ -15,4 +16,7 @@ void _fIntroMenuProcessMultiplayerJoin() {
     int wyy = __state.framebuffer.texture.height;
 
     DrawTexture(__state.playbtn_container, 0, 0, WHITE);
+
+    _fTextInputUpdate(__state.ip_input);
+    _fTextInputRenderText(__state.ip_input);
 }

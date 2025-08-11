@@ -58,7 +58,7 @@ void _fEntityUpdate(struct fentity* entity) {
         }
     }
 
-    if (!entity->on_ground) {
+    if (!entity->on_ground && !entity->no_gravity) {
         entity->speed.y += delta * 100.f;
         if (entity->speed.y > max_speed_y) {
             entity->speed.y = max_speed_y;
@@ -80,13 +80,13 @@ void _fEntityUpdate(struct fentity* entity) {
     entity->ground_hitbox.x = entity->hitbox.x;
     entity->ground_hitbox.y = entity->hitbox.y + (entity->hitbox.height - entity->ground_hitbox.height) + 1;
 
-    RLRectangle r1 = *(RLRectangle*)(&entity->ground_hitbox);
+    RLRectangle r1 = _fHitboxToRect(entity->ground_hitbox);
 
     entity->on_ground = 0;
     entity->standing_object = (fhitbox){ 0 };
 
     for (unsigned int i = 0; i < entity->obstacles_length; i++) {
-        RLRectangle r2 = *(RLRectangle*)(entity->obstacles + i);
+        RLRectangle r2 = _fHitboxToRect(entity->obstacles[i]);
 
         if (CheckCollisionRecs(r1, r2)) {
             entity->on_ground = 1;

@@ -61,6 +61,7 @@ struct fentity {
     unsigned char dead : 1;
     unsigned char object_destroyed : 1;
     unsigned char begin_destruction : 1;
+    unsigned char no_gravity : 1;
 
     fhitbox hitbox;
 

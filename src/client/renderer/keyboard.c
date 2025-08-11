@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/keyboard.h>
 #include <fraylib.h>
 
@@ -91,4 +92,8 @@ void _fKeyboardRequestKey(struct fkeyboard_mgr* mgr, int key) {
 		mgr->current.pressed[idx] = 0;
 		mgr->current.down[idx] = 1;
 	}
+}
+
+unsigned char _fKeyPressedR(int key) {
+    return IsKeyPressed(key) || IsKeyPressedRepeat(key);
 }

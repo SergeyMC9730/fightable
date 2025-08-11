@@ -28,6 +28,9 @@ unsigned char _fHitboxIntersects(fhitbox *h1, fhitbox *h2);
 void _fHitboxMove(fhitbox *h1, float x, float y);
 fhitbox _fHitboxExpand(fhitbox *h, float x, float y);
 
+RLRectangle _fHitboxToRect(fhitbox hitbox);
+fhitbox _fHitboxFromRect(RLRectangle rect);
+
 #ifdef __cplusplus
 }
 #endif

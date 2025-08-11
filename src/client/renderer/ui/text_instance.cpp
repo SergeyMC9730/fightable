@@ -4,8 +4,10 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 //
+#include "raylib.h"
 #include <fightable/string.h>
 #include <fightable/text_instance.hpp>
+#include <netdb.h>
 #include <string.h>
 #include <fightable/generic_tools.hpp>
 
@@ -292,6 +294,7 @@ void _fTextInstanceDraw(struct ftext_instance *instance, Vector2 position) {
                 if (!IsTextureValid(entry.prerendered_text)) break;
 
                 DrawTexture(entry.prerendered_text, cur_position.x, cur_position.y, WHITE);
+                // DrawRectangleLines(cur_position.x, cur_position.y, entry.prerendered_text.width, entry.prerendered_text.height, RED);
                 cur_position.x += entry.prerendered_text.width;
 
                 break;

@@ -209,7 +209,9 @@ void _fInit(int argc, char **argv) {
         {"raylib_16x16.png"},
         {"Px437_IBM_VGA_8x16.ttf"},
         {"downsky_16bit_2.png"},
-        {"config.json"}
+        {"config.json"},
+        {"unifont-16.0.02.otf"},
+        {"EndlessDream.SymMOD"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
@@ -225,6 +227,10 @@ void _fInit(int argc, char **argv) {
 
     __state.test_midground = LoadTexture("downsky_16bit_2.png");
     SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
+
+    int codepoint_amount = 0;
+    int *codepoints = LoadCodepoints(_ntGetCodepoints(), &codepoint_amount);
+    __state.unifont16 = LoadFontEx("unifont-16.0.02.otf", 16, codepoints, codepoint_amount);
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -423,7 +429,7 @@ void _fInit(int argc, char **argv) {
             RlDrawText(dbg_buffer, 8, 32, 20, RED);
         }
 
-        _fDrawOnScreenKeyboard();
+        _fSchedulerIteratePostDraws();
 
         EndDrawing();
 

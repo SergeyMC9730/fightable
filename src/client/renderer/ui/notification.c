@@ -4,11 +4,11 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <fightable/notif_object.h>
 #include <fightable/string.h>
 #include <nt5emul/renderer_animation.h>
 #include <nt5emul/renderer_keyframe.h>
+#include <fightable/state.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,9 +21,7 @@ struct fnotif_object *_fNotifObjectCreate(const char *content) {
     struct fnotif_object *o = (struct fnotif_object *)malloc(sizeof(struct fnotif_object));
     memset(o, 0, sizeof(struct fnotif_object));
 
-    RLFont font = GetFontDefault();
-
-    o->text = _fMultilineTextInstanceCreateWithFont(content, font, 20.f, 1.f);
+    o->text = _fMultilineTextInstanceCreateWithFont(content, __state.unifont16, 16.f, 1.f);
 
     o->text_size = _fMultilineTextInstanceGetSize(o->text);
     o->box.width = o->text_size.x + (POPUP_SAFE_AREA * 2);

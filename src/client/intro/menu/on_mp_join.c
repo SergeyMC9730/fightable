@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/text_input.h"
 #include <fightable/intro.h>
 #include <fraylib.h>
 #include <fightable/state.h>
@@ -26,12 +27,14 @@ void _fIntroMenuOnMpJoin() {
     UnloadTexture(__state.playbtn_container);
 
     RenderTexture2D rt2d = LoadRenderTexture(__state.framebuffer.texture.width, __state.framebuffer.texture.height);
-    Texture2D ip_input = _fTextRenderGradientV(&__state.text_manager, "Enter server address", WHITE, (Color){0x91, 0xbf, 0xfb, 0xff}, 1);
+    Texture2D ip_input = _fTextRenderGradientV(&__state.text_manager, "Enter server address", WHITE, __state.intro_text_tint, 1);
+
+    int center_x = (__state.framebuffer.texture.width - ip_input.width) / 2;
 
     BeginTextureModeStacked(rt2d);
 
-    ClearBackground((Color){0, 0, 0, 0}); // (Color){0, 0, 0, 160}
-    DrawTexture(ip_input, 3, 10, WHITE);
+    ClearBackground((Color){0, 0, 0, 0});
+    DrawTexture(ip_input, center_x, 30, WHITE);
     EndTextureModeStacked();
 
     UnloadTexture(ip_input);
@@ -43,4 +46,6 @@ void _fIntroMenuOnMpJoin() {
 
     UnloadImage(img);
     UnloadRenderTexture(rt2d);
+
+    __state.ip_input = _fTextInputCreate(128, "\n", __state.unifont16, 32, 1.f, __state.framebuffer.texture.width / 3, (Vector2){16, 16});
 }

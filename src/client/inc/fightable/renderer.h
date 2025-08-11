@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "raylib.h"
 #include <fraylib.h>
 
 #ifdef __cplusplus
@@ -65,13 +64,26 @@ int _ntRendererGetMainIdxInStack();
 
 void _fScheduleOverlayFunc(renderer_event_t on_draw);
 void _fSchedulerIterateOverlays();
-void _fSchedulerVisit();
 unsigned char _fSchedulerInOverlay();
+
+void _fSchedulePostDrawFunc(renderer_event_t on_draw);
+void _fSchedulerIteratePostDraws();
+unsigned char _fSchedulerInPostDraw();
+
+unsigned char _fSchedulerInScheduler();
+
 // schedules a `func` to be called before draw after `delay` seconds.
 // required function will be called `n` times.
 // ! timer accuracity depends on framerate !
 // ! for more precise stuff use _ntInstallTimer and _ntSetupTimerSync !
-void _fSchedule(renderer_event_t func, long double delay, int n);
+// void _fSchedule(renderer_event_t func, long double delay, int n);
+
+Vector2 _fPosScreenToFramebuffer(Vector2 pos);
+Vector2 _fPosScreenToOverlay(Vector2 pos);
+Vector2 _fPosFramebufferToScreen(Vector2 pos);
+Vector2 _fPosOverlayToScreen(Vector2 pos);
+Vector2 _fPosFramebufferToOverlay(Vector2 pos);
+Vector2 _fPosOverlayToFramebuffer(Vector2 pos);
 
 Vector2 _fGetMousePosPix();
 Vector2 _fGetMousePosOverlay();
@@ -96,6 +108,8 @@ void _ntRendererDrawSizedTexture(Texture2D texture, Vector2 size, Vector2 pos, V
 
 Vector2 _fGetCurrentFramebufferSize();
 
+unsigned char _fKeyPressedR(int key);
+
 extern unsigned int UI_SCALE;
 
 #ifdef __cplusplus
@@ -106,5 +120,6 @@ extern unsigned int UI_SCALE;
 
 using foverlay_callback = std::function<void(Vector2)>;
 
+void _fSchedulePostDrawFunc(const foverlay_callback &callback);
 void _fScheduleOverlayFunc(const foverlay_callback &callback);
 #endif

@@ -60,3 +60,62 @@ char *_fCopyStringWithLen(const char *c, unsigned int len) {
 
     return res;
 }
+
+int _fGetUtf8AtIndex(const char *utf_string, unsigned int char_index) {
+    if (!utf_string) return -1;
+    return _fGetUtf8AtIndexWithLen(utf_string, char_index, strlen(utf_string));
+}
+int _fGetUtf8AtIndexWithLen(const char *utf_string, unsigned int char_index, unsigned int buffer_len) {
+    if (!utf_string || buffer_len == 0) return -1;
+
+    unsigned char *p = (unsigned char *)utf_string;
+    unsigned char *end = p + buffer_len;
+    unsigned int current_index = 0;
+
+    while (p < end && *p && current_index <= char_index) {
+        unsigned int codepoint = 0;
+        int bytes_to_read = 0;
+
+        if ((*p & 0x80) == 0x00) {
+            codepoint = *p;
+            bytes_to_read = 1;
+        }
+        else if ((*p & 0xE0) == 0xC0) {
+            if (p + 1 >= end) return -1;
+            codepoint = *p & 0x1F;
+            bytes_to_read = 2;
+        }
+        else if ((*p & 0xF0) == 0xE0) {
+            if (p + 2 >= end) return -1;
+            codepoint = *p & 0x0F;
+            bytes_to_read = 3;
+        }
+        else if ((*p & 0xF8) == 0xF0) {
+            if (p + 3 >= end) return -1;
+            codepoint = *p & 0x07;
+            bytes_to_read = 4;
+        }
+        else {
+            return -1;
+        }
+
+        for (int i = 1; i < bytes_to_read; i++) {
+            if (p + i >= end) return -1;
+            if ((p[i] & 0xC0) != 0x80) {
+                return -1;
+            }
+            codepoint = (codepoint << 6) | (p[i] & 0x3F);
+        }
+
+        if (current_index == char_index) {
+            if (codepoint > 0x10FFFF) return -1;
+            if (codepoint >= 0xD800 && codepoint <= 0xDFFF) return -1;
+            return (int)codepoint;
+        }
+
+        current_index++;
+        p += bytes_to_read;
+    }
+
+    return -1;
+}

@@ -47,6 +47,8 @@ void _ntTuiLoadEnvironmentDefault(float scaling);
 
 struct nt_tui_environment *_ntGetTuiEnvironment();
 
+const char *_ntGetCodepoints();
+
 #ifdef __cplusplus
 }
 #endif

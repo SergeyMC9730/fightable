@@ -24,7 +24,7 @@ void _fNotifMgrRealign() {
 
     for (int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
-        if (e->popup->closed) continue;
+        if (e->popup->closed || e->closing) continue;
 
         new_offsets[i] = x;
         x += e->popup->box.width;
@@ -108,7 +108,7 @@ void _fNotifMgrUpdate() {
     if (!__state.notifications) _fNotifMgrInit();
 
     if (IsKeyPressed(KEY_T)) {
-        _fNotifMgrSendWithTime("<cyellow,white>Hello, World!\n<cyellow,red>Multiline text<cwhite> is\n<cgreen>supported<cwhite> too.", POPUP_TIMEOUT);
+        _fNotifMgrSendWithTime("* human.. i remember you're\n  <cred,orange>genocides..\n ", POPUP_TIMEOUT);
     }
 
     float delta = GetFrameTime();

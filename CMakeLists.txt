@@ -266,7 +266,7 @@ set(FIGHTABLE_SRC
     src/client/entity/base/setters.c
     src/client/intro/gfx.cpp
     src/client/renderer/keyboard.c
-    src/client/renderer/overlay_scheduler.cpp
+    src/client/renderer/scheduler.cpp
     src/client/renderer/mouse.c
     src/client/editor/place_block.cpp
     src/client/audio/volume.c
@@ -327,6 +327,9 @@ set(FIGHTABLE_SRC
     src/client/renderer/on_screen_keyboard.c
     src/client/renderer/ui/multiline_text_instance.cpp
     src/client/intro/menu/process_mp_join.c
+    src/client/hitbox/conv.c
+    src/client/renderer/pos.c
+    src/client/renderer/ui/text_input.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -538,7 +541,9 @@ file(COPY ${CMAKE_SOURCE_DIR}/src/assets DESTINATION ${CMAKE_BINARY_DIR}/)
 add_executable(physics-test
     src/physics_test/main.c
 )
-
+add_executable(keyboard-test
+    src/keyboard_test/main.c
+)
 add_executable(collide-test
     src/collide_test/main.c
     src/collide_test/hitbox/clip_x.c
@@ -576,6 +581,11 @@ target_include_directories(physics-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+target_include_directories(keyboard-test PRIVATE
+    ${FIGHTABLE_RENDERER_INC}
+    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
 target_include_directories(gun-test PRIVATE
     ${FIGHTABLE_RENDERER_INC}
     src/shooting_system_test/include
@@ -597,6 +607,7 @@ target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )
 target_link_libraries(collide-test ${FIGHTABLE_RENDERER_LIB} )
 target_link_libraries(gun-test ${FIGHTABLE_RENDERER_LIB} )
+target_link_libraries(keyboard-test ${FIGHTABLE_RENDERER_LIB} )
 
 message(STATUS "")
 message(STATUS "")
