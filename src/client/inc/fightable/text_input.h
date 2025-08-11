@@ -22,6 +22,7 @@ struct ftext_input {
     char *buffer;
     unsigned int buffer_length;
     unsigned int characters_entered;
+    unsigned int max_characters;
     struct fmultiline_text_instance *rendered_text;
     Vector2 rendered_text_size;
 
@@ -32,7 +33,7 @@ struct ftext_input {
     unsigned char selected;
 
     Vector2 pointer_pos;
-    unsigned int pointer_char_index;
+    int pointer_char_index;
 
     RLRectangle box;
 
@@ -46,3 +47,4 @@ struct ftext_input *_fTextInputCreate(unsigned int max_characters, const char *r
 void _fTextInputUpdate(struct ftext_input *input);
 void _fTextInputQueueRenderer(struct ftext_input *input);
 void _fTextInputRenderText(struct ftext_input *input);
+void _fTextInputDestroy(struct ftext_input *input);

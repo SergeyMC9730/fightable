@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/string.h>
 #include <string.h>
 #include <rsb/rsb_array_char.h>
@@ -62,8 +68,7 @@ char *_fCopyStringWithLen(const char *c, unsigned int len) {
 }
 
 int _fGetUtf8AtIndex(const char *utf_string, unsigned int char_index) {
-    if (!utf_string) return -1;
-    return _fGetUtf8AtIndexWithLen(utf_string, char_index, strlen(utf_string));
+    return utf_string != NULL ? _fGetUtf8AtIndexWithLen(utf_string, char_index, strlen(utf_string)) : -1;
 }
 int _fGetUtf8AtIndexWithLen(const char *utf_string, unsigned int char_index, unsigned int buffer_len) {
     if (!utf_string || buffer_len == 0) return -1;
@@ -118,4 +123,38 @@ int _fGetUtf8AtIndexWithLen(const char *utf_string, unsigned int char_index, uns
     }
 
     return -1;
+}
+
+unsigned int _fGetUtf8ByteOffset(const char *utf_string, unsigned int char_index) {
+    return utf_string != NULL ? _fGetUtf8ByteOffsetWithLen(utf_string, char_index, strlen(utf_string)) : 0;
+}
+unsigned int _fGetUtf8ByteOffsetWithLen(const char *utf_string, unsigned int char_index, unsigned int buffer_len) {
+    if (!utf_string || buffer_len == 0) return 0;
+
+    unsigned int byte_offset = 0;
+    unsigned int current_char_index = 0;
+
+    while (byte_offset < buffer_len && utf_string[byte_offset] != 0 && current_char_index < char_index) {
+        unsigned char c = utf_string[byte_offset];
+        int bytes_in_char = 1;
+
+        if ((c & 0xE0) == 0xC0) bytes_in_char = 2;
+        else if ((c & 0xF0) == 0xE0) bytes_in_char = 3;
+        else if ((c & 0xF8) == 0xF0) bytes_in_char = 4;
+
+        if (byte_offset + bytes_in_char > buffer_len) {
+            return 0;
+        }
+
+        for (int i = 1; i < bytes_in_char; i++) {
+            if ((utf_string[byte_offset + i] & 0xC0) != 0x80) {
+                return 0;
+            }
+        }
+
+        byte_offset += bytes_in_char;
+        current_char_index++;
+    }
+
+    return byte_offset;
 }

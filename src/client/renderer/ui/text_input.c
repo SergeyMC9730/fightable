@@ -11,8 +11,8 @@
 #include <fightable/renderer.h>
 #include <string.h>
 #include <stdio.h>
-#include <math.h>
 #include <fightable/state.h>
+#include <sys/types.h>
 
 #define INPUT_SAFE_ZONE 10
 
@@ -26,25 +26,49 @@ void _fTextInputAppendCodepoint(struct ftext_input *input, int codepoint) {
     int utf_size = 0;
     const char *utf_char = CodepointToUTF8(codepoint, &utf_size);
 
-    if (!utf_char || utf_char <= 0 || _fTextInputIsRestricted(input, utf_char)) return;
-    if (strlen(input->buffer) + utf_size >= (input->buffer_length - 1)) return;
+    if (!utf_char || utf_char <= 0 || _fTextInputIsRestricted(input, utf_char)) {
+        return;
+    }
+    if (input->characters_entered >= input->max_characters || strlen(input->buffer) + utf_size >= (input->buffer_length - 1)) {
+        return;
+    }
 
-    strncat(input->buffer, utf_char, utf_size);
+    unsigned int o = _fGetUtf8ByteOffset(input->buffer, input->pointer_char_index);
+    char *offset = input->buffer + o;
+    memmove(offset + utf_size, offset, input->buffer_length - utf_size);
+    memcpy(offset, utf_char, utf_size);
+
     input->buffer[input->buffer_length - 1] = 0;
 
     input->characters_entered++;
+    input->pointer_char_index++;
+    input->pointer_pos.x += MeasureTextEx(input->rl_font, utf_char, input->rl_size, input->rl_spacing).x + input->rl_spacing;
 }
 void _fTextInputPopChar(struct ftext_input *input) {
-    if (!input || input->characters_entered == 0) return;
+    if (!input || input->characters_entered == 0 || input->pointer_char_index <= 0) return;
 
-    int codepoint = _fGetUtf8AtIndex(input->buffer, input->characters_entered - 1);
+    int i = input->pointer_char_index - 1;
+
+    int codepoint = _fGetUtf8AtIndex(input->buffer, i);
     int utf_size = 0;
     CodepointToUTF8(codepoint, &utf_size);
 
     if (utf_size <= 0) return;
 
-    input->buffer[strlen(input->buffer) - utf_size] = 0;
+    unsigned int o = _fGetUtf8ByteOffset(input->buffer, i);
+    char *offset = input->buffer + o;
+
+    char symbol[6] = {};
+    memcpy(symbol, offset, utf_size);
+
+    TraceLog(LOG_INFO, "%s", symbol);
+
+
+    memmove(offset, offset + utf_size, input->buffer_length - utf_size);
+
     input->characters_entered--;
+    input->pointer_char_index--;
+    input->pointer_pos.x -= MeasureTextEx(input->rl_font, symbol, input->rl_size, input->rl_spacing).x + input->rl_spacing;
 }
 void _fTextInputUpdateLabel(struct ftext_input *input) {
     if (!input) return;
@@ -65,8 +89,6 @@ void _fTextInputUpdateLabel(struct ftext_input *input) {
         input->box.height += input->rl_size;
     }
 
-    TraceLog(LOG_INFO, "Updated text with: %s\nINFO: Lines: %ld", formatted_str, _fMultilineTextInstanceGetLineAmount(input->rendered_text));
-
     MemFree(formatted_str);
 }
 
@@ -85,12 +107,20 @@ struct ftext_input *_fTextInputCreate(unsigned int max_characters, const char *r
     obj->rl_font = font;
     obj->rl_size = size;
     obj->rl_spacing = spacing;
+    obj->max_characters = max_characters;
 
     return obj;
 }
 
 void _fTextInputUpdate(struct ftext_input *input) {
     if (!input) return;
+
+    if (input->pointer_char_index < 0) {
+        input->pointer_char_index = 0;
+    }
+    if (input->pointer_pos.x < 0) {
+        input->pointer_pos.x = 0;
+    }
 
     Vector2 mouse = _fGetMousePosOverlay();
 
@@ -125,32 +155,74 @@ void _fTextInputUpdate(struct ftext_input *input) {
     }
 
     if (_fKeyPressedR(KEY_LEFT)) {
+        if (input->pointer_char_index != 0) {
+            input->pointer_char_index--;
 
+            int i = input->pointer_char_index;
+
+            int utf_size = 0;
+            const char *symbol = CodepointToUTF8(_fGetUtf8AtIndex(input->buffer, i), &utf_size);
+            if (utf_size > 0) {
+                TraceLog(LOG_INFO, "LEFT: %s (%d; %d)", symbol, utf_size, i);
+                input->pointer_pos.x -= MeasureTextEx(input->rl_font, symbol, input->rl_size, input->rl_spacing).x + input->rl_spacing;
+            } else {
+                TraceLog(LOG_ERROR, "Unknown char at %d (sz=%d)", i, utf_size);
+            }
+        }
+    } else if (_fKeyPressedR(KEY_RIGHT)) {
+        if (input->pointer_char_index < input->characters_entered) {
+            input->pointer_char_index++;
+
+            int i = input->pointer_char_index;
+            if (input->pointer_char_index >= input->characters_entered) {
+                i--;
+            }
+            int utf_size = 0;
+            const char *symbol = CodepointToUTF8(_fGetUtf8AtIndex(input->buffer, i), &utf_size);
+            if (utf_size > 0) {
+                TraceLog(LOG_INFO, "RIGHT: %s (%d; %d)", symbol, utf_size, i);
+                input->pointer_pos.x += MeasureTextEx(input->rl_font, symbol, input->rl_size, input->rl_spacing).x + input->rl_spacing;
+            } else {
+                TraceLog(LOG_ERROR, "Unknown char at %d (sz=%d)", i, utf_size);
+            }
+        } else {
+            TraceLog(LOG_ERROR, "Array check failure: %d %u", input->pointer_char_index, input->characters_entered);
+        }
     }
+
+    // TraceLog(LOG_INFO, "%d %f %u", input->pointer_char_index, input->pointer_pos.x, input->characters_entered);
 }
 void _fTextInputQueueRenderer(struct ftext_input *input) {
     if (!input) return;
 
-    DrawRectangleRec(input->box, WHITE);
-    if (input->selected) DrawRectangleLinesEx(input->box, (float)INPUT_SAFE_ZONE / 4.f, __state.intro_text_tint);
+    Vector2 shake_conv = _fPosFramebufferToOverlay(__state.gui_render_offset);
+    RLRectangle tr = input->box;
+    int h = INPUT_SAFE_ZONE / 2;
+
+    tr.x += shake_conv.x;
+    tr.y += shake_conv.y;
+
+    DrawRectangleRec(tr, WHITE);
+    if (input->selected) {
+        DrawRectangleLinesEx(tr, (float)INPUT_SAFE_ZONE / 4.f, __state.intro_text_tint);
+    }
 
     if (input->rendered_text == NULL) return;
 
     Vector2 text_size = input->rendered_text_size;
-    if (text_size.x > (input->box.width - INPUT_SAFE_ZONE)) {
-        // TraceLog(LOG_INFO, "Scissor");
-
-        int h = INPUT_SAFE_ZONE / 2;
-        BeginScissorMode(input->box.x + h, input->box.y + h, input->box.width - (h * 2), input->box.height - h);
-
-        _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){input->box.x - text_size.x + (input->box.width / 2), input->box.y + h});
-
+    text_size = input->pointer_pos;
+    if (text_size.x > (tr.width - INPUT_SAFE_ZONE)) {
+        BeginScissorMode(tr.x + h, tr.y + h, tr.width - (h * 2), tr.height - h);
+        _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){tr.x - text_size.x + tr.width - h, tr.y + h});
         EndScissorMode();
+        if (input->selected) {
+            DrawRectangle(tr.x + tr.width - h, tr.y + h, 4, tr.height - (h * 2), GRAY);
+        }
     } else {
-        // TraceLog(LOG_INFO, "Default %d", _fMultilineTextInstanceGetLineAmount(input->rendered_text));
-
-        int h = INPUT_SAFE_ZONE / 2;
-        _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){input->box.x + h, input->box.y + h});
+        _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){tr.x + h, tr.y + h});
+        if (input->selected) {
+            DrawRectangle(tr.x + input->pointer_pos.x + h, tr.y + input->pointer_pos.y + h, 4, tr.height - (h * 2), GRAY);
+        }
     }
 }
 void _fTextInputRenderText(struct ftext_input *input) {
@@ -160,4 +232,13 @@ void _fTextInputRenderText(struct ftext_input *input) {
     event.user = input;
 
     _fScheduleOverlayFunc(event);
+}
+
+void _fTextInputDestroy(struct ftext_input *input) {
+    if (!input) return;
+
+    MemFree(input->buffer);
+    if (input->rendered_text) _fMultilineTextInstanceDestroy(input->rendered_text);
+
+    MemFree(input);
 }
