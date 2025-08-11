@@ -11,12 +11,24 @@
 #include <fightable/flags.h>
 #include <fightable/slider.h>
 
+#define SETUP_BUTTON(NAME, Y, XO) SETUP_BUTTON_EX(NAME, Y, WHITE, XO)
+#define SETUP_BUTTON_EX(NAME, Y, COLOR, XO) sz = _fButtonMeasureSizeSimple(NAME); if (_fButtonDrawSimple(NAME, (IVector2){(wx - sz) / 2 + __state.menu_cur_x + (float)(XO), Y}, COLOR))
+
 void _fIntroMenuProcessMultiplayerJoin() {
-    int wxx = __state.framebuffer.texture.width;
-    int wyy = __state.framebuffer.texture.height;
+    int wx = __state.framebuffer.texture.width;
+    int wy = __state.framebuffer.texture.height;
 
     DrawTexture(__state.playbtn_container, 0, 0, WHITE);
 
     _fTextInputUpdate(__state.ip_input);
     _fTextInputRenderText(__state.ip_input);
+
+    _fTextInputUpdate(__state.name_input);
+    _fTextInputRenderText(__state.name_input);
+
+    unsigned int sz = 0;
+
+    SETUP_BUTTON("Join", 68, 45) {
+
+    }
 }

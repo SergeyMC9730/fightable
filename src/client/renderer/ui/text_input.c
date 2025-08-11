@@ -63,7 +63,6 @@ void _fTextInputPopChar(struct ftext_input *input) {
 
     TraceLog(LOG_INFO, "%s", symbol);
 
-
     memmove(offset, offset + utf_size, input->buffer_length - utf_size);
 
     input->characters_entered--;

@@ -204,6 +204,7 @@ struct fightable_state {
     RLFont unifont16;
 
     struct ftext_input *ip_input;
+    struct ftext_input *name_input;
 };
 
 extern struct fightable_state __state;
