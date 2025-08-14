@@ -56,11 +56,25 @@ void _fNotifMgrRealign() {
     MemFree(new_offsets);
 }
 
+int _fNotifMgrGenerateEntryId(struct fnotif_mgr_entry *entry) {
+    const int max_attemps = 16;
+    int cur_attempt = 0;
+
+    while (!_fNotifMgrGetEntryById(entry->notif_id) && cur_attempt <= max_attemps) {
+        entry->notif_id = rand();
+        if (!_fNotifMgrGetEntryById(entry->notif_id)) return entry->notif_id;
+        cur_attempt++;
+    }
+
+    entry->notif_id = 1;
+    return entry->notif_id;
+}
+
 void _fNotifMgrInit() {
     if (__state.notifications) return;
     __state.notifications = RSBCreateArray_fnotif_mgr_entry();
 }
-void _fNotifMgrSendWithTime(const char *message, double tlength) {
+int _fNotifMgrSendWithTime(const char *message, double tlength) {
     if (!__state.notifications) _fNotifMgrInit();
     if (!message) message = "(null)";
 
@@ -87,7 +101,7 @@ void _fNotifMgrSendWithTime(const char *message, double tlength) {
 
     if (used_offset < 0) {
         TraceLog(LOG_WARNING, "Popup %s cannot be placed, because there is no space left on the screen", message);
-        return;
+        return 0;
     }
 
     struct fnotif_mgr_entry e = {_fNotifObjectCreate(message), 0.f, tlength, 0, used_offset};
@@ -97,12 +111,14 @@ void _fNotifMgrSendWithTime(const char *message, double tlength) {
     e.offscreen = (e.popup->box.x + e.popup->box.width) > (float)__state.overlay_framebuffer.texture.width && (__state.overlay_framebuffer.texture.width * __state.overlay_framebuffer.texture.height != 0);
     _fNotifObjectApplyOpenAnimation(e.popup);
 
+    _fNotifMgrGenerateEntryId(&e);
     RSBAddElement_fnotif_mgr_entry(__state.notifications, e);
-
     _fNotifMgrRealign();
+
+    return e.notif_id;
 }
-void _fNotifMgrSend(const char *message) {
-    _fNotifMgrSendWithTime(message, POPUP_TIMEOUT);
+int _fNotifMgrSend(const char *message) {
+    return _fNotifMgrSendWithTime(message, POPUP_TIMEOUT);
 }
 void _fNotifMgrUpdate() {
     if (!__state.notifications) _fNotifMgrInit();
@@ -113,7 +129,7 @@ void _fNotifMgrUpdate() {
 
     float delta = GetFrameTime();
 
-    for (int i = 0; i < __state.notifications->len; i++) {
+    for (unsigned int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
         if (!e->closing) {
             if (!e->offscreen && e->max_time != 0) {
@@ -123,7 +139,7 @@ void _fNotifMgrUpdate() {
 
             // TraceLog(LOG_INFO, "%f %f %d", (float)e->time, (float)e->max_time, e->offscreen);
 
-            if (e->time >= e->max_time) {
+            if (e->time >= e->max_time || e->popup->complete_progress >= 1.f) {
                 TraceLog(LOG_INFO, "Closing notification %s", _fMultilineTextInstanceGetText(e->popup->text));
                 _fNotifObjectApplyCloseAnimation(e->popup);
                 e->closing = 1;
@@ -140,7 +156,7 @@ void _fNotifMgrUpdate() {
         }
     }
 
-    for (int i = 0; i < __state.notifications->len; i++) {
+    for (unsigned int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
 
         if (e->offscreen) continue;
@@ -152,4 +168,14 @@ void _fNotifMgrUpdate() {
 
         _fNotifObjectDraw(e->popup);
     }
+}
+
+struct fnotif_object *_fNotifMgrGetEntryById(int id) {
+    for (unsigned int i = 0; i < __state.notifications->len; i++) {
+        struct fnotif_mgr_entry *e = __state.notifications->objects + i;
+
+        if (e->notif_id == id) return e->popup;
+    }
+
+    return NULL;
 }

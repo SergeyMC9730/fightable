@@ -17,6 +17,7 @@ struct fnotif_mgr_entry {
     double max_time;
     unsigned char closing;
     int offset;
+    int notif_id;
 
     unsigned char offscreen;
 
@@ -31,9 +32,10 @@ extern "C" {
 #endif
 
 void _fNotifMgrInit();
-void _fNotifMgrSend(const char *message);
-void _fNotifMgrSendWithTime(const char *message, double length);
+int _fNotifMgrSend(const char *message);
+int _fNotifMgrSendWithTime(const char *message, double length);
 void _fNotifMgrUpdate();
+struct fnotif_object *_fNotifMgrGetEntryById(int id);
 
 #ifdef __cplusplus
 }
