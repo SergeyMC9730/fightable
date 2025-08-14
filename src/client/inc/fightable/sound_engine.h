@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #pragma once
 
 #ifdef __cplusplus
@@ -55,7 +61,7 @@ unsigned char _fAudioPlayModule(struct faudio_engine *engine, const char *path);
 void _fAudioStop(struct faudio_engine *engine);
 double _fAudioGetPlayTime(struct faudio_engine *engine);
 void _fAudioLoopCurrent(struct faudio_engine *engine);
-const char *_fAudioGetDbg(struct faudio_engine *engine, int channel);
+const char *_fAudioGetChannelRow(struct faudio_engine *engine, int channel);
 int _fAudioGetChannelsTotal(struct faudio_engine *engine);
 const char *_fAudioGetSongName(struct faudio_engine *engine);
 float _fAudioGetVolume(struct faudio_engine *engine);
@@ -63,7 +69,6 @@ void _fAudioSetVolume(struct faudio_engine *engine, float v);
 
 void _fAudioFxUpdate(struct faudio_engine* engine);
 void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time);
-void _fAudioFxInitEcho(struct faudio_engine* engine);
 
 #ifdef __cplusplus
 }

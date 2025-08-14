@@ -330,6 +330,7 @@ set(FIGHTABLE_SRC
     src/client/hitbox/conv.c
     src/client/renderer/pos.c
     src/client/renderer/ui/text_input.c
+    src/client/mpclient/connect.c
     ${FIGHTABLE_GPU_SRC}
 )
 

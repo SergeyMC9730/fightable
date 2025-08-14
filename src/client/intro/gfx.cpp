@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/sound_engine.h"
 #include <cstring>
 #include <fightable/intro.h>
 #include <fightable/sound_library.h>
@@ -54,7 +55,7 @@ public:
         // TraceLog(LOG_INFO, "rows: %s", rows.c_str());
 
         for (int i = _check_offset; i < _shake_lock.size(); i++) {
-            const char* rowc = _fAudioGetDbg(&__state.sound_engine, i);
+            const char* rowc = _fAudioGetChannelRow(&__state.sound_engine, i);
 
             if (!rowc) {
                 TraceLog(LOG_ERROR, "Pattern row at channel %d is null!", i);
@@ -110,10 +111,11 @@ public:
     fintro_ed2_shaker() : fintro_shaker({ "12", "04" }) {_shake_level = 1.1f;}
 };
 
-static fintro_shaker_base* __current_shaker = nullptr;
+static fintro_shaker_base*  __current_shaker = nullptr;
+bool                        __shaker_enabled = true;
 
 void _fIntroProcessGfx() {
-    if (__current_shaker != nullptr) {
+    if (__current_shaker != nullptr && __shaker_enabled) {
         __current_shaker->update();
     }
 }
@@ -138,4 +140,11 @@ void _fIntroGfxInit() {
         break;
     }
     }
+}
+
+void _fIntroGfxEnable() {
+    __shaker_enabled = true;
+}
+void _fIntroGfxDisable() {
+    __shaker_enabled = false;
 }

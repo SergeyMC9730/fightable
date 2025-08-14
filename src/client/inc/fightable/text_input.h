@@ -10,6 +10,10 @@
 #include <nt5emul/renderer_keyframe.h>
 #include <fightable/multiline_text_instance.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct ftext_input_osk {
     unsigned char shift;
     unsigned char caps;
@@ -31,6 +35,7 @@ struct ftext_input {
     struct ftext_input_osk mob_osk;
     unsigned char mob_moved_on_touch;
     unsigned char selected;
+    unsigned char locked;
 
     Vector2 pointer_pos;
     int pointer_char_index;
@@ -48,3 +53,10 @@ void _fTextInputUpdate(struct ftext_input *input);
 void _fTextInputQueueRenderer(struct ftext_input *input);
 void _fTextInputRenderText(struct ftext_input *input);
 void _fTextInputDestroy(struct ftext_input *input);
+void _fTextInputLock(struct ftext_input *input);
+void _fTextInputUnlock(struct ftext_input *input);
+unsigned char _fTextInputEmpty(struct ftext_input *input);
+
+#ifdef __cplusplus
+}
+#endif

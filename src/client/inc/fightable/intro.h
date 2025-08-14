@@ -24,6 +24,8 @@ int _fIntroGetSeekableRow();
 
 void _fIntroGfxInit();
 void _fIntroProcessGfx();
+void _fIntroGfxEnable();
+void _fIntroGfxDisable();
 
 void _fIntroMenuOnPlay();
 void _fIntroMenuOnEditor();

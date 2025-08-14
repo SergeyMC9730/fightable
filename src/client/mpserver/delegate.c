@@ -4,17 +4,16 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef _DISABLE_MP_SERVER_
+
 #include <fightable/state.h>
 #include <fightable/mp_server.h>
 #include <fightable/storage.h>
 #include <net_drivers/udp.h>
 
-#ifndef _DISABLE_MP_SERVER_
 #include <fightable/http/http_server.h>
 #include <nbnet.h>
-#endif
 
-#ifndef _DISABLE_MP_SERVER_
 MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_req, MetadataReq,
     NBN_SerializeUInt(stream, obj->http_port, 1024, 8000);
     NBN_SerializeUInt(stream, obj->max_players, 1, MP_MAX_CLIENTS);
@@ -23,12 +22,10 @@ MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_req, MetadataReq,
 MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_acquire, MetadataAcquire,
     NBN_SerializeBytes(stream, &obj->pad, 1);
 )
-#endif
 
 extern void _fMainLog(const char *msg);
 
 unsigned char _fMpServerOpen() {
-#ifndef _DISABLE_MP_SERVER_
     __state.mp_server_ready = 0;
 
     if (__state.mp_server_handles) {
@@ -79,7 +76,6 @@ unsigned char _fMpServerOpen() {
 
     __state.mp_server_ready = 1;
     return 1;
-#endif
-
-    return 0;
 }
+
+#endif

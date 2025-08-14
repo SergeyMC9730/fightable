@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef _DISABLE_MP_SERVER_
+
 #include <fightable/mp_server.h>
 #include <fightable/state.h>
 
@@ -19,3 +21,5 @@ NBN_ConnectionHandle *_fMpServerFindHandle(NBN_ConnectionHandle ref) {
 
     return handle_ref;
 }
+
+#endif

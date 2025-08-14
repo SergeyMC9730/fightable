@@ -205,6 +205,13 @@ struct fightable_state {
 
     struct ftext_input *ip_input;
     struct ftext_input *name_input;
+
+#ifndef _DISABLE_MP_SERVER_
+    NBN_ConnectionHandle *mp_client_handle;
+    float mp_client_connect_state;
+    unsigned char mp_client_connecting;
+    struct fnotif_mgr_entry *mp_client_notif_status;
+#endif
 };
 
 extern struct fightable_state __state;

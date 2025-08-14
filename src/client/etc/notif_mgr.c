@@ -139,7 +139,7 @@ void _fNotifMgrUpdate() {
 
             // TraceLog(LOG_INFO, "%f %f %d", (float)e->time, (float)e->max_time, e->offscreen);
 
-            if (e->time >= e->max_time || e->popup->complete_progress >= 1.f) {
+            if (e->time > e->max_time || e->popup->complete_progress >= 1.f) {
                 TraceLog(LOG_INFO, "Closing notification %s", _fMultilineTextInstanceGetText(e->popup->text));
                 _fNotifObjectApplyCloseAnimation(e->popup);
                 e->closing = 1;
@@ -170,11 +170,11 @@ void _fNotifMgrUpdate() {
     }
 }
 
-struct fnotif_object *_fNotifMgrGetEntryById(int id) {
+struct fnotif_mgr_entry *_fNotifMgrGetEntryById(int id) {
     for (unsigned int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
 
-        if (e->notif_id == id) return e->popup;
+        if (e->notif_id == id) return e;
     }
 
     return NULL;

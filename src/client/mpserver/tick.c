@@ -4,7 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
+#ifndef _DISABLE_MP_SERVER_
+
 #include <fightable/mp_server_defs.h>
 #include <fightable/mp_server.h>
 #include <fightable/state.h>
@@ -55,7 +56,6 @@ void _fMpServerTickOnMessage() {
 }
 
 void _fMpServerTick() {
-#ifndef _DISABLE_MP_SERVER_
     if (!__state.mp_server_ready) return;
 
     int ev;
@@ -73,5 +73,6 @@ void _fMpServerTick() {
             }
         }
     }
-#endif
 }
+
+#endif

@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef _DISABLE_MP_SERVER_
+
 #include "fightable/storage.h"
 #include <fightable/mp_create_menu.h>
 #include <fightable/state.h>
@@ -29,7 +31,6 @@ void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
 }
 
 void _fMpCreateDraw() {
-#ifndef _DISABLE_MP_SERVER_
 	Color bg = {
 		243, 134, 5, 255
 	};
@@ -141,5 +142,6 @@ void _fMpCreateDraw() {
 	if (_fButtonDrawSimple("Open", (IVector2) { 108, 17 + 15 + 2 }, WHITE)) {
 	    _fOpenFileSelector(_fStorageGetWritable(), _fMpOnOpenLevel);
 	}
-#endif
 }
+
+#endif

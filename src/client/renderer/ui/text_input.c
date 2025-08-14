@@ -16,6 +16,8 @@
 
 #define INPUT_SAFE_ZONE 10
 
+void _fTextInputUpdateSelection(struct ftext_input *input);
+
 unsigned int _fTextInputIsRestricted(struct ftext_input *input, const char *c) {
     return input != NULL && c != NULL && input->restricted != NULL && strstr(c, input->restricted) != NULL;
 }
@@ -77,18 +79,7 @@ void _fTextInputUpdateLabel(struct ftext_input *input) {
         input->rendered_text = NULL;
     }
 
-    char *formatted_str = (char *)MemAlloc(input->buffer_length + 10);
-    snprintf(formatted_str, input->buffer_length + 10, "<cblack>%s", input->buffer);
-
-    input->rendered_text = _fMultilineTextInstanceCreateWithFont(formatted_str, input->rl_font, input->rl_size, input->rl_spacing);
-    input->rendered_text_size = _fMultilineTextInstanceGetSize(input->rendered_text);
-    input->box.height = INPUT_SAFE_ZONE + input->rendered_text_size.y;
-
-    if (input->box.height == INPUT_SAFE_ZONE) {
-        input->box.height += input->rl_size;
-    }
-
-    MemFree(formatted_str);
+    _fTextInputUpdateSelection(input);
 }
 
 struct ftext_input *_fTextInputCreate(unsigned int max_characters, const char *restricted_chars, RLFont font, float size, float spacing, int input_width_fb, Vector2 input_pos_fb) {
@@ -129,7 +120,7 @@ void _fTextInputUpdate(struct ftext_input *input) {
 
     if (!input->selected) return;
 
-    if (_fKeyPressedR(KEY_BACKSPACE)) {
+    if (_fKeyPressedR(KEY_BACKSPACE) && !input->locked) {
         _fTextInputPopChar(input);
         _fTextInputUpdateLabel(input);
 
@@ -144,7 +135,7 @@ void _fTextInputUpdate(struct ftext_input *input) {
     } else {
         codepoint = GetCharPressed();
     }
-    while (codepoint) {
+    while (codepoint && !input->locked) {
         _fTextInputAppendCodepoint(input, codepoint);
         _fTextInputUpdateLabel(input);
 
@@ -153,7 +144,7 @@ void _fTextInputUpdate(struct ftext_input *input) {
         codepoint = GetCharPressed();
     }
 
-    if (_fKeyPressedR(KEY_LEFT)) {
+    if (_fKeyPressedR(KEY_LEFT) && !input->locked) {
         if (input->pointer_char_index != 0) {
             input->pointer_char_index--;
 
@@ -168,7 +159,7 @@ void _fTextInputUpdate(struct ftext_input *input) {
                 TraceLog(LOG_ERROR, "Unknown char at %d (sz=%d)", i, utf_size);
             }
         }
-    } else if (_fKeyPressedR(KEY_RIGHT)) {
+    } else if (_fKeyPressedR(KEY_RIGHT) && !input->locked) {
         if (input->pointer_char_index < input->characters_entered) {
             input->pointer_char_index++;
 
@@ -201,8 +192,10 @@ void _fTextInputQueueRenderer(struct ftext_input *input) {
     tr.x += shake_conv.x;
     tr.y += shake_conv.y;
 
+    unsigned char selected = input->selected && !input->locked;
+
     DrawRectangleRec(tr, WHITE);
-    if (input->selected) {
+    if (selected) {
         DrawRectangleLinesEx(tr, (float)INPUT_SAFE_ZONE / 4.f, __state.intro_text_tint);
     }
 
@@ -210,19 +203,19 @@ void _fTextInputQueueRenderer(struct ftext_input *input) {
 
     Vector2 text_size = input->rendered_text_size;
     text_size = input->pointer_pos;
+    BeginScissorMode(tr.x + h, tr.y + h, tr.width - (h * 2), tr.height - h);
     if (text_size.x > (tr.width - INPUT_SAFE_ZONE)) {
-        BeginScissorMode(tr.x + h, tr.y + h, tr.width - (h * 2), tr.height - h);
         _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){tr.x - text_size.x + tr.width - h, tr.y + h});
-        EndScissorMode();
-        if (input->selected) {
+        if (selected) {
             DrawRectangle(tr.x + tr.width - h, tr.y + h, 4, tr.height - (h * 2), GRAY);
         }
     } else {
         _fMultilineTextInstanceDraw(input->rendered_text, (Vector2){tr.x + h, tr.y + h});
-        if (input->selected) {
+        if (selected) {
             DrawRectangle(tr.x + input->pointer_pos.x + h, tr.y + input->pointer_pos.y + h, 4, tr.height - (h * 2), GRAY);
         }
     }
+    EndScissorMode();
 }
 void _fTextInputRenderText(struct ftext_input *input) {
     renderer_event_t event;
@@ -240,4 +233,40 @@ void _fTextInputDestroy(struct ftext_input *input) {
     if (input->rendered_text) _fMultilineTextInstanceDestroy(input->rendered_text);
 
     MemFree(input);
+}
+
+unsigned char _fTextInputEmpty(struct ftext_input *input) {
+    if (!input) return 1;
+
+    return input->characters_entered == 0;
+}
+
+void _fTextInputUpdateSelection(struct ftext_input *input) {
+    const char *color = !input->locked ? "black" : "lightgray";
+
+    char *formatted_str = (char *)MemAlloc(input->buffer_length + 10);
+    snprintf(formatted_str, input->buffer_length + 10, "<c%s>%s", color, input->buffer);
+
+    input->rendered_text = _fMultilineTextInstanceCreateWithFont(formatted_str, input->rl_font, input->rl_size, input->rl_spacing);
+    input->rendered_text_size = _fMultilineTextInstanceGetSize(input->rendered_text);
+    input->box.height = INPUT_SAFE_ZONE + input->rendered_text_size.y;
+
+    if (input->box.height == INPUT_SAFE_ZONE) {
+        input->box.height += input->rl_size;
+    }
+
+    MemFree(formatted_str);
+}
+
+void _fTextInputLock(struct ftext_input *input) {
+    if (!input) return;
+
+    input->locked = 1;
+    _fTextInputUpdateSelection(input);
+}
+void _fTextInputUnlock(struct ftext_input *input) {
+    if (!input) return;
+
+    input->locked = 0;
+    _fTextInputUpdateSelection(input);
 }
