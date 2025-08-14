@@ -28,7 +28,14 @@ void _fIntroMenuProcessMultiplayerJoin() {
 
     unsigned int sz = 0;
 
-    SETUP_BUTTON("Join", 68, 45) {
+    SETUP_BUTTON("Join", 59, 45) {
+        TraceLog(LOG_INFO, "Join");
+    }
 
+    SETUP_BUTTON("Exit", 78, 45) {
+        TraceLog(LOG_INFO, "Exit");
+
+        __state.menu_state = INTRO_MENU_BASE_SELECTOR;
+        UnloadTexture(__state.playbtn_container);
     }
 }
