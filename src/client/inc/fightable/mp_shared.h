@@ -6,13 +6,19 @@
 
 #pragma once
 
+#ifndef _DISABLE_MP_SERVER_
+
+#define MP_PROTOCOL "fightable-0"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-float _fSanitizeFloat(float v, float min, float max);
-double _fSanitizeDouble(double v, double min, double max);
+void _fMpTick();
+void _fMpInit();
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

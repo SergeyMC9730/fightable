@@ -4,15 +4,12 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#include <fightable/mp_shared.h>
+#include <nbnet.h>
+#include <net_drivers/udp.h>
+#include <fraylib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-float _fSanitizeFloat(float v, float min, float max);
-double _fSanitizeDouble(double v, double min, double max);
-
-#ifdef __cplusplus
+void _fMpInit() {
+    TraceLog(LOG_INFO, "Registering UDP driver from nbnet");
+    NBN_UDP_Register();
 }
-#endif

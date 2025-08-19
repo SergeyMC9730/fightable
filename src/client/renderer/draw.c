@@ -12,10 +12,15 @@
 #include <fightable/editor.h>
 #include <fightable/intro.h>
 #include <fightable/mp_create_menu.h>
+#include <fightable/mp_shared.h>
 
 void _fDrawFileSelector(void *unused);
 
 void _fDraw() {
+#ifndef _DISABLE_MP_SERVER_
+    _fMpTick();
+#endif
+
     ClearBackground(BLACK);
 
     unsigned char fs_should_skip = 0;

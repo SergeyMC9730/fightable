@@ -65,8 +65,6 @@ void _fIntroMenuProcessMultiplayerJoin() {
                     port = (unsigned short)(abs(atoi(a->objects[1])) % 0xFFFF);
                 }
 
-                TraceLog(LOG_INFO, "Connecting to %s:%d (%d)", ip, (int)port, a->len);
-
                 if (!_fMpClientConnect(ip, port)) {
                     _fAudioFxSlideVolume(&__state.sound_engine, 1, 1.f);
                     _fIntroGfxEnable();
@@ -74,6 +72,8 @@ void _fIntroMenuProcessMultiplayerJoin() {
                     _fTextInputUnlock(__state.name_input);
                     __state.mp_client_connecting = 0;
                 }
+
+                _fCleanupSplittedString(a);
             }
         }
     }

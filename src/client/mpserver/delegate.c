@@ -15,12 +15,13 @@
 #include <nbnet.h>
 
 MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_req, MetadataReq,
+    NBN_SerializeBool(stream, obj->connection_rejected);
     NBN_SerializeUInt(stream, obj->http_port, 1024, 8000);
     NBN_SerializeUInt(stream, obj->max_players, 1, MP_MAX_CLIENTS);
     NBN_SerializeUInt(stream, obj->players_connected, 0, MP_MAX_CLIENTS);
 )
 MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_acquire, MetadataAcquire,
-    NBN_SerializeBytes(stream, &obj->pad, 1);
+    NBN_SerializeBytes(stream, &obj->username, 32);
 )
 
 extern void _fMainLog(const char *msg);
@@ -34,8 +35,6 @@ unsigned char _fMpServerOpen() {
     __state.mp_server_handle_amount = MP_MAX_CLIENTS;
     __state.mp_server_handles = (NBN_ConnectionHandle *)NBN_Allocator(sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
     memset(__state.mp_server_handles, 0, sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
-
-    NBN_UDP_Register();
 
     unsigned char opened = 0;
     for (int i = 0; i < 16; i++) {
@@ -62,8 +61,8 @@ unsigned char _fMpServerOpen() {
 
     TraceLog(LOG_INFO, "Registering UDP messages");
 
-    MP_PACKET_CLASS_ATTACH(MP_METADATA_REQ_ID, MetadataReq);
-    MP_PACKET_CLASS_ATTACH(MP_METADATA_ACQUIRE_ID, MetadataAcquire);
+    MP_PACKET_CLASS_ATTACH(MP_SC_METADATA_REQ_ID, MetadataReq);
+    MP_PACKET_CLASS_ATTACH(MP_CS_METADATA_ACQUIRE_ID, MetadataAcquire);
 
     TraceLog(LOG_INFO, "Creating HTTP server for resource downloading");
     __state.mp_server_http_port = __state.mp_server_port + 1;
@@ -75,6 +74,8 @@ unsigned char _fMpServerOpen() {
 #endif
 
     __state.mp_server_ready = 1;
+    __state.mp_server_should_tick = 1;
+
     return 1;
 }
 

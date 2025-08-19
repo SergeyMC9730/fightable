@@ -6,6 +6,10 @@
 
 #pragma once
 
+#ifndef _DISABLE_MP_SERVER_
+
+#include <fightable/mp_shared.h>
+
 #define MP_CREATE_PACKET_CLASS_DEF(PACKET_STRUCT, FN_PREFIX)    \
 struct PACKET_STRUCT *_fMpPacketCreate##FN_PREFIX(void);        \
 void _fMpPacketDestroy##FN_PREFIX(struct PACKET_STRUCT *obj);   \
@@ -31,18 +35,22 @@ MP_CREATE_PACKET_CLASS_IMPL(PACKET_STRUCT, FN_PREFIX, SER_IMPL)             \
 #define MP_PACKET_CLASS_ATTACH(MESSAGE_ID, FN_PREFIX) NBN_GameServer_RegisterMessage(MESSAGE_ID, (NBN_MessageBuilder)_fMpPacketCreate##FN_PREFIX, (NBN_MessageDestructor)_fMpPacketDestroy##FN_PREFIX, (NBN_MessageSerializer)_fMpPacketSerialize##FN_PREFIX)
 
 struct fmp_metadata_req {
+    _Bool connection_rejected;
+
     unsigned int http_port;
     unsigned int max_players;
     unsigned int players_connected;
 };
 struct fmp_metadata_acquire {
-    char pad[1];
+    char username[32];
 };
 
-#define MP_METADATA_REQ_ID                  0x00
-#define MP_METADATA_ACQUIRE_ID              0x01
+#define MP_SC_METADATA_REQ_ID                   0x00
+#define MP_CS_METADATA_ACQUIRE_ID               0x01
 
-#define MP_CON_REJECT_BUSY                  0x00
+#define MP_CON_REJECT_BUSY                      0x00
 
 
-#define MP_MAX_CLIENTS                      8
+#define MP_MAX_CLIENTS                          8
+
+#endif

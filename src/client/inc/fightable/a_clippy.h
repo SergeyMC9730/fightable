@@ -6,12 +6,20 @@
 
 #pragma once
 
+#include <fightable/intvec.h>
+
+struct fa_clippy {
+    IVector2 pos;
+    double time;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-float _fSanitizeFloat(float v, float min, float max);
-double _fSanitizeDouble(double v, double min, double max);
+struct fa_clippy _fAssistantClippyCreate(IVector2 base_pos);
+void _fAssistantClippyUpdate(struct fa_clippy *obj);
+void _fAssistantClippyDraw(struct fa_clippy *obj);
 
 #ifdef __cplusplus
 }

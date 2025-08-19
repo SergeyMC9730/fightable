@@ -6,6 +6,8 @@
 
 #pragma once
 
+#ifndef _DISABLE_MP_SERVER_
+
 #include <fightable/mp_server_defs.h>
 #include <nbnet.h>
 
@@ -22,4 +24,6 @@ void _fMpServerTick();
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

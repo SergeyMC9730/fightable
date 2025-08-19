@@ -331,6 +331,12 @@ set(FIGHTABLE_SRC
     src/client/renderer/pos.c
     src/client/renderer/ui/text_input.c
     src/client/mpclient/connect.c
+    src/client/mpclient/packet_send.c
+    src/client/mpclient/tick.c
+    src/client/mpshared/tick.c
+    src/client/net/nbnet_init.c
+    src/client/etc/assistant/clippy.c
+    src/client/etc/distance.c
     ${FIGHTABLE_GPU_SRC}
 )
 

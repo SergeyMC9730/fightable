@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/a_clippy.h"
+#include "fightable/intvec.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -18,7 +20,7 @@
 #include <fightable/debug.h>
 #include <fightable/sanitizer.h>
 #ifndef _DISABLE_MP_SERVER_
-#include <fightable/http/http_server.h>
+#include <fightable/mp_shared.h>
 #endif
 #include <fightable/storage.h>
 #include <cJSON.h>
@@ -130,6 +132,10 @@ void _fInit(int argc, char **argv) {
     SetRandomSeed(time(0));
 
     _fStoragePrepareWritable();
+
+#ifndef _DISABLE_MP_SERVER_
+    _fMpInit();
+#endif
 
 #ifdef TARGET_ANDROID
     SetTraceLogCallback(_fAndroidTraceLog);
@@ -337,8 +343,7 @@ void _fInit(int argc, char **argv) {
 
     SetTextLineSpacing((int)(15.f / GetWindowScaleDPI().y * 1.5f));
 
-    char test_buffer[16] = {};
-    _fOpenOnScreenKeyboard((RLRectangle){}, test_buffer, 16, (renderer_event_t){});
+    __state.clippy = _fAssistantClippyCreate((IVector2){16, 16});
 
     while (!WindowShouldClose()) {
         actual_sz.x = GetRenderWidth();
@@ -364,6 +369,8 @@ void _fInit(int argc, char **argv) {
         BeginTextureModeStacked(__state.framebuffer);
 
         _fDraw();
+        _fAssistantClippyUpdate(&__state.clippy);
+        _fAssistantClippyDraw(&__state.clippy);
 
         if (IsKeyPressed(KEY_F3)) {
             __state.show_debug_info = !__state.show_debug_info;
@@ -447,12 +454,6 @@ void _fInit(int argc, char **argv) {
 
     __state.sound_engine.should_stop = 1;
     pthread_join(__state.sound_thread, NULL);
-
-#ifndef _DISABLE_MP_SERVER_
-    if (__state.webserver != NULL) {
-        _fHttpServerDestroy(__state.webserver);
-    }
-#endif
 
     _fConfigSave(&__state.config);
 }

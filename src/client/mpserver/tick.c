@@ -39,12 +39,12 @@ void _fMpServerTickOnMessage() {
     NBN_MessageInfo info = NBN_GameServer_GetMessageInfo();
 
     switch (info.type) {
-        case MP_METADATA_ACQUIRE_ID: {
+        case MP_CS_METADATA_ACQUIRE_ID: {
             struct fmp_metadata_req *r = _fMpPacketCreateMetadataReq();
             r->http_port = __state.mp_server_http_port;
             r->max_players = MP_MAX_CLIENTS;
 
-            NBN_GameServer_SendUnreliableMessageTo(info.sender, MP_METADATA_REQ_ID, r);
+            NBN_GameServer_SendUnreliableMessageTo(info.sender, MP_SC_METADATA_REQ_ID, r);
             _fMpPacketDestroyMetadataReq(r);
             break;
         }
@@ -56,19 +56,26 @@ void _fMpServerTickOnMessage() {
 }
 
 void _fMpServerTick() {
-    if (!__state.mp_server_ready) return;
+    // if (!__state.mp_server_ready) return;
 
     int ev;
 
     while ((ev = NBN_GameServer_Poll()) != NBN_NO_EVENT) {
         if (ev < 0) {
             TraceLog(LOG_ERROR, "_fMpServerTick: cannot get event");
-            return;
         }
 
         switch (ev) {
             case NBN_NEW_CONNECTION: {
                 _fMpServerTickAcceptConnection();
+                break;
+            }
+            case NBN_DISCONNECTED: {
+                _fMpServerTickAcceptDisconnect();
+                break;
+            }
+            case NBN_MESSAGE_RECEIVED: {
+                _fMpServerTickOnMessage();
                 break;
             }
         }

@@ -33,6 +33,7 @@ typedef struct openmpt_module openmpt_module;
 #include <fightable/config.h>
 #include <nt5emul/renderer_animation.h>
 #include <fightable/text_input.h>
+#include <fightable/a_clippy.h>
 #ifndef _DISABLE_MP_SERVER_
 #include <nbnet.h>
 #endif
@@ -173,6 +174,7 @@ struct fightable_state {
     unsigned int mp_server_handle_amount;
 
     unsigned char mp_server_ready;
+    unsigned char mp_server_should_tick;
 #endif
 
     Vector2 mp_level_preview_offset;
@@ -207,11 +209,13 @@ struct fightable_state {
     struct ftext_input *name_input;
 
 #ifndef _DISABLE_MP_SERVER_
-    NBN_ConnectionHandle *mp_client_handle;
     float mp_client_connect_state;
     unsigned char mp_client_connecting;
+    unsigned char mp_client_should_tick;
     struct fnotif_mgr_entry *mp_client_notif_status;
 #endif
+
+    struct fa_clippy clippy;
 };
 
 extern struct fightable_state __state;

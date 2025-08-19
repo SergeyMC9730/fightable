@@ -6,12 +6,13 @@
 
 #pragma once
 
+#include <fraylib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-float _fSanitizeFloat(float v, float min, float max);
-double _fSanitizeDouble(double v, double min, double max);
+double _fDistPointToCircle(Vector2 point, Vector2 circle_center, double circle_radius);
 
 #ifdef __cplusplus
 }
