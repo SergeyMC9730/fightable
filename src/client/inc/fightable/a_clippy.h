@@ -17,8 +17,13 @@ struct fa_clippy {
 extern "C" {
 #endif
 
+// clippy just wants to help you
 struct fa_clippy _fAssistantClippyCreate(IVector2 base_pos);
+
+// clippy just wants to update itself
 void _fAssistantClippyUpdate(struct fa_clippy *obj);
+
+// clippy just wants to draw itself
 void _fAssistantClippyDraw(struct fa_clippy *obj);
 
 #ifdef __cplusplus
