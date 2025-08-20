@@ -17,6 +17,8 @@ void _fIntroProcessEndlessDream();
 void _fIntroProcessElectricDrug();
 void _fIntroProcessCelestialFantasia();
 
+const char *_fIntroGetAuthorName();
+
 void _fIntroMenuInit();
 void _fIntroMenuDraw();
 

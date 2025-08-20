@@ -337,6 +337,7 @@ set(FIGHTABLE_SRC
     src/client/net/nbnet_init.c
     src/client/etc/assistant/clippy.c
     src/client/etc/distance.c
+    src/client/intro/author.c
     ${FIGHTABLE_GPU_SRC}
 )
 

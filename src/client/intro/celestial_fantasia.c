@@ -71,22 +71,22 @@ void _fIntroProcessCelestialFantasia() {
     if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
         if (__state.title_song_stage >= 1) {
             {
-                int size_x = _fTextMeasure(&__state.text_manager, "dogotrigger").x;
-                int size_y = _fTextMeasure(&__state.text_manager, "dogotrigger").y;
+                const char *author = _fIntroGetAuthorName();
+                IVector2 size = _fTextMeasure(&__state.text_manager, author);
 
-                int cx = (w - size_x) / 2;
-                int cy = (h - size_y) / 2;
+                int cx = (w - size.x) / 2;
+                int cy = (h - size.y) / 2;
 
-                _fTextDraw(&__state.text_manager, "dogotrigger", (IVector2){cx, cy}, WHITE, 1);
+                _fTextDraw(&__state.text_manager, author, (IVector2){cx, cy}, WHITE, 1);
             }
             {
-                int size_x = _fTextMeasure(&__state.text_manager, "presents").x;
-                int size_y = _fTextMeasure(&__state.text_manager, "presents").y;
+                const char *label2 = "presents";
+                IVector2 size = _fTextMeasure(&__state.text_manager, label2);
 
-                int cx = (w - size_x) / 2;
-                int cy = (h - size_y) / 2;
+                int cx = (w - size.x) / 2;
+                int cy = (h - size.y) / 2;
 
-                _fTextDraw(&__state.text_manager, "presents", (IVector2){cx, cy + (__state.text_manager.tilemap.tile_size.y + 5)}, WHITE, 1);
+                _fTextDraw(&__state.text_manager, label2, (IVector2){cx, cy + (__state.text_manager.tilemap.tile_size.y + 5)}, WHITE, 1);
             }
         }
 

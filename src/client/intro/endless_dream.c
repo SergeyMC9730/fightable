@@ -50,13 +50,13 @@ void _fIntroProcessEndlessDream() {
 
     if (__state.title_song_stage != 4 && !__state.intro_stage_completed) {
         if (__state.title_song_stage >= 1) {
-            int size_x = 6 * __state.tilemap->tile_size.x;
-            int size_y = 1 * __state.tilemap->tile_size.y;
+            const char *author = _fIntroGetAuthorName();
+            IVector2 size = _fTextMeasure(&__state.text_manager, author);
 
-            int cx = (w - size_x) / 2;
-            int cy = (h - size_y) / 2;
+            int cx = (w - size.x) / 2;
+            int cy = (h - size.y) / 2;
 
-            _fTilemapDrawMegatile(__state.tilemap, (IVector2){cx, cy}, (IVector2){14, 5}, (IVector2){6, 1}, 0, 0, WHITE);
+            _fTextDraw(&__state.text_manager, author, (IVector2){cx, cy}, WHITE, 0);
         }
 
         if (__state.title_song_stage >= 2) {

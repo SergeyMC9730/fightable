@@ -36,8 +36,10 @@ void _fAssistantClippyDraw(struct fa_clippy *obj) {
     sprite_center.x += __state.tilemap->tile_size.x / 2;
     sprite_center.y += __state.tilemap->tile_size.y;
 
+    float distance_ratio = _fDistPointToCircle(_fGetMousePosPix(), _fImathToVFloat(sprite_center), __state.tilemap->tile_size.x * 8);
+
     Color c1 = WHITE;
-    c1.a = (unsigned char)fmax(32.f, 255.f * _fDistPointToCircle(_fGetMousePosPix(), _fImathToVFloat(sprite_center), __state.tilemap->tile_size.x * 8));
+    c1.a = (unsigned char)fmax(32.f, 255.f * distance_ratio);
 
     _fTilemapDrawMegatile(__state.tilemap, new_pos, (IVector2){18, 6}, (IVector2){1, 2}, is_flipped, 0, c1);
     _fTilemapDraw(__state.tilemap, new_pos, (IVector2){19, 6}, is_flipped, 0, c1);
