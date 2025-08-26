@@ -31,7 +31,6 @@ unsigned char _fMpClientConnect(const char* ip, unsigned short port) {
     ip = _fCopyString(ip);
 
     int res = NBN_GameClient_Start(MP_PROTOCOL, ip, port);
-
     if (res < 0) {
         _fNotifMgrSend("<cred,orange>ERROR:\n<cyellow>Connection failed");
 
@@ -42,9 +41,15 @@ unsigned char _fMpClientConnect(const char* ip, unsigned short port) {
         free(ip);
 
         return 0;
+    } else {
+        TraceLog(LOG_INFO, "Created connection to %s:%d", ip, port);
+        _fMpRegisterMessages(1);
     }
 
+    __state.mp_client_port = port;
+    __state.mp_client_ip = ip;
     __state.mp_client_should_tick = 1;
+    _fMpInitPlayerList();
 
     return 1;
 }

@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/mp_shared.h"
 #include "fightable/notif_mgr.h"
 #include "fightable/text_input.h"
 #include <fightable/intro.h>
@@ -23,6 +24,19 @@ void _fIntroMenuProcessMultiplayerJoin() {
     int wy = __state.framebuffer.texture.height;
 
     DrawTexture(__state.playbtn_container, 0, 0, WHITE);
+
+    // if (__state.mp_lobby_bg_ready) {
+    //     float delta = GetFrameTime();
+    //     __state.mp_lobby_bg_opacity += delta / 1.5f;
+    //     if (__state.mp_lobby_bg_opacity > 1.f) {
+    //         __state.mp_lobby_bg_opacity = 1.f;
+    //     } else {
+    //         TraceLog(LOG_INFO, "__state.mp_lobby_bg_opacity = %f;", __state.mp_lobby_bg_opacity);
+    //     }
+
+
+    //     _fMpDrawLobbyBackground(__state.mp_lobby_bg_opacity);
+    // }
 
     _fTextInputUpdate(__state.ip_input);
     _fTextInputRenderText(__state.ip_input);
@@ -66,7 +80,7 @@ void _fIntroMenuProcessMultiplayerJoin() {
                 }
 
                 if (!_fMpClientConnect(ip, port)) {
-                    _fAudioFxSlideVolume(&__state.sound_engine, 1, 1.f);
+                    _fAudioFxSlideVolume(&__state.sound_engine, 1, __state.config.volume_slider.progress);
                     _fIntroGfxEnable();
                     _fTextInputUnlock(__state.ip_input);
                     _fTextInputUnlock(__state.name_input);

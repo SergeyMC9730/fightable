@@ -364,7 +364,7 @@ void _fInit(int argc, char **argv) {
         if (IsKeyPressed(KEY_F)) {
             _fOpenFileSelector(_fStorageGetWritable(), NULL);
         }
-
+        
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
 

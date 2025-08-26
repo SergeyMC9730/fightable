@@ -9,17 +9,23 @@
 #include <fightable/mp_server.h>
 #include <fightable/state.h>
 
-NBN_ConnectionHandle *_fMpServerFindHandle(NBN_ConnectionHandle ref) {
-    NBN_ConnectionHandle *handle_ref = NULL;
+struct fmp_find_handle_result _fMpServerFindHandle(NBN_ConnectionHandle ref) {
+    struct fmp_find_handle_result res = {};
 
-    for (unsigned int i = 0; i < __state.mp_server_handle_amount && __state.mp_server_handles != NULL; i++) {
-        if (*(__state.mp_server_handles + i) == ref) {
-            handle_ref = __state.mp_server_handles + i;
-            break;
+    if (__state.mp_connected_players == NULL || ref == 0) return res;
+
+    for (unsigned int i = 0; i < __state.mp_connected_players->len; i++) {
+        struct fplayer_connection *con = __state.mp_connected_players->objects + i;
+        if (con->srv_handler == ref) {
+            res.index = i;
+            res.ref = con;
+            res.success = true && res.ref;
+
+            return res;
         }
     }
 
-    return handle_ref;
+    return res;
 }
 
 #endif

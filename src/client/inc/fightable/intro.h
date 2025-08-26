@@ -36,6 +36,8 @@ void _fIntroMenuOnOptions();
 void _fIntroMenuOnMpCreate();
 void _fIntroMenuOnMpJoin();
 
+void _fIntroMenuInitMpBackground();
+
 void _fIntroMenuProcessPlay();
 void _fIntroMenuProcessBase();
 void _fIntroMenuProcessOptions();

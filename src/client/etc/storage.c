@@ -4,19 +4,27 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <fightable/storage.h>
 #include <fightable/state.h>
+#include <stdio.h>
 
 #ifdef TARGET_ANDROID
 #include <android_native_app_glue.h>
 #endif
 
+char fTempStorageBuffer[512] = {};
+
 const char *_fStorageGetWritable() {
 #ifdef TARGET_ANDROID
     return ".";
 #elif defined TARGET_UNIX
-    return "~/.fightable";
+    char *home = getenv("HOME");
+    if (!home) {
+        return ".fightable";
+    } else {
+        snprintf(fTempStorageBuffer, 512, "%s/.fightable", home);
+        return (const char *)fTempStorageBuffer;
+    }
 #else
     return ".fightable";
 #endif

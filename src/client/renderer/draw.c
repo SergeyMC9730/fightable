@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/mp_client.h"
 #include <fightable/renderer.h>
 #include <fightable/state.h>
 #include <fightable/intvec.h>
@@ -59,6 +60,10 @@ void _fDraw() {
     }
     case UI_MENU_MPCREATE: {
         _fMpCreateDraw();
+        break;
+    }
+    case UI_MENU_MPJOIN: {
+        _fMpClientDraw();
         break;
     }
     }

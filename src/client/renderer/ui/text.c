@@ -9,6 +9,7 @@
 #include <fightable/tilemap.h>
 #include <stdio.h>
 #include <fightable/renderer.h>
+#include <math.h>
 
 static IVector2 __default_font_data[0xFF] = {
     {0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},
@@ -29,6 +30,8 @@ IVector2 _fTextMeasure(struct ftext_manager *man, const char *text) {
 
     int padding = man->char_padding;
 
+    int old_width = 0;
+
     size_t len = strlen(text);
     for (size_t i = 0; i < len; i++) {
         char c = text[i];
@@ -39,6 +42,8 @@ IVector2 _fTextMeasure(struct ftext_manager *man, const char *text) {
 
         if (c == '\n') {
             result.y += man->tilemap.tile_size.y + padding;
+            old_width = result.x;
+            result.x = 0;
 
             continue;
         }
@@ -49,6 +54,8 @@ IVector2 _fTextMeasure(struct ftext_manager *man, const char *text) {
     if (result.x != 0) {
         result.x -= padding;
     }
+
+    result.x = fmax(old_width, result.x);
 
     return result;
 }

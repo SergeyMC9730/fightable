@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "fightable/player_connection.h"
 #include <fraylib.h>
 
 #include <pthread.h>
@@ -37,9 +38,6 @@ typedef struct openmpt_module openmpt_module;
 #ifndef _DISABLE_MP_SERVER_
 #include <nbnet.h>
 #endif
-#ifndef FIGHTABLE_NO_MULTIPLAYER
-#include <nbnet.h>
-#endif
 #include <nt5emul/tui/file_selector.h>
 #include <fightable/multiline_text_instance.h>
 #if _WIN32
@@ -59,6 +57,7 @@ typedef struct openmpt_module openmpt_module;
 #define UI_MENU_MAIN        0
 #define UI_MENU_MPCREATE    1
 #define UI_MENU_EDITOR      2
+#define UI_MENU_MPJOIN      3
 
 typedef struct rsb_array__fnotif_mgr_entry rsb_array__fnotif_mgr_entry;
 
@@ -67,6 +66,8 @@ struct android_app;
 #endif
 
 struct fosk_row;
+
+struct fmp_metadata_req;
 
 struct fightable_state {
     struct ftilemap *tilemap;
@@ -164,14 +165,17 @@ struct fightable_state {
     Texture2D mp_create_bg1;
     Texture2D mp_create_bg2;
     Shader mp_create_wave_shader;
+    unsigned char mp_lobby_bg_ready;
+    float mp_lobby_bg_opacity;
+    RenderTexture2D mp_lobby_bg;
+    unsigned char mp_lobby_lp_moving;
 
     long double mp_create_time;
 
     unsigned short mp_server_port;
     unsigned short mp_server_http_port;
 
-    NBN_ConnectionHandle *mp_server_handles;
-    unsigned int mp_server_handle_amount;
+    unsigned int mp_server_max_connections;
 
     unsigned char mp_server_ready;
     unsigned char mp_server_should_tick;
@@ -212,7 +216,13 @@ struct fightable_state {
     float mp_client_connect_state;
     unsigned char mp_client_connecting;
     unsigned char mp_client_should_tick;
+    char *mp_client_ip;
+    unsigned short mp_client_port;
+    struct fmp_metadata_req *mp_client_srvmeta;
     struct fnotif_mgr_entry *mp_client_notif_status;
+    struct flevel *mp_client_level;
+
+    rsb_array__PlayerCon *mp_connected_players;
 #endif
 
     struct fa_clippy clippy;

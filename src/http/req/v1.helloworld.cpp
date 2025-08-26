@@ -1,3 +1,4 @@
+#include "fightable/http/http_server.h"
 #include <fightable/http/v1.helloworld.hpp>
 #ifdef TARGET_UNIX
 #include <unistd.h>
@@ -15,25 +16,20 @@ std::shared_ptr<http_response> LevelAPI::v1::HelloWorldRequest::render(const htt
     auto a = req.get_arg("mykey");
 
 #ifdef TARGET_UNIX
-    std::string res = " Working directory: ";
+    std::string dir = _fHttpGetAllowedResourceDir(_httpServer);
 
-    {
-        std::array<char, 1024> buffer;
-        getcwd(buffer.data(), buffer.size());
-        
-        res += std::string(buffer.data());
-    }
+    std::string res = " Working directory: " + dir;
 
-    DIR *dp = opendir("./");
+    DIR *dp = opendir(_fHttpGetAllowedResourceDir(_httpServer));
     if (!dp) {
         res += "\n Directory listing\ncannot be created";
     } else {
         dirent *ep;
 
-        res += "\n Directory listing:";
+        res += "\n Directory listing:\n";
 
         while ((ep = readdir(dp)) != nullptr) {
-            res += "- " + std::string(ep->d_name);
+            res += "- " + std::string(ep->d_name) + "\n";
         }
 
         closedir(dp);

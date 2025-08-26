@@ -22,6 +22,8 @@ foreach(CACHE_VAR ${CACHE_VARS})
 endforeach()
 message("CMAKE_ARGS: ${CMAKE_ARGS}")
 
+set(OVERRIDE_CXX_STD 17)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS On)
 set(FIGHTABLE_COMPILER ${CMAKE_CXX_COMPILER_ID})
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
@@ -81,10 +83,14 @@ add_library(fshared STATIC
     src/shared/src/pchar.c
     src/shared/src/tools.cpp
     src/shared/src/sort.c
+    src/shared/src/pthread_compat.c
+    src/shared/src/curl_parameter.c
+    src/shared/src/curl_connection.c
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
 )
+target_link_libraries(fshared curl)
 
 if (LIBC_FD_SIZE)
     message(STATUS "Setting MP stack definition, FD_SETSIZE, to ${LIBC_FD_SIZE}")
@@ -103,10 +109,6 @@ if (MICROHTTPD_LIB)
 endif()
 
 include(CheckIncludeFile)
-
-if (NOT OVERRIDE_CXX_STD)
-    set(OVERRIDE_CXX_STD 20)
-endif()
 
 find_library(OPENMPT_LIB openmpt)
 if (NOT OPENMPT_LIB)
@@ -131,16 +133,25 @@ endif()
 
 if (DISABLE_MP_FUNCTIONALITY)
     set(DISABLE_MP_SERVER ON)
-    add_compile_definitions(FIGHTABLE_NO_MULTIPLAYER)
 endif()
 
 if (NOT DISABLE_MP_SERVER)
+    find_library(CURL_LIB curl)
+    if(NOT CURL_LIB)
+        message(FATAL_ERROR "libcurl could not be found")
+    endif()
+
     find_library(MICROHTTPD_LIB microhttpd)
     if(NOT MICROHTTPD_LIB)
         message(FATAL_ERROR "libmicrohttpd could not be found")
     endif()
 
     message(STATUS "libmicrohttpd lib path: ${MICROHTTPD_LIB}")
+
+    CHECK_INCLUDE_FILE("curl/curl.h" HAVE_LIBCURL)
+    if (NOT HAVE_LIBCURL)
+        message(FATAL_ERROR "libcurl binaries were found but the header files itself are missing")
+    endif()
 
     CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
     if (NOT HAVE_LIBMICROHTTPD AND NOT MICROHTTPD_INC)
@@ -151,8 +162,6 @@ if (NOT DISABLE_MP_SERVER)
     if (WIN32)
         set(FIGHTABLE_NATIVE_LIBS ${FIGHTABLE_NATIVE_LIBS} Ws2_32)
     endif()
-else()
-    set(OVERRIDE_CXX_STD 17)
 endif()
 
 set(CMAKE_CXX_STANDARD ${OVERRIDE_CXX_STD})
@@ -319,7 +328,6 @@ set(FIGHTABLE_SRC
     src/client/renderer/file_selector.c
     src/client/renderer/ui/notification.c
     src/client/etc/notif_mgr.c
-    src/client/etc/pthread_compat.c
     src/client/renderer/texture_draw.c
     src/client/etc/middle.c
     src/client/renderer/framebuffer.c
@@ -338,6 +346,17 @@ set(FIGHTABLE_SRC
     src/client/etc/assistant/clippy.c
     src/client/etc/distance.c
     src/client/intro/author.c
+    src/client/mpshared/register_msg.c
+    src/client/mpclient/assets.c
+    src/client/mpshared/lobby_bg.c
+    src/client/entity/rplayer/update.c
+    src/client/entity/rplayer/init.c
+    src/client/entity/rplayer/draw.c
+    src/client/mpshared/player_connection.c
+    src/client/mpshared/lobby.c
+    src/client/mpserver/open_level.c
+    src/client/mpclient/switch_to_lobby.c
+    src/client/mpclient/draw.c
     ${FIGHTABLE_GPU_SRC}
 )
 

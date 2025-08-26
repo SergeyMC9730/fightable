@@ -24,7 +24,7 @@ void _fNotifMgrRealign() {
 
     for (int i = 0; i < __state.notifications->len; i++) {
         struct fnotif_mgr_entry *e = __state.notifications->objects + i;
-        if (e->popup->closed || e->closing) continue;
+        if (e->popup->closed) continue;
 
         new_offsets[i] = x;
         x += e->popup->box.width;
@@ -48,7 +48,7 @@ void _fNotifMgrRealign() {
         e->linked_keyframe.ending_value = new_offsets[i] - e->popup->box.x;
         e->linked_keyframe.easing = TOOutExpo;
 
-        if (e->offscreen && new_offsets[i] < __state.overlay_framebuffer.texture.width) {
+        if (e->offscreen && (new_offsets[i] + e->popup->box.width) < __state.overlay_framebuffer.texture.width) {
             e->offscreen = 0;
         }
     }

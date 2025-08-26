@@ -5,6 +5,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "fightable/mp_server.h"
+#include "raylib.h"
 #include <fraylib.h>
 #include <fightable/intro.h>
 #include <fightable/state.h>
@@ -20,18 +21,7 @@
 #include <fightable/mp_create_menu.h>
 #include <math.h>
 
-#ifndef _DISABLE_MP_SERVER_
-void _fIntroMenuOnMpCreateCallback(void *ctx) {
-    if (!_fMpServerOpen()) return;
-
-    float* old_vol = (float*)ctx;
-    if (!old_vol) return;
-
-    char* buffer = (char*)MemAlloc(256);
-    const char* readable = _fStorageGetWritable();
-
-    _fAudioStop(&__state.sound_engine);
-
+void _fIntroMenuInitMpBackground() {
     Image pattern_image1 = GenImageColor(__state.framebuffer.texture.width, __state.framebuffer.texture.height, BLANK);
     Image pattern_image2 = ImageCopy(pattern_image1);
 
@@ -73,12 +63,35 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
     SetTextureWrap(__state.mp_create_bg1, TEXTURE_WRAP_REPEAT);
     SetTextureWrap(__state.mp_create_bg2, TEXTURE_WRAP_REPEAT);
 
+    char* buffer = (char*)MemAlloc(256);
+    const char* readable = _fStorageGetWritable();
+
 #ifndef GRAPHICS_API_OPENGL_ES3
     snprintf(buffer, 256, "%s/wave_warp.fs", readable);
 #else
     snprintf(buffer, 256, "%s/wave_warp_es3.fs", readable);
 #endif
     __state.mp_create_wave_shader = LoadShader(NULL, buffer);
+
+    MemFree(buffer);
+
+    __state.mp_lobby_bg = LoadRenderTexture(__state.framebuffer.texture.width, __state.framebuffer.texture.height);
+    __state.mp_lobby_bg_ready = 1;
+}
+
+#ifndef _DISABLE_MP_SERVER_
+void _fIntroMenuOnMpCreateCallback(void *ctx) {
+    if (!_fMpServerOpen()) return;
+
+    float* old_vol = (float*)ctx;
+    if (!old_vol) return;
+
+    char* buffer = (char*)MemAlloc(256);
+    const char* readable = _fStorageGetWritable();
+
+    _fAudioStop(&__state.sound_engine);
+
+    _fIntroMenuInitMpBackground();
 
     snprintf(buffer, 256, "%s/3g_crim.xm", readable);
 

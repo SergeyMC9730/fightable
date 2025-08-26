@@ -16,17 +16,17 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 	int tx = level->tilemap->tile_size.x;
 	int ty = level->tilemap->tile_size.y;
 
-	BeginScissorMode(frame.x, frame.y, frame.width, frame.height);
 	Camera2D cam = level->camera;
-	// cam.target.x /= tx;
-	// cam.target.y /= ty;
-
-	BeginMode2DStacked(cam);
 	for (unsigned int i = 0; i < level->data_size; i++) {
 		struct fblock obj = level->objects[i];
 
 		unsigned short id = _fBlockIdFromRenderable(obj.base);
 		if (id == BLOCK_AIR) continue;
+
+		int _x = frame.x + obj.base.block_x - (int)cam.target.x;
+		int _y = frame.y + obj.base.block_y - (int)cam.target.y;
+
+		if ((_x < frame.x || _x > frame.x + frame.width - 1) || (_y < frame.y || _y  > frame.y + frame.height - 1)) continue;
 
 		Color col = YELLOW;
 		switch (id) {
@@ -117,13 +117,6 @@ void _fLevelDrawPixelated(struct flevel* level, IRectangle frame) {
 		}
 		}
 
-		int _x = frame.x + obj.base.block_x;
-		int _y = frame.y + obj.base.block_y;
-
-		// if (GetCollisio)
-
 		DrawPixel(_x, _y, col);
 	}
-	EndMode2DStacked();
-	EndScissorMode();
 }

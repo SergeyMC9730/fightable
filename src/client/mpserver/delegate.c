@@ -6,6 +6,10 @@
 
 #ifndef _DISABLE_MP_SERVER_
 
+#include "fightable/mp_server_defs.h"
+#include "fightable/mp_shared.h"
+#include "fightable/player_connection.h"
+
 #include <fightable/state.h>
 #include <fightable/mp_server.h>
 #include <fightable/storage.h>
@@ -14,33 +18,18 @@
 #include <fightable/http/http_server.h>
 #include <nbnet.h>
 
-MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_req, MetadataReq,
-    NBN_SerializeBool(stream, obj->connection_rejected);
-    NBN_SerializeUInt(stream, obj->http_port, 1024, 8000);
-    NBN_SerializeUInt(stream, obj->max_players, 1, MP_MAX_CLIENTS);
-    NBN_SerializeUInt(stream, obj->players_connected, 0, MP_MAX_CLIENTS);
-)
-MP_CREATE_PACKET_CLASS_IMPL(fmp_metadata_acquire, MetadataAcquire,
-    NBN_SerializeBytes(stream, &obj->username, 32);
-)
-
 extern void _fMainLog(const char *msg);
 
 unsigned char _fMpServerOpen() {
     __state.mp_server_ready = 0;
 
-    if (__state.mp_server_handles) {
-        NBN_Deallocator(__state.mp_server_handles);
-    }
-    __state.mp_server_handle_amount = MP_MAX_CLIENTS;
-    __state.mp_server_handles = (NBN_ConnectionHandle *)NBN_Allocator(sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
-    memset(__state.mp_server_handles, 0, sizeof(NBN_ConnectionHandle) * __state.mp_server_handle_amount);
+    _fMpInitPlayerList();
+    __state.mp_server_max_connections = MP_MAX_CLIENTS;
 
     unsigned char opened = 0;
     for (int i = 0; i < 16; i++) {
-        __state.mp_server_port = GetRandomValue(1024, 8000);
-        __state.mp_server_port = 3000; // TEMP
-        int status = NBN_GameServer_StartEx("fightable-0", __state.mp_server_port);
+        __state.mp_server_port = GetRandomValue(0x0400, 0x3FFF);
+        int status = NBN_GameServer_Start(MP_PROTOCOL, __state.mp_server_port);
 
         if (status < 0) {
             TraceLog(LOG_ERROR, "Cannot start server on 0.0.0.0:%d (attempt %d) -> status=%d", (int)__state.mp_server_port, i, status);
@@ -53,16 +42,11 @@ unsigned char _fMpServerOpen() {
 
     if (!opened) {
         TraceLog(LOG_ERROR, "Critical failure on server creation");
-        NBN_Deallocator(__state.mp_server_handles);
-        __state.mp_server_handles = NULL;
-        __state.mp_server_handle_amount = 0;
+        RSBDestroy_PlayerCon(__state.mp_connected_players);
         return 0;
     }
 
-    TraceLog(LOG_INFO, "Registering UDP messages");
-
-    MP_PACKET_CLASS_ATTACH(MP_SC_METADATA_REQ_ID, MetadataReq);
-    MP_PACKET_CLASS_ATTACH(MP_CS_METADATA_ACQUIRE_ID, MetadataAcquire);
+    _fMpRegisterMessages(0);
 
     TraceLog(LOG_INFO, "Creating HTTP server for resource downloading");
     __state.mp_server_http_port = __state.mp_server_port + 1;

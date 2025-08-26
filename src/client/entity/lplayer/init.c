@@ -1,5 +1,12 @@
+
+//          Sergei Baigerov 2024 - 2025.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/player.h>
 #include <fightable/entity_library.h>
+#include <fightable/state.h>
 
 void _flPlayerInit(struct felplayer* instance) {
 	if (!instance) return;
@@ -12,7 +19,7 @@ void _flPlayerInit(struct felplayer* instance) {
 	instance->base.damage = (void(*)(struct fentity*, float))_flPlayerDamage;
 	instance->base.perform_death = (void(*)(struct fentity*))_flPlayerPerformDeath;
 
-	_fEntitySetHitbox(&instance->base, (RLRectangle) { 0, 0, 8, 8 });
+	_fEntitySetHitbox(&instance->base, (RLRectangle) { 0, 0, __state.tilemap->tile_size.x, __state.tilemap->tile_size.y });
 
 	instance->base.max_damage_colddown = 0.4f;
 }

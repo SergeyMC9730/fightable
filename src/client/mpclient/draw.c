@@ -7,12 +7,10 @@
 #ifndef _DISABLE_MP_SERVER_
 
 #include <fightable/mp_client.h>
-#include <nbnet.h>
-#include <fraylib.h>
+#include <fightable/mp_shared.h>
 
-void _fMpClientSendPacket(unsigned char type, void *data) {
-    TraceLog(LOG_INFO, "Sending packet %d", (int)type);
-    NBN_GameClient_SendReliableMessage(type, data);
+void _fMpClientDraw() {
+    _fMpDrawLobby(1.f, 1);
 }
 
 #endif

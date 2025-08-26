@@ -4,8 +4,11 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#define WITH_PLACEHOLDERS
+#include <fightable/rplayer.h>
 
-#define ENTITY_PLAYER			1
-#define ENTITY_REMOTE_PLAYER	2
-#define ENTITY_TEXT				3
+void _frPlayerUpdate(struct ferplayer* instance) {
+    struct fentity* entity = &instance->base;
+
+    _fEntityUpdate(entity);
+}

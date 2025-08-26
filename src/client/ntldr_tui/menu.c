@@ -28,11 +28,15 @@ extern struct nt_tui_environment _ntTuiEnvironment;
 #include <nt5emul/tui/rectangle.h>
 #include <nt5emul/tui/menu.h>
 
+unsigned char _ntKeyPressed(int key) {
+    return IsKeyPressed(key) || IsKeyPressedRepeat(key);
+}
+
 void _ntUpdateMenu(struct nt_tui_menu *menu) {
     if (!menu || menu->items_total == 0) return;
 
     // check if KEY_DOWN is pressed
-    if (IsKeyPressed(KEY_DOWN)) {
+    if (_ntKeyPressed(KEY_DOWN)) {
         menu->selected_item++; // increment item id
 
         // do boundary check
@@ -42,7 +46,7 @@ void _ntUpdateMenu(struct nt_tui_menu *menu) {
     }
 
     // check if KEY_UP is pressed
-    else if (IsKeyPressed(KEY_UP)) {
+    else if (_ntKeyPressed(KEY_UP)) {
         menu->selected_item--; // decrement item id
 
         // do boundary check
@@ -58,7 +62,7 @@ void _ntUpdateMenu(struct nt_tui_menu *menu) {
         if (menu->click_handler != NULL) menu->click_handler(menu->selected_item, menu);
     }
 
-    else if (IsKeyPressed(KEY_PAGE_DOWN)) {
+    else if (_ntKeyPressed(KEY_PAGE_DOWN)) {
         menu->selected_item += menu->items_total / 2;
 
         if (menu->selected_item >= menu->items_total) {
@@ -66,7 +70,7 @@ void _ntUpdateMenu(struct nt_tui_menu *menu) {
         }
     }
 
-    else if (IsKeyPressed(KEY_PAGE_UP)) {
+    else if (_ntKeyPressed(KEY_PAGE_UP)) {
         menu->selected_item -= menu->items_total / 2;
 
         // do boundary check
