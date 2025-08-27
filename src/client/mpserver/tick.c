@@ -26,12 +26,7 @@ void _fMpServerTickAcceptConnection() {
     NBN_GameServer_AcceptIncomingConnection();
     NBN_ConnectionHandle handle = NBN_GameServer_GetIncomingConnection();
 
-    struct fplayer_connection connection = {};
-    connection.username = NULL;
-    connection.linked_entity = NULL;
-    connection.srv_handler = handle;
-
-    RSBAddElement_PlayerCon(__state.mp_connected_players, connection);
+    _fMpServerConnectHandle(handle, NULL);
 
     TraceLog(LOG_INFO, "Accepted client %d", handle);
 }
@@ -65,10 +60,12 @@ void _fMpServerTickOnMessage() {
             r->http_port = __state.mp_server_http_port;
             r->max_players = MP_MAX_CLIENTS;
             r->players_connected = __state.mp_connected_players->len;
-            r->connection_rejected = r->players_connected == (r->max_players + 1);
+            r->connection_rejected = (r->players_connected + 1) > (r->max_players);
+            r->user_id = result.ref->player_id;
 
             NBN_GameServer_SendReliableMessageTo(info.sender, MP_SC_METADATA_REQ_ID, r);
-            // _fMpPacketDestroyMetadataReq(r);
+
+            _fMpServerSendPlayerList();
 
             break;
         }

@@ -43,11 +43,11 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
     int safe_area_y = ty;
 
     char buffer[48] = {};
-    snprintf(buffer, sizeof(buffer) - 1, "running on port\n %d\n\njoin now!", port);
+    snprintf(buffer, sizeof(buffer) - 1, "Running on port\n %d\n\nJoin now!", port);
 
     _fTextDraw(&__state.text_manager, buffer, (IVector2) { safe_area_x, safe_area_y }, cblack, 0);
 
-    const unsigned char simulate_player_rendering = 1;
+    const unsigned char simulate_player_rendering = 0;
     int clients = (simulate_player_rendering) ? MP_MAX_CLIENTS : __state.mp_connected_players->len;
 
     if (clients > 0) {
@@ -107,7 +107,15 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
             } else if (!con->username) {
                 nickname = "Connecting";
             } else {
-                nickname = con->username;
+                if (con->is_local) {
+                    snprintf(buffer, sizeof(buffer) - 1, "%s\n(you)", con->username);
+                    nickname = buffer;
+                } else if (con->is_owner) {
+                    snprintf(buffer, sizeof(buffer) - 1, "%s\n(owner)", con->username);
+                    nickname = buffer;
+                } else {
+                    nickname = con->username;
+                }
             }
 
             IVector2 len = _fTextMeasure(&__state.text_manager, nickname);
@@ -139,7 +147,7 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
         _fTextDraw(&__state.text_manager, error, center, cwhite, 1);
     }
 
-    const char *label = (client) ? "waiting for level" : "current level";
+    const char *label = (client) ? (__state.mp_client_level) ? "current level" : "waiting for level" : "current level";
 
     IVector2 sel_sz = _fTextMeasure(&__state.text_manager, label);
     IVector2 text_pos = (IVector2){__state.framebuffer.texture.width - sel_sz.x - safe_area_x, safe_area_y};
@@ -176,11 +184,22 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
 
     if (!client) {
         const char *button_label = "Open";
-
         int button_size = _fButtonMeasureSizeSimple(button_label);
+        IVector2 button_placement = (IVector2) { area.x - button_size - 2, area.y };
 
-        if (_fButtonDrawSimple(button_label, (IVector2) { area.x - button_size - 2, area.y }, cwhite) && interactable) {
+        if (_fButtonDrawSimple(button_label, button_placement, cwhite) && interactable) {
             _fOpenFileSelector(_fStorageGetWritable(), _fMpOnOpenLevel);
+        }
+
+        if (__state.current_level) {
+            button_label = "Play";
+            button_size = _fButtonMeasureSizeSimple(button_label);
+            button_placement.x = area.x - button_size - 2;
+            button_placement.y += ty + 2;
+
+            if (_fButtonDrawSimple(button_label, button_placement, cwhite) && interactable) {
+                TraceLog(LOG_INFO, "TODO");
+            }
         }
     } else {
         // if (!level) {

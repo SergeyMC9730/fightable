@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "nt5emul/renderer_event.h"
+#include "raylib.h"
 #ifndef _DISABLE_MP_SERVER_
 
 #include <fightable/state.h>
@@ -24,6 +26,11 @@ struct fmp_download_context {
     unsigned int current_file_index;
     struct fcurl_connection *connection;
     char *current_url;
+    void (*on_download_success)(void*);
+    void *on_download_success_ctx;
+
+    struct fnotif_mgr_entry *current_notif;
+    char *notif_content;
 };
 
 void _fMpClientDownloadFile(struct fmp_download_context *ctx);
@@ -32,6 +39,7 @@ void _fMpClientRequestFileDownload(void *ctx) {
     if (!ctx) return;
     _fMpClientDownloadFile(ctx);
 }
+
 void _fMpClientOnDownloadedFile(struct fcurl_con_settings *settings) {
     if (!settings || !settings->custom_data) return;
 
@@ -45,35 +53,83 @@ void _fMpClientRequestCurlDestruction(void *ctx) {
     _fCurlConnectionDestroy(ctx);
 }
 
+void _fMpClientUpdateNotif(void *_ctx) {
+    struct fmp_download_context *ctx = (struct fmp_download_context *)_ctx;
+
+    if (!ctx->current_notif || !ctx->connection->current_operation) {
+        return;
+    }
+
+    ctx->current_notif->popup->complete_progress = ctx->connection->current_operation->result->download_progress;
+
+    _fScheduleOverlayFunc((renderer_event_t){_fMpClientUpdateNotif, _ctx});
+}
+void _fMpClientSendNotif(void *_ctx) {
+    struct fmp_download_context *ctx = (struct fmp_download_context *)_ctx;
+
+    int id = _fNotifMgrSendWithTime(ctx->notif_content, 0);
+    ctx->current_notif = _fNotifMgrGetEntryById(id);
+
+    free(ctx->notif_content);
+    ctx->notif_content = NULL;
+
+    _fScheduleOverlayFunc((renderer_event_t){_fMpClientUpdateNotif, _ctx});
+}
+
 void _fMpClientDownloadFile(struct fmp_download_context *ctx) {
     if (!ctx || ctx->current_file_index >= ctx->array_length) {
         TraceLog(LOG_ERROR, "Cannot download next file");
 
-        renderer_event_t e;
-        e.callback = _fMpClientRequestCurlDestruction;
-        e.user = ctx->connection;
-        _fScheduleOverlayFunc(e);
+        if (ctx) {
+            if (ctx->on_download_success) {
+                ctx->on_download_success(ctx->on_download_success_ctx);
+            }
 
-        free(ctx);
+            if (ctx->current_notif) {
+                ctx->current_notif->popup->complete_progress = 1.f;
+                ctx->current_notif->max_time = 1.f;
+                ctx->current_notif->time = 1.f;
+                ctx->current_notif = NULL;
+            }
+
+            renderer_event_t e;
+            e.callback = _fMpClientRequestCurlDestruction;
+            e.user = ctx->connection;
+            _fScheduleOverlayFunc(e);
+
+            free(ctx);
+        }
         return;
+    }
+
+    if (ctx->current_notif) {
+        ctx->current_notif->popup->complete_progress = 1.f;
+        ctx->current_notif->max_time = 1.f;
+        ctx->current_notif->time = 1.f;
+        ctx->current_notif = NULL;
     }
 
     const char *dir = _fMpClientGetNewDirectory();
     const char *file = ctx->assets[ctx->current_file_index];
 
-    unsigned int buffer_size = strlen(dir) + strlen(file) + 2;
+    unsigned int buffer_size = 1024;
     char *buffer = (char *)malloc(buffer_size);
 
-    snprintf(buffer, buffer_size, "%s/%s", dir, file);
+    const char *storage_path = _fStorageGetWritable();
+
+    snprintf(buffer, buffer_size, "%s/%s", storage_path, dir);
+    MakeDirectory(buffer);
+
+    snprintf(buffer, buffer_size, "%s/%s/%s", storage_path, dir, file);
 
     TraceLog(LOG_INFO, "Downloading %s", buffer);
 
     FILE *f = fopen(buffer, "wb");
-    
+
     char *url_buffer = (char *)malloc(512);
     memset(url_buffer, 0, 512);
-    
-    snprintf(url_buffer, 511, "http://%s:%d/api/v1/res/request/%s", __state.mp_client_ip, __state.mp_client_srvmeta->http_port, file);
+
+    snprintf(url_buffer, 511, "http://%s:%d/api/v1/res/request/%s", __state.mp_client_ip, __state.mp_client_http_port, file);
 
     if (!ctx->connection) {
         ctx->connection = _fCurlConnectionCreate();
@@ -82,8 +138,10 @@ void _fMpClientDownloadFile(struct fmp_download_context *ctx) {
     settings->custom_data = ctx;
     ctx->current_file_index++;
 
-    snprintf(buffer, buffer_size, "<cgreen,white>Downloading\n<cgreen,white>%s", file);
-    _fNotifMgrSend(buffer);
+    ctx->notif_content = (char *)MemAlloc(512);
+    snprintf(ctx->notif_content, 512, "<cgreen,white>Downloading\n<cgreen,white>%s", file);
+
+    _fScheduleOverlayFunc((renderer_event_t){_fMpClientSendNotif, ctx});
 
     free(buffer);
 }
@@ -95,13 +153,15 @@ void _fMpClientPrepareAssets() {
         MakeDirectory(dir);
     }
 }
-void _fMpClientDownloadAssets(const char **assets, unsigned int array_length) {
-    struct fmp_download_context *ctx = (struct fmp_download_context *)malloc(sizeof(struct fmp_download_context));
+void _fMpClientDownloadAssets(const char **assets, unsigned int array_length, void (*on_download_success)(void*), void *on_download_success_ctx) {
+    struct fmp_download_context *ctx = (struct fmp_download_context *)MemAlloc(sizeof(struct fmp_download_context));
 
     ctx->array_length = array_length;
     ctx->assets = assets;
     ctx->current_file_index = 0;
     ctx->connection = _fCurlConnectionCreate();
+    ctx->on_download_success = on_download_success;
+    ctx->on_download_success_ctx = on_download_success_ctx;
 
     _fMpClientDownloadFile(ctx);
 }

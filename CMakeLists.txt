@@ -357,6 +357,8 @@ set(FIGHTABLE_SRC
     src/client/mpserver/open_level.c
     src/client/mpclient/switch_to_lobby.c
     src/client/mpclient/draw.c
+    src/client/mpserver/connect.c
+    src/client/mpserver/player_list.c
     ${FIGHTABLE_GPU_SRC}
 )
 

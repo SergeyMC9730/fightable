@@ -20,6 +20,7 @@ MP_CREATE_PACKET_CLASS_DEF(fmp_metadata_req, MetadataReq)
 MP_CREATE_PACKET_CLASS_DEF(fmp_metadata_acquire, MetadataAcquire)
 MP_CREATE_PACKET_CLASS_DEF(fmp_heartbeat, Heartbeat)
 MP_CREATE_PACKET_CLASS_DEF(fmp_opened_level, OpenedLevel)
+MP_CREATE_PACKET_CLASS_DEF(fmp_player_list, PlayerList)
 
 struct fplayer_connection;
 
@@ -30,6 +31,10 @@ struct fmp_find_handle_result {
 };
 
 struct fmp_find_handle_result _fMpServerFindHandle(NBN_ConnectionHandle ref);
+void _fMpServerConnectHandle(NBN_ConnectionHandle h, char *username);
+
+void _fMpServerSendPlayerList();
+
 unsigned char _fMpServerOpen();
 void _fMpServerTick();
 

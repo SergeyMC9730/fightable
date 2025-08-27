@@ -10,7 +10,8 @@
 
 #include <nbnet.h>
 
-#define MP_PROTOCOL "fightable-0"
+#define MP_PROTOCOL     "fightable-0"
+#define MP_MAX_CLIENTS  8
 
 struct ferplayer;
 struct fmp_obj_player {

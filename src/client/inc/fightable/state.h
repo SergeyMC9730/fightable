@@ -218,9 +218,10 @@ struct fightable_state {
     unsigned char mp_client_should_tick;
     char *mp_client_ip;
     unsigned short mp_client_port;
-    struct fmp_metadata_req *mp_client_srvmeta;
+    unsigned short mp_client_http_port;
     struct fnotif_mgr_entry *mp_client_notif_status;
     struct flevel *mp_client_level;
+    int mp_client_user_id;
 
     rsb_array__PlayerCon *mp_connected_players;
 #endif

@@ -121,6 +121,8 @@ void *_fCurlConnectionThr0(void *pctx) {
     return NULL;
 }
 void *_fCurlConnectionThr1(void *pctx) {
+    printf("fcurl: Threaded curl operation begin\n");
+
     struct fcurl_con_context *ctx = (struct fcurl_con_context *)pctx;
     struct fcurl_con_settings *settings = _fCurlConnectionDownloadPageWithMethod(ctx->con, ctx->url, ctx->method, ctx->file, 0, ctx->async_callback);
 
@@ -149,7 +151,7 @@ struct fcurl_con_settings *_fCurlConnectionOpenPageWithMethod(struct fcurl_conne
         pthread_create(&con->result_thread, NULL, _fCurlConnectionThr0, ctx);
 
         while (!con->current_operation) {}
-        con->result_thread = (PTHREAD_TYPE){};
+        printf("con->current_operation=%p", con->current_operation);
         return con->current_operation;
     }
 
@@ -255,7 +257,7 @@ struct fcurl_con_settings *_fCurlConnectionDownloadPageWithMethod(struct fcurl_c
         pthread_create(&con->result_thread, NULL, _fCurlConnectionThr1, ctx);
 
         while (!con->current_operation) {}
-        con->result_thread = (PTHREAD_TYPE){};
+        printf("con->current_operation=%p", con->current_operation);
         return con->current_operation;
     }
 

@@ -18,13 +18,15 @@
 void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
     char *filename = "remote_level.bin";
 
-    struct fmp_opened_level *p = _fMpPacketCreateOpenedLevel();
-    snprintf(p->level_path, sizeof(p->level_path) - 1, "%s/%s", _fStorageGetWritable(), filename);
+    struct fmp_opened_level *packet_template = _fMpPacketCreateOpenedLevel();
+    snprintf(packet_template->level_path, sizeof(packet_template->level_path), "%s/%s", _fStorageGetWritable(), filename);
 
-    remove(p->level_path);
-    link(path, p->level_path);
+    packet_template->http_port = __state.mp_server_http_port;
 
-    struct flevel *lvl = _fLevelLoadFromFileSelector(p->level_path);
+    remove(packet_template->level_path);
+    link(path, packet_template->level_path);
+
+    struct flevel *lvl = _fLevelLoadFromFileSelector(packet_template->level_path);
 
     if (lvl != __state.current_level && __state.current_level) {
         unsigned char src = __state.current_level->level_source;
@@ -34,17 +36,20 @@ void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
 
     __state.current_level = lvl;
 
-    memset(p->level_path, 0, sizeof(p->level_path));
-    strcpy(p->level_path, filename);
+    memset(packet_template->level_path, 0, sizeof(packet_template->level_path));
+    strcpy(packet_template->level_path, filename);
 
     for (unsigned int i = 0; i < __state.mp_connected_players->len; i++) {
         struct fplayer_connection *con = __state.mp_connected_players->objects + i;
         if (con->srv_handler == 0) continue;
 
-        NBN_GameServer_SendReliableMessageTo(con->srv_handler, MP_SC_OPENED_LEVEL, p);
+        struct fmp_opened_level *packet = _fMpPacketCreateOpenedLevel();
+        memcpy(packet, packet_template, sizeof(*packet));
+
+        NBN_GameServer_SendReliableMessageTo(con->srv_handler, MP_SC_OPENED_LEVEL, packet);
     }
 
-    NBN_Deallocator(p);
+    // NBN_Deallocator(p);
 
     _fCloseFileSelector();
 }

@@ -12,10 +12,31 @@
 RSB_ARRAY_IMPL_GEN(struct fplayer_connection, _PlayerCon);
 
 void _fMpInitPlayerList() {
-    if (__state.mp_connected_players) {
-        RSBDestroy_PlayerCon(__state.mp_connected_players);
+    _fPlayerConnectionListRecreate(&__state.mp_connected_players);
+}
+
+struct fplayer_connection _fPlayerConnectionCreate() {
+    struct fplayer_connection p = {};
+    p.player_id = rand();
+    return p;
+}
+
+void _fPlayerConnectionListCleanup(rsb_array__PlayerCon *list) {
+    if (!list) return;
+
+    for (unsigned int i = 0; i < list->len; i++) {
+        struct fplayer_connection *con = list->objects + i;
+        if (con->username) free(con->username);
     }
-    __state.mp_connected_players = RSBCreateArray_PlayerCon();
+
+    RSBDestroy_PlayerCon(list);
+}
+
+void _fPlayerConnectionListRecreate(rsb_array__PlayerCon **list) {
+    if (!list) return;
+
+    _fPlayerConnectionListCleanup(*list);
+    *list = RSBCreateArray_PlayerCon();
 }
 
 #endif

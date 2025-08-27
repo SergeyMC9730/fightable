@@ -11,7 +11,7 @@ void _fMpClientMenuDraw();
 void _fMpClientSendPacket(unsigned char type, void *data);
 void _fMpClientTick();
 void _fMpClientPrepareAssets();
-void _fMpClientDownloadAssets(const char **assets, unsigned int array_length);
+void _fMpClientDownloadAssets(const char **assets, unsigned int array_length, void (*on_download_success)(void*), void *on_download_success_ctx);
 void _fMpClientSwitchAssets();
 const char *_fMpClientGetNewDirectory();
 void _fMpClientSwitchToLobby();

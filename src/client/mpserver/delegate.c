@@ -6,6 +6,7 @@
 
 #ifndef _DISABLE_MP_SERVER_
 
+#include "fightable/string.h"
 #include "fightable/mp_server_defs.h"
 #include "fightable/mp_shared.h"
 #include "fightable/player_connection.h"
@@ -13,10 +14,13 @@
 #include <fightable/state.h>
 #include <fightable/mp_server.h>
 #include <fightable/storage.h>
+#include <fightable/level.h>
 #include <net_drivers/udp.h>
 
 #include <fightable/http/http_server.h>
 #include <nbnet.h>
+
+#include <stdio.h>
 
 extern void _fMainLog(const char *msg);
 
@@ -56,6 +60,22 @@ unsigned char _fMpServerOpen() {
 #else
     _fHttpSetAllowedResourceDir(__state.webserver, _fStorageGetWritable());
 #endif
+
+    struct fplayer_connection connection = _fPlayerConnectionCreate();
+    connection.username = _fCopyString("Owner");
+    connection.is_local = 1;
+    connection.is_owner = 1;
+
+    RSBAddElement_PlayerCon(__state.mp_connected_players, connection);
+
+    if (__state.current_level) {
+        char *buffer = (char *)MemAlloc(512);
+        char *filename = "remote_level.bin";
+
+        snprintf(buffer, 512, "%s/%s", _fStorageGetWritable(), filename);
+
+        _fLevelSave(__state.current_level, buffer);
+    }
 
     __state.mp_server_ready = 1;
     __state.mp_server_should_tick = 1;
