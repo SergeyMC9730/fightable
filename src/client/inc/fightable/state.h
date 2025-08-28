@@ -71,6 +71,7 @@ struct fmp_metadata_req;
 
 struct fightable_state {
     struct ftilemap *tilemap;
+    struct ftilemap *tilemap2;
 
     struct flevel *current_level;
 

@@ -32,6 +32,7 @@
 #include <fightable/multiline_text_instance.h>
 
 struct ftilemap __tilemap;
+struct ftilemap __tilemap2;
 
 #ifndef TARGET_ANDROID
 unsigned int UI_SCALE = 4;
@@ -203,6 +204,7 @@ void _fInit(int argc, char **argv) {
 
     struct fresource_file resources[] = {
         {"fightable1.png"},
+        {"fightable2.png"},
         {"text.png"},
         {"damage_overlay.png"},
         {"damage_overlay.json"},
@@ -230,6 +232,9 @@ void _fInit(int argc, char **argv) {
 
     __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
+
+    __tilemap2 = _fTilemapCreate("fightable2.png", (IVector2){32, 32});
+    __state.tilemap2 = &__tilemap2;
 
     __state.test_midground = LoadTexture("downsky_16bit_2.png");
     SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
@@ -364,7 +369,7 @@ void _fInit(int argc, char **argv) {
         if (IsKeyPressed(KEY_F)) {
             _fOpenFileSelector(_fStorageGetWritable(), NULL);
         }
-        
+
         BeginDrawing();
         BeginTextureModeStacked(__state.framebuffer);
 

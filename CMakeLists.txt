@@ -359,6 +359,7 @@ set(FIGHTABLE_SRC
     src/client/mpclient/draw.c
     src/client/mpserver/connect.c
     src/client/mpserver/player_list.c
+    src/client/entity/wasp.c
     ${FIGHTABLE_GPU_SRC}
 )
 

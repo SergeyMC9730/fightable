@@ -13,6 +13,11 @@ FColor _fColorToFloat(Color col) {
     return res;
 }
 Color _fFloatToColor(FColor col) {
+    col.r = _fSanitizeFloat(col.r, 0.f, 1.f);
+    col.g = _fSanitizeFloat(col.g, 0.f, 1.f);
+    col.b = _fSanitizeFloat(col.b, 0.f, 1.f);
+    col.a = _fSanitizeFloat(col.a, 0.f, 1.f);
+
     Color res = {
         .r = (unsigned char)(col.r * 255.f),
         .g = (unsigned char)(col.g * 255.f),
@@ -25,16 +30,16 @@ Color _fFloatToColor(FColor col) {
 
 Color _fInvertColor(Color col) {
     Color res = col;
-    
+
     res.r = 255 - col.r;
     res.g = 255 - col.g;
     res.b = 255 - col.b;
-    
+
     return res;
 }
 FColor _fInvertFColor(FColor col) {
     FColor res = col;
-    
+
     res.r = 1.f - col.r;
     res.g = 1.f - col.g;
     res.b = 1.f - col.b;
