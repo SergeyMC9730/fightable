@@ -37,6 +37,7 @@ struct fplayer_connection _fPlayerConnectionCreate();
 
 void _fPlayerConnectionListCleanup(rsb_array__PlayerCon *list);
 void _fPlayerConnectionListRecreate(rsb_array__PlayerCon **list);
+void _fPlayerConnectionClose(struct fplayer_connection *connection);
 
 #ifdef __cplusplus
 }
