@@ -228,6 +228,10 @@ struct fightable_state {
 #endif
 
     struct fa_clippy clippy;
+
+    Sound snd_drone_close;
+    Sound snd_drone_flew;
+    Music mus_drone_near_loop;
 };
 
 extern struct fightable_state __state;

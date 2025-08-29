@@ -76,6 +76,7 @@ struct fentity {
 
     unsigned short global_entity_id;
     unsigned short entity_id;
+    int entity_runtime_id;
 
     fhitbox standing_object;
 

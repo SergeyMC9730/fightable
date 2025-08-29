@@ -12,4 +12,5 @@ void _fEntityInit(struct fentity* entity) {
     entity->max_damage_colddown = 0.5f;
     entity->damage_colddown = 0;
     entity->tint = WHITE;
+    entity->entity_runtime_id = rand();
 }

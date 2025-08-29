@@ -219,7 +219,10 @@ void _fInit(int argc, char **argv) {
         {"downsky_16bit_2.png"},
         {"config.json"},
         {"unifont-16.0.02.otf"},
-        {"EndlessDream.SymMOD"}
+        {"EndlessDream.SymMOD"},
+        {"drone_close.wav"},
+        {"drone_flew.wav"},
+        {"drone_near_loop.wav"}
     };
 
     _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));

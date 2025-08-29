@@ -7,10 +7,21 @@
 #pragma once
 
 #include <fightable/entity.h>
+#include <rsb/rsb_array_gen.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct fewasp_state_entry {
+    struct fentity *locked_entity;
+
+    unsigned char played_effect_1;
+    unsigned char played_effect_2;
+    unsigned char played_effect_3;
+};
+
+RSB_ARRAY_DEF_GEN(struct fewasp_state_entry, _wasp_se);
 
 struct fentity_wasp {
 	struct fentity base;
@@ -24,11 +35,14 @@ struct fentity_wasp {
 
 	double live_time;
 	unsigned long long live_frames;
+
+	rsb_array__wasp_se *trapped_entities;
 };
 
 void _feWaspInit(struct fentity_wasp* instance);
 void _feWaspDraw(struct fentity_wasp* instance);
 void _feWaspCleanup(struct fentity_wasp* instance);
+void _feWaspUpdate(struct fentity_wasp* instance);
 
 #ifdef __cplusplus
 }

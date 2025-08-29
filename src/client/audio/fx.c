@@ -7,6 +7,7 @@
 #include <fightable/sound_engine.h>
 #include <fightable/mixer.h>
 #include <fightable/sanitizer.h>
+#include <fightable/state.h>
 #include <fraylib.h>
 
 void _fAudioFxUpdate(struct faudio_engine* engine) {
@@ -23,6 +24,11 @@ void _fAudioFxUpdate(struct faudio_engine* engine) {
 			engine->fx.perform_volume_slider = 0;
 			_fAudioSetVolume(engine, engine->fx.slide_volume_value);
 		}
+	}
+
+	Music chk = __state.mus_drone_near_loop;
+	if (IsMusicValid(chk) && IsMusicStreamPlaying(chk)) {
+        UpdateMusicStream(chk);
 	}
 }
 void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time) {
