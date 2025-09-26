@@ -23,16 +23,16 @@ void _fIntroInit() {
     __state.song_id = song_ids[GetRandomValue(0, (sizeof(song_ids) / sizeof(int)) - 1)];
     // __state.song_id = song_ids[2]; // TEMP
 
-    const char *file_to_load = "EndlessDream.SymMOD";
+    const char *file_to_load = "assets/music/EndlessDream.SymMOD";
 
     switch (__state.song_id) {
         case MUS_ELECTRIC_DRUG: {
-            file_to_load = "electric_drug.mod";
+            file_to_load = "assets/music/electric_drug.mod";
             break;
         }
         case MUS_CELESTIAL_FANTASIA: {
-            file_to_load = "celestial_fantasia.s3m";
-            char *p = _fStorageFind("cf_level.bin");
+            file_to_load = "assets/music/celestial_fantasia.s3m";
+            char *p = _fStorageFind("assets/embedded_levels/cf_level.bin");
             __state.current_level = _fLevelLoadFromFile(p);
             MemFree(p);
             if (__state.current_level) {
@@ -58,7 +58,7 @@ void _fIntroInit() {
         __state.song_id = -1;
     }
 
-    p = _fStorageFind("raylib_16x16.png");
+    p = _fStorageFind("assets/textures/raylib_16x16.png");
     __state.raylib_logo = LoadTexture(p);
     MemFree(p);
 

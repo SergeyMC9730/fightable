@@ -8,6 +8,7 @@
 
 #include <fightable/entity.h>
 #include <rsb/rsb_array_gen.h>
+#include <nt5emul/renderer_animation.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,12 @@ struct fewasp_state_entry {
     unsigned char played_effect_1;
     unsigned char played_effect_2;
     unsigned char played_effect_3;
+
+    struct sound_library {
+	    unsigned int drone_close;
+		unsigned int drone_flew;
+		unsigned int drone_near_loop;
+	} sounds;
 };
 
 RSB_ARRAY_DEF_GEN(struct fewasp_state_entry, _wasp_se);
@@ -37,6 +44,8 @@ struct fentity_wasp {
 	unsigned long long live_frames;
 
 	rsb_array__wasp_se *trapped_entities;
+
+	struct fentity *closest_target;
 };
 
 void _feWaspInit(struct fentity_wasp* instance);

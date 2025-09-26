@@ -18,3 +18,9 @@ double _fDistPointToCircle(Vector2 point, Vector2 circle_center, double circle_r
 
     return _fSanitizeDouble(normalized_distance, 0, 1);
 }
+
+double _fDistPointToPoint(Vector2 point_a, Vector2 point_b) {
+    float dx = point_b.x - point_a.x;
+    float dy = point_b.y - point_a.y;
+    return sqrt(dx * dx + dy * dy);
+}

@@ -60,3 +60,15 @@ _begin:
 _ret:
     return buf;
 }
+
+// free memory after use
+char *_fStorageAppend(const char *path) {
+    const char *storage = _fStorageGetWritable();
+
+    size_t buf_size = strlen(storage) + 1 + strlen(path) + 1;
+    char *buf = (char *)malloc(buf_size);
+
+    snprintf(buf, buf_size, "%s/%s", storage, path);
+
+    return buf;
+}

@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 double _fDistPointToCircle(Vector2 point, Vector2 circle_center, double circle_radius);
+double _fDistPointToPoint(Vector2 point_a, Vector2 point_b);
 
 #ifdef __cplusplus
 }

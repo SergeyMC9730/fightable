@@ -9,6 +9,7 @@
 #include <fightable/tilemap.h>
 #include <fightable/block.h>
 #include <fightable/pthread_compat.h>
+#include <fightable/block_library.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +21,7 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
     level->width = 32;
     level->height = 8;
 
-    level->data_size = level->width * level->height;
+    level->data_size = level->width * level->height + 1;
     level->objects = (struct fblock *)malloc(sizeof(struct fblock) * level->data_size);
     level->tilemap = tilemap;
 
@@ -48,6 +49,12 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
             obj->base.block_y = y + 3;
         }
     }
+
+    struct fblock *obj = level->objects + (level->data_size - 1);
+    *obj = _fBlockFromId(BLOCK_START);
+
+    obj->base.block_x = 0;
+    obj->base.block_y = -10;
 
     level->background_tile = _fTilemapExportTile(tilemap, background_tile);
     SetTextureWrap(level->background_tile, TEXTURE_WRAP_REPEAT);

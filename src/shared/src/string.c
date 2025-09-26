@@ -59,12 +59,7 @@ void _fCleanupSplittedString(rsb_array__pchar *array) {
 }
 
 char *_fCopyStringWithLen(const char *c, unsigned int len) {
-    char *res = (char *)malloc(len + 1);
-
-    memcpy(res, c, len);
-    res[len] = 0;
-
-    return res;
+    return strndup(c, len);
 }
 
 int _fGetUtf8AtIndex(const char *utf_string, unsigned int char_index) {
@@ -157,4 +152,14 @@ unsigned int _fGetUtf8ByteOffsetWithLen(const char *utf_string, unsigned int cha
     }
 
     return byte_offset;
+}
+
+unsigned char _fStringEndsWith(const char *str, const char *substr) {
+    if (!str || !substr) return 0;
+
+    unsigned int str_len = strlen(str);
+    unsigned int substr_len = strlen(substr);
+
+    if (substr_len > str_len) return _fStringEndsWith(substr, str);
+    return strcmp(str + str_len - substr_len, substr) == 0;
 }

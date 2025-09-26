@@ -528,7 +528,6 @@ void _fEditorDraw(struct feditor *editor) {
             editor->should_display_sidebar = true;
             editor->should_process_interactions = true;
             editor->should_playback = false;
-            editor->level->entities = 0;
             editor->level->in_gameover_mode = 0;
 
             UnloadRenderTexture(__state.framebuffer);
@@ -544,13 +543,7 @@ void _fEditorDraw(struct feditor *editor) {
                     fentity* e = RSBGetAtIndex_fentity(editor->level->entities, i);
                     if (!e) continue;
 
-                    if (e->cleanup) {
-                        e->cleanup(e);
-                    }
-                    else {
-                        _fEntityCleanup(e);
-                    }
-
+                    e->cleanup(e);
                     MemFree(e);
                 }
 
@@ -558,6 +551,7 @@ void _fEditorDraw(struct feditor *editor) {
                 editor->level->entities = NULL;
             }
 
+            editor->level->entities = 0;
             editor->entities.clear();
 
             const float old_vol = __state.config.volume_slider.progress;

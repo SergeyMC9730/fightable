@@ -86,6 +86,9 @@ add_library(fshared STATIC
     src/shared/src/pthread_compat.c
     src/shared/src/curl_parameter.c
     src/shared/src/curl_connection.c
+    src/shared/src/fs_file.c
+    src/shared/src/fs_directory.c
+    src/shared/src/fs_native.c
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}
@@ -360,6 +363,7 @@ set(FIGHTABLE_SRC
     src/client/mpserver/connect.c
     src/client/mpserver/player_list.c
     src/client/entity/wasp.c
+    src/client/audio/raylib.c
     ${FIGHTABLE_GPU_SRC}
 )
 

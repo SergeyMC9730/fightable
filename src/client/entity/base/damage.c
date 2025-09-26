@@ -19,10 +19,5 @@ void _fEntityDamage(struct fentity* entity, float damage) {
 void _fEntityKill(struct fentity* entity) {
 	if (!entity || entity->object_destroyed) return;
 
-	if (!entity->damage) {
-		_fEntityDamage(entity, entity->max_hp);
-	}
-	else {
-		entity->damage(entity, entity->max_hp);
-	}
+	entity->damage(entity, entity->max_hp);
 }

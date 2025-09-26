@@ -4,8 +4,10 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#define IAUDIO_ENGINE
 #include "fightable/a_clippy.h"
 #include "fightable/intvec.h"
+#include "fightable/sound_engine.h"
 #include <nt5emul/tui/environment.h>
 #include <fightable/state.h>
 #include <fightable/tilemap.h>
@@ -30,6 +32,7 @@
 #include <fightable/notif_mgr.h>
 #include <fightable/sort.h>
 #include <fightable/multiline_text_instance.h>
+#include <fightable/filesystem.h>
 
 struct ftilemap __tilemap;
 struct ftilemap __tilemap2;
@@ -65,60 +68,10 @@ void _fMainLog(const char *msg) {
 struct android_app *GetAndroidApp();
 #endif
 
-struct fresource_file {
-    const char *filename;
-    unsigned char *data;
-    int data_size;
-};
-
-void _fMainLoadResource(struct fresource_file *file) {
-    file->data = LoadFileData(file->filename, &file->data_size);
-}
-void _fMainLoadResources(struct fresource_file *resources, int files) {
-    for (int i = 0; i < files; i++) {
-        struct fresource_file *resource = resources + i;
-        _fMainLoadResource(resource);
-    }
-}
-
-void _fMainCloneResources(struct fresource_file *resources, int files) {
-    const char *path = _fStorageGetWritable();
-    char *buffer = (char *)MemAlloc(2048);
-
-    for (int i = 0; i < files; i++) {
-        struct fresource_file resource = resources[i];
-        if (!resource.data) {
-            TraceLog(LOG_WARNING, "Resource file %s does not contain data", resource.filename);
-            continue;
-        }
-        if (resource.data_size <= 0) {
-            TraceLog(LOG_WARNING, "Resource file %s has invalid data size (%d)", resource.filename, resource.data_size);
-            continue;
-        }
-
-        snprintf(buffer, 2048, "%s/%s", path, resource.filename);
-        SaveFileData(buffer, resource.data, resource.data_size);
-    }
-
-    MemFree(buffer);
-}
-void _fMainDestroyResources(struct fresource_file *resources, int files) {
-    for (int i = 0; i < files; i++) {
-        struct fresource_file resource = resources[i];
-        if (!resource.data) {
-            TraceLog(LOG_WARNING, "Resource file %s does not contain data, cannot be cleaned up", resource.filename);
-            continue;
-        }
-        if (resource.data_size <= 0) {
-            TraceLog(LOG_WARNING, "Resource file %s has invalid data size (%d), cannot be cleaned up", resource.filename, resource.data_size);
-            continue;
-        }
-
-        MemFree(resource.data);
-    }
-}
 
 void _fInit(int argc, char **argv) {
+
+
 #ifdef TARGET_ANDROID
     __state.system = GetAndroidApp();
 #else
@@ -133,6 +86,17 @@ void _fInit(int argc, char **argv) {
     SetRandomSeed(time(0));
 
     _fStoragePrepareWritable();
+
+#ifndef TARGET_ANDROID
+    char *assets_dir = "assets";
+#else
+    char *assets_dir = ".";
+#endif
+    char *new_assets = _fStorageAppend("assets");
+    _fFsDirectoryCopy(assets_dir, new_assets);
+
+    ChangeDirectory(_fStorageGetWritable());
+    free(new_assets);
 
 #ifndef _DISABLE_MP_SERVER_
     _fMpInit();
@@ -191,41 +155,12 @@ void _fInit(int argc, char **argv) {
 
     SetWindowSize(actual_sz.x, actual_sz.y);
 
-#ifndef TARGET_ANDROID
-    ChangeDirectory("assets");
-#endif
-
-    SetWindowIcon(RlLoadImage("icon.png"));
+    SetWindowIcon(RlLoadImage("assets/textures/icon.png"));
 
     InitAudioDevice();
 
     int result = pthread_create(&__state.sound_thread, NULL, main_thr0, NULL);
     TraceLog(LOG_INFO, "pthread_create: result value %d", result);
-
-    struct fresource_file resources[] = {
-        {"fightable1.png"},
-        {"fightable2.png"},
-        {"text.png"},
-        {"damage_overlay.png"},
-        {"damage_overlay.json"},
-        {"3g_crim.xm"},
-        {"wave_warp.fs"},
-        {"wave_warp_es3.fs"},
-        {"test.obj"},
-        {"celestial_fantasia.s3m"},
-        {"cf_level.bin"},
-        {"raylib_16x16.png"},
-        {"Px437_IBM_VGA_8x16.ttf"},
-        {"downsky_16bit_2.png"},
-        {"config.json"},
-        {"unifont-16.0.02.otf"},
-        {"EndlessDream.SymMOD"},
-        {"drone_close.wav"},
-        {"drone_flew.wav"},
-        {"drone_near_loop.wav"}
-    };
-
-    _fMainLoadResources(resources, sizeof(resources) / sizeof(struct fresource_file));
 
 #ifdef TARGET_ANDROID
     _ntTuiLoadEnvironmentDefault(1.25f);
@@ -233,18 +168,18 @@ void _fInit(int argc, char **argv) {
     _ntTuiLoadEnvironmentDefault(1.f);
 #endif
 
-    __tilemap = _fTilemapCreate("fightable1.png", (IVector2){8, 8});
+    __tilemap = _fTilemapCreate("assets/textures/fightable1.png", (IVector2){8, 8});
     __state.tilemap = &__tilemap;
 
-    __tilemap2 = _fTilemapCreate("fightable2.png", (IVector2){32, 32});
+    __tilemap2 = _fTilemapCreate("assets/textures/fightable2.png", (IVector2){32, 32});
     __state.tilemap2 = &__tilemap2;
 
-    __state.test_midground = LoadTexture("downsky_16bit_2.png");
+    __state.test_midground = LoadTexture("assets/textures/downsky_16bit_2.png");
     SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
 
     int codepoint_amount = 0;
     int *codepoints = LoadCodepoints(_ntGetCodepoints(), &codepoint_amount);
-    __state.unifont16 = LoadFontEx("unifont-16.0.02.otf", 16, codepoints, codepoint_amount);
+    __state.unifont16 = LoadFontEx("assets/fonts/unifont-16.0.02.otf", 16, codepoints, codepoint_amount);
 
     __state.text_manager = _fTextLoadDefault();
 
@@ -294,13 +229,6 @@ void _fInit(int argc, char **argv) {
 
     unsigned char shake_lock[8] = {0};
 
-#ifndef TARGET_ANDROID
-    ChangeDirectory("..");
-#endif
-
-    _fMainCloneResources(resources, sizeof(resources) / sizeof(struct fresource_file));
-    _fMainDestroyResources(resources, sizeof(resources) / sizeof(struct fresource_file));
-
     _fConfigInit(&__state.config);
 
     if (__state.song_id == -1) {
@@ -310,9 +238,9 @@ void _fInit(int argc, char **argv) {
     }
 
     {
-        char *p = _fStorageFind("damage_overlay.png");
+        char *p = _fStorageFind("assets/textures/damage_overlay.png");
         __state.damage_overlay = LoadTexture(p);
-        MemFree(p); p = _fStorageFind("damage_overlay.json");
+        MemFree(p); p = _fStorageFind("assets/textures/damage_overlay.json");
         __state.damage_overlay_anim = _ntRendererLoadAnimation(p);
         MemFree(p);
 
@@ -324,7 +252,7 @@ void _fInit(int argc, char **argv) {
         if (data) {
             char *data_str = cJSON_Print(data);
 
-            snprintf(dbg_buffer, 2048, "%s/fightable1.json", _fStorageGetWritable());
+            snprintf(dbg_buffer, 2048, "%s/assets/textures/fightable1.json", _fStorageGetWritable());
             SaveFileText(dbg_buffer, data_str);
         }
     }
@@ -334,7 +262,7 @@ void _fInit(int argc, char **argv) {
         if (data) {
             char *data_str = cJSON_Print(data);
 
-            snprintf(dbg_buffer, 2048, "%s/text.json", _fStorageGetWritable());
+            snprintf(dbg_buffer, 2048, "%s/assets/fonts/text.json", _fStorageGetWritable());
             SaveFileText(dbg_buffer, data_str);
         }
     }
@@ -359,6 +287,7 @@ void _fInit(int argc, char **argv) {
 
         __state.base_game_size = actual_sz;
 
+        _fAudioUpdateRaylibSounds(&__state.sound_engine);
         _fAudioFxUpdate(&__state.sound_engine);
         _fGfxUpdate(&__state.gfx);
 

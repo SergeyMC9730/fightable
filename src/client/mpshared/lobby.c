@@ -6,9 +6,7 @@
 
 #include "fightable/button.h"
 #include "fightable/intvec.h"
-#include "fightable/mp_server_defs.h"
 #include "fightable/text.h"
-#include "raylib.h"
 #ifndef _DISABLE_MP_SERVER_
 
 #include "fightable/renderer.h"

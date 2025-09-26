@@ -4,11 +4,12 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/distance.h"
 #include "fightable/hitbox.h"
-#include "fightable/notif_mgr.h"
+#include "fightable/renderer.h"
+#include "fightable/sound_engine.h"
 #include "fightable/storage.h"
-#include <stdio.h>
-#include "raylib.h"
+#include "nt5emul/renderer_event.h"
 #include "rsb/rsb_array_gen.h"
 #define WITH_PLACEHOLDERS
 #include "fightable/entity.h"
@@ -147,11 +148,24 @@ void _feWaspDraw(struct fentity_wasp* instance) {
 	//DrawCircleV(_fImathToVFloat(center), 32 * instance->base.level->tilemap->texture.width, RED);
 	DrawCircleLines(center.x, center.y, 32 * tt.x, RED);
 	DrawCircleLines(center.x, center.y, 8 * tt.x, YELLOW);
+	DrawCircleLines(center.x, center.y, 48 * tt.x, BLUE);
 
 	// TraceLog(LOG_INFO, "%lf %d", instance->live_time, degrees * -2);
 }
 void _feWaspCleanup(struct fentity_wasp* instance) {
+    TraceLog(LOG_INFO, "BBBBBB");
+
 	if (!instance) return;
+
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
+	TraceLog(LOG_INFO, "AAAAAA");
 
 	UnloadImage(instance->tile1);
 	UnloadImage(instance->tile2);
@@ -159,6 +173,21 @@ void _feWaspCleanup(struct fentity_wasp* instance) {
 	UnloadImage(instance->temp_img2);
 	UnloadTexture(instance->main_texture);
 	UnloadTexture(instance->texture2);
+
+    for (unsigned int i = 0; i < instance->trapped_entities->len; i++) {
+        struct fewasp_state_entry *entry = instance->trapped_entities->objects + i;
+
+        TraceLog(LOG_INFO, "SADAKLSJDSAD");
+
+        _fAudioSetSoundParamRl(&__state.sound_engine, entry->sounds.drone_near_loop, AE_LOOP, 0);
+        _fAudioRunSoundActionRl(&__state.sound_engine, entry->sounds.drone_near_loop, AE_STOP);
+
+        _fAudioSetSoundParamRl(&__state.sound_engine, entry->sounds.drone_close, AE_LOOP, 0);
+        _fAudioRunSoundActionRl(&__state.sound_engine, entry->sounds.drone_close, AE_STOP);
+
+        _fAudioSetSoundParamRl(&__state.sound_engine, entry->sounds.drone_flew, AE_LOOP, 0);
+        _fAudioRunSoundActionRl(&__state.sound_engine, entry->sounds.drone_flew, AE_STOP);
+    }
 
 	RSBDestroy_wasp_se(instance->trapped_entities);
 }
@@ -172,6 +201,37 @@ struct fewasp_state_entry *_feWaspGetTrappedEntityState(struct fentity_wasp* ins
     }
 
     return NULL;
+}
+
+double _feWaspDistanceFromEntity(struct fentity_wasp* instance, struct fentity *e) {
+    IVector2 t = instance->base.level->tilemap->tile_size;
+    IVector2 pos = (IVector2){instance->base.hitbox.x, instance->base.hitbox.y};
+    IVector2 pos2 = (IVector2){e->hitbox.x, e->hitbox.y};
+    IVector2 center = {
+        pos.x + (instance->main_texture.width / 2),
+        pos.y + (instance->main_texture.height / 2)
+    };
+
+    return _fDistPointToPoint(_fImathToVFloat(center), _fImathToVFloat(pos2));
+}
+
+void _feWaspDamagePlayer(void *_ctx) {
+    struct fentity *entity = (struct fentity *)_ctx;
+
+    return; // TEMP
+
+    entity->damage(entity, 5.f);
+}
+
+unsigned char _feWaspEntityInRadius(struct fentity_wasp* instance, struct fentity *e, unsigned int radius_blocks) {
+    IVector2 t = instance->base.level->tilemap->tile_size;
+    IVector2 pos = (IVector2){instance->base.hitbox.x, instance->base.hitbox.y};
+    IVector2 center = {
+        pos.x + (instance->main_texture.width / 2),
+        pos.y + (instance->main_texture.height / 2)
+    };
+
+    return CheckCollisionCircleRec(_fImathToVFloat(center), radius_blocks * t.x, _fHitboxToRect(e->hitbox));
 }
 
 void _feWaspUpdate(struct fentity_wasp* instance) {
@@ -190,13 +250,19 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
 
     IVector2 t = instance->base.level->tilemap->tile_size;
 
+    double closest_distance;
+    struct fentity *closest_target;
+
     for (unsigned int i = 0; i < level->entities->len; i++) {
         struct fentity *entity = level->entities->objects[i];
         if (!entity) continue;
 
         if (entity->global_entity_id == ENTITY_WASP) continue;
         if (entity->global_entity_id == ENTITY_PLAYER) {
-            if (CheckCollisionCircleRec(_fImathToVFloat(center), 8 * t.x, _fHitboxToRect(entity->hitbox))) {
+            float distance_circ = _fDistPointToCircle((Vector2){entity->hitbox.x, entity->hitbox.y}, _fImathToVFloat(center), 32 * t.y);
+            float distance = _feWaspDistanceFromEntity(instance, entity);
+
+            if (_feWaspEntityInRadius(instance, entity, 8)) {
                 struct fewasp_state_entry *current = _feWaspGetTrappedEntityState(instance, entity);
                 if (!current) {
                     struct fewasp_state_entry new_entry = {};
@@ -206,58 +272,25 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
                 }
 
                 if (!current->played_effect_1) {
-                    char *buffer = (char *)MemAlloc(512);
-                    const char *storage = _fStorageGetWritable();
-
-                    if (!IsSoundValid(__state.snd_drone_close)) {
-                        snprintf(buffer, 512, "%s/drone_close.wav", storage);
-                        __state.snd_drone_close = LoadSound(buffer);
-                    }
-                    if (IsSoundValid(__state.snd_drone_close)) {
-                        RlPlaySound(__state.snd_drone_close);
-                    } else {
-                        snprintf(buffer, 512, "Cannot load sound\ndrone_close.wav");
-                        _fNotifMgrSend(buffer);
-                    }
-
-                    MemFree(buffer);
+                    current->sounds.drone_close = _fAudioPlayRaylibSound(&__state.sound_engine, "assets/sounds/drone_close.wav", 1);
+                    _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_close, AE_VOLUME, 1.f);
                     current->played_effect_1 = 1;
                 }
 
-                if (!entity->damage) {
-                    _fEntityDamage(entity, 5.f);
-                } else {
-                    entity->damage(5.f);
-                }
+                _fScheduleOverlayFunc((renderer_event_t){_feWaspDamagePlayer, entity});
             }
-            if (!CheckCollisionCircleRec(_fImathToVFloat(center), 32 * t.x, _fHitboxToRect(entity->hitbox))) {
+            if (!_feWaspEntityInRadius(instance, entity, 32)) {
                 struct fewasp_state_entry *current = _feWaspGetTrappedEntityState(instance, entity);
                 if (current) {
                     if (!current->played_effect_2) {
-                        char *buffer = (char *)MemAlloc(512);
-                        const char *storage = _fStorageGetWritable();
-
-                        if (!IsSoundValid(__state.snd_drone_flew)) {
-                            snprintf(buffer, 512, "%s/drone_flew.wav", storage);
-                            __state.snd_drone_flew = LoadSound(buffer);
-                        }
-                        if (IsSoundValid(__state.snd_drone_flew)) {
-                            RlPlaySound(__state.snd_drone_flew);
-                        } else {
-                            snprintf(buffer, 512, "Cannot load sound\ndrone_flew.wav");
-                            _fNotifMgrSend(buffer);
-                        }
-
-                        MemFree(buffer);
+                        current->sounds.drone_flew = _fAudioPlayRaylibSound(&__state.sound_engine, "assets/sounds/drone_flew.wav", 1);
+                        _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_flew, AE_VOLUME, 0.5f);
                         current->played_effect_2 = 1;
                         current->played_effect_1 = 0;
                         current->played_effect_3 = 0;
 
-                        if (IsMusicValid(__state.mus_drone_near_loop)) {
-                            if (IsMusicStreamPlaying(__state.mus_drone_near_loop)) {
-                                StopMusicStream(__state.mus_drone_near_loop);
-                            }
-                        }
+                        _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_near_loop, AE_LOOP, 0);
+                        _fAudioRunSoundActionRl(&__state.sound_engine, current->sounds.drone_near_loop, AE_STOP);
                     }
                 }
             } else {
@@ -273,23 +306,21 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
                     char *buffer = (char *)MemAlloc(512);
                     const char *storage = _fStorageGetWritable();
 
-                    if (!IsMusicValid(__state.mus_drone_near_loop)) {
-                        snprintf(buffer, 512, "%s/drone_near_loop.wav", storage);
-                        __state.mus_drone_near_loop = LoadMusicStream(buffer);
-                    }
-                    if (IsMusicValid(__state.mus_drone_near_loop)) {
-                        if (!IsMusicStreamPlaying(__state.mus_drone_near_loop)) {
-                            __state.mus_drone_near_loop.looping = 1;
-                            PlayMusicStream(__state.mus_drone_near_loop);
-                        }
-                    } else {
-                        snprintf(buffer, 512, "Cannot load music\ndrone_near_loop.wav");
-                        _fNotifMgrSend(buffer);
-                    }
+                    current->sounds.drone_near_loop = _fAudioPlayRaylibSound(&__state.sound_engine, "assets/sounds/drone_near_loop.wav", 1);
+                    _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_near_loop, AE_LOOP, 1);
+                    _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_near_loop, AE_VOLUME, 0.5f);
 
-                    MemFree(buffer);
                     current->played_effect_3 = 1;
                     current->played_effect_2 = 0;
+                } else {
+                    float cd = 1.f;
+                    if (entity->max_damage_colddown > 0.f) {
+                        cd = 1.f - (entity->damage_colddown / entity->max_damage_colddown);
+                    }
+                    float nv = 0.5f * distance_circ * cd;
+                    TraceLog(LOG_INFO, "nv=%f distance_circ=%f cd=%f distance=%f", nv, distance_circ, cd, distance);
+
+                    _fAudioSetSoundParamRl(&__state.sound_engine, current->sounds.drone_near_loop, AE_VOLUME, nv);
                 }
             }
         }

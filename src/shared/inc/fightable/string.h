@@ -24,6 +24,8 @@ int _fGetUtf8AtIndexWithLen(const char *utf_string, unsigned int char_index, uns
 unsigned int _fGetUtf8ByteOffset(const char *utf_string, unsigned int char_index);
 unsigned int _fGetUtf8ByteOffsetWithLen(const char *utf_string, unsigned int char_index, unsigned int buffer_len);
 
+unsigned char _fStringEndsWith(const char *str, const char *substr);
+
 #ifdef __cplusplus
 }
 #endif

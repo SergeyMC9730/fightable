@@ -5,7 +5,6 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "fightable/mp_server.h"
-#include "raylib.h"
 #include <fraylib.h>
 #include <fightable/intro.h>
 #include <fightable/state.h>
@@ -67,9 +66,9 @@ void _fIntroMenuInitMpBackground() {
     const char* readable = _fStorageGetWritable();
 
 #ifndef GRAPHICS_API_OPENGL_ES3
-    snprintf(buffer, 256, "%s/wave_warp.fs", readable);
+    snprintf(buffer, 256, "%s/assets/shaders/wave_warp.fs", readable);
 #else
-    snprintf(buffer, 256, "%s/wave_warp_es3.fs", readable);
+    snprintf(buffer, 256, "%s/assets/shaders/wave_warp_es3.fs", readable);
 #endif
     __state.mp_create_wave_shader = LoadShader(NULL, buffer);
 
@@ -93,7 +92,7 @@ void _fIntroMenuOnMpCreateCallback(void *ctx) {
 
     _fIntroMenuInitMpBackground();
 
-    snprintf(buffer, 256, "%s/3g_crim.xm", readable);
+    snprintf(buffer, 256, "%s/assets/music/3g_crim.xm", readable);
 
     _fAudioPlayModule(&__state.sound_engine, buffer);
     _fAudioLoopCurrent(&__state.sound_engine);

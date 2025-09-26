@@ -64,14 +64,5 @@ void _flPlayerDamage(struct felplayer* instance, float hp) {
 		_fEntitySetDestroyTimer(&label->base, 3.f);
 
 		RSBAddElement_fentity(label->base.level->entities, &label->base);
-
-		struct fentity_wasp* test = (struct fentity_wasp*)MemAlloc(sizeof(struct fentity_wasp));
-		_feWaspInit(test);
-
-		test->base.level = instance->base.level;
-		test->base.hitbox.x = instance->base.hitbox.x;
-		test->base.hitbox.y = instance->base.hitbox.y;
-
-		RSBAddElement_fentity(test->base.level->entities, &test->base);
 	}
 }

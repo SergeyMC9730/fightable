@@ -21,17 +21,18 @@ void *_fLevelDoBlockUpdate(void* _level) {
 
     while (!level->block_p_close) {
         if (!level->pause_world) {
-            if (level->block_p_profile) start = clock();
+            start = clock();
             _fLevelTick(level);
+            end = clock();
+            double t = ((double)(end - start) / (double)CLOCKS_PER_SEC) * 1000.f;
+            int req = (int)((1000.f / level->tps) - t);
+            if (level->tps > 0.f) _fSleep(req);
             if (level->block_p_profile) {
-                end = clock();
-                double t = ((double)(end - start) / (double)CLOCKS_PER_SEC) * 1000.f;
-
-                TraceLog(LOG_INFO, "Level ticked in %fms", (float)t);
+                TraceLog(LOG_INFO, "Level ticked in %fms; Wait %d ms", (float)t, req);
             }
+        } else {
+            if (level->tps > 0.f) _fSleep((int)(1000.f / level->tps));
         }
-
-        if (level->tps > 0.f) _fSleep((int)(1000.f / level->tps));
     }
 
     TraceLog(LOG_INFO, "Closing tick thread");
@@ -61,13 +62,7 @@ void _fLevelTick(struct flevel* level) {
             entity->obstacles = level->hitboxes;
             entity->obstacles_length = level->data_size;
             entity->custom_delta = delta;
-
-            if (!entity->update) {
-                _fEntityUpdate(entity);
-            }
-            else {
-                entity->update(entity);
-            }
+            entity->update(entity);
         }
     }
 }

@@ -14,6 +14,7 @@
 #include <fightable/color.h>
 #include <fightable/sanitizer.h>
 #include <fightable/renderer.h>
+#include <fightable/e_wasp.h>
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
 RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
@@ -189,12 +190,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
-            if (!entity->draw) {
-                _fEntityDraw(entity);
-            }
-            else {
-                entity->draw(entity);
-            }
+            entity->draw(entity);
         }
     }
 
@@ -221,7 +217,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     // EndMode2DStacked();
 
     if (IsKeyPressed(KEY_M) && level->entities) {
-        TraceLog(LOG_INFO, "Damaging all entities by 0%");
+        TraceLog(LOG_INFO, "Damaging all entities by 0 hp");
 
         for (int i = 0; i < level->entities->len; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
@@ -234,6 +230,18 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
                 entity->damage(entity, 0.f);
             }
         }
+    }
+    if (IsKeyPressed(KEY_N) && player) {
+        TraceLog(LOG_INFO, "Spawning wasp");
+
+       	struct fentity_wasp* test = (struct fentity_wasp*)MemAlloc(sizeof(struct fentity_wasp));
+        _feWaspInit(test);
+
+        test->base.level = level;
+        test->base.hitbox.x = player->hitbox.x;
+        test->base.hitbox.y = player->hitbox.y;
+
+        RSBAddElement_fentity(level->entities, &test->base);
     }
 
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);

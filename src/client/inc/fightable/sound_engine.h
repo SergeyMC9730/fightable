@@ -20,6 +20,29 @@ extern "C" {
 typedef struct openmpt_module openmpt_module;
 typedef struct AudioStream AudioStream;
 
+#include <fraylib.h>
+#include <rsb/rsb_array_gen.h>
+
+struct fae_sound_cache_entry {
+    Sound sound;
+    char *filepath;
+};
+struct fae_sound_entry {
+    Sound sound_alias;
+    char *path;
+    unsigned int id;
+    unsigned char loop;
+    struct fae_sound_cache_entry *cache_data;
+};
+
+struct fae_search_result {
+    struct fae_sound_cache_entry *cache;
+    struct fae_sound_entry *alias;
+};
+
+RSB_ARRAY_DEF_GEN(struct fae_sound_entry, _ae_sound_entry);
+RSB_ARRAY_DEF_GEN(struct fae_sound_cache_entry, _ae_sound_cache_entry);
+
 struct faudio_engine {
     openmpt_module *current_module;
 
@@ -54,6 +77,19 @@ struct faudio_engine {
 
         double time;
     } fx;
+
+    struct rl_snd {
+        rsb_array__ae_sound_entry *current_sounds;
+        rsb_array__ae_sound_cache_entry *sound_cache;
+        unsigned int current_id;
+    } rl_engine;
+};
+
+enum fae_parameter {
+    AE_VOLUME, AE_PAN, AE_PITCH, AE_LOOP
+};
+enum fae_action {
+    AE_STOP, AE_PLAY, AE_PAUSE, AE_RESUME
 };
 
 void _fAudioBegin(struct faudio_engine *engine);
@@ -69,6 +105,17 @@ void _fAudioSetVolume(struct faudio_engine *engine, float v);
 
 void _fAudioFxUpdate(struct faudio_engine* engine);
 void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time);
+
+void _fAudioUpdateRaylibSounds(struct faudio_engine* engine);
+unsigned int _fAudioPlayRaylibSound(struct faudio_engine* engine, const char *path, unsigned char in_storage);
+
+void _fAudioSetSoundParamRl(struct faudio_engine* engine, unsigned int sound_id, enum fae_parameter param, float value);
+void _fAudioRunSoundActionRl(struct faudio_engine* engine, unsigned int sound_id, enum fae_action act);
+
+void _fAudioToggleSoundLoopRl(struct faudio_engine* engine, unsigned int sound_id, unsigned char state);
+
+struct fae_search_result _fAudioFindEntryRl(struct faudio_engine* engine, unsigned int sound_id);
+struct fae_search_result _fAudioFindEntryRlByFilename(struct faudio_engine* engine, const char *ending);
 
 #ifdef __cplusplus
 }

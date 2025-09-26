@@ -25,11 +25,6 @@ void _fAudioFxUpdate(struct faudio_engine* engine) {
 			_fAudioSetVolume(engine, engine->fx.slide_volume_value);
 		}
 	}
-
-	Music chk = __state.mus_drone_near_loop;
-	if (IsMusicValid(chk) && IsMusicStreamPlaying(chk)) {
-        UpdateMusicStream(chk);
-	}
 }
 void _fAudioFxSlideVolume(struct faudio_engine* engine, float v, float time) {
 	if (time <= 0) return _fAudioSetVolume(engine, v);

@@ -5,6 +5,7 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include "fightable/level.h"
+#include "fightable/sound_engine.h"
 #include <fightable/editor.hpp>
 #include <fightable/editor.h>
 #include <fightable/state.h>
@@ -75,6 +76,8 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
     __state.current_ui_menu = UI_MENU_EDITOR;
 
     _fCloseFileSelector();
+
+    _fAudioFxSlideVolume(&__state.sound_engine, __state.config.volume_slider.progress, 0.5f);
 }
 
 struct feditor *_fEditorCreate() {

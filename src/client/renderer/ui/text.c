@@ -94,7 +94,7 @@ struct ftext_manager _fTextLoadDefault() {
     struct ftext_manager man = {0};
 
     man.char_padding = 1;
-    man.tilemap = _fTilemapCreate("text.png", (IVector2){3, 5});
+    man.tilemap = _fTilemapCreate("assets/fonts/text.png", (IVector2){3, 5});
     man.char_mapping = __default_font_data;
 
     return man;
