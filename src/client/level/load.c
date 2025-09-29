@@ -4,11 +4,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/level.h>
 #include <fightable/block.h>
 #include <fightable/block_library.h>
 #include <fightable/state.h>
 #include <fightable/notif_mgr.h>
+#include <rsb/rsb_array_int.h>
 #include <stdio.h>
 
 struct flevel* _fLevelLoadFromFile(const char* filename) {
@@ -133,6 +135,10 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 		unsigned int rid = 1;
 
+		TraceLog(LOG_INFO, "Analyzing level layers");
+
+		rsb_array__int *layer_array = RSBCreateArray_int();
+
 		for (unsigned int i = 0; i < objects; i++) {
 			unsigned int offset = 10 + (11 * i);
 			if (offset >= len) {
@@ -156,27 +162,75 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 			uint8_t bitdata = ref[11];
 
-			struct fblock block = _fBlockFromId(id);
-			block.layer_id = lid;
-			block.base.block_x = x;
-			block.base.block_y = y;
-			if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
-
-			level->objects[i] = block;
-
-			struct flevel_registry_entry entry = { 0 };
-			entry.id = rid;
-			TraceLog(LOG_INFO, "Creating unitype for %d", rid);
-			entry.entry = __uni_create("h");
-			*(float*)(entry.entry->next->p) = gid;
-			entry.entry->next->name = "gid";
-
-			level->last_entry_id = rid;
-
-			RSBAddElement_lre(level->block_entries, entry);
-
-			rid++;
+			if (!RSBContains_int(layer_array, lid)) {
+			    RSBAddElement_int(layer_array, lid);
+			}
 		}
+
+		if (layer_array->len > 0) {
+            TraceLog(LOG_INFO, "Level contains %d layers; sorting block data", layer_array->len);
+		} else {
+		    TraceLog(LOG_WARNING, "Cannot determine layer metadata; parsing blocks in classical way");
+
+			RSBAddElement_int(layer_array, 0);
+		}
+
+		for (unsigned int j = 0; j < layer_array->len; j++) {
+            unsigned short wanted_layer = layer_array->objects[j];
+            TraceLog(LOG_ERROR, "Processing layer %d", wanted_layer);
+            for (unsigned int i = 0; i < objects; i++) {
+                unsigned int offset = 10 + (11 * i);
+                if (offset >= len) {
+                    TraceLog(LOG_WARNING, "Unexpected EOF at %d", offset);
+                    break;
+                }
+
+                unsigned char* ref = data + offset;
+                short* sref = (short*)ref;
+
+                unsigned short id = sref[0];
+                if (id == BLOCK_AIR || id == INVALID_BLOCK_ID) {
+                    // TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
+                    continue;
+                }
+
+                short x = sref[1];
+                short y = sref[2];
+                unsigned short gid = sref[3];
+                unsigned short lid = sref[4];
+
+                if (lid != wanted_layer) continue;
+
+                uint8_t bitdata = ref[11];
+
+                if (!RSBContains_int(layer_array, lid)) {
+                    RSBAddElement_int(layer_array, lid);
+                }
+
+                struct fblock block = _fBlockFromId(id);
+                block.layer_id = lid;
+                block.base.block_x = x;
+                block.base.block_y = y;
+                if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
+
+                level->objects[i] = block;
+
+                struct flevel_registry_entry entry = { 0 };
+                entry.id = rid;
+                TraceLog(LOG_INFO, "Creating unitype for %d", rid);
+                entry.entry = __uni_create("h");
+                *(float*)(entry.entry->next->p) = gid;
+                entry.entry->next->name = "gid";
+
+                level->last_entry_id = rid;
+
+                RSBAddElement_lre(level->block_entries, entry);
+
+                rid++;
+            }
+        }
+
+		RSBDestroy_int(layer_array);
 
 		break;
 	}
@@ -231,6 +285,11 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 		unsigned char* block_entries_ptr = NULL;
 
+		TraceLog(LOG_INFO, "Analyzing level layers");
+
+		long cur_pos = ftell(file);
+		rsb_array__int *layer_array = RSBCreateArray_int();
+
 		for (unsigned int i = 0; i < objects; i++) {
 			unsigned int registry_id = 0;
 			unsigned short id = 0, layer_id = 0;
@@ -244,19 +303,72 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 			fread(&registry_id, sizeof(registry_id), 1, file);
 			fread(&bitdata, sizeof(bitdata), 1, file);
 
-			if (id == BLOCK_AIR || id == INVALID_BLOCK_ID) {
-				// TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
-				continue;
+			if (!RSBContains_int(layer_array, layer_id)) {
+			    RSBAddElement_int(layer_array, layer_id);
 			}
 
-			struct fblock block = _fBlockFromId(id);
-			block.layer_id = layer_id;
-			block.registry_id = registry_id;
-			block.base.block_x = x;
-			block.base.block_y = y;
-			_fBlockRecoverBitfield(&block, bitdata);
+			// if (id == BLOCK_AIR || id == INVALID_BLOCK_ID) {
+			// 	// TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
+			// 	continue;
+			// }
 
-			level->objects[i] = block;
+			// struct fblock block = _fBlockFromId(id);
+			// block.layer_id = layer_id;
+			// block.registry_id = registry_id;
+			// block.base.block_x = x;
+			// block.base.block_y = y;
+			// _fBlockRecoverBitfield(&block, bitdata);
+
+			// level->objects[i] = block;
+		}
+
+		if (layer_array->len > 0) {
+            TraceLog(LOG_INFO, "Level contains %d layers; sorting block data", layer_array->len);
+		} else {
+		    TraceLog(LOG_WARNING, "Cannot determine layer metadata; parsing blocks in classical way");
+
+			RSBAddElement_int(layer_array, 0);
+		}
+
+		for (unsigned int j = 0; j < layer_array->len; j++) {
+		    fseek(file, cur_pos, SEEK_SET);
+
+			unsigned short wanted_layer = layer_array->objects[j];
+			TraceLog(LOG_ERROR, "Processing layer %d", wanted_layer);
+
+            for (unsigned int i = 0; i < objects; i++) {
+                unsigned int registry_id = 0;
+                unsigned short id = 0, layer_id = 0;
+                short x = 0, y = 0;
+                unsigned char bitdata = 0;
+
+                fread(&id, sizeof(id), 1, file);
+                fread(&x, sizeof(x), 1, file);
+                fread(&y, sizeof(y), 1, file);
+                fread(&layer_id, sizeof(layer_id), 1, file);
+                fread(&registry_id, sizeof(registry_id), 1, file);
+                fread(&bitdata, sizeof(bitdata), 1, file);
+
+                if (layer_id != wanted_layer) continue;
+
+                if (!RSBContains_int(layer_array, layer_id)) {
+                    RSBAddElement_int(layer_array, layer_id);
+                }
+
+                if (id == BLOCK_AIR || id == INVALID_BLOCK_ID) {
+         			// TraceLog(LOG_INFO, "Invalid block id %d at pos %d(%d)", (int)ref, i);
+         			continue;
+                }
+
+                struct fblock block = _fBlockFromId(id);
+                block.layer_id = layer_id;
+                block.registry_id = registry_id;
+                block.base.block_x = x;
+                block.base.block_y = y;
+                _fBlockRecoverBitfield(&block, bitdata);
+
+                level->objects[i] = block;
+            }
 		}
 
 		unsigned int be_amount;

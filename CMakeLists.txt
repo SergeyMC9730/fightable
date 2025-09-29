@@ -89,6 +89,7 @@ add_library(fshared STATIC
     src/shared/src/fs_file.c
     src/shared/src/fs_directory.c
     src/shared/src/fs_native.c
+    src/shared/src/int.c
 )
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_SHARED_INC}

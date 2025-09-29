@@ -5,3 +5,4 @@
 #define BLOCK_WHITE 38
 #define BLOCK_BLACK 39
 #define BLOCK_MAGMA 47
+#define BLOCK_TMOVE

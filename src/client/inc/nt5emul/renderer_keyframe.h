@@ -32,7 +32,7 @@ struct renderer_keyframe {
     double length;
 
     // ending_value is the relative value. starting_value is incremented by ending_value
-    // starting value does not directly exists inside a keyframe. starting_value is the resulting movement value from the previous keyframe
+    // starting value does not directly exist inside a keyframe. starting_value is the resulting movement value from the previous keyframe
     double ending_value;
 
     renderer_tweak_type easing;

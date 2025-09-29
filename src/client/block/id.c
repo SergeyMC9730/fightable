@@ -129,6 +129,7 @@ static const struct fblock __blocks[] = {
     {TSET(38, 2,Wool)},                                     // 117
     {TSET(39, 2,Wool)},                                     // 118
     {TSET(40, 2,Wool)},                                     // 119
+    {TSET(14, 5,Move),.passable = 1},                       // 120
 };
 
 struct fblock _fBlockFromId(unsigned short id) {
