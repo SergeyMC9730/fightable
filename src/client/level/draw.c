@@ -150,6 +150,21 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (_x > __state.framebuffer.texture.width || _y > __state.framebuffer.texture.height || (_x + tx) < 0 || (_y + ty) < 0) continue;
         if (_fBlockIdFromRenderable(obj->base) == 0) continue;
 
+        struct flevel_registry_entry *reg = obj->linked_reg;
+        if (reg) {
+            __uni_print(reg->entry);
+            unitype_t *p_offsetx = __uni_find(reg->entry, "tmp_offset_x");
+            unitype_t *p_offsety = __uni_find(reg->entry, "tmp_offset_y");
+            if (p_offsetx && p_offsety) {
+                int offsetx = *(int*)p_offsetx->p;
+                int offsety = *(int*)p_offsety->p;
+                TraceLog(LOG_INFO, "OFFSET FOR %d IS %d:%d", obj->registry_id, offsetx, offsety);
+
+                _x += offsetx;
+                _y += offsety + sin(GetTime() * 5) * 8;
+            }
+        }
+
         if (level->in_workbench_mode) {
             _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj->base.tile_x, obj->base.tile_y}, obj->base.flipped_x, obj->base.flipped_y, BLACK);
         }

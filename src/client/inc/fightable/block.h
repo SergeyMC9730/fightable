@@ -8,6 +8,8 @@ extern "C" {
 
 #pragma pack(push, 1)
 
+struct flevel_registry_entry;
+
 struct fblock {
     struct frendered_object base;
 
@@ -25,12 +27,14 @@ struct fblock {
     unsigned int registry_id;
     unsigned short parent_id;
     unsigned short layer_id;
+
+    struct flevel_registry_entry *linked_reg;
 };
 
 #pragma pack(pop)
 
-// id + block_x + block_y + bitflags
-#define BLOCK_SIZE (sizeof(short) + sizeof(short) + sizeof(short) + sizeof(uint8_t))
+// id + block_x + block_y + bitflags + parent id + layer id + registry id
+#define BLOCK_SIZE (sizeof(short) + sizeof(short) + sizeof(short) + sizeof(uint8_t) + sizeof(short) + sizeof(short) + sizeof(int))
 
 struct fblock _fBlockFromId(unsigned short id);
 

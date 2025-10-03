@@ -53,6 +53,8 @@ typedef struct unitype_t unitype_t;
 	unitype_t* __uni_last(unitype_t* args);
 	// Find first entry
 	unitype_t* __uni_first(unitype_t* args);
+	// Output unitype linked list
+	void __uni_print(unitype_t* args);
 #pragma pack(pop)
 
 #ifdef __cplusplus

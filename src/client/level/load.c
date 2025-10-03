@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <fightable/level.h>
 #include <fightable/block.h>
 #include <fightable/block_library.h>
@@ -88,16 +87,14 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 			block.base.block_y = y;
 			if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
 
-			level->objects[i] = block;
-
 			struct flevel_registry_entry entry = { 0 };
 			entry.id = rid;
 			entry.entry = __uni_create("h");
 			*(float*)(entry.entry->next->p) = gid;
 			entry.entry->next->name = "gid";
 
-			RSBAddElement_lre(level->block_entries, entry);
-
+			block.linked_reg = RSBAddElement_lre(level->block_entries, entry);
+			level->objects[i] = block;
 			level->last_entry_id = rid;
 
 			rid++;
@@ -213,15 +210,15 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
                 block.base.block_y = y;
                 if (parse_bitfield) _fBlockRecoverBitfield(&block, bitdata);
 
-                level->objects[i] = block;
-
                 struct flevel_registry_entry entry = { 0 };
                 entry.id = rid;
                 TraceLog(LOG_INFO, "Creating unitype for %d", rid);
-                entry.entry = __uni_create("h");
+                entry.entry = __uni_create("h"); // short
                 *(float*)(entry.entry->next->p) = gid;
                 entry.entry->next->name = "gid";
 
+                block.linked_reg = RSBAddElement_lre(level->block_entries, entry);
+                level->objects[i] = block;
                 level->last_entry_id = rid;
 
                 RSBAddElement_lre(level->block_entries, entry);
@@ -385,7 +382,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 			level->last_entry_id = id;
 
-			// TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
+			TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
 
 			unitype_t* root = __uni_create(NULL);
 
@@ -421,7 +418,12 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 				__uni_add(root, u);
 			}
 
-			RSBAddElement_lre(level->block_entries, entry);
+			struct fblock *reg = _fLevelBlockFromRegistry(level, entry.id);
+			if (!reg) {
+			    TraceLog(LOG_WARNING, "Unused registry entry %d was found", entry.id);
+			} else {
+			    reg->linked_reg = RSBAddElement_lre(level->block_entries, entry);
+			}
 		}
 
 		fclose(file);

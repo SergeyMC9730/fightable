@@ -32,23 +32,23 @@ struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_til
 
     level->block_entries = RSBCreateArray_lre();
 
-    for (int x = 0; x < level->width; x++) {
-        for (int y = 0; y < level->height; y++) {
-            int idx = (y * level->width) + x;
+    // for (int x = 0; x < level->width; x++) {
+    //     for (int y = 0; y < level->height; y++) {
+    //         int idx = (y * level->width) + x;
 
-            struct fblock *obj = level->objects + idx;
+    //         struct fblock *obj = level->objects + idx;
 
-            if (y == 0) {
-                *obj = _fBlockFromId(2);
-            }
-            else {
-                *obj = _fBlockFromId(19);
-            }
+    //         if (y == 0) {
+    //             *obj = _fBlockFromId(2);
+    //         }
+    //         else {
+    //             *obj = _fBlockFromId(19);
+    //         }
 
-            obj->base.block_x = x;
-            obj->base.block_y = y + 3;
-        }
-    }
+    //         obj->base.block_x = x;
+    //         obj->base.block_y = y + 3;
+    //     }
+    // }
 
     struct fblock *obj = level->objects + (level->data_size - 1);
     *obj = _fBlockFromId(BLOCK_START);

@@ -1,6 +1,7 @@
 #include <tunnelos/unitype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 unitype_t* __placeholder_unitype(unitype_t* args) {
 	return 0;
@@ -157,4 +158,19 @@ void __uni_add(unitype_t* args, unitype_t* entry) {
 	last->next = entry;
 	entry->prev = last;
 	entry->next = NULL;
+}
+
+// Output unitype linked list
+void __uni_print(unitype_t* args) {
+    if (!args) return;
+
+    unitype_t *u = args;
+
+    unsigned int i = 0;
+    while (u != NULL) {
+        printf("unitype %p (parent=%p); id=%d; type=%c; NAME=\"%s\"; data address=%p\n", u, args, i, u->type, u->name, u->p);
+
+        u = u->next;
+        i++;
+    }
 }

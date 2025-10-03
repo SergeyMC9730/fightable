@@ -97,20 +97,32 @@ struct flevel {
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
 void _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
+
 struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
+
 RLRectangle *_fLevelGetHitboxes(struct flevel *level);
+
 struct fentity *_fLevelFindPlayer(struct flevel *level);
+
 void _fLevelTriggerGameOver(struct flevel* level);
+
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity);
+
 void _fLevelSave(struct flevel* level, const char* filename);
+
 struct flevel* _fLevelLoadFromFile(const char* filename);
 struct flevel* _fLevelLoadFromFileSelector(const char* filename);
+
 void _fLevelTick(struct flevel* level);
 void *_fLevelDoBlockUpdate(void* level);
 void _fLevelLoadProcessor(struct flevel *level);
+
 void _fLevelDestroy(struct flevel* level, unsigned char level_allocated, unsigned char blocks_allocated, unsigned char entities_allocated);
 
 void _fLevelLightSourceDraw(struct flevel* env, struct flevel_light_source* source);
+
+struct flevel_registry_entry *_fLevelFindBlockEntry(struct flevel *level, unsigned int unique_block_id);
+struct fblock *_fLevelBlockFromRegistry(struct flevel *level, unsigned int registry_id);
 
 #ifdef __cplusplus
 }

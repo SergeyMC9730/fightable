@@ -18,7 +18,7 @@ extern "C" {
 
 #define RSB_ARRAY_FUNC_CREATE_DEF(funname) RSB_ARRAY_NAME(funname) *RSBCreateArray##funname()
 #define RSB_ARRAY_FUNC_CREATEFL_DEF(type, funname) RSB_ARRAY_NAME(funname) *RSBCreateArrayFromList##funname(type *object_list, unsigned int size)
-#define RSB_ARRAY_FUNC_ADDELEMENT_DEF(type, funname) void RSBAddElement##funname(RSB_ARRAY_NAME(funname) *array, type object)
+#define RSB_ARRAY_FUNC_ADDELEMENT_DEF(type, funname) type *RSBAddElement##funname(RSB_ARRAY_NAME(funname) *array, type object)
 #define RSB_ARRAY_FUNC_POPELEMENT_DEF(funname) void RSBPopElement##funname(RSB_ARRAY_NAME(funname) *array)
 #define RSB_ARRAY_FUNC_DESTROY_DEF(funname) void RSBDestroy##funname(RSB_ARRAY_NAME(funname) *array)
 #define RSB_ARRAY_FUNC_GETATINDEX_DEF(type, funname) type RSBGetAtIndex##funname(RSB_ARRAY_NAME(funname) *array, unsigned int index)
@@ -73,7 +73,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 }
 
 #define RSB_ARRAY_FUNC_ADDELEMENT_IMPL(type, funname) RSB_ARRAY_FUNC_ADDELEMENT_DEF(type, funname) {                        \
-    if (!array) return;                                                                                                     \
+    if (!array) return NULL;                                                                                                \
     while (array->lock) {}                                                                                                  \
     array->lock = 1;                                                                                                        \
                                                                                                                             \
@@ -95,7 +95,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
                                                                                                                             \
     array->lock = 0;                                                                                                        \
                                                                                                                             \
-    return;                                                                                                                 \
+    return array->objects + array->current_index - 1;                                                                                                                 \
 }
 
 #define RSB_ARRAY_FUNC_POPELEMENT_IMPL(type, funname) RSB_ARRAY_FUNC_POPELEMENT_DEF(funname) {                          \

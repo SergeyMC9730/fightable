@@ -1,3 +1,4 @@
+#include "fightable/block_library.h"
 #include <fightable/editor.h>
 #include <fightable/editor.hpp>
 #include <fightable/block.h>
@@ -32,23 +33,31 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
         auto b = _fBlockFromId(_id);
         b.layer_id = layer_id;
 
-        editor->objects[layer_id][pos.x][pos.y] = b;
-
         struct flevel_registry_entry entry = { 0 };
         entry.id = ++editor->level->last_entry_id;
         entry.entry = __uni_create(NULL);
 
-        RSBAddElement_lre(editor->level->block_entries, entry);
+        b.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
+        b.registry_id = entry.id;
+        editor->objects[layer_id][pos.x][pos.y] = b;
 
         return;
     }
 
     block.layer_id = layer_id;
-    editor->objects[layer_id][pos.x][pos.y] = block;
 
     struct flevel_registry_entry entry = { 0 };
     entry.id = ++editor->level->last_entry_id;
-    entry.entry = __uni_create(" ");
 
-    RSBAddElement_lre(editor->level->block_entries, entry);
+    if (id == BLOCK_TMOVE) {
+        entry.entry = __uni_create("ii");
+        entry.entry->next->name = "tmp_offset_x";
+        entry.entry->next->next->name = "tmp_offset_y";
+    } else {
+        entry.entry = __uni_create(" ");
+    }
+
+    block.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
+    block.registry_id = entry.id;
+    editor->objects[layer_id][pos.x][pos.y] = block;
 }

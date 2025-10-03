@@ -365,6 +365,7 @@ set(FIGHTABLE_SRC
     src/client/mpserver/player_list.c
     src/client/entity/wasp.c
     src/client/audio/raylib.c
+    src/client/level/registry.c
     ${FIGHTABLE_GPU_SRC}
 )
 
