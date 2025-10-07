@@ -8,7 +8,14 @@
 #include <libopenmpt/libopenmpt.h>
 
 const char *_fAudioGetChannelRow(struct faudio_engine *engine, int channel) {
-    if (!engine->current_module) return NULL;
+    if (!engine || !engine->current_module) return NULL;
 
-    return openmpt_module_format_pattern_row_channel(engine->current_module, engine->_pattern, engine->_row, channel, 0, 0);
+    // B-6 01v16 D00
+    return openmpt_module_format_pattern_row_channel(
+        engine->current_module,
+        engine->_pattern,
+        engine->_row,
+        channel,
+        0, 0
+    );
 }
