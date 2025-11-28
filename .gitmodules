@@ -31,3 +31,6 @@
 [submodule "ext/nbnet"]
 	path = ext/nbnet
 	url = https://github.com/nathhB/nbnet
+[submodule "ext/args"]
+	path = ext/args
+	url = https://github.com/dmulholl/args.git

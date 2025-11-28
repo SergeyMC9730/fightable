@@ -1,5 +1,6 @@
 #include <fightable/init.h>
 #include <stdio.h>
+#include <fraylib.h>
 
 int main(int argc, char **argv) {
     static const char *creators[] = {
@@ -23,7 +24,21 @@ int main(int argc, char **argv) {
 
     printf("! Powered by %s\n", fightable_renderer);
 
-    _fInit(argc, argv);
+    printf("Loading game's renderer\n");
+    InitWindow(640, 480, "Fightable");
+
+    struct fightable_init_data application = {};
+
+    _fInit(argc, argv, &application);
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        unsigned char res = application.draw();
+        EndDrawing();
+        if (!res) break;
+    }
+
+    application.close();
 
     return 0;
 }

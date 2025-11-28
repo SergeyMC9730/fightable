@@ -73,6 +73,10 @@ set(FIGHTABLE_SHARED_INC
     src/shared/inc
 )
 
+add_library(args STATIC
+    ext/args/src/args.c
+)
+
 add_library(fshared STATIC
     src/shared/src/cstr.c
     src/shared/src/uchar.c
@@ -366,6 +370,20 @@ set(FIGHTABLE_SRC
     src/client/entity/wasp.c
     src/client/audio/raylib.c
     src/client/level/registry.c
+    src/client/loader/close.c
+    src/client/loader/draw.c
+    src/client/loader/step1_rng.c
+    src/client/loader/step2_storage.c
+    src/client/loader/step3_networking.c
+    src/client/loader/step4_logging.c
+    src/client/loader/step5_audio.c
+    src/client/loader/step6_framerate.c
+    src/client/loader/step7_window.c
+    src/client/loader/step8_ui.c
+    src/client/loader/step9_assets.c
+    src/client/loader/step10_arguments.c
+    src/client/loader/step11_uitweak.c
+    src/client/loader/step12_environment.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -453,6 +471,10 @@ else()
 
     message(FATAL_ERROR "Fightable does not support targets beyond Unix(X11) and NT")
 endif()
+
+target_include_directories(fightable PRIVATE
+    ${FIGHTABLE_RENDERER_INC}
+)
 
 if (UNIX OR LINUX)
     message(STATUS "Applying linkage patches for Unix")
@@ -603,6 +625,7 @@ target_include_directories(fbase PRIVATE
     ext/nativefiledialog-extended/src/include
     ext/PerlinNoise
     ext/nbnet
+    ext/args/src
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
@@ -635,9 +658,9 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared )
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args)
 else()
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared)
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args)
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )

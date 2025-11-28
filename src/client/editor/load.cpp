@@ -15,10 +15,7 @@
 #include <fightable/pthread_compat.h>
 #include <stdio.h>
 
-void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path) {
-    feditor *editor = __state.current_editor;
-
-    struct flevel *lvl = _fLevelLoadFromFileSelector(path);
+void _fEditorFinishEditorInit(feditor *editor, flevel *lvl) {
     if (!lvl) {
         __state.current_editor = NULL;
         return;
@@ -75,12 +72,18 @@ void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path)
 
     __state.current_ui_menu = UI_MENU_EDITOR;
 
-    _fCloseFileSelector();
-
     _fAudioFxSlideVolume(&__state.sound_engine, __state.config.volume_slider.progress, 0.5f);
 }
 
-struct feditor *_fEditorCreate() {
+void _fEditorOnFileSelected(struct nt_file_selector_menu *ctx, const char *path) {
+    feditor *editor = __state.current_editor;
+    struct flevel *lvl = _fLevelLoadFromFileSelector(path);
+
+    _fEditorFinishEditorInit(editor, lvl);
+    _fCloseFileSelector();
+}
+
+struct feditor *_fEditorCreateExt(unsigned char with_file_dialog) {
     feditor *editor = new feditor;
 
     editor->current_block_id = 0;
@@ -91,7 +94,15 @@ struct feditor *_fEditorCreate() {
     __state.current_editor = editor;
     // editor->camera.target.x = 261340;
 
-    _fOpenFileSelector(_fStorageGetWritable(), _fEditorOnFileSelected);
+    if (with_file_dialog || !__state.current_level) {
+        _fOpenFileSelector(_fStorageGetWritable(), _fEditorOnFileSelected);
+    } else {
+        _fEditorFinishEditorInit(editor, __state.current_level);
+    }
 
     return editor;
+}
+
+struct feditor *_fEditorCreate() {
+    return _fEditorCreateExt(1);
 }
