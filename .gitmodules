@@ -35,3 +35,6 @@
 [submodule "ext/args"]
 	path = ext/args
 	url = https://github.com/dmulholl/args.git
+[submodule "ext/libnbt"]
+	path = ext/libnbt
+	url = https://github.com/SergeyMC9730/libnbt.git

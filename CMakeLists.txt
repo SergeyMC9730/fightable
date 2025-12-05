@@ -89,6 +89,12 @@ if (NOT HAVE_LIBCURL AND NOT CURL_INC)
 endif()
 message(STATUS "curl custom include path: ${CURL_INC}")
 
+add_library(nbt-miniz STATIC
+    ext/libnbt/miniz.c
+)
+target_include_directories(nbt-miniz PRIVATE
+    ext/libnbt/
+)
 
 add_library(fshared STATIC
     src/shared/src/cstr.c
@@ -632,6 +638,7 @@ target_include_directories(fbase PRIVATE
     ext/PerlinNoise
     ext/nbnet
     ext/args/src
+    ext/libnbt/
     ${FIGHTABLE_HTTP_INC}
     ${OPENMPT_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
