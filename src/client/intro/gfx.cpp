@@ -123,7 +123,7 @@ void _fIntroProcessGfx() {
 void _fIntroGfxInit() {
 #if defined(TARGET_UNIX) && !defined(TARGET_LINUX)
     #pragma message("illegal instruction while executing shake code. ignoring this effect")
-    return;
+    // return;
 #endif
 
     switch (__state.song_id) {

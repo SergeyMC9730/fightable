@@ -77,6 +77,19 @@ add_library(args STATIC
     ext/args/src/args.c
 )
 
+include(CheckIncludeFile)
+
+find_library(CURL_LIB curl)
+if(NOT CURL_LIB)
+    message(FATAL_ERROR "libcurl could not be found")
+endif()
+CHECK_INCLUDE_FILE("curl/curl.h" HAVE_LIBCURL)
+if (NOT HAVE_LIBCURL AND NOT CURL_INC)
+    message(FATAL_ERROR "libcurl binaries were found but the header files itself are missing")
+endif()
+message(STATUS "curl custom include path: ${CURL_INC}")
+
+
 add_library(fshared STATIC
     src/shared/src/cstr.c
     src/shared/src/uchar.c
@@ -96,9 +109,9 @@ add_library(fshared STATIC
     src/shared/src/int.c
 )
 target_include_directories(fshared PRIVATE
-    ${FIGHTABLE_SHARED_INC}
+    ${FIGHTABLE_SHARED_INC} ${CURL_INC}
 )
-target_link_libraries(fshared curl)
+target_link_libraries(fshared ${CURL_LIB})
 
 if (LIBC_FD_SIZE)
     message(STATUS "Setting MP stack definition, FD_SETSIZE, to ${LIBC_FD_SIZE}")
@@ -115,8 +128,6 @@ endif()
 if (MICROHTTPD_LIB)
     set(MICROHTTPD_LIB_CUSTOM TRUE)
 endif()
-
-include(CheckIncludeFile)
 
 find_library(OPENMPT_LIB openmpt)
 if (NOT OPENMPT_LIB)
@@ -144,22 +155,12 @@ if (DISABLE_MP_FUNCTIONALITY)
 endif()
 
 if (NOT DISABLE_MP_SERVER)
-    find_library(CURL_LIB curl)
-    if(NOT CURL_LIB)
-        message(FATAL_ERROR "libcurl could not be found")
-    endif()
-
     find_library(MICROHTTPD_LIB microhttpd)
     if(NOT MICROHTTPD_LIB)
         message(FATAL_ERROR "libmicrohttpd could not be found")
     endif()
 
     message(STATUS "libmicrohttpd lib path: ${MICROHTTPD_LIB}")
-
-    CHECK_INCLUDE_FILE("curl/curl.h" HAVE_LIBCURL)
-    if (NOT HAVE_LIBCURL)
-        message(FATAL_ERROR "libcurl binaries were found but the header files itself are missing")
-    endif()
 
     CHECK_INCLUDE_FILE("microhttpd.h" HAVE_LIBMICROHTTPD)
     if (NOT HAVE_LIBMICROHTTPD AND NOT MICROHTTPD_INC)
@@ -202,6 +203,11 @@ endif()
 
 if (NOT DISABLE_PORTAUDIO)
     set(WDMKS OFF)
+    if (NOT LINUX)
+        set(PA_USE_ALSA OFF)
+        set(PA_USE_PULSEAUDIO OFF)
+        set(PA_USE_OSS ON)
+    endif()
     add_subdirectory(ext/portaudio_opensles)
 else()
     add_compile_definitions(_DISABLE_PORTAUDIO_)
@@ -658,7 +664,7 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson PortAudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args)
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson portaudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args)
 else()
     target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args)
 endif()

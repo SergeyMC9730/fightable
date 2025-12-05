@@ -212,7 +212,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
                 struct flevel_registry_entry entry = { 0 };
                 entry.id = rid;
-                TraceLog(LOG_INFO, "Creating unitype for %d", rid);
+                // TraceLog(LOG_INFO, "Creating unitype for %d", rid);
                 entry.entry = __uni_create("h"); // short
                 *(float*)(entry.entry->next->p) = gid;
                 entry.entry->next->name = "gid";
@@ -382,7 +382,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 			level->last_entry_id = id;
 
-			TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
+			// TraceLog(LOG_INFO, "Creating unitype root for %d (%d)", id, extra_objects_len);
 
 			unitype_t* root = __uni_create(NULL);
 
@@ -420,7 +420,7 @@ struct flevel* _fLevelLoadFromFile(const char* filename) {
 
 			struct fblock *reg = _fLevelBlockFromRegistry(level, entry.id);
 			if (!reg) {
-			    TraceLog(LOG_WARNING, "Unused registry entry %d was found", entry.id);
+			    // TraceLog(LOG_WARNING, "Unused registry entry %d was found", entry.id);
 			} else {
 			    reg->linked_reg = RSBAddElement_lre(level->block_entries, entry);
 			}
