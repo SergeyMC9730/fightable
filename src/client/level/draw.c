@@ -152,13 +152,13 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
 
         struct flevel_registry_entry *reg = obj->linked_reg;
         if (reg) {
-            __uni_print(reg->entry);
-            unitype_t *p_offsetx = __uni_find(reg->entry, "tmp_offset_x");
-            unitype_t *p_offsety = __uni_find(reg->entry, "tmp_offset_y");
-            if (p_offsetx && p_offsety) {
-                int offsetx = *(int*)p_offsetx->p;
-                int offsety = *(int*)p_offsety->p;
-                TraceLog(LOG_INFO, "OFFSET FOR %d IS %d:%d", obj->registry_id, offsetx, offsety);
+            nbt_tag_t *tag_tox = nbt_tag_compound_get(reg->entry, "tmp_offset_x");
+            nbt_tag_t *tag_toy = nbt_tag_compound_get(reg->entry, "tmp_offset_y");
+
+            if (tag_tox && tag_toy) {
+                int offsetx = tag_tox->tag_short.value;
+                int offsety = tag_toy->tag_short.value;
+                // TraceLog(LOG_INFO, "OFFSET FOR %d IS %d:%d", obj->registry_id, offsetx, offsety);
 
                 _x += offsetx;
                 _y += offsety + sin(GetTime() * 5) * 8;

@@ -2,116 +2,133 @@
 #include <fightable/generic_tools.hpp>
 #include <fightable/block.h>
 #include <fightable/block_library.h>
+#include <fightable/nbt_tools.h>
 
 void _fLevelSave(struct flevel* level, const char* filename) {
-	if (!level || !level->objects || !filename) return;
+    if (!level || !level->objects || !filename) return;
 
-	std::vector<uint8_t> output;
-	unsigned int valid_blocks = 0;
+    std::vector<uint8_t> output;
+    unsigned int valid_blocks = 0;
 
-	for (unsigned int i = 0; i < level->data_size; i++) {
-		struct fblock block = level->objects[i];
+    for (unsigned int i = 0; i < level->data_size; i++) {
+        struct fblock block = level->objects[i];
 
-		if (_fBlockIdFromBlock(block) == BLOCK_AIR) continue;
-		valid_blocks++;
-	}
+        if (_fBlockIdFromBlock(block) == BLOCK_AIR) continue;
+        valid_blocks++;
+    }
 
-	GenericTools::addVectors(&output, GenericTools::valueToVector(LEVEL_FORMAT_VERSION));
-	GenericTools::addVectors(&output, GenericTools::valueToVector(level->width));
-	GenericTools::addVectors(&output, GenericTools::valueToVector(level->height));
-	GenericTools::addVectors(&output, GenericTools::valueToVector(valid_blocks));
+    GenericTools::addVectors(&output, GenericTools::valueToVector(LEVEL_FORMAT_VERSION));
+    GenericTools::addVectors(&output, GenericTools::valueToVector(level->width));
+    GenericTools::addVectors(&output, GenericTools::valueToVector(level->height));
+    GenericTools::addVectors(&output, GenericTools::valueToVector(valid_blocks));
 #ifdef TARGET_BIG_ENDIAN
-	GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)1));
+    GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)1));
 #else
-	GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)0));
+    GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned char)0));
 #endif
 
-	for (unsigned int i = 0; i < level->data_size; i++) {
-		struct fblock block = level->objects[i];
-		unsigned short id = _fBlockIdFromBlock(block);
+    for (unsigned int i = 0; i < level->data_size; i++) {
+        struct fblock block = level->objects[i];
+        unsigned short id = _fBlockIdFromBlock(block);
 
-		if (id == BLOCK_AIR) continue;
+        if (id == BLOCK_AIR) continue;
 
-		GenericTools::addVectors(&output, GenericTools::valueToVector(id));
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_x));
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_y));
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.layer_id));
-		GenericTools::addVectors(&output, GenericTools::valueToVector(block.registry_id));
-		GenericTools::addVectors(&output, GenericTools::valueToVector(_fBlockGetBitfield(&block)));
-	}
+        GenericTools::addVectors(&output, GenericTools::valueToVector(id));
+        GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_x));
+        GenericTools::addVectors(&output, GenericTools::valueToVector(block.base.block_y));
+        GenericTools::addVectors(&output, GenericTools::valueToVector(block.layer_id));
+        GenericTools::addVectors(&output, GenericTools::valueToVector(block.registry_id));
+        GenericTools::addVectors(&output, GenericTools::valueToVector(_fBlockGetBitfield(&block)));
+    }
 
-	if (level->block_entries == NULL) {
-		GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned int)(0)));
-	}
-	else {
-		GenericTools::addVectors(&output, GenericTools::valueToVector(level->block_entries->len));
+    if (level->block_entries == NULL) {
+        GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned int)(0)));
+    }
+    else {
+        GenericTools::addVectors(&output, GenericTools::valueToVector(level->block_entries->len));
 
-		TraceLog(LOG_INFO, "Amount of block entries: %d", level->block_entries->len);
+        TraceLog(LOG_INFO, "Amount of block entries: %d", level->block_entries->len);
 
-		for (unsigned int i = 0; i < level->block_entries->len; i++) {
-			auto e = level->block_entries->objects[i];
-			GenericTools::addVectors(&output, GenericTools::valueToVector(e.id));
+        for (unsigned int i = 0; i < level->block_entries->len; i++) {
+            auto e = level->block_entries->objects[i];
+            GenericTools::addVectors(&output, GenericTools::valueToVector(e.id));
 
-			unsigned int l = 0;
-			unitype_t* u = e.entry;
+            nbt__write_stream_t write_stream;
+            write_stream.buffer = (uint8_t*)NBT_MALLOC(NBT_BUFFER_SIZE);
+            write_stream.offset = 0;
+            write_stream.size = 0;
+            write_stream.alloc_size = NBT_BUFFER_SIZE;
 
-			while (u != NULL) {
-				u = u->next;
-				l++;
-			}
+            nbt__write_tag(&write_stream, e.entry, 1, 1);
 
-			GenericTools::addVectors(&output, GenericTools::valueToVector(l));
+            GenericTools::addVectors(&output, GenericTools::valueToVector((unsigned int)write_stream.size));
+            GenericTools::addVectors(&output, GenericTools::arrayToVector(write_stream.buffer, write_stream.size));
+        }
 
-			TraceLog(LOG_INFO, "%d: Amount of extra objects: %d", i, l);
+        // for (unsigned int i = 0; i < level->block_entries->len; i++) {
+        //     auto e = level->block_entries->objects[i];
+        //     GenericTools::addVectors(&output, GenericTools::valueToVector(e.id));
 
-			if (l != 0) {
-				u = e.entry;
+        //     unsigned int l = 0;
+        //     unitype_t* u = e.entry;
 
-				while (u != NULL) {
-				    if (!u->name || (u->p == NULL && u->p_sz != 0) || (u->p != NULL && u->p_sz == 0)) {
-						TraceLog(LOG_WARNING, "%d: Entry cannot be saved properly %s(status=%d%d%d%d%d|%p.%d.%c)",
-						    i,
-						    u->next == NULL ? "and continued " : "\0",
-							!u->name,
-							u->p == NULL,
-							u->p_sz != 0,
-							u->p != NULL,
-							u->p_sz == 0,
-							u->p,
-							u->p_sz,
-							u->type
-						);
+        //     while (u != NULL) {
+        //         u = u->next;
+        //         l++;
+        //     }
 
-						GenericTools::addVectors(&output, GenericTools::valueToVector((size_t)0));
-						GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
-						GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
+        //     GenericTools::addVectors(&output, GenericTools::valueToVector(l));
 
-						if (u->next == NULL) {
-							break;
-						} else {
-							u = u->next;
-							continue;
-						}
-					}
+        //     TraceLog(LOG_INFO, "%d: Amount of extra objects: %d", i, l);
 
-					std::string name = u->name;
-					size_t name_len = name.length();
+        //     if (l != 0) {
+        //         u = e.entry;
 
-					GenericTools::addVectors(&output, GenericTools::valueToVector(name_len));
-					GenericTools::addVectors(&output, GenericTools::stringToVector<uint8_t>(name));
+        //         while (u != NULL) {
+        //             if (!u->name || (u->p == NULL && u->p_sz != 0) || (u->p != NULL && u->p_sz == 0)) {
+        //                 TraceLog(LOG_WARNING, "%d: Entry cannot be saved properly %s(status=%d%d%d%d%d|%p.%d.%c)",
+        //                     i,
+        //                     u->next == NULL ? "and continued " : "\0",
+        //                     !u->name,
+        //                     u->p == NULL,
+        //                     u->p_sz != 0,
+        //                     u->p != NULL,
+        //                     u->p_sz == 0,
+        //                     u->p,
+        //                     u->p_sz,
+        //                     u->type
+        //                 );
 
-					GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
-					GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
-					GenericTools::addVectors(&output, GenericTools::arrayToVector((uint8_t *)u->p, u->p_sz));
+        //                 GenericTools::addVectors(&output, GenericTools::valueToVector((size_t)0));
+        //                 GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
+        //                 GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
 
-					u = u->next;
-				}
-			}
-		}
-	}
+        //                 if (u->next == NULL) {
+        //                     break;
+        //                 } else {
+        //                     u = u->next;
+        //                     continue;
+        //                 }
+        //             }
 
-	TraceLog(LOG_INFO, "Output size: %d bytes", output.size());
+        //             std::string name = u->name;
+        //             size_t name_len = name.length();
 
-	if (output.size() == 0) return;
-	SaveFileData(filename, output.data(), output.size());
+        //             GenericTools::addVectors(&output, GenericTools::valueToVector(name_len));
+        //             GenericTools::addVectors(&output, GenericTools::stringToVector<uint8_t>(name));
+
+        //             GenericTools::addVectors(&output, GenericTools::valueToVector(u->type));
+        //             GenericTools::addVectors(&output, GenericTools::valueToVector(u->p_sz));
+        //             GenericTools::addVectors(&output, GenericTools::arrayToVector((uint8_t *)u->p, u->p_sz));
+
+        //             u = u->next;
+        //         }
+        //     }
+        // }
+    }
+
+    TraceLog(LOG_INFO, "Output size: %d bytes", output.size());
+
+    if (output.size() == 0) return;
+    SaveFileData(filename, output.data(), output.size());
 }

@@ -1,7 +1,9 @@
 #include "fightable/block_library.h"
+#include "fightable/level.h"
 #include <fightable/editor.h>
 #include <fightable/editor.hpp>
 #include <fightable/block.h>
+#include <fightable/nbt_tools.h>
 
 void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos) {
     if (!editor || editor->in_edit_mode) return;
@@ -35,11 +37,13 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
 
         struct flevel_registry_entry entry = { 0 };
         entry.id = ++editor->level->last_entry_id;
-        entry.entry = __uni_create(NULL);
+        entry.entry = nbt_new_tag_compound();
 
         b.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
         b.registry_id = entry.id;
         editor->objects[layer_id][pos.x][pos.y] = b;
+
+        TraceLog(LOG_INFO, "(1) Block ID: %d", entry.id);
 
         return;
     }
@@ -50,14 +54,22 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
     entry.id = ++editor->level->last_entry_id;
 
     if (id == BLOCK_TMOVE) {
-        entry.entry = __uni_create("ii");
-        entry.entry->next->name = "tmp_offset_x";
-        entry.entry->next->next->name = "tmp_offset_y";
+        entry.entry = nbt_new_tag_compound();
+        nbt_tag_t *tag_tox = nbt_new_tag_short(4);
+        nbt_tag_t *tag_toy = nbt_new_tag_short(8);
+
+        nbt_set_tag_name_easy(tag_tox, "tmp_offset_x");
+        nbt_set_tag_name_easy(tag_toy, "tmp_offset_y");
+
+        nbt_tag_compound_append(entry.entry, tag_tox);
+        nbt_tag_compound_append(entry.entry, tag_toy);
     } else {
-        entry.entry = __uni_create(" ");
+        entry.entry = nbt_new_tag_compound();
     }
 
     block.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
     block.registry_id = entry.id;
     editor->objects[layer_id][pos.x][pos.y] = block;
+
+    TraceLog(LOG_INFO, "(2) Block ID: %d", entry.id);
 }

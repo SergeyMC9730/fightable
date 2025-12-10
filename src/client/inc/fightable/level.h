@@ -10,7 +10,7 @@
 #include <fightable/intvec.h>
 #include <fightable/intrect.h>
 #include <rsb/rsb_array_gen.h>
-#include <tunnelos/unitype.h>
+#include <nbt.h>
 
 #include <pthread.h>
 
@@ -18,7 +18,7 @@
 #define LEVEL_SOURCE_EDITOR     1
 #define LEVEL_SOURCE_FILE       2
 
-#define LEVEL_FORMAT_VERSION (uint16_t)4
+#define LEVEL_FORMAT_VERSION (uint16_t)5
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +37,7 @@ struct flevel_light_source {
 
 struct flevel_registry_entry {
     unsigned int id;
-    unitype_t* entry;
+    nbt_tag_t* entry;
 };
 
 struct flevel_chunk {

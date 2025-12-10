@@ -396,6 +396,8 @@ set(FIGHTABLE_SRC
     src/client/loader/step10_arguments.c
     src/client/loader/step11_uitweak.c
     src/client/loader/step12_environment.c
+    src/client/etc/nbt_impl.c
+    src/client/etc/nbt_helper.c
     ${FIGHTABLE_GPU_SRC}
 )
 
@@ -671,9 +673,9 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson portaudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args)
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson portaudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args nbt-miniz)
 else()
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args)
+    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args nbt-miniz)
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )

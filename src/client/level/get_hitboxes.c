@@ -29,16 +29,16 @@ RLRectangle *_fLevelGetHitboxes(struct flevel *level) {
 
         struct flevel_registry_entry *reg = bref->linked_reg;
         if (reg) {
-            __uni_print(reg->entry);
-            unitype_t *p_offsetx = __uni_find(reg->entry, "tmp_offset_x");
-            unitype_t *p_offsety = __uni_find(reg->entry, "tmp_offset_y");
-            if (p_offsetx && p_offsety) {
-                int offsetx = *(int*)p_offsetx->p;
-                int offsety = *(int*)p_offsety->p;
+            // __uni_print(reg->entry);
+            // unitype_t *p_offsetx = __uni_find(reg->entry, "tmp_offset_x");
+            // unitype_t *p_offsety = __uni_find(reg->entry, "tmp_offset_y");
+            // if (p_offsetx && p_offsety) {
+            //     int offsetx = *(int*)p_offsetx->p;
+            //     int offsety = *(int*)p_offsety->p;
 
-                ref->x += offsetx;
-                ref->y += offsety + sin(GetTime() * 5) * 8;
-            }
+            //     ref->x += offsetx;
+            //     ref->y += offsety + sin(GetTime() * 5) * 8;
+            // }
         }
     }
 
