@@ -381,7 +381,7 @@ void _fEditorDraw(struct feditor *editor) {
                     struct fbutton btn = {};
                     btn.text = "Play";
 
-                    btn.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btnBlock)) / 2);
+                    btn.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btn)) / 2);
                     btn.position.y = blackbox_starty + 75;
                     btn.tint = WHITE;
 
