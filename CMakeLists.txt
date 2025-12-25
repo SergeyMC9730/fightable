@@ -398,6 +398,8 @@ set(FIGHTABLE_SRC
     src/client/loader/step12_environment.c
     src/client/etc/nbt_impl.c
     src/client/etc/nbt_helper.c
+    src/client/level/chunk.c
+    src/client/block/array_impl.c
     ${FIGHTABLE_GPU_SRC}
 )
 

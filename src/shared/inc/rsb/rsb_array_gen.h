@@ -5,15 +5,17 @@ extern "C" {
 #endif
 
 #include <assert.h>
+#include <stdio.h>
 
 #define RSB_ARRAY_NAME(funname) rsb_array_##funname
 
 #define RSB_ARRAY_STRUCT(type, funname) typedef struct RSB_ARRAY_NAME(funname) { \
-    unsigned int alloc_len;     \
-    unsigned int current_index; \
-    unsigned int len;           \
-    type *objects;              \
-    unsigned char lock;         \
+    unsigned int alloc_len;                                                                                 \
+    unsigned int current_index;                                                                             \
+    unsigned int len;                                                                                       \
+    type *objects;                                                                                          \
+    unsigned char lock;                                                                                     \
+    void (*callback_address_change)(struct RSB_ARRAY_NAME(funname) *ctx, void *old_addr, void *new_addr);   \
 } RSB_ARRAY_NAME(funname);
 
 #define RSB_ARRAY_FUNC_CREATE_DEF(funname) RSB_ARRAY_NAME(funname) *RSBCreateArray##funname()
@@ -78,15 +80,22 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->lock = 1;                                                                                                        \
                                                                                                                             \
     if (!array->objects) {                                                                                                  \
-        array->alloc_len = 32;                                                                                              \
+        array->alloc_len = 8;                                                                                               \
         array->objects = (type *)calloc(array->alloc_len, sizeof(type));                                                    \
         array->current_index = 0;                                                                                           \
         array->len = 0;                                                                                                     \
     }                                                                                                                       \
                                                                                                                             \
-    if ((array->len + 1) > array->alloc_len) {                                                                              \
-        array->alloc_len = array->len + 16;                                                                                 \
-        array->objects = (type *)realloc(array->objects, sizeof(type) * (array->alloc_len));                                \
+    unsigned char ra = 0;                                                                                                   \
+    while ((array->len + 1) >= array->alloc_len) { array->alloc_len += 8; ra = 1; }                                         \
+    if (ra) {                                                                                                               \
+        void *old = array->objects;                                                                                         \
+        printf("realloc required for %s: alloc_len=%d, objects=%p; ", #type, array->alloc_len - 8, array->objects);         \
+        array->objects = (type *)reallocarray(array->objects, array->alloc_len, sizeof(type));                              \
+        printf("new_ptr=%p; alloc_len=%d; new_len=%d\n", array->objects, array->alloc_len, array->len + 1);                 \
+        if (old != array->objects && array->callback_address_change) {                                                      \
+            array->callback_address_change(array, old, array->objects);                                                     \
+        }                                                                                                                   \
     }                                                                                                                       \
                                                                                                                             \
     array->objects[array->current_index] = object;                                                                          \
@@ -95,7 +104,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
                                                                                                                             \
     array->lock = 0;                                                                                                        \
                                                                                                                             \
-    return array->objects + array->current_index - 1;                                                                                                                 \
+    return array->objects + array->current_index - 1;                                                                       \
 }
 
 #define RSB_ARRAY_FUNC_POPELEMENT_IMPL(type, funname) RSB_ARRAY_FUNC_POPELEMENT_DEF(funname) {                          \

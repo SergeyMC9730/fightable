@@ -38,6 +38,7 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
         struct flevel_registry_entry entry = { 0 };
         entry.id = ++editor->level->last_entry_id;
         entry.entry = nbt_new_tag_compound();
+        entry.valid = entry.id == editor->level->last_entry_id && entry.entry != NULL && entry.id != 0;
 
         b.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
         b.registry_id = entry.id;
@@ -66,6 +67,7 @@ void _fEditorPlaceBlock(struct feditor *editor, unsigned short id, IVector2 pos)
     } else {
         entry.entry = nbt_new_tag_compound();
     }
+    entry.valid = entry.id == editor->level->last_entry_id && entry.entry != NULL && entry.id != 0;
 
     block.linked_reg = RSBAddElement_lre(editor->level->block_entries, entry);
     block.registry_id = entry.id;

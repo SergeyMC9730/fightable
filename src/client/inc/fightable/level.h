@@ -27,6 +27,7 @@ extern "C" {
 struct ftilemap;
 struct fentity;
 struct fblock;
+typedef struct rsb_array__fblock rsb_array__fblock;
 
 RSB_ARRAY_DEF_GEN(struct fentity*, _fentity);
 
@@ -38,15 +39,18 @@ struct flevel_light_source {
 struct flevel_registry_entry {
     unsigned int id;
     nbt_tag_t* entry;
+    unsigned int valid;
 };
 
 struct flevel_chunk {
     RenderTexture2D obj;
     IVector2 chunk_offset;
+    rsb_array__fblock *blocks;
 };
 
 RSB_ARRAY_DEF_GEN(struct flevel_light_source, _lls);
 RSB_ARRAY_DEF_GEN(struct flevel_registry_entry, _lre);
+RSB_ARRAY_DEF_GEN(struct flevel_chunk, _lchunk);
 
 struct flevel {
     struct fblock *objects;
@@ -93,6 +97,8 @@ struct flevel {
     unsigned char level_source;
 
     RLRectangle *hitboxes;
+
+    rsb_array__lchunk *chunks;
 };
 
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
@@ -123,6 +129,10 @@ void _fLevelLightSourceDraw(struct flevel* env, struct flevel_light_source* sour
 
 struct flevel_registry_entry *_fLevelFindBlockEntry(struct flevel *level, unsigned int unique_block_id);
 struct fblock *_fLevelBlockFromRegistry(struct flevel *level, unsigned int registry_id);
+
+void _fLevelSplitObjectsIntoChunks(struct flevel *level);
+
+void _fChunkDestroy(struct flevel_chunk *chunk);
 
 #ifdef __cplusplus
 }

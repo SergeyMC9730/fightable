@@ -151,7 +151,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (_fBlockIdFromRenderable(obj->base) == 0) continue;
 
         struct flevel_registry_entry *reg = obj->linked_reg;
-        if (reg) {
+        if (reg && reg->valid == 1 && reg->id != 0) {
             nbt_tag_t *tag_tox = nbt_tag_compound_get(reg->entry, "tmp_offset_x");
             nbt_tag_t *tag_toy = nbt_tag_compound_get(reg->entry, "tmp_offset_y");
 

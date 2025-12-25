@@ -7,6 +7,7 @@
 #pragma once
 
 #include <fightable/rendered_object.h>
+#include <rsb/rsb_array_gen.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,6 +85,8 @@ struct flevel;
 
 // update block properties
 void _fBlockUpdate(struct fblock* block, struct flevel* env);
+
+RSB_ARRAY_DEF_GEN(struct fblock, _fblock);
 
 #ifdef __cplusplus
 }
