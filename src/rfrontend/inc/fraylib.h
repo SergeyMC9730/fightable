@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -11,6 +11,8 @@
 #define TARGET_SUPPORTS_3D
 #define TARGET_SUPPORTS_RLGL_2D
 #define TARGET_SUPPORTS_RLGL_3D
+#define TARGET_SUPPORTS_OGL_2D
+#define TARGET_SUPPORTS_OGL_3D
 #include <raylib.h>
 #elif TARGET_RDR_ID == 1
 #define TARGET_SUPPORTS_2D
