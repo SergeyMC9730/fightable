@@ -12,11 +12,17 @@
 #include <fightable/level.h>
 #include <fightable/editor.h>
 
+void _fLoaderMainInitHelp(ArgParser *parser) {
+    ap_set_helptext(parser, "[LOADER HELP] --ui - set UI mode. available options: \"pc\"; \"android\"\n[LOADER HELP] --session - set preloaded scene. available options: \"main\"; \"editor\"\n[LOADER HELP] --level - set preloaded level. available options: \"none\"; \"[PATH TO THE LEVEL]\"\n[LOADER HELP] --help - print this manual.");
+}
+
 void _fLoaderMainProcessArguments(Vector2 *win_sz, Vector2 *actual_sz, Vector2 *editor_sz, unsigned int argc, char **argv, Vector2 *ui_scaling) {
     TraceLog(LOG_INFO, "[LOADER] Looking through any command-line arguments");
 
     ArgParser* parser = ap_new_parser();
     ap_set_version(parser, "alpha 1.0.0");
+
+    _fLoaderMainInitHelp(parser);
 
     ap_add_str_opt(parser, "ui", "pc");
     ap_add_str_opt(parser, "session", "main");
