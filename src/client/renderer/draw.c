@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <fightable/intro.h>
 #include <fightable/mp_create_menu.h>
 #include <fightable/mp_shared.h>
+#include <fightable/singleplayer.h>
 
 void _fDrawFileSelector(void *unused);
 
@@ -64,6 +65,10 @@ void _fDraw() {
     }
     case UI_MENU_MPJOIN: {
         _fMpClientDraw();
+        break;
+    }
+    case UI_MENU_SPJOIN: {
+        _fSingleplayerDrawLobby();
         break;
     }
     }

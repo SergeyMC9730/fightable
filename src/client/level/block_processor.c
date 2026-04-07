@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 #include <fightable/block.h>
 #include <fightable/entity.h>
 #include <fightable/time.h>
+#include <fightable/pthread_compat.h>
 #include <time.h>
 
 void *_fLevelDoBlockUpdate(void* _level) {
@@ -75,4 +76,16 @@ void _fLevelLoadProcessor(struct flevel *level) {
     level->block_p_loaded = 1;
 
     pthread_create(&level->block_processor_thread, NULL, _fLevelDoBlockUpdate, level);
+}
+
+void _fLevelUnloadProcessor(struct flevel *level) {
+    if (!level->block_p_loaded) return;
+
+    TraceLog(LOG_INFO, "Unloading level's tick thread");
+
+    level->block_p_close = 1;
+    if (!_fComparePthreadAndEmptyThread(level->block_processor_thread)) {
+        pthread_join(level->block_processor_thread, NULL);
+    }
+    level->block_p_loaded = 0;
 }

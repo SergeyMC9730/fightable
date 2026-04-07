@@ -1,9 +1,10 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/mp_shared.h"
 #include "fightable/renderer.h"
 #include "fightable/storage.h"
 #ifndef _DISABLE_MP_SERVER_
@@ -99,7 +100,7 @@ void _fMpClientMsg() {
 
             TraceLog(LOG_INFO, "HTTP port: %d; Max players: %d; Players connected: %d; User ID: %d", data->http_port, data->max_players, data->players_connected, data->user_id);
 
-            _fIntroMenuInitMpBackground();
+            _fMpCreateLobbyBackground();
             _fMpClientSwitchToLobby();
 
             break;

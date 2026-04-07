@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -8,13 +8,18 @@
 #include <fightable/intro.h>
 #include <fightable/renderer.h>
 #include <fightable/rect.h>
+#include <fightable/compile_config.h>
 
 void _fIntroMenuOnPlay() {
     if (__state.menu_block_ui) return;
 
     __state.menu_state = INTRO_MENU_PLAY;
 
+#ifndef DEMO_MODE
     Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Create New", WHITE, GREEN, 1);
+#else
+    Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Singleplayer", WHITE, GREEN, 1);
+#endif
     Texture2D multiplayer_label = _fTextRenderGradientV(&__state.text_manager, "Join Server", WHITE, BLUE, 1);
 
     int wx = __state.framebuffer.texture.width;
@@ -46,8 +51,13 @@ void _fIntroMenuOnPlay() {
 
     // DrawRectanglePro((RLRectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
     DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
+#ifndef DEMO_MODE
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+#else
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){35, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+    _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){37, 4}, (IVector2){2, 2}, 0, 0, WHITE);
+#endif
 
     DrawLine(2, 23 + offset, area.width - 2, 23 + offset, (Color){0x71, 0xaf, 0xfb, 0xff});
 

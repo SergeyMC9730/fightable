@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -29,7 +29,6 @@ void _fMpInit();
 void _fMpRegisterMessages(unsigned char is_client);
 
 void _fMpDrawLobby(float opacity, unsigned char interactable);
-void _fMpDrawLobbyBackground(float opacity);
 
 void _fMpInitPlayerList();
 
@@ -37,4 +36,15 @@ void _fMpInitPlayerList();
 }
 #endif
 
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void _fMpCreateLobbyBackground();
+void _fMpDrawLobbyBackground(float opacity);
+
+#ifdef __cplusplus
+}
 #endif

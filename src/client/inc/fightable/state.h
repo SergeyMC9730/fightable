@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -58,6 +58,7 @@ typedef struct openmpt_module openmpt_module;
 #define UI_MENU_MPCREATE    1
 #define UI_MENU_EDITOR      2
 #define UI_MENU_MPJOIN      3
+#define UI_MENU_SPJOIN      4
 
 typedef struct rsb_array__fnotif_mgr_entry rsb_array__fnotif_mgr_entry;
 
@@ -228,6 +229,8 @@ struct fightable_state {
 #endif
 
     struct fa_clippy clippy;
+
+    unsigned char sp_opened_level;
 };
 
 extern struct fightable_state __state;

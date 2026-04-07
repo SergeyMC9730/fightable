@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -101,8 +101,12 @@ struct flevel {
     rsb_array__lchunk *chunks;
 };
 
+struct fLDPResult {
+    unsigned char has_startpos;
+};
+
 void _fLevelDraw(struct flevel *level, IVector2 initial_pos);
-void _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
+struct fLDPResult _fLevelDrawPixelated(struct flevel* level, IRectangle frame);
 
 struct flevel *_fLevelLoadTest(struct ftilemap *tilemap, IVector2 background_tile);
 
@@ -122,6 +126,7 @@ struct flevel* _fLevelLoadFromFileSelector(const char* filename);
 void _fLevelTick(struct flevel* level);
 void *_fLevelDoBlockUpdate(void* level);
 void _fLevelLoadProcessor(struct flevel *level);
+void _fLevelUnloadProcessor(struct flevel *level);
 
 void _fLevelDestroy(struct flevel* level, unsigned char level_allocated, unsigned char blocks_allocated, unsigned char entities_allocated);
 
@@ -133,6 +138,8 @@ struct fblock *_fLevelBlockFromRegistry(struct flevel *level, unsigned int regis
 void _fLevelSplitObjectsIntoChunks(struct flevel *level);
 
 void _fChunkDestroy(struct flevel_chunk *chunk);
+
+void _fLevelPerformBasicSpawn(struct flevel *level, unsigned char full_reset);
 
 #ifdef __cplusplus
 }

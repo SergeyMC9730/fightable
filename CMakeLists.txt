@@ -400,6 +400,8 @@ set(FIGHTABLE_SRC
     src/client/etc/nbt_helper.c
     src/client/level/chunk.c
     src/client/block/array_impl.c
+    src/client/singleplayer/sp_lobby.c
+    src/client/level/spawn.c
     ${FIGHTABLE_GPU_SRC}
 )
 
