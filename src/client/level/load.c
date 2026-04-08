@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,7 @@
 #include <fightable/nbt_tools.h>
 #include <rsb/rsb_array_int.h>
 #include <stdio.h>
+#include <fightable/translation.h>
 
 static void print_nbt_tree(nbt_tag_t* tag, int indentation) {
   for (int i = 0; i < indentation; i++) {
@@ -594,7 +595,7 @@ struct flevel* _fLevelLoadFromFileSelector(const char* filename) {
         struct flevel *ref = _fLevelLoadFromFile(filename);
         if (!ref) {
             TraceLog(LOG_INFO, "Could not open level. Opening template level");
-            _fNotifMgrSend("Could not open level");
+            _fNotifMgrSend(_fTranslationGetString("notification.level.load_failed"));
             ret = _fLevelLoadTest(__state.tilemap, (IVector2){ 28, 4 });
         }
         else {
@@ -606,7 +607,7 @@ struct flevel* _fLevelLoadFromFileSelector(const char* filename) {
 
     if (!ret) {
         TraceLog(LOG_INFO, "Could not open level because of unknown reasons");
-        _fNotifMgrSend("Could not open level");
+        _fNotifMgrSend(_fTranslationGetString("notification.level.load_failed"));
     } else {
         ret->hitboxes = _fLevelGetHitboxes(ret);
     }

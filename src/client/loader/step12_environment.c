@@ -9,6 +9,7 @@
 #include <fightable/renderer.h>
 #include <fightable/intro.h>
 #include <fightable/notif_mgr.h>
+#include <fightable/translation.h>
 
 void _fLoaderMainPrepareEnvironment(Vector2 *actual_sz, Vector2 *win_sz, Vector2 *ui_scaling) {
     TraceLog(LOG_INFO, "[LOADER] Preparing game environment");
@@ -28,7 +29,7 @@ void _fLoaderMainPrepareEnvironment(Vector2 *actual_sz, Vector2 *win_sz, Vector2
 
     if (__state.song_id == -1) {
         TraceLog(LOG_ERROR, "Could not initialize intro properly");
-        _fNotifMgrSend("Could not initialize intro properly");
+        _fNotifMgrSend(_fTranslationGetString("notification.intro.load_failed"));
         _fIntroMenuInit();
     }
 

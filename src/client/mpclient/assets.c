@@ -1,11 +1,9 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "nt5emul/renderer_event.h"
-#include "raylib.h"
 #ifndef _DISABLE_MP_SERVER_
 
 #include <fightable/state.h>
@@ -19,6 +17,7 @@
 #include <stdio.h>
 #include <fightable/curl_frontend.h>
 #include <fightable/renderer.h>
+#include <fightable/translation.h>
 
 struct fmp_download_context {
     const char **assets;
@@ -139,7 +138,7 @@ void _fMpClientDownloadFile(struct fmp_download_context *ctx) {
     ctx->current_file_index++;
 
     ctx->notif_content = (char *)MemAlloc(512);
-    snprintf(ctx->notif_content, 512, "<cgreen,white>Downloading\n<cgreen,white>%s", file);
+    snprintf(ctx->notif_content, 512, _fTranslationGetString("notification.mpc.download"), file);
 
     _fScheduleOverlayFunc((renderer_event_t){_fMpClientSendNotif, ctx});
 

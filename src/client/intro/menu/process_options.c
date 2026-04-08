@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2026.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include "fightable/config.h"
 #include <fightable/intro.h>
 #include <fightable/state.h>
@@ -20,7 +26,7 @@ void _fIntroMenuProcessOptions() {
 
     RLRectangle area = (RLRectangle){btncheck_pos.x + 10 + 2, btncheck_pos.y + 1, w, 10};
 
-    unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint);
+    unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wxx - (3 * __state.tilemap->tile_size.x)) / 2, 94 }, tint, "menu.options.back");
 
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
         _fConfigSave(&__state.config);

@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -8,6 +8,7 @@
 #include "nt5emul/renderer_keyframe.h"
 #include <fightable/notif_mgr.h>
 #include <fightable/state.h>
+#include <fightable/translation.h>
 
 #define POPUP_GAP 2
 #define POPUP_TIMEOUT (float)5.f
@@ -124,7 +125,7 @@ void _fNotifMgrUpdate() {
     if (!__state.notifications) _fNotifMgrInit();
 
     if (IsKeyPressed(KEY_T)) {
-        _fNotifMgrSendWithTime("* human.. i remember you're\n  <cred,orange>genocides..\n ", POPUP_TIMEOUT);
+        _fNotifMgrSendWithTime(_fTranslationGetString("notification.funny.remember"), POPUP_TIMEOUT);
     }
 
     float delta = GetFrameTime();

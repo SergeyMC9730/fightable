@@ -1,11 +1,12 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #include <fightable/sound_engine.h>
 #include <fightable/notif_mgr.h>
+#include <fightable/translation.h>
 
 #include <libopenmpt/libopenmpt.h>
 #include <libopenmpt/libopenmpt_stream_callbacks_file.h>
@@ -69,7 +70,7 @@ unsigned char _fAudioPlayModule(struct faudio_engine *engine, const char *path) 
 
     const char *name = _fAudioGetSongName(engine);
     char *buf = (char *)malloc(2048);
-    snprintf(buf, 2048, "Playing %s", name);
+    snprintf(buf, 2048, _fTranslationGetString("notification.song"), name);
 
     _fNotifMgrSend(buf);
     free(buf);

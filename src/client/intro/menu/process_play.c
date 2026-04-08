@@ -1,7 +1,16 @@
+
+//          Sergei Baigerov 2024 - 2026.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/intro.h>
 #include <fightable/state.h>
 #include <fightable/button.h>
 #include <fightable/renderer.h>
+#include <fightable/translation.h>
+#include <fightable/color.h>
+#include <fightable/compile_config.h>
 
 void _fIntroMenuProcessPlay() {
     int wx = __state.framebuffer.texture.width;
@@ -12,7 +21,7 @@ void _fIntroMenuProcessPlay() {
     RLRectangle area = (RLRectangle){(wx - w) / 2 + __state.menu_cur_x, 42, w, 50};
     Color tint = WHITE;
 
-    unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height + 2 }, tint);
+    unsigned char btn_flag = _fButtonDrawSimple("BACK", (IVector2) { (wx - (3 * __state.tilemap->tile_size.x)) / 2, area.y + area.height + 2 }, tint, "menu.play.back");
 
     if (btn_flag || IsKeyPressed(KEY_ESCAPE)) {
         __state.menu_state = INTRO_MENU_BASE_SELECTOR;
@@ -25,6 +34,16 @@ void _fIntroMenuProcessPlay() {
     area.height = __state.playbtn_container.height;
 
     DrawTexture(__state.playbtn_container, area.x, area.y, tint);
+
+    enum flang_id lang = _fTranslationGetCurrentLanguage();
+    if (lang != FLI_EnUs) {
+        _fTranslationQueueTextDraw((IVector2){area.x + 25, area.y + 6}, "menu.play.join_server", 0.45f, _fMixColors(WHITE, BLUE, 0.5), 1);
+#ifdef DEMO_MODE
+        _fTranslationQueueTextDraw((IVector2){area.x + 25, area.y + 33}, "menu.play.singleplayer", 0.45f, _fMixColors(WHITE, GREEN, 0.5), 1);
+#else
+        _fTranslationQueueTextDraw((IVector2){area.x + 25, area.y + 33}, "menu.play.create_new", 0.45f, _fMixColors(WHITE, GREEN, 0.5), 1);
+#endif
+    }
 
     {
         RLRectangle r = area;
@@ -40,7 +59,7 @@ void _fIntroMenuProcessPlay() {
                 _fIntroMenuOnMpJoin();
             }
         }
-        
+
         r.y += r.height;
         if (CheckCollisionPointRec(mpos, r)) {
             BeginBlendMode(BLEND_MULTIPLIED);

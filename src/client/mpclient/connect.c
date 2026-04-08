@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -14,12 +14,13 @@
 #include <fightable/mp_server.h>
 #include <fightable/notif_mgr.h>
 #include <fightable/string.h>
+#include <fightable/translation.h>
 
 unsigned char _fMpClientConnect(const char* ip, unsigned short port) {
     TraceLog(LOG_INFO, "Connecting to %s:%d", ip, (int)port);
 
     if (!ip || port == 0) {
-        _fNotifMgrSend("<cred,orange>ERROR:\n<cyellow>Pre-connect assertion failed");
+        _fNotifMgrSend(_fTranslationGetString("notification.mpc.assert"));
 
         if (__state.mp_client_notif_status) {
             __state.mp_client_notif_status->max_time = 1.f;
@@ -32,7 +33,7 @@ unsigned char _fMpClientConnect(const char* ip, unsigned short port) {
 
     int res = NBN_GameClient_Start(MP_PROTOCOL, ip, port);
     if (res < 0) {
-        _fNotifMgrSend("<cred,orange>ERROR:\n<cyellow>Connection failed");
+        _fNotifMgrSend(_fTranslationGetString("notification.mpc.basic_error"));
 
         if (__state.mp_client_notif_status) {
             __state.mp_client_notif_status->max_time = 1.f;

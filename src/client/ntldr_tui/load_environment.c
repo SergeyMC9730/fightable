@@ -1,6 +1,6 @@
 /*
     nt5 -- Windows XP simulator.
-    Copyright (C) 2023  Sergei Baigerov
+    Copyright (C) 2026  Sergei Baigerov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -35,7 +35,7 @@ const char *_ntTuiCodepoints =  "QWERTYUIOPASDFGHJKLZXCVBNMZXCVBNM" // english a
                                 "/\\|" // slashes
                                 "1234567890" // numbers
                                 "<>-=+~*^%№" // math signs
-                                "\"'`" // quotation marks
+                                "\"'`«»" // quotation marks
                                 "@#$&_" // random characters
                                 "═ • │ ┤ ╡ ╢ ╖ ╕ ╣ ║ ╗ ╝ ╜ ╛ ┐ └ ┴ ┬ ├ ─ ┼ ╞ ╟ ╚ ╔ ╩ ╦ ╠ ═ ╬ ╧ ╨ ╤ ╥ ╙ ╘ ╒ ╓ ╫ ╪ ┘ ┌ █ ▄ ▌ ▐ ▀ "; // lines
 

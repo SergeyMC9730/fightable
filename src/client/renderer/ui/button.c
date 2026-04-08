@@ -4,11 +4,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/intvec.h"
 #include <fightable/button.h>
 #include <fightable/state.h>
 #include <fightable/text.h>
 #include <math.h>
 #include <fightable/renderer.h>
+#include <fightable/translation.h>
 
 unsigned char _fButtonDraw(struct fbutton *btn) {
     if (!btn || !btn->text) return 0;
@@ -65,17 +67,37 @@ unsigned char _fButtonDraw(struct fbutton *btn) {
         cur_pos.x += __state.tilemap->tile_size.x;
     }
 
-    _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, btn->tint, 0);
+    if (btn->tr_alt_id && _fTranslationGetCurrentLanguage() != FLI_EnUs) {
+        const char *alt = _fTranslationGetString(btn->tr_alt_id);
+        Vector2 text_sz_o = _fPosFramebufferToOverlay(_fImathToVFloat(text_sz));
+        Vector2 def_text_sz = MeasureTextEx(__state.ubuntu_mono64, alt, 64, 0.5);
+        Vector2 scaling = {text_sz_o.x / def_text_sz.x, text_sz_o.y / def_text_sz.y};
+        float m = (scaling.x > scaling.y) ? scaling.y : scaling.x;
+        m *= 1.2f;
+
+        def_text_sz.x *= m;
+        def_text_sz.y *= m;
+
+        Vector2 new_offset = _fPosFramebufferToOverlay(_fImathToVFloat(btn_label_offset));
+
+        RLRectangle new_rect = _fRectFramebufferToOverlay(btn_rect);
+        Vector2 new_center = (Vector2){new_rect.x + ((new_rect.width - def_text_sz.x) / 2) + new_offset.x, new_rect.y + ((new_rect.height - def_text_sz.y) / 2) + new_offset.y};
+
+        _fTranslationQueueTextDraw(_fVFloatToI(new_center), btn->tr_alt_id, m, btn->tint, 0);
+    } else {
+        _fTextDraw(&__state.text_manager, btn->text, (IVector2){btn->position.x + center_x + btn_label_offset.x, btn->position.y + 2 + btn_label_offset.y}, btn->tint, 0);
+    }
 
     return ret;
     // DrawRectangleLinesEx(btn_rect, 1.f, RED);
 }
 
-unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint) {
+unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint, const char *alt_id) {
     struct fbutton btn = {0};
     btn.text = text;
     btn.position = pos;
     btn.tint = tint;
+    btn.tr_alt_id = alt_id;
 
     return _fButtonDraw(&btn);
 }

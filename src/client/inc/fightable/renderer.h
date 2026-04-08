@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "raylib.h"
 #include <fraylib.h>
 
 #ifdef __cplusplus
@@ -84,6 +85,8 @@ Vector2 _fPosFramebufferToScreen(Vector2 pos);
 Vector2 _fPosOverlayToScreen(Vector2 pos);
 Vector2 _fPosFramebufferToOverlay(Vector2 pos);
 Vector2 _fPosOverlayToFramebuffer(Vector2 pos);
+
+RLRectangle _fRectFramebufferToOverlay(RLRectangle rect);
 
 Vector2 _fGetMousePosPix();
 Vector2 _fGetMousePosOverlay();

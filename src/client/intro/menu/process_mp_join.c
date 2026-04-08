@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -15,9 +15,10 @@
 #include <fightable/sound_engine.h>
 #include <fightable/string.h>
 #include <fightable/mp_client.h>
+#include <fightable/translation.h>
 
-#define SETUP_BUTTON(NAME, Y, XO) SETUP_BUTTON_EX(NAME, Y, WHITE, XO)
-#define SETUP_BUTTON_EX(NAME, Y, COLOR, XO) sz = _fButtonMeasureSizeSimple(NAME); if (_fButtonDrawSimple(NAME, (IVector2){(wx - sz) / 2 + __state.menu_cur_x + (float)(XO), Y}, COLOR))
+#define SETUP_BUTTON(NAME, Y, XO, ALT) SETUP_BUTTON_EX(NAME, Y, WHITE, XO, ALT)
+#define SETUP_BUTTON_EX(NAME, Y, COLOR, XO, ALT) sz = _fButtonMeasureSizeSimple(NAME); if (_fButtonDrawSimple(NAME, (IVector2){(wx - sz) / 2 + __state.menu_cur_x + (float)(XO), Y}, COLOR, ALT))
 
 void _fIntroMenuProcessMultiplayerJoin() {
     int wx = __state.framebuffer.texture.width;
@@ -46,16 +47,16 @@ void _fIntroMenuProcessMultiplayerJoin() {
 
     unsigned int sz = 0;
 
-    SETUP_BUTTON("Join", 59, 45) {
+    SETUP_BUTTON("Join", 59, 45, "menu.mp.join") {
         TraceLog(LOG_INFO, "Join");
 
         if (_fTextInputEmpty(__state.ip_input)) {
-            _fNotifMgrSend("<cred,orange>ERROR:\n<cyellow>IP address is empty!");
+            _fNotifMgrSend(_fTranslationGetString("notification.mp.no_ip"));
         } else if (_fTextInputEmpty(__state.name_input)) {
-            _fNotifMgrSend("<cred,orange>ERROR:\n<cyellow>Username field is empty!");
+            _fNotifMgrSend(_fTranslationGetString("notification.mp.no_username"));
         } else {
             if (!__state.mp_client_connecting) {
-                int id = _fNotifMgrSendWithTime("<cyellow>Connecting to the server...", 0);
+                int id = _fNotifMgrSendWithTime(_fTranslationGetString("notification.mp.connecting"), 0);
                 __state.mp_client_notif_status = _fNotifMgrGetEntryById(id);
 
                 _fTextInputLock(__state.ip_input);
@@ -92,7 +93,7 @@ void _fIntroMenuProcessMultiplayerJoin() {
         }
     }
 
-    SETUP_BUTTON("Exit", 78, 45) {
+    SETUP_BUTTON("Exit", 78, 45, "menu.mp.exit") {
         TraceLog(LOG_INFO, "Exit");
 
         if (!__state.mp_client_connecting) {

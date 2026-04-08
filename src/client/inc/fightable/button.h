@@ -25,6 +25,8 @@ struct fbutton {
     IVector2 position;
 
     Color tint;
+
+    const char *tr_alt_id;
 };
 
 #define SQRBTN_NONE         0
@@ -47,7 +49,7 @@ struct fsquare_button {
     unsigned char type;
 };
 unsigned char _fButtonDraw(struct fbutton *btn);
-unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint);
+unsigned char _fButtonDrawSimple(const char *text, IVector2 pos, Color tint, const char *alt_id);
 int _fButtonMeasureSize(struct fbutton *btn);
 int _fButtonMeasureSizeSimple(const char *text);
 unsigned char _fSquareButtonDrawSimple(IVector2 pos, Color tint, unsigned char type, unsigned char flag);

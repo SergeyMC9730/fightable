@@ -23,6 +23,7 @@
 #include <fraylib.h>
 #include <fightable/curl_frontend.h>
 #include <fightable/level.h>
+#include <fightable/translation.h>
 
 struct fmp_client_download_ctx {
     char **assets;
@@ -51,7 +52,7 @@ void _fMpClientOnDownloadLevel(void *ctx) {
 }
 
 void _fMpClientConnected() {
-    _fNotifMgrSendWithTime("<cgreen,white>Connection\n<cgreen,white>established", 1.f);
+    _fNotifMgrSendWithTime(_fTranslationGetString("notification.mpc.connected"), 1.f);
 
     if (__state.mp_client_notif_status) {
         __state.mp_client_notif_status->popup->complete_progress = 0.25;
@@ -70,7 +71,7 @@ void _fMpClientDisconnected() {
     __state.mp_client_connecting = 0;
     __state.mp_client_should_tick = 0;
 
-    _fNotifMgrSend("Disconnected\nfrom server");
+    _fNotifMgrSend(_fTranslationGetString("notification.mpc.disconnected"));
 
     if (__state.mp_client_notif_status) {
         __state.mp_client_notif_status->time = __state.mp_client_notif_status->popup->complete_progress;

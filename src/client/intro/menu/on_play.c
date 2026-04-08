@@ -9,11 +9,14 @@
 #include <fightable/renderer.h>
 #include <fightable/rect.h>
 #include <fightable/compile_config.h>
+#include <fightable/translation.h>
 
 void _fIntroMenuOnPlay() {
     if (__state.menu_block_ui) return;
 
     __state.menu_state = INTRO_MENU_PLAY;
+
+    enum flang_id lang = _fTranslationGetCurrentLanguage();
 
 #ifndef DEMO_MODE
     Texture2D singleplayer_label = _fTextRenderGradientV(&__state.text_manager, "Create New", WHITE, GREEN, 1);
@@ -43,14 +46,14 @@ void _fIntroMenuOnPlay() {
     // DrawRectanglePro((RLRectangle){3, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
     // DrawRectanglePro((RLRectangle){1, 0 + offset, 15, 15}, (Vector2){}, 45.f, (Color){0, 0, 0, 16});
     // DrawRectanglePro((RLRectangle){0, 0 + offset, 15, 15}, (Vector2){}, 45.f, GREEN);
-    DrawTexture(multiplayer_label, 25, 6 + offset, WHITE);
+    if (lang == FLI_EnUs) DrawTexture(multiplayer_label, 25, 6 + offset, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 4}, (IVector2){33, 4}, (IVector2){2, 2}, 0, 0, WHITE);
 
     offset -= 2;
 
     // DrawRectanglePro((RLRectangle){8, 26 + offset, 15, 15}, (Vector2){}, 65.f, RED);
-    DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
+    if (lang == FLI_EnUs) DrawTexture(singleplayer_label, 25, 33 + offset, WHITE);
 #ifndef DEMO_MODE
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){29, 4}, (IVector2){2, 2}, 0, 0, WHITE);
     _fTilemapDrawMegatile(__state.tilemap, (IVector2){5, 29}, (IVector2){31, 4}, (IVector2){2, 2}, 0, 0, WHITE);

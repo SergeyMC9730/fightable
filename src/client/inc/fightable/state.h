@@ -210,6 +210,7 @@ struct fightable_state {
     rsb_array__fnotif_mgr_entry *notifications;
 
     RLFont unifont16;
+    RLFont ubuntu_mono64;
 
     struct ftext_input *ip_input;
     struct ftext_input *name_input;

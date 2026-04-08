@@ -185,7 +185,7 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
         int button_size = _fButtonMeasureSizeSimple(button_label);
         IVector2 button_placement = (IVector2) { area.x - button_size - 2, area.y };
 
-        if (_fButtonDrawSimple(button_label, button_placement, cwhite) && interactable) {
+        if (_fButtonDrawSimple(button_label, button_placement, cwhite, "mp.lobby.open") && interactable) {
             _fOpenFileSelector(_fStorageGetWritable(), _fMpOnOpenLevel);
         }
 
@@ -195,7 +195,7 @@ void _fMpDrawLobby(float opacity, unsigned char interactable) {
             button_placement.x = area.x - button_size - 2;
             button_placement.y += ty + 2;
 
-            if (_fButtonDrawSimple(button_label, button_placement, cwhite) && interactable) {
+            if (_fButtonDrawSimple(button_label, button_placement, cwhite, "mp.lobby.join") && interactable) {
                 TraceLog(LOG_INFO, "TODO");
             }
         }

@@ -150,20 +150,20 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         if (_x > __state.framebuffer.texture.width || _y > __state.framebuffer.texture.height || (_x + tx) < 0 || (_y + ty) < 0) continue;
         if (_fBlockIdFromRenderable(obj->base) == 0) continue;
 
-        struct flevel_registry_entry *reg = obj->linked_reg;
-        if (reg && reg->valid == 1 && reg->id != 0) {
-            nbt_tag_t *tag_tox = nbt_tag_compound_get(reg->entry, "tmp_offset_x");
-            nbt_tag_t *tag_toy = nbt_tag_compound_get(reg->entry, "tmp_offset_y");
+        // struct flevel_registry_entry *reg = obj->linked_reg;
+        // if (reg && reg->valid == 1 && reg->id != 0) {
+        //     nbt_tag_t *tag_tox = nbt_tag_compound_get(reg->entry, "tmp_offset_x");
+        //     nbt_tag_t *tag_toy = nbt_tag_compound_get(reg->entry, "tmp_offset_y");
 
-            if (tag_tox && tag_toy) {
-                int offsetx = tag_tox->tag_short.value;
-                int offsety = tag_toy->tag_short.value;
-                // TraceLog(LOG_INFO, "OFFSET FOR %d IS %d:%d", obj->registry_id, offsetx, offsety);
+        //     if (tag_tox && tag_toy) {
+        //         int offsetx = tag_tox->tag_short.value;
+        //         int offsety = tag_toy->tag_short.value;
+        //         // TraceLog(LOG_INFO, "OFFSET FOR %d IS %d:%d", obj->registry_id, offsetx, offsety);
 
-                _x += offsetx;
-                _y += offsety + sin(GetTime() * 5) * 8;
-            }
-        }
+        //         _x += offsetx;
+        //         _y += offsety + sin(GetTime() * 5) * 8;
+        //     }
+        // }
 
         if (level->in_workbench_mode) {
             _fTilemapDraw(level->tilemap, (IVector2){_x + 1, _y + 1}, (IVector2){obj->base.tile_x, obj->base.tile_y}, obj->base.flipped_x, obj->base.flipped_y, BLACK);

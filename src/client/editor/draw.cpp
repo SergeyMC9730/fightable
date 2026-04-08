@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,7 @@
 #include <fightable/storage.h>
 #include <climits>
 #include <fightable/notif_mgr.h>
+#include <fightable/translation.h>
 
 #define MAX_BUTTON_PAGES 2
 
@@ -371,6 +372,7 @@ void _fEditorDraw(struct feditor *editor) {
                 btnBlock.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btnBlock)) / 2);
                 btnBlock.position.y = blackbox_starty + 66;
                 btnBlock.tint = WHITE;
+                btnBlock.tr_alt_id = "editor.blocks";
                 if(_fButtonDraw(&btnBlock) || IsKeyPressed(KEY_F2)) {
                     editor->should_display_selector = ~editor->should_display_selector;
                 }
@@ -384,6 +386,7 @@ void _fEditorDraw(struct feditor *editor) {
                     btn.position.x = blackbox_startx + ((space - _fButtonMeasureSize(&btn)) / 2);
                     btn.position.y = blackbox_starty + 75;
                     btn.tint = WHITE;
+                    btn.tr_alt_id = "editor.play";
 
                     if (_fButtonDraw(&btn) || IsKeyPressed(KEY_F1)) {
                         IVector2 pos = _fEditorGetPosOfFirstId(editor, BLOCK_START);
@@ -427,7 +430,7 @@ void _fEditorDraw(struct feditor *editor) {
                     }
                 }
 
-                if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Save")) / 2), blackbox_starty + 84 }, WHITE)) {
+                if (_fButtonDrawSimple("Save", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Save")) / 2), blackbox_starty + 84 }, WHITE, "editor.save")) {
                     TraceLog(LOG_INFO, "Trying to save level into a file");
 
                     std::string writable = _fStorageGetWritable();
@@ -439,23 +442,23 @@ void _fEditorDraw(struct feditor *editor) {
 
                     _fLevelSave(editor->level, filename.c_str());
 
-                    std::string notif_msg = "Saved under " + filename;
+                    std::string notif_msg = _fTranslationGetString("notification.editor.saved") + filename;
                     _fNotifMgrSend(notif_msg.c_str());
 
                     TraceLog(LOG_INFO, "Save done");
                 }
 
                 Color cc = (editor->in_edit_mode) ? GREEN : RED;
-                if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Edit")) / 2), blackbox_starty + 93 }, cc)) {
+                if (_fButtonDrawSimple("Edit", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Edit")) / 2), blackbox_starty + 93 }, cc, "editor.edit")) {
                     editor->in_edit_mode = !editor->in_edit_mode;
                 }
 
                 cc = (editor->swipe_enabled) ? GREEN : RED;
-                if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Swipe")) / 2), blackbox_starty + 102 }, cc)) {
+                if (_fButtonDrawSimple("Swipe", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Swipe")) / 2), blackbox_starty + 102 }, cc, "editor.swipe")) {
                     editor->swipe_enabled = !editor->swipe_enabled;
                 }
 
-                if (_fButtonDrawSimple("More", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("More")) / 2), blackbox_starty + 111 }, WHITE)) {
+                if (_fButtonDrawSimple("More", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("More")) / 2), blackbox_starty + 111 }, WHITE, "editor.more")) {
                     if ((editor->button_page + 1) < MAX_BUTTON_PAGES) {
                         editor->button_page++;
                     }
@@ -464,7 +467,7 @@ void _fEditorDraw(struct feditor *editor) {
                 break;
             }
             case 1: {
-                if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE)) {
+                if (_fButtonDrawSimple("Perlin Gen", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Perlin Gen")) / 2), blackbox_starty + 66 }, WHITE, "editor.perlin_gen")) {
                     editor->perlin = siv::PerlinNoise(editor->current_layer);
 
                     constexpr int chunks = 8;
@@ -506,7 +509,7 @@ void _fEditorDraw(struct feditor *editor) {
                     }
                 }
 
-                if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE)) {
+                if (_fButtonDrawSimple("Back", (IVector2) { blackbox_startx + ((space - _fButtonMeasureSizeSimple("Back")) / 2), blackbox_starty + 75 }, WHITE, "editor.back")) {
                     editor->button_page--;
                 }
             }
@@ -517,9 +520,13 @@ void _fEditorDraw(struct feditor *editor) {
         bool flag = false;
 
 #ifndef TARGET_ANDROID
-        _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
+        if (_fTranslationGetCurrentLanguage() == FLI_EnUs) {
+            _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
+        } else {
+            _fTranslationQueueTextDraw({2, 2}, "editor.play.f1", 0.5, BLUE, 1);
+        }
 #else
-        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE);
+        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE, "editor.play.exit");
 #endif
 
         if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {

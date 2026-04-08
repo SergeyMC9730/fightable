@@ -402,6 +402,7 @@ set(FIGHTABLE_SRC
     src/client/block/array_impl.c
     src/client/singleplayer/sp_lobby.c
     src/client/level/spawn.c
+    src/client/translation/translation.cpp
     ${FIGHTABLE_GPU_SRC}
 )
 

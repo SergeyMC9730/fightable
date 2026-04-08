@@ -116,7 +116,7 @@ void _fSingleplayerDrawLobby() {
     int button_size = _fButtonMeasureSizeSimple(button_label);
     IVector2 button_placement = (IVector2) { area.x, area.y + area.height + 2};
 
-    if (_fButtonDrawSimple(button_label, button_placement, cwhite)) {
+    if (_fButtonDrawSimple(button_label, button_placement, cwhite, "mp.lobby.open")) {
         _fOpenFileSelector(_fStorageGetWritable(), _fSingleplayerOnOpenLevel);
     }
 
@@ -125,7 +125,7 @@ void _fSingleplayerDrawLobby() {
         button_size = _fButtonMeasureSizeSimple(button_label);
         button_placement.x = area.x + area.width - button_size;
 
-        if (_fButtonDrawSimple(button_label, button_placement, cwhite)) {
+        if (_fButtonDrawSimple(button_label, button_placement, cwhite, "mp.lobby.join")) {
             _fSingleplayerJoinWorld();
         }
     }
