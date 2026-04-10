@@ -50,13 +50,16 @@ compile_mpt() {
 	else
 		exit 1
 	fi
+	echo $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
+	ls -la $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
+	mkdir -pv $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/
 	sudo cp libs/$W_ARCH/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
-	sudo mkdir -p $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt
+	sudo mkdir -pv $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt
 	sudo cp libopenmpt/*.h* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt/ -rv
 }
 
 compile_mhd() {
-	cd libmicrohttpd-1.0.1/
+	cd libmicrohttpd-1.0.3/
 
 	export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
 	export TARGET=$CLANG_TARGET
@@ -92,4 +95,3 @@ wait
 cd $TARGET_REPO
 source setup_android_build.sh $W_ABI $W_ABI
 source compile_android_arch.sh $W_ABI $W_ABI
-
