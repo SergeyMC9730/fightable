@@ -4,13 +4,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/renderer.h>
 #include <fightable/storage.h>
 #include <fightable/notif_mgr.h>
 #include <fightable/translation.h>
 #include <fightable/string.h>
+#include <fightable/level.h>
 #include <stdio.h>
 
 char dbg_buffer[2048] = {};
@@ -99,7 +99,14 @@ unsigned char _fLoaderDraw() {
     if (__state.show_debug_info) {
         DrawFPS(32, 8);
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f",
+        const char *tps_warn = "TPS OK";
+        if (__state.current_level) {
+            if (__state.world_tick_time > (1000.f / (float)__state.current_level->tps)) {
+                tps_warn = "TPS ERROR: TPS SLOWDOWN";
+            }
+        }
+
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f\n   tick length: %f ms\n   (%s)",
             align_x,
             (float)UI_SCALE,
             (float)__state.window_scale,
@@ -113,7 +120,8 @@ unsigned char _fLoaderDraw() {
             __state.damage_overlay_timer,
             __state.damage_overlay_timer2,
             __state.gui_render_offset.x,
-            __state.gui_render_offset.y
+            __state.gui_render_offset.y,
+            (__state.world_tick_time), tps_warn
         );
 
         RlDrawText(dbg_buffer, 8, 32, 20, RED);

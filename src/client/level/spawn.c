@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "rsb/rsb_array_gen.h"
 #include <fightable/level.h>
 #include <fightable/state.h>
 #include <fightable/editor.h>
@@ -32,10 +33,12 @@ void _fLevelPerformBasicSpawn(struct flevel *level, unsigned char full_reset) {
 
     if (full_reset) {
         if (level->entities) {
+            RSB_WRLOCK_BEGIN(level->entities);
             for (unsigned long i = 0; i < level->entities->len; i++) {
                 struct fentity *e = level->entities->objects[i];
                 e->cleanup(e);
             }
+            RSB_WRLOCK_END(level->entities);
             RSBDestroy_fentity(level->entities);
         }
     }
@@ -43,7 +46,7 @@ void _fLevelPerformBasicSpawn(struct flevel *level, unsigned char full_reset) {
     if (!level->entities) {
         level->entities = RSBCreateArray_fentity();
     }
-    RSBAddElement_fentity(level->entities, &player->base);
+    RSB_WRLOCK(level->entities, RSBAddElement_fentity(level->entities, &player->base););
 
     level->pause_world = 0;
 }

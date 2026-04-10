@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "rsb/rsb_array_gen.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/entity.h>

@@ -5,8 +5,35 @@ extern "C" {
 #endif
 
 #include <assert.h>
-#include <fightable/pthread_compat.h>
 #include <stdio.h>
+
+#if defined(TARGET_UNIX) || defined(TARGET_WIN32)
+#include <fightable/pthread_compat.h>
+#define RSB_DEFINE_MUTEX_VAR pthread_rwlock_t lock;
+#define RSB_MUTEX_INIT pthread_rwlock_init(&array->lock, NULL);
+#define RSB_MUTEX_DEINIT pthread_rwlock_destroy(&array->lock);
+#define RSB_SUPPORT_MUTEX
+#define RSB_RDLOCK_BEGIN(ARRAY) if(ARRAY) pthread_rwlock_rdlock(&ARRAY->lock)
+#define RSB_RDLOCK_END(ARRAY) if(ARRAY) pthread_rwlock_unlock(&ARRAY->lock)
+#define RSB_WRLOCK_BEGIN(ARRAY) if(ARRAY) pthread_rwlock_wrlock(&ARRAY->lock)
+#define RSB_WRLOCK_END(ARRAY) if(ARRAY) pthread_rwlock_unlock(&ARRAY->lock)
+#define RSB_RDLOCK(ARRAY, ...) RSB_RDLOCK_BEGIN(ARRAY); \
+__VA_ARGS__ \
+RSB_RDLOCK_END(ARRAY);
+#define RSB_WRLOCK(ARRAY, ...) RSB_WRLOCK_BEGIN(ARRAY); \
+__VA_ARGS__ \
+RSB_WRLOCK_END(ARRAY);
+#else
+#define RSB_DEFINE_MUTEX_VAR
+#define RSB_MUTEX_INIT
+#define RSB_MUTEX_DEINIT
+#define RSB_RDLOCK(ARRAY, ...) __VA_ARGS__
+#define RSB_WRLOCK(ARRAY, ...) __VA_ARGS__
+#define RSB_RDLOCK_BEGIN(ARRAY)
+#define RSB_RDLOCK_END(ARRAY)
+#define RSB_WRLOCK_BEGIN(ARRAY)
+#define RSB_WRLOCK_END(ARRAY)
+#endif
 
 #define RSB_ARRAY_NAME(funname) rsb_array_##funname
 
@@ -15,7 +42,7 @@ extern "C" {
     unsigned int current_index;                                                                             \
     unsigned int len;                                                                                       \
     type *objects;                                                                                          \
-    unsigned char lock;                                                                                     \
+    RSB_DEFINE_MUTEX_VAR                                                                                    \
     void (*callback_address_change)(struct RSB_ARRAY_NAME(funname) *ctx, void *old_addr, void *new_addr);   \
 } RSB_ARRAY_NAME(funname);
 
@@ -58,7 +85,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->current_index = 0;                                                                               \
     array->len = 0;                                                                                         \
     array->objects = NULL;                                                                                  \
-    array->lock = 0;                                                                                        \
+    RSB_MUTEX_INIT                                                                                          \
                                                                                                             \
     return array;                                                                                           \
 }
@@ -77,8 +104,6 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 
 #define RSB_ARRAY_FUNC_ADDELEMENT_IMPL(type, funname) RSB_ARRAY_FUNC_ADDELEMENT_DEF(type, funname) {                        \
     if (!array) return NULL;                                                                                                \
-    while (array->lock) {}                                                                                                  \
-    array->lock = 1;                                                                                                        \
                                                                                                                             \
     if (!array->objects) {                                                                                                  \
         array->alloc_len = 8;                                                                                               \
@@ -103,22 +128,17 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->len++;                                                                                                           \
     array->current_index++;                                                                                                 \
                                                                                                                             \
-    array->lock = 0;                                                                                                        \
-                                                                                                                            \
     return array->objects + array->current_index - 1;                                                                       \
 }
 
 #define RSB_ARRAY_FUNC_POPELEMENT_IMPL(type, funname) RSB_ARRAY_FUNC_POPELEMENT_DEF(funname) {                          \
     if (!array || !array->objects || array->len == 0 || array->alloc_len == 0) return;                                  \
-    while (array->lock) {}                                                                                              \
-    array->lock = 1;                                                                                                    \
     if ((array->alloc_len - 1) == 0) {                                                                                  \
         free(array->objects);                                                                                           \
         array->objects = NULL;                                                                                          \
                                                                                                                         \
         array->len = 0;                                                                                                 \
         array->alloc_len = 0;                                                                                           \
-        array->lock = 0;                                                                                                \
                                                                                                                         \
         return;                                                                                                         \
     }                                                                                                                   \
@@ -129,8 +149,6 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->len--;                                                                                                       \
     array->current_index--;                                                                                             \
                                                                                                                         \
-    array->lock = 0;                                                                                                    \
-                                                                                                                        \
     return;                                                                                                             \
 }
 
@@ -139,6 +157,7 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
                                                                                       \
     if (array->objects) free(array->objects);                                         \
     free(array);                                                                      \
+    RSB_MUTEX_DEINIT                                                                  \
                                                                                       \
     return;                                                                           \
 }
@@ -146,15 +165,12 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
 #define RSB_ARRAY_FUNC_GETATINDEX_IMPL(type, funname) RSB_ARRAY_FUNC_GETATINDEX_DEF(type, funname) {  \
     assert(array);                                                                                    \
     if (!array->objects || array->len <= index) return (type){};                                      \
-    while (array->lock) {}                                                                            \
                                                                                                       \
     return array->objects[index];                                                                     \
 }
 
 #define RSB_ARRAY_FUNC_MERGE_IMPL(type, funname) RSB_ARRAY_FUNC_MERGE_DEF(type, funname) {  \
     if (!source || !destination || !source->objects || !destination->objects) return;       \
-    while (destination->lock) {}                                                            \
-    destination->lock = 0;                                                                  \
                                                                                             \
     for (size_t i = 0; i < source->len; i++) {                                              \
         type obj = RSBGetAtIndex##funname(source, i);                                       \
@@ -162,29 +178,21 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
         RSBAddElement##funname(destination, obj);                                           \
     }                                                                                       \
                                                                                             \
-    destination->lock = 0;                                                                  \
     return;                                                                                 \
 }
 
 #define RSB_ARRAY_FUNC_ADDELEMENTATINDEX_IMPL(type, funname) RSB_ARRAY_FUNC_ADDELEMENTATINDEX_DEF(type, funname) {  \
     if (!array || index > array->alloc_len) return;                                                                 \
-    while (array->lock) {}                                                                                          \
-    array->lock = 1;                                                                                                \
                                                                                                                     \
     rsb_array_##funname *new_arr = RSBCreateArray##funname();                                                       \
                                                                                                                     \
     for (size_t i = 0; i < array->len; i++) {                                                                       \
         if (i == index) {                                                                                           \
-            new_arr->lock = 0;                                                                                      \
             RSBAddElement##funname(new_arr, object);                                                                \
         }                                                                                                           \
-        array->lock = 0;                                                                                            \
-        new_arr->lock = 0;                                                                                          \
         RSBAddElement##funname(new_arr, RSBGetAtIndex##funname(array, i));                                          \
-        array->lock = 1;                                                                                            \
     }                                                                                                               \
                                                                                                                     \
-    array->lock = 0;                                                                                                \
     RSBClear##funname(array);                                                                                       \
                                                                                                                     \
     for (size_t i = 0; i < new_arr->len; i++) {                                                                     \
@@ -192,42 +200,30 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     }                                                                                                               \
                                                                                                                     \
     RSBDestroy##funname(new_arr);                                                                                   \
-    array->lock = 0;                                                                                                \
 }
 
 #define RSB_ARRAY_FUNC_POPELEMENTATINDEX_IMPL(type, funname) RSB_ARRAY_FUNC_POPELEMENTATINDEX_DEF(type, funname) {  \
     if (!array || index > array->alloc_len) return;                                                                 \
-    while (array->lock) {}                                                                                          \
-    array->lock = 1;                                                                                                \
                                                                                                                     \
     rsb_array_##funname *new_arr = RSBCreateArray##funname();                                                       \
                                                                                                                     \
     for (size_t i = 0; i < array->len; i++) {                                                                       \
         if (i != index) {                                                                                           \
-            array->lock = 0;                                                                                        \
-            new_arr->lock = 0;                                                                                      \
             RSBAddElement##funname(new_arr, RSBGetAtIndex##funname(array, i));                                      \
-            array->lock = 1;                                                                                        \
         }                                                                                                           \
     }                                                                                                               \
                                                                                                                     \
-    array->lock = 0;                                                                                                \
     RSBClear##funname(array);                                                                                       \
                                                                                                                     \
     for (size_t i = 0; i < new_arr->len; i++) {                                                                     \
-        new_arr->lock = 0;                                                                                          \
-        array->lock = 0;                                                                                            \
         RSBAddElement##funname(array, RSBGetAtIndex##funname(new_arr, i));                                          \
     }                                                                                                               \
                                                                                                                     \
     RSBDestroy##funname(new_arr);                                                                                   \
-    array->lock = 0;                                                                                                \
 }
 
 #define RSB_ARRAY_FUNC_CLEAR_IMPL(type, funname) RSB_ARRAY_FUNC_CLEAR_DEF(type, funname) {  \
     if (!array || !array->objects || !array->alloc_len) return;                             \
-    while (array->lock) {}                                                                  \
-    array->lock = 1;                                                                        \
                                                                                             \
     free(array->objects);                                                                   \
                                                                                             \
@@ -235,7 +231,6 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     array->current_index = 0;                                                               \
     array->alloc_len = 0;                                                                   \
     array->objects = 0;                                                                     \
-    array->lock = 0;                                                                        \
 }
 
 #define RSB_ARRAY_FUNC_VALID_IMPL(type, funname) RSB_ARRAY_FUNC_VALID_DEF(type, funname) {  \

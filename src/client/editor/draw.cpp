@@ -551,6 +551,7 @@ void _fEditorDraw(struct feditor *editor) {
             __state.overlay_framebuffer = LoadRenderTexture(800 + pix, 600);
 
             if (editor->level->entities != NULL) {
+                RSB_WRLOCK_BEGIN(editor->level->entities);
                 for (unsigned int i = 0; i < editor->level->entities->len; i++) {
                     fentity* e = RSBGetAtIndex_fentity(editor->level->entities, i);
                     if (!e) continue;
@@ -558,6 +559,7 @@ void _fEditorDraw(struct feditor *editor) {
                     e->cleanup(e);
                     MemFree(e);
                 }
+                RSB_WRLOCK_END(editor->level->entities);
 
                 RSBDestroy_fentity(editor->level->entities);
                 editor->level->entities = NULL;

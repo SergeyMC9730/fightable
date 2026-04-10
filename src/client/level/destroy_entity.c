@@ -10,6 +10,7 @@
 void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity) {
     if (!level || !entity || !level->entities) return;
 
+    RSB_WRLOCK_BEGIN(level->entities);
     unsigned int idx = 0xFFFFFFFF;
     for (unsigned int i = 0; i < level->entities->len; i++) {
         if (level->entities->objects[i] == entity) {
@@ -21,4 +22,5 @@ void _fLevelDestroyEntity(struct flevel* level, struct fentity* entity) {
     if (idx == 0xFFFFFFFF) return;
 
     RSBPopElementAtIndex_fentity(level->entities, idx);
+    RSB_WRLOCK_END(level->entities);
 }

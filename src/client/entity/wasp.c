@@ -253,6 +253,7 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
     double closest_distance;
     struct fentity *closest_target;
 
+    RSB_RDLOCK_BEGIN(level->entities);
     for (unsigned int i = 0; i < level->entities->len; i++) {
         struct fentity *entity = level->entities->objects[i];
         if (!entity) continue;
@@ -325,4 +326,5 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
             }
         }
     }
+    RSB_RDLOCK_END(level->entities);
 }

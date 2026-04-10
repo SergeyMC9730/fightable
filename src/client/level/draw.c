@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -202,12 +202,14 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
             player->update(player);
         }
 
+        RSB_RDLOCK_BEGIN(level->entities);
         for (int i = 0; i < level->entities->len; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
             if (!entity) continue;
 
             entity->draw(entity);
         }
+        RSB_RDLOCK_END(level->entities);
     }
 
     if (level->render_crop_area.width * level->render_crop_area.height > 0.f) {
@@ -235,8 +237,9 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (IsKeyPressed(KEY_M) && level->entities) {
         TraceLog(LOG_INFO, "Damaging all entities by 0 hp");
 
-        for (int i = 0; i < level->entities->len; i++) {
-            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
+        unsigned int len = level->entities->len;
+        for (int i = 0; i < len; i++) {
+            RSB_RDLOCK(level->entities, struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i););
             if (!entity) continue;
 
             if (!entity->damage) {
@@ -257,7 +260,16 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         test->base.hitbox.hitbox.x = player->hitbox.hitbox.x;
         test->base.hitbox.hitbox.y = player->hitbox.hitbox.y;
 
-        RSBAddElement_fentity(level->entities, &test->base);
+        RSB_WRLOCK(level->entities, RSBAddElement_fentity(level->entities, &test->base););
+    }
+    if (IsKeyPressed(KEY_P)) {
+        if (level->pause_world) {
+            TraceLog(LOG_INFO, "Resuming world");
+            level->pause_world = 0;
+        } else {
+            TraceLog(LOG_INFO, "Pausing world");
+            level->pause_world = 1;
+        }
     }
 
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), gameover_bg);

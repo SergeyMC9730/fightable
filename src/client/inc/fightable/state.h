@@ -232,6 +232,9 @@ struct fightable_state {
     struct fa_clippy clippy;
 
     unsigned char sp_opened_level;
+
+    float world_tick_time;
+    float world_tick_time_ext;
 };
 
 extern struct fightable_state __state;

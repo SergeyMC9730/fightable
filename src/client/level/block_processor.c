@@ -11,6 +11,7 @@
 #include <fightable/entity.h>
 #include <fightable/time.h>
 #include <fightable/pthread_compat.h>
+#include <fightable/state.h>
 #include <time.h>
 
 void *_fLevelDoBlockUpdate(void* _level) {
@@ -31,6 +32,8 @@ void *_fLevelDoBlockUpdate(void* _level) {
             if (level->block_p_profile) {
                 TraceLog(LOG_INFO, "Level ticked in %fms; Wait %d ms", (float)t, req);
             }
+            __state.world_tick_time = t;
+            // __state.world_tick_time_ext = t + ((float)req / 1000.f);
         } else {
             if (level->tps > 0.f) _fSleep((int)(1000.f / level->tps));
         }
@@ -43,9 +46,9 @@ void *_fLevelDoBlockUpdate(void* _level) {
 void _fLevelTick(struct flevel* level) {
     if (!level) return;
 
-    for (unsigned int i = 0; i < level->data_size; i++) {
-        _fBlockUpdate(level->objects + i, level);
-    }
+    // for (unsigned int i = 0; i < level->data_size; i++) {
+    //     _fBlockUpdate(level->objects + i, level);
+    // }
 
     struct fentity *player = 0;
 
@@ -57,8 +60,9 @@ void _fLevelTick(struct flevel* level) {
 
     if (level->entities && level->hitboxes) {
         // TraceLog(LOG_INFO, "lock=%d", level->entities->lock);
-        for (int i = 0; level->entities && i < level->entities->len; i++) {
-            struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
+        unsigned int len = level->entities->len;
+        for (int i = 0; level->entities && i < len; i++) {
+            RSB_RDLOCK(level->entities, struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i););
             if (!entity) continue;
             if (entity->dead) continue;
             if (entity->hitbox.hitbox.y > 1024) {

@@ -12,6 +12,7 @@ void _flEnemyUpdate(struct felenemy* instance) {
     struct fentity* entity = &instance->base;
 
     unsigned char idle = !instance->followed_entity || instance->followed_entity == entity;
+    // idle = 1;
 
     entity->moving_horizontally = 0;
     entity->moving_negative = 0;
@@ -21,8 +22,12 @@ void _flEnemyUpdate(struct felenemy* instance) {
         return;
     }
 
-    if (entity->doesnt_move && idle) {
-        _fEntityFlipDirection(entity);
+    if (entity->doesnt_move) {
+        if (idle) {
+            _fEntityFlipDirection(entity);
+        } else {
+            _fEntityJump(entity, 0);
+        }
     }
 
     if (!idle) {
