@@ -1,10 +1,10 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "raylib.h"
+#include "fightable/storage.h"
 #include <fraylib.h>
 #include <fightable/state.h>
 #include <fightable/renderer.h>
@@ -21,6 +21,9 @@ void _fLoaderMainProcessAssets(struct ftilemap *tilemapA, struct ftilemap *tilem
 
     __state.test_midground = LoadTexture("assets/textures/downsky_16bit_2.png");
     SetTextureWrap(__state.test_midground, TEXTURE_WRAP_REPEAT);
+
+    __state.damage_overlay = LoadTexture("assets/textures/damage_overlay.png");
+    __state.damage_overlay_anim = _ntRendererLoadAnimation(TextFormat("%s/assets/textures/damage_overlay.json", _fStorageGetWritable()));
 
     int codepoint_amount = 0;
     int *codepoints = LoadCodepoints(_ntGetCodepoints(), &codepoint_amount);
