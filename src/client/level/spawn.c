@@ -49,4 +49,6 @@ void _fLevelPerformBasicSpawn(struct flevel *level, unsigned char full_reset) {
     RSB_WRLOCK(level->entities, RSBAddElement_fentity(level->entities, &player->base););
 
     level->pause_world = 0;
+
+    level->hitboxes = _fLevelGetHitboxes(level);
 }

@@ -106,7 +106,7 @@ unsigned char _fLoaderDraw() {
             }
         }
 
-        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f\n   tick length: %f ms\n   (%s)",
+        snprintf(dbg_buffer, 2048, "   offset: %d\n   ui scale: %f\n   window scale: %f\n   mus time: %f\n   playing: %s\n   song stage: %d\n   song id: %d\n   render area: %d:%d (%d:%d tiles)\n   gpu time: %fms\n   timer: %f\n   timer2: %f\n   shake data: %f %f\n   tick length: %f ms\n   (%s)\n   entities: %ld",
             align_x,
             (float)UI_SCALE,
             (float)__state.window_scale,
@@ -121,7 +121,8 @@ unsigned char _fLoaderDraw() {
             __state.damage_overlay_timer2,
             __state.gui_render_offset.x,
             __state.gui_render_offset.y,
-            (__state.world_tick_time), tps_warn
+            (__state.world_tick_time), tps_warn,
+            (__state.current_level && __state.current_level->entities) ? __state.current_level->entities->len : (long)0
         );
 
         RlDrawText(dbg_buffer, 8, 32, 20, RED);

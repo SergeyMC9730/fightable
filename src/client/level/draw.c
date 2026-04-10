@@ -253,14 +253,16 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     if (IsKeyPressed(KEY_N) && player) {
         TraceLog(LOG_INFO, "Spawning test enemy");
 
-       	struct felenemy * test = (struct felenemy*)MemAlloc(sizeof(struct felenemy));
-        _flEnemyInit(test);
+        for (int i = 0; i < 32; i++) {
+            struct felenemy * test = (struct felenemy*)MemAlloc(sizeof(struct felenemy));
+            _flEnemyInit(test);
 
-        test->base.level = level;
-        test->base.hitbox.hitbox.x = player->hitbox.hitbox.x;
-        test->base.hitbox.hitbox.y = player->hitbox.hitbox.y;
+            test->base.level = level;
+            test->base.hitbox.hitbox.x = player->hitbox.hitbox.x;
+            test->base.hitbox.hitbox.y = player->hitbox.hitbox.y;
 
-        RSB_WRLOCK(level->entities, RSBAddElement_fentity(level->entities, &test->base););
+            RSB_WRLOCK(level->entities, RSBAddElement_fentity(level->entities, &test->base););
+        }
     }
     if (IsKeyPressed(KEY_P)) {
         if (level->pause_world) {

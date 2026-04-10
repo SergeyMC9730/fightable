@@ -28,10 +28,11 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
         // TraceLog(LOG_INFO, "%f %f %f %f", r.x, r.y, r.width, r.height);
 
         // iterate over all entities
-        RSB_RDLOCK_BEGIN(env->entities);
-        for (unsigned int i = 0; i < env->entities->len; i++) {
+        // RSB_RDLOCK_BEGIN(env->entities);
+        unsigned int len = env->entities->len;
+        for (unsigned int i = 0; i < len; i++) {
             // get entity
-            struct fentity* entity = RSBGetAtIndex_fentity(env->entities, i);
+            RSB_RDLOCK(env->entities, struct fentity* entity = RSBGetAtIndex_fentity(env->entities, i););
             // check if entity is valid
             if (!entity) continue;
 
@@ -48,6 +49,5 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
                 }
             }
         }
-        RSB_RDLOCK_END(env->entities);
     }
 }

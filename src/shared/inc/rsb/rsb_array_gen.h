@@ -116,9 +116,9 @@ RSB_ARRAY_FUNC_VALID_DEF(type, funname);
     while ((array->len + 1) >= array->alloc_len) { array->alloc_len += 8; ra = 1; }                                         \
     if (ra) {                                                                                                               \
         void *old = array->objects;                                                                                         \
-        printf("realloc required for %s: alloc_len=%d, objects=%p; ", #type, array->alloc_len - 8, array->objects);         \
+        /*printf("realloc required for %s: alloc_len=%d, objects=%p; ", #type, array->alloc_len - 8, array->objects);*/         \
         array->objects = (type *)reallocarray(array->objects, array->alloc_len, sizeof(type));                              \
-        printf("new_ptr=%p; alloc_len=%d; new_len=%d\n", array->objects, array->alloc_len, array->len + 1);                 \
+        /*printf("new_ptr=%p; alloc_len=%d; new_len=%d\n", array->objects, array->alloc_len, array->len + 1);*/                 \
         if (old != array->objects && array->callback_address_change) {                                                      \
             array->callback_address_change(array, old, array->objects);                                                     \
         }                                                                                                                   \

@@ -46,9 +46,9 @@ void *_fLevelDoBlockUpdate(void* _level) {
 void _fLevelTick(struct flevel* level) {
     if (!level) return;
 
-    // for (unsigned int i = 0; i < level->data_size; i++) {
-    //     _fBlockUpdate(level->objects + i, level);
-    // }
+    for (unsigned int i = 0; i < level->data_size; i++) {
+        _fBlockUpdate(level->objects + i, level);
+    }
 
     struct fentity *player = 0;
 
