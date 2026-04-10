@@ -14,7 +14,7 @@ export ANDROID_SDK=$SDK
 export ANDROID_NDK=$NDK
 
 export ANDROID_API=26
-export APP_PLATFORM=android-$ANDROID_API
+# export APP_PLATFORM=android-$ANDROID_API
 
 export APK_NAME=Fightable
 export PACKAGE_NAME=dogotrigger.fightable

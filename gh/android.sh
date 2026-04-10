@@ -51,6 +51,8 @@ compile_mpt() {
 		exit 1
 	fi
 	echo $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
+	ls $ANDROID_SDK/ndk -la
+	ls $ANDROID_SDK/ -la
 	ls -la $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
 	mkdir -pv $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/
 	sudo cp libs/$W_ARCH/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
