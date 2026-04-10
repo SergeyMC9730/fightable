@@ -26,7 +26,7 @@ void _fLevelPerformBasicSpawn(struct flevel *level, unsigned char full_reset) {
     player->base.level = level;
 
     _flPlayerInit(player);
-    _fEntitySetPosition(&player->base, (Vector2){ pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
+    _fEntitySetPosition(&player->base, (Vector2){ pos.x * player->base.hitbox.hitbox.width, pos.y * player->base.hitbox.hitbox.height });
     _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_2);
     _fEntityAddAccessory(&player->base, ENTITY_ACC_GLASSES_1);
 

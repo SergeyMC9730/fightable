@@ -31,6 +31,8 @@ fhitbox _fHitboxExpand(fhitbox *h, float x, float y);
 RLRectangle _fHitboxToRect(fhitbox hitbox);
 fhitbox _fHitboxFromRect(RLRectangle rect);
 
+Vector2 _fHitboxPositionFromHitbox(fhitbox hitbox);
+
 #ifdef __cplusplus
 }
 #endif

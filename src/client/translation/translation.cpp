@@ -19,7 +19,7 @@ struct ftr_queue {
 };
 
 std::queue<ftr_queue> __trQueue;
-flang_id __trLang = FLI_RuRu;
+flang_id __trLang = FLI_EnUs;
 std::vector<ftr_entry> __trStrings = {
     {
         "menu.base.play",
@@ -205,7 +205,12 @@ std::vector<ftr_entry> __trStrings = {
         "menu.play.join_server",
         "Join Server",
         "Подключиться\nк серверу"
-    }
+    },
+    {
+        "notification.screenshot.saved",
+        "Screenshot was saved under\n",
+        "Скриншот сохранён под именем\n"
+    },
 };
 
 void _fTranslationQueueTextDraw(IVector2 pos, const char *entry_id, float scaling, Color tint, unsigned char should_convert) {

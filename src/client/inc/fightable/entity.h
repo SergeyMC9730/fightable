@@ -1,12 +1,12 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
-#define ENTITY_PLAYER 1
+#include <fightable/entity_library.h>
 
 #include <stdint.h>
 
@@ -46,6 +46,15 @@ enum fentity_accessory_type {
     ENTITY_ACCT_GLASSES = 2
 };
 
+struct fentity_hitbox {
+    fhitbox hitbox;
+    fhitbox ground_hitbox;
+    fhitbox wall_hitbox_a;
+    fhitbox wall_hitbox_b;
+
+    unsigned char update_unused;
+};
+
 struct fentity {
     Vector2 speed;
 
@@ -61,14 +70,13 @@ struct fentity {
     unsigned char dead : 1;
     unsigned char object_destroyed : 1;
     unsigned char begin_destruction : 1;
+    unsigned char doesnt_move : 1;
     unsigned char no_gravity : 1;
 
-    fhitbox hitbox;
+    struct fentity_hitbox hitbox;
 
     fhitbox* obstacles;
     unsigned int obstacles_length;
-
-    fhitbox ground_hitbox;
 
     struct flevel *level;
 
@@ -79,6 +87,7 @@ struct fentity {
     int entity_runtime_id;
 
     fhitbox standing_object;
+    fhitbox last_standing_object;
 
     rsb_array__fentity_accessory* accessories;
 
@@ -93,6 +102,8 @@ struct fentity {
     float destroy_timer;
 
     float custom_delta;
+
+    Vector2 max_speed;
 
     void (*update)(struct fentity *entity);
     void (*draw)(struct fentity *entity);
@@ -135,6 +146,16 @@ void _fEntitySetDestroyTimer(struct fentity* entity, float time);
 
 void _fEntitySetDelta(struct fentity* entity, float delta);
 float _fEntityGetDelta(struct fentity* entity);
+
+unsigned char _fEntityInWall(struct fentity* entity, struct fentity_hitbox *opt_env);
+float _fEntityGetClosestHole(struct fentity *entity);
+unsigned char _fEntityCanFall(struct fentity *entity, struct fentity_hitbox *opt_env);
+
+void _fEntityFlipDirection(struct fentity* entity);
+
+void _fEntityUpdateHitbox(struct fentity_hitbox *env);
+
+float _fEntityDistanceToEntity(struct fentity *entity_a, struct fentity *entity_b);
 
 #ifdef __cplusplus
 }

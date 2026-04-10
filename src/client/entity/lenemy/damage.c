@@ -1,18 +1,18 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 #define WITH_PLACEHOLDERS
-#include <fightable/player.h>
+#include <fightable/enemy.h>
 #include <fightable/gfx.h>
 #include <fightable/state.h>
 #include <fightable/entity_spawner.h>
 #include <fightable/level.h>
 #include <stdio.h>
 
-void _flPlayerDamage(struct felplayer* instance, float hp) {
+void _flEnemyDamage(struct felenemy* instance, float hp) {
     if (!instance || instance->base.damage_colddown > 0) return;
 
     int old_hp = (int)instance->base.hp;
@@ -20,26 +20,7 @@ void _flPlayerDamage(struct felplayer* instance, float hp) {
 	int delta_hp = old_hp - (int)instance->base.hp;
 
 	if (instance->base.damage_colddown == instance->base.max_damage_colddown) {
-		TraceLog(LOG_INFO, "Applied damage to local player");
-
-		_fGfxShakeConst(&__state.gfx, 1.2);
-
-		if (!instance->base.dead) {
-			const float old_vol = __state.config.volume_slider.progress;
-
-			_fAudioSetVolume(&__state.sound_engine, old_vol / 4);
-			_fAudioFxSlideVolume(&__state.sound_engine, old_vol, 0.5f);
-
-			_fGfxActivateDamageOverlay();
-			_ntRendererResetAnimation(__state.damage_overlay_anim);
-		}
-		else {
-			if (__state.damage_overlay_play) {
-				__state.damage_overlay_timer = 1.f;
-			}
-		}
-
-		TraceLog(LOG_INFO, "Spawning label \"%d\"", (int)delta_hp);
+		TraceLog(LOG_INFO, "enemy: Spawning label \"%d\"", (int)delta_hp);
 
 		char buffer[16] = {};
 		snprintf(buffer, 16, "%d", (int)delta_hp);

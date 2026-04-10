@@ -1,3 +1,9 @@
+
+//          Sergei Baigerov 2024 - 2026.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #include <fightable/entity.h>
 #include <fightable/tilemap.h>
 #include <fightable/level.h>
@@ -8,7 +14,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 	if (!entity || !entity->accessories || entity->object_destroyed) return;
 
 	IVector2 basepos = _fEntityGetDrawingPos(entity);
-	
+
 	for (unsigned int i = 0; i < entity->accessories->len; i++) {
 		struct fentity_accessory a = RSBGetAtIndex_fentity_accessory(entity->accessories, i);
 
@@ -16,7 +22,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 		case ENTITY_ACC_HAT_1: {
 			IVector2 pos = {
 				.x = basepos.x - 1,
-				.y = basepos.y - (int)(entity->hitbox.height - 2)
+				.y = basepos.y - (int)(entity->hitbox.hitbox.height - 2)
 			};
 
 			if (entity->render_direction == ENTITY_DIR_LEFT) {
@@ -30,7 +36,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 		case ENTITY_ACC_HAT_2: {
 			IVector2 pos = {
 				.x = basepos.x,
-				.y = basepos.y - (int)entity->hitbox.height
+				.y = basepos.y - (int)entity->hitbox.hitbox.height
 			};
 
 			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 1, 7 }, entity->render_direction, 0, entity->tint);
@@ -40,7 +46,7 @@ void _fEntityDrawAccessory(struct fentity* entity) {
 		case ENTITY_ACC_HAT_3: {
 			IVector2 pos = {
 				.x = basepos.x,
-				.y = basepos.y - (int)entity->hitbox.height
+				.y = basepos.y - (int)entity->hitbox.hitbox.height
 			};
 
 			_fTilemapDraw(entity->level->tilemap, pos, (IVector2) { 2, 7 }, entity->render_direction, 0, entity->tint);

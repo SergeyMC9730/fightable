@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -130,6 +130,7 @@ static const struct fblock __blocks[] = {
     {TSET(39, 2,Wool)},                                     // 118
     {TSET(40, 2,Wool)},                                     // 119
     {TSET(14, 5,Move),.passable = 0},                       // 120
+    {TSET(31, 3,Spwnr),.passable = 1},                      // 121
 };
 
 struct fblock _fBlockFromId(unsigned short id) {

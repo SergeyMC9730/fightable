@@ -4,11 +4,13 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "raylib.h"
 #include <fightable/state.h>
 #include <fightable/renderer.h>
 #include <fightable/storage.h>
 #include <fightable/notif_mgr.h>
 #include <fightable/translation.h>
+#include <fightable/string.h>
 #include <stdio.h>
 
 char dbg_buffer[2048] = {};
@@ -31,6 +33,19 @@ unsigned char _fLoaderDraw() {
     }
     if (IsKeyPressed(KEY_F)) {
         _fOpenFileSelector(_fStorageGetWritable(), NULL);
+    }
+    if (IsKeyPressed(KEY_J)) {
+        // const char *storage = _fStorageGetWritable();
+        time_t tm = time(0);
+        char *path = _fCopyString(TextFormat("scr_%ld.png", tm));
+
+        TakeScreenshot(path);
+
+        char *fmt = _fCopyString(TextFormat("%s%s", _fTranslationGetString("notification.editor.saved"), path));
+        _fNotifMgrSend(fmt);
+
+        free(path);
+        free(fmt);
     }
 
     BeginTextureModeStacked(__state.framebuffer);

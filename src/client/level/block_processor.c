@@ -56,9 +56,15 @@ void _fLevelTick(struct flevel* level) {
     }
 
     if (level->entities && level->hitboxes) {
-        for (int i = 0; i < level->entities->len; i++) {
+        // TraceLog(LOG_INFO, "lock=%d", level->entities->lock);
+        for (int i = 0; level->entities && i < level->entities->len; i++) {
             struct fentity* entity = RSBGetAtIndex_fentity(level->entities, i);
-            if (!entity || entity == player) continue;
+            if (!entity) continue;
+            if (entity->dead) continue;
+            if (entity->hitbox.hitbox.y > 1024) {
+                entity->damage(entity, 4);
+            }
+            if (entity == player) continue;
 
             entity->obstacles = level->hitboxes;
             entity->obstacles_length = level->data_size;
@@ -88,4 +94,5 @@ void _fLevelUnloadProcessor(struct flevel *level) {
         pthread_join(level->block_processor_thread, NULL);
     }
     level->block_p_loaded = 0;
+    level->block_p_close = 0;
 }

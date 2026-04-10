@@ -12,3 +12,7 @@ RLRectangle _fHitboxToRect(fhitbox hitbox) {
 fhitbox _fHitboxFromRect(RLRectangle rect) {
     return rect;
 }
+
+Vector2 _fHitboxPositionFromHitbox(fhitbox hitbox) {
+    return (Vector2){hitbox.x, hitbox.y};
+}

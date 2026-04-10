@@ -16,10 +16,10 @@ void _fEntityMove(struct fentity *entity, Vector2 pos) {
             fhitbox o = entity->obstacles[i];
             if (o.width * o.height <= 0.f) continue;
 
-            pos.x = _fHitboxClipXCollide(entity->obstacles + i, &entity->hitbox, pos.x);
+            pos.x = _fHitboxClipXCollide(entity->obstacles + i, &entity->hitbox.hitbox, pos.x);
         }
 
-        entity->hitbox.x += pos.x;
+        entity->hitbox.hitbox.x += pos.x;
 
         // Stop motion on collision
         if (prevX != pos.x) entity->speed.x = 0.f;
@@ -30,12 +30,14 @@ void _fEntityMove(struct fentity *entity, Vector2 pos) {
             fhitbox o = entity->obstacles[i];
             if (o.width * o.height <= 0.f) continue;
 
-            pos.y = _fHitboxClipYCollide(entity->obstacles + i, &entity->hitbox, pos.y);
+            pos.y = _fHitboxClipYCollide(entity->obstacles + i, &entity->hitbox.hitbox, pos.y);
         }
 
-        entity->hitbox.y += pos.y;
+        entity->hitbox.hitbox.y += pos.y;
 
         // Stop motion on collision
         if (prevY != pos.y) entity->speed.y = 0.f;
     }
+
+    entity->doesnt_move = entity->speed.x == 0.f;
 }

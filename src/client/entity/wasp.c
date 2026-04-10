@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -29,8 +29,8 @@ void _feWaspInit(struct fentity_wasp* instance) {
 
 	_fEntityInit(&instance->base);
 
-	instance->base.hitbox.width = 0;
-	instance->base.hitbox.height = 0;
+	instance->base.hitbox.hitbox.width = 0;
+	instance->base.hitbox.hitbox.height = 0;
 
 	instance->base.can_be_damaged = 0;
 	instance->base.no_gravity = 1;
@@ -205,8 +205,8 @@ struct fewasp_state_entry *_feWaspGetTrappedEntityState(struct fentity_wasp* ins
 
 double _feWaspDistanceFromEntity(struct fentity_wasp* instance, struct fentity *e) {
     IVector2 t = instance->base.level->tilemap->tile_size;
-    IVector2 pos = (IVector2){instance->base.hitbox.x, instance->base.hitbox.y};
-    IVector2 pos2 = (IVector2){e->hitbox.x, e->hitbox.y};
+    IVector2 pos = (IVector2){instance->base.hitbox.hitbox.x, instance->base.hitbox.hitbox.y};
+    IVector2 pos2 = (IVector2){e->hitbox.hitbox.x, e->hitbox.hitbox.y};
     IVector2 center = {
         pos.x + (instance->main_texture.width / 2),
         pos.y + (instance->main_texture.height / 2)
@@ -225,13 +225,13 @@ void _feWaspDamagePlayer(void *_ctx) {
 
 unsigned char _feWaspEntityInRadius(struct fentity_wasp* instance, struct fentity *e, unsigned int radius_blocks) {
     IVector2 t = instance->base.level->tilemap->tile_size;
-    IVector2 pos = (IVector2){instance->base.hitbox.x, instance->base.hitbox.y};
+    IVector2 pos = (IVector2){instance->base.hitbox.hitbox.x, instance->base.hitbox.hitbox.y};
     IVector2 center = {
         pos.x + (instance->main_texture.width / 2),
         pos.y + (instance->main_texture.height / 2)
     };
 
-    return CheckCollisionCircleRec(_fImathToVFloat(center), radius_blocks * t.x, _fHitboxToRect(e->hitbox));
+    return CheckCollisionCircleRec(_fImathToVFloat(center), radius_blocks * t.x, _fHitboxToRect(e->hitbox.hitbox));
 }
 
 void _feWaspUpdate(struct fentity_wasp* instance) {
@@ -242,7 +242,7 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
     struct flevel *level = instance->base.level;
     if (!level) return;
 
-    IVector2 pos = (IVector2){instance->base.hitbox.x, instance->base.hitbox.y};
+    IVector2 pos = (IVector2){instance->base.hitbox.hitbox.x, instance->base.hitbox.hitbox.y};
     IVector2 center = {
         pos.x + (instance->main_texture.width / 2),
         pos.y + (instance->main_texture.height / 2)
@@ -259,7 +259,7 @@ void _feWaspUpdate(struct fentity_wasp* instance) {
 
         if (entity->global_entity_id == ENTITY_WASP) continue;
         if (entity->global_entity_id == ENTITY_PLAYER) {
-            float distance_circ = _fDistPointToCircle((Vector2){entity->hitbox.x, entity->hitbox.y}, _fImathToVFloat(center), 32 * t.y);
+            float distance_circ = _fDistPointToCircle((Vector2){entity->hitbox.hitbox.x, entity->hitbox.hitbox.y}, _fImathToVFloat(center), 32 * t.y);
             float distance = _feWaspDistanceFromEntity(instance, entity);
 
             if (_feWaspEntityInRadius(instance, entity, 8)) {

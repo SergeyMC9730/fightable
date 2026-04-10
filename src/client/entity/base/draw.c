@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 void _fEntityDraw(struct fentity *entity) {
     if (!entity || entity->dead || entity->object_destroyed) return;
 
-    fhitbox hitbox = entity->hitbox;
+    fhitbox hitbox = entity->hitbox.hitbox;
     IVector2 pos = _fEntityGetDrawingPos(entity);
 
     hitbox.x = pos.x;

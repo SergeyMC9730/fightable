@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +16,8 @@
 void _fEntityUpdate(struct fentity* entity) {
     if (!entity || entity->object_destroyed) return;
 
-    static const double max_speed_x = 1.5 / 1.1 * 70.f;
-    static const double max_speed_y = 3.f * 20.f;
+    double max_speed_x = entity->max_speed.x;
+    double max_speed_y = entity->max_speed.y;
 
     const double delta = _fEntityGetDelta(entity);
 
@@ -75,22 +75,20 @@ void _fEntityUpdate(struct fentity* entity) {
 
     _fEntityMove(entity, entity->speed);
 
-    entity->ground_hitbox.width = entity->hitbox.width;
-    entity->ground_hitbox.height = 1;
-    entity->ground_hitbox.x = entity->hitbox.x;
-    entity->ground_hitbox.y = entity->hitbox.y + (entity->hitbox.height - entity->ground_hitbox.height) + 1;
+    _fEntityUpdateHitbox(&entity->hitbox);
 
-    RLRectangle r1 = _fHitboxToRect(entity->ground_hitbox);
+    RLRectangle r1 = entity->hitbox.ground_hitbox;
 
     entity->on_ground = 0;
     entity->standing_object = (fhitbox){ 0 };
 
     for (unsigned int i = 0; i < entity->obstacles_length; i++) {
-        RLRectangle r2 = _fHitboxToRect(entity->obstacles[i]);
+        RLRectangle r2 = entity->obstacles[i];
 
         if (CheckCollisionRecs(r1, r2)) {
             entity->on_ground = 1;
             entity->standing_object = entity->obstacles[i];
+            entity->last_standing_object = entity->standing_object;
 
             break;
         }
@@ -117,5 +115,26 @@ void _fEntityUpdate(struct fentity* entity) {
 
             _fLevelDestroyEntity(entity->level, entity);
         }
+    }
+}
+
+void _fEntityUpdateHitbox(struct fentity_hitbox *env) {
+    if (!env) return;
+
+    env->ground_hitbox.width = env->hitbox.width;
+    env->ground_hitbox.height = 1;
+    env->ground_hitbox.x = env->hitbox.x;
+    env->ground_hitbox.y = env->hitbox.y + (env->hitbox.height - env->ground_hitbox.height) + 1;
+
+    if (env->update_unused) {
+        env->wall_hitbox_a.width = 2;
+        env->wall_hitbox_a.height = env->hitbox.height - 2;
+        env->wall_hitbox_a.x = env->hitbox.x - env->wall_hitbox_a.width;
+        env->wall_hitbox_a.y = env->hitbox.y + 1;
+
+        env->wall_hitbox_b.width = 2;
+        env->wall_hitbox_b.height = env->hitbox.height - 2;
+        env->wall_hitbox_b.x = env->hitbox.x + env->hitbox.width;
+        env->wall_hitbox_b.y = env->hitbox.y + 1;
     }
 }

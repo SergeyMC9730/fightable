@@ -1,5 +1,9 @@
-#include "fightable/intvec.h"
-#include "fightable/multiline_text_instance.h"
+
+//          Sergei Baigerov 2024 - 2026.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE.txt or copy at
+//          https://www.boost.org/LICENSE_1_0.txt)
+
 #define WITH_PLACEHOLDERS
 #include <fightable/etext.h>
 #include <fightable/text.h>
@@ -16,11 +20,11 @@ void _feTextInit(struct fentity_text* instance, const char* text) {
 	instance->text = _fMultilineTextInstanceCreateWithTextMan(text, &__state.text_manager);
 
 	Vector2 v = _fMultilineTextInstanceGetSize(instance->text);
-	fhitbox hitbox = instance->base.hitbox;
+	fhitbox hitbox = instance->base.hitbox.hitbox;
 	hitbox.width = v.x; hitbox.height = v.y;
 
 	instance->base.can_be_damaged = 0;
-	instance->base.hitbox = hitbox;
+	_fEntitySetHitbox(&instance->base, hitbox);
 	instance->base.global_entity_id = ENTITY_TEXT;
 	instance->base.draw = (void(*)(struct fentity*))_feTextDraw;
 	instance->base.cleanup = (void(*)(struct fentity*))_feTextCleanup;

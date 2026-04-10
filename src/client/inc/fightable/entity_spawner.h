@@ -6,8 +6,14 @@
 
 #pragma once
 
-#define ENTITY_PLAYER			1
-#define ENTITY_REMOTE_PLAYER	2
-#define ENTITY_TEXT				3
-#define ENTITY_ENEMY            4
-#define ENTITY_WASP             100
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct fentity;
+
+void _fEntitySpawnTempLabel(struct fentity *instance, char *data);
+
+#ifdef __cplusplus
+}
+#endif

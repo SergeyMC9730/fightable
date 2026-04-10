@@ -15,6 +15,7 @@
 #include <fightable/sanitizer.h>
 #include <fightable/renderer.h>
 #include <fightable/e_wasp.h>
+#include <fightable/enemy.h>
 
 RSB_ARRAY_IMPL_GEN(struct fentity*, _fentity);
 RSB_ARRAY_IMPL_GEN(struct flevel_light_source, _lls);
@@ -75,8 +76,8 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     int ty = level->tilemap->tile_size.y;
 
     if (player) {
-        actual_cam.target.x = (int)(player->hitbox.x - (float)__state.framebuffer.texture.width / 2) + (int)__state.gui_render_offset.x;
-        actual_cam.target.y = (int)(player->hitbox.y - (float)__state.framebuffer.texture.height / 2) + (int)__state.gui_render_offset.y;
+        actual_cam.target.x = (int)(player->hitbox.hitbox.x - (float)__state.framebuffer.texture.width / 2) + (int)__state.gui_render_offset.x;
+        actual_cam.target.y = (int)(player->hitbox.hitbox.y - (float)__state.framebuffer.texture.height / 2) + (int)__state.gui_render_offset.y;
     }
 
     IVector2 cam_blocks = {
@@ -218,7 +219,7 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
     for (unsigned int i = 0; i < level->light_sources->len; i++) {
         struct flevel_light_source* source = level->light_sources->objects + i;
         if (player) {
-            if (!CheckCollisionPointRec((Vector2) { source->pos.x, source->pos.y }, player->hitbox)) {
+            if (!CheckCollisionPointRec((Vector2) { source->pos.x, source->pos.y }, player->hitbox.hitbox)) {
                 _fLevelLightSourceDraw(level, source);
             }
         }
@@ -247,14 +248,14 @@ void _fLevelDraw(struct flevel *level, IVector2 initial_pos) {
         }
     }
     if (IsKeyPressed(KEY_N) && player) {
-        TraceLog(LOG_INFO, "Spawning wasp");
+        TraceLog(LOG_INFO, "Spawning test enemy");
 
-       	struct fentity_wasp* test = (struct fentity_wasp*)MemAlloc(sizeof(struct fentity_wasp));
-        _feWaspInit(test);
+       	struct felenemy * test = (struct felenemy*)MemAlloc(sizeof(struct felenemy));
+        _flEnemyInit(test);
 
         test->base.level = level;
-        test->base.hitbox.x = player->hitbox.x;
-        test->base.hitbox.y = player->hitbox.y;
+        test->base.hitbox.hitbox.x = player->hitbox.hitbox.x;
+        test->base.hitbox.hitbox.y = player->hitbox.hitbox.y;
 
         RSBAddElement_fentity(level->entities, &test->base);
     }

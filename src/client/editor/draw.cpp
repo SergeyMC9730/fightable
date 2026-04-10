@@ -4,6 +4,7 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include "fightable/level.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -405,7 +406,7 @@ void _fEditorDraw(struct feditor *editor) {
                         player->base.level = editor->level;
 
                         _flPlayerInit(player);
-                        _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.width, pos.y * player->base.hitbox.height });
+                        _fEntitySetPosition(&player->base, { pos.x * player->base.hitbox.hitbox.width, pos.y * player->base.hitbox.hitbox.height });
                         _fEntityAddAccessory(&player->base, ENTITY_ACC_HAT_2);
                         _fEntityAddAccessory(&player->base, ENTITY_ACC_GLASSES_1);
 
@@ -427,6 +428,8 @@ void _fEditorDraw(struct feditor *editor) {
                         editor->level->entities = RSBCreateArrayFromList_fentity(editor->entities.data(), editor->entities.size());
 
                         editor->f1_lock = true;
+
+                        _fLevelLoadProcessor(editor->level);
                     }
                 }
 
@@ -530,6 +533,8 @@ void _fEditorDraw(struct feditor *editor) {
 #endif
 
         if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {
+            _fLevelUnloadProcessor(editor->level);
+
             Vector2 dpi = GetWindowScaleDPI();
 
             editor->should_display_sidebar = true;

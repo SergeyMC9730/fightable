@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -35,7 +35,7 @@ void _fBlockUpdate(struct fblock* block, struct flevel* env) {
             if (!entity) continue;
 
             // get entity hitbox
-            RLRectangle er = entity->hitbox;
+            fhitbox er = entity->hitbox.hitbox;
 
             // check for collision between entity and block surface
             if (CheckCollisionRecs(er, r)) {

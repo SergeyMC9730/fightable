@@ -403,6 +403,12 @@ set(FIGHTABLE_SRC
     src/client/singleplayer/sp_lobby.c
     src/client/level/spawn.c
     src/client/translation/translation.cpp
+    src/client/entity/lenemy/damage.c
+    src/client/entity/lenemy/draw.c
+    src/client/entity/lenemy/init.c
+    src/client/entity/lenemy/perform_death.c
+    src/client/entity/lenemy/update.c
+    src/client/entity/base/spawner.c
     ${FIGHTABLE_GPU_SRC}
 )
 
