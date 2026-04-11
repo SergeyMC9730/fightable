@@ -100,7 +100,7 @@ compile_mhd() {
 	sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
 	sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
 
-	echo "end: start date: $(date)"
+	echo "mhd: end date: $(date)"
 }
 
 compile_curl() {
@@ -113,7 +113,7 @@ compile_curl() {
     chmod 755 build_for_android.sh
     ./build_for_android.sh
 
-    sudo cp jni/build/curl/*/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
+    sudo cp jni/curl/include/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
     sudo cp libs/*/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/zlib/*/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/zlib/*/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
