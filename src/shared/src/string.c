@@ -1,9 +1,10 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
+#include <stdlib.h>
 #include <fightable/string.h>
 #include <string.h>
 #include <rsb/rsb_array_char.h>
@@ -59,7 +60,13 @@ void _fCleanupSplittedString(rsb_array__pchar *array) {
 }
 
 char *_fCopyStringWithLen(const char *c, unsigned int len) {
-    return strndup(c, len);
+    if (!c || !len) return NULL;
+
+    char *dest = (char *)malloc(len + 1);
+    memcpy(dest, c, len);
+    dest[len] = 0;
+
+    return dest;
 }
 
 int _fGetUtf8AtIndex(const char *utf_string, unsigned int char_index) {
