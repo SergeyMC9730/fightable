@@ -138,7 +138,7 @@ else()
     target_include_directories(fshared PRIVATE
         ${CURL_INC}
     )
-    target_link_libraries(fshared ${CURL_LIB})
+    target_link_libraries(fshared PRIVATE ${CURL_LIB})
 endif()
 if (LIBC_FD_SIZE)
     message(STATUS "Setting MP stack definition, FD_SETSIZE, to ${LIBC_FD_SIZE}")
@@ -173,7 +173,7 @@ if (WIN32)
     find_library(WIN32_WS_LIB ws2)
     if (NOT WIN32_WS_LIB)
         message(WARNING "Ws2_32 could not be found")
-        set(DISABLE_MP_FUNCTIONALITY ON)
+        # set(DISABLE_MP_FUNCTIONALITY ON)
     endif()
 endif()
 
@@ -525,7 +525,7 @@ target_include_directories(fightable PRIVATE
 target_include_directories(fshared PRIVATE
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
-target_link_libraries(fshared ${FIGHTABLE_NATIVE_LIBS})
+target_link_libraries(fshared PRIVATE ${FIGHTABLE_NATIVE_LIBS})
 
 if (UNIX OR LINUX)
     message(STATUS "Applying linkage patches for Unix")
