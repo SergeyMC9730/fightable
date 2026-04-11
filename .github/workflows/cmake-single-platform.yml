@@ -64,6 +64,13 @@ jobs:
 
       - name: Generate an APK file
         run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fightable-android-universal
+          path: |
+            ${{github.workspace}}/bin
+          if-no-files-found: error
   windows:
     runs-on: windows-latest
     steps:

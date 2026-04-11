@@ -29,4 +29,5 @@ cp $(find . | grep "libportaudio") $LIB_PATH -v
 cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libmicrohttpd.so $LIB_PATH -v
 cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libopenmpt.so $LIB_PATH -v
 cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libc++_shared.so $LIB_PATH -v
+cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/libcurl.so $LIB_PATH -v
 cd ..

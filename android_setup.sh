@@ -4,7 +4,7 @@ export APK_LIBS="lib"
 
 source setup_android_vars.sh
 
-mkdir -p bin
+mkdir -pv bin
 
 $BUILD_TOOLS/aapt package -f -I "${ANDROID_SDK}/platforms/android-$ANDROID_API/android.jar" -M AndroidManifest.xml -A src/assets -S res -m -F bin/app-unsigned.apk
 

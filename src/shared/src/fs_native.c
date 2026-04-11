@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +16,9 @@
 #include <windows.h>
 #include <direct.h>
 #define mkdir(PATH, MODE) _mkdir(PATH)
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m) & _S_IFDIR) == _S_IFDIR)
+#endif
 #elif defined(TARGET_UNIX)
 #include <dirent.h>
 #include <unistd.h>

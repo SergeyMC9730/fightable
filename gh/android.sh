@@ -32,7 +32,7 @@ cd android_req
 
 wget https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.7.13+release.makefile.tar.gz &
 wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz &
-git clone https://github.com/ibaoger/libcurl-android.git &
+git clone https://github.com/ibaoger/libcurl-android.git --recursive &
 
 wait
 
@@ -107,18 +107,18 @@ compile_curl() {
     echo "curl: start date: $(date)"
 
     cd libcurl-android
-    git submodule init
-    git submodule update
 
     chmod 755 build_for_android.sh
     ./build_for_android.sh
 
+    sleep 3
+
     sudo cp jni/curl/include/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
-    sudo cp libs/*/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/zlib/*/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/zlib/*/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/openssl/*/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/openssl/*/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp libs/$W_ARCH/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/$W_ARCH/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/$W_ARCH/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$W_ARCH/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$W_ARCH/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
 
     echo "curl: end date: $(date)"
 }
