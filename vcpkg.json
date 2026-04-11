@@ -1,0 +1,5 @@
+{
+  "name": "fightable",
+  "version-string": "1.0.0-alpha",
+  "dependencies": ["curl"]
+}

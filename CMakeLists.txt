@@ -5,6 +5,11 @@
 #          https://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.26)
+
+if (WIN32)
+    set(VCPKG_TARGET_TRIPLET x64-windows-static)
+endif()
+
 project(fightable LANGUAGES C CXX)
 
 get_cmake_property(CACHE_VARS CACHE_VARIABLES)
@@ -81,13 +86,23 @@ include(CheckIncludeFile)
 
 find_library(CURL_LIB curl)
 if(NOT CURL_LIB)
-    message(FATAL_ERROR "libcurl could not be found")
+    if (NOT WIN32)
+        message(FATAL_ERROR "libcurl could not be found")
+    else()
+        message(STATUS "libcurl could not be found. trying to use find_package...")
+        find_package(CURL CONFIG REQUIRED)
+        set(FPACKAGED_CURL ON)
+    endif()
 endif()
-CHECK_INCLUDE_FILE("curl/curl.h" HAVE_LIBCURL)
-if (NOT HAVE_LIBCURL AND NOT CURL_INC)
-    message(FATAL_ERROR "libcurl binaries were found but the header files itself are missing")
+if (FPACKAGED_CURL)
+    message(STATUS "Trying to use include path from curl package")
+else()
+    CHECK_INCLUDE_FILE("curl/curl.h" HAVE_LIBCURL)
+    if (NOT HAVE_LIBCURL AND NOT CURL_INC)
+        message(FATAL_ERROR "libcurl binaries were found but the header files itself are missing")
+    endif()
+    message(STATUS "curl custom include path: ${CURL_INC}")
 endif()
-message(STATUS "curl custom include path: ${CURL_INC}")
 
 add_library(nbt-miniz STATIC
     ext/libnbt/miniz.c
@@ -115,10 +130,16 @@ add_library(fshared STATIC
     src/shared/src/int.c
 )
 target_include_directories(fshared PRIVATE
-    ${FIGHTABLE_SHARED_INC} ${CURL_INC}
+    ${FIGHTABLE_SHARED_INC}
 )
-target_link_libraries(fshared ${CURL_LIB})
-
+if (FPACKAGED_CURL)
+    target_link_libraries(fshared PRIVATE CURL::libcurl)
+else()
+    target_include_directories(fshared PRIVATE
+        ${CURL_INC}
+    )
+    target_link_libraries(fshared ${CURL_LIB})
+endif()
 if (LIBC_FD_SIZE)
     message(STATUS "Setting MP stack definition, FD_SETSIZE, to ${LIBC_FD_SIZE}")
     add_compile_definitions(FD_SETSIZE=${LIBC_FD_SIZE})
@@ -208,7 +229,7 @@ if (FIGHTABLE_RENDERER STREQUAL "raylib")
     add_subdirectory(ext/raylib)
 endif()
 
-if (NOT DISABLE_PORTAUDIO AND N)
+if (NOT DISABLE_PORTAUDIO)
     set(WDMKS OFF)
     if (NOT LINUX)
         set(PA_USE_ALSA OFF)
@@ -684,10 +705,9 @@ target_include_directories(collide-test PRIVATE
     ${FIGHTABLE_SHARED_INC}
     ${FIGHTABLE_NATIVE_INCLUDES}
 )
+target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args nbt-miniz)
 if (NOT DISABLE_PORTAUDIO)
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson portaudio ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIB} ${FIGHTABLE_HTTP_LINK} fshared args nbt-miniz)
-else()
-    target_link_libraries(fbase ${FIGHTABLE_RENDERER_LIB} cjson ${OPENMPT_LIB} ${FIGHTABLE_NATIVE_LIBS} ${FIGHTABLE_HTTP_LINK} fshared args nbt-miniz)
+    target_link_libraries(fbase portaudio)
 endif()
 target_link_libraries(fightable fbase)
 target_link_libraries(physics-test ${FIGHTABLE_RENDERER_LIB} )

@@ -35,7 +35,7 @@ RSB_WRLOCK_END(ARRAY);
 #define RSB_WRLOCK_END(ARRAY)
 #endif
 
-#if defined(TARGET_LINUX)
+#if defined(TARGET_LINUX) && !defined(TARGET_ANDROID)
 #define RSB_REALLOCARRAY(p, n, size) reallocarray(p, n, size)
 #elif
 #define RSB_REALLOCARRAY(p, n, size) realloc(p, n * size)

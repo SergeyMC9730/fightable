@@ -83,5 +83,10 @@ jobs:
       - name: Download Ninja
         run: choco install ninja
 
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: "**/vcpkg.json"
+
       - name: Build project
         run: gh/win_build.ps1
