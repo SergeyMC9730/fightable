@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #include <fightable/tilemap.h>
 #include <fightable/init.h>
 #include <fightable/loader.h>
+#include <fightable/state.h>
 #include <stdio.h>
 
 struct ftilemap __tilemap;
