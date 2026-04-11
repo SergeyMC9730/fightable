@@ -22,6 +22,10 @@
 
 #include <stdio.h>
 
+#ifdef TARGET_ANDROID
+#include <android_native_app_glue.h>
+#endif
+
 extern void _fMainLog(const char *msg);
 
 unsigned char _fMpServerOpen() {
