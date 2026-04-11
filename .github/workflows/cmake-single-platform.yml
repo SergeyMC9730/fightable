@@ -79,3 +79,9 @@ jobs:
 
       - name: Download dependencies
         run: gh/win_deps.ps1
+
+      - name: Download Ninja
+        run: choco install ninja
+
+      - name: Build project
+        run: gh/win_build.ps1
