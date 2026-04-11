@@ -2,13 +2,15 @@
 if [[ "${ANDROID_SDK_ROOT+x}" = "x" ]]; then
     echo "using preexisting sdk values"
     export SDK=$ANDROID_SDK_ROOT
-    export NDK=$ANDROID_SDK_ROOT/ndk/28.0.13004108
 else
     echo "using default sdk values"
     export ANDROID_SDK_ROOT=/usr/lib/android_sdk
     export SDK=/usr/lib/android-sdk
-    export NDK=/usr/lib/android-sdk/ndk/28.0.13004108
 fi
+
+export NDK_VERSION=$(ls -1 $ANDROID_SDK_ROOT/ndk 2>/dev/null | sort -V | tail -n1)
+
+echo "NDK version: " $NDK_VERSION
 
 export ANDROID_SDK=$SDK
 export ANDROID_NDK=$NDK
