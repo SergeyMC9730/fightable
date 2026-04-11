@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 3.26)
 
 if (WIN32)
     set(VCPKG_TARGET_TRIPLET x64-windows-static)
+    add_compile_definitions(CURL_STATICLIB)
 endif()
 
 project(fightable LANGUAGES C CXX)
