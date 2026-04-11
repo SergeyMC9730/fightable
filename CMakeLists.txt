@@ -522,6 +522,10 @@ endif()
 target_include_directories(fightable PRIVATE
     ${FIGHTABLE_RENDERER_INC}
 )
+target_include_directories(fshared PRIVATE
+    ${FIGHTABLE_NATIVE_INCLUDES}
+)
+target_link_libraries(fshared ${FIGHTABLE_NATIVE_LIBS})
 
 if (UNIX OR LINUX)
     message(STATUS "Applying linkage patches for Unix")
