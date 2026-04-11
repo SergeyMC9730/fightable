@@ -10,6 +10,7 @@ fi
 
 export NDK_VERSION=$(ls -1 $ANDROID_SDK_ROOT/ndk 2>/dev/null | sort -V | tail -n1)
 export NDK=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
+export NDK_ROOT=$NDK
 
 echo "NDK version: " $NDK_VERSION
 

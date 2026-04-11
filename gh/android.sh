@@ -32,6 +32,7 @@ cd android_req
 
 wget https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.7.13+release.makefile.tar.gz &
 wget https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-latest.tar.gz &
+git clone https://github.com/ibaoger/libcurl-android.git &
 
 wait
 
@@ -40,7 +41,12 @@ tar -xf "libmicrohttpd-latest.tar.gz" &
 
 wait
 
+export PATH=$PATH:$ANDROID_NDK
+which ndk-build
+
 compile_mpt() {
+    echo "mpt: start date: $(date)"
+
 	cd libopenmpt-0.7.13+release/
 	cp build/android_ndk/* . -rv
 	mkdir jni
@@ -48,6 +54,7 @@ compile_mpt() {
 	if ndk-build -j $(nproc) ; then
 		echo MPT GOOD
 	else
+	    echo MPT BAD
 		exit 1
 	fi
 	echo $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib
@@ -58,9 +65,13 @@ compile_mpt() {
 	sudo cp libs/$W_ARCH/* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
 	sudo mkdir -pv $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt
 	sudo cp libopenmpt/*.h* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/libopenmpt/ -rv
+
+	echo "mpt: end date: $(date)"
 }
 
 compile_mhd() {
+    echo "mhd: start date: $(date)"
+
 	cd libmicrohttpd-1.0.3/
 
 	export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
@@ -82,18 +93,44 @@ compile_mhd() {
 	if make -j$(nproc) ; then
 		echo MHD GOOD
 	else
+	    echo MHD BAD
 		exit 1
 	fi
 	sudo make install
 	sudo cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -rv
 	sudo rm $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/libmicro* -rv
+
+	echo "end: start date: $(date)"
 }
 
-compile_mpt &
-compile_mhd &
+compile_curl() {
+    echo "curl: start date: $(date)"
+
+    cd libcurl-android
+    git submodule init
+    git submodule update
+
+    chmod 755 build_for_android.sh
+    ./build_for_android.sh
+
+    sudo cp jni/build/curl/*/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
+    sudo cp libs/*/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/*/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/*/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/*/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/*/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+
+    echo "curl: end date: $(date)"
+}
+
+mkdir -p $TARGET_REPO/logs
+
+(compile_mpt | tee -a $TARGET_REPO/logs/compile_mpt.txt) &
+(compile_mhd | tee -a $TARGET_REPO/logs/compile_mhd.txt) &
+(compile_curl | tee -a $TARGET_REPO/logs/compile_curl.txt) &
 
 wait
 
 cd $TARGET_REPO
-source setup_android_build.sh $W_ABI $W_ABI
-source compile_android_arch.sh $W_ABI $W_ABI
+source setup_android_build.sh $W_ABI $W_ABI | tee -a $TARGET_REPO/logs/compile_fightable_a.txt
+source compile_android_arch.sh $W_ABI $W_ABI | tee -a $TARGET_REPO/logs/compile_fightable_b.txt
