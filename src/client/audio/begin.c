@@ -10,6 +10,7 @@
 #if !defined(TARGET_ANDROID) && !defined(_DISABLE_PORTAUDIO_)
 #pragma message("enabling portaudio")
 #include <portaudio.h>
+#define USE_PORTAUDIO
 #endif
 
 #include <libopenmpt/libopenmpt.h>
@@ -21,10 +22,6 @@
 #include <fraylib.h>
 
 #include <fightable/time.h>
-
-#if !defined(TARGET_ANDROID) && !defined(_DISABLE_PORTAUDIO_)
-#define USE_PORTAUDIO
-#endif
 
 void _fAudioBegin(struct faudio_engine *engine) {
     int channels = 1;

@@ -189,6 +189,7 @@ set(JACK_FOUND OFF)
 
 if (ANDROID)
     set(PLATFORM Android)
+    set(DISABLE_PORTAUDIO ON)
 
     message(STATUS "Building Fightable for Android. Main executable would be built as library instead")
 endif()
@@ -207,7 +208,7 @@ if (FIGHTABLE_RENDERER STREQUAL "raylib")
     add_subdirectory(ext/raylib)
 endif()
 
-if (NOT DISABLE_PORTAUDIO)
+if (NOT DISABLE_PORTAUDIO AND N)
     set(WDMKS OFF)
     if (NOT LINUX)
         set(PA_USE_ALSA OFF)
