@@ -86,10 +86,10 @@ jobs:
       - name: Update vcpkg.json
         run: gh/win_vcpkg_baseline.ps1
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: "**/vcpkg.json"
+      # - name: Setup vcpkg
+      #   uses: lukka/run-vcpkg@v11
+      #   with:
+      #     vcpkgJsonGlob: "**/vcpkg.json"
 
       - name: Build project
         run: gh/win_build.ps1
