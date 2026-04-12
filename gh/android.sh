@@ -22,7 +22,7 @@ source setup_android_vars.sh
 source translate_abi.sh $W_ARCH
 
 echo
-echo "---- TRANSLATED ABI: $W_ARCH $CLANG_TARGET $NDK_ABI $SYSROOT_LIB $W_ABI"
+echo "---- TRANSLATED ABI: $W_ARCH $CLANG_TARGET $NDK_ABI $SYSROOT_LIB $W_ABI $NDK_ABI_B"
 echo
 
 export PATH=/usr/lib/android-sdk/ndk/$NDK_VERSION:$PATH
@@ -118,11 +118,11 @@ compile_curl() {
     ls jni/build/openssl -la
 
     sudo cp jni/curl/include/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
-    sudo cp libs/$W_ARCH/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/zlib/$W_ARCH/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/zlib/$W_ARCH/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/openssl/$W_ARCH/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
-    sudo cp jni/build/openssl/$W_ARCH/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp libs/$NDK_ABI_B/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/$NDK_ABI_B/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/zlib/$NDK_ABI_B/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$NDK_ABI_B/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$NDK_ABI_B/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
 
     echo "curl: end date: $(date)"
 }

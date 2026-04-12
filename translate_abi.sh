@@ -4,18 +4,22 @@ if [ $A_ABI = "arm64-v8a" ]; then
 	export NDK_ABI=aarch64
 	export SYSROOT_LIB=$NDK_ABI-linux-android
 	export CLANG_TARGET=$SYSROOT_LIB
+	export NDK_ABI_B=$NDK_ABI
 elif [ $A_ABI = "armeabi-v7a" ]; then
 	export NDK_ABI=arm
 	export SYSROOT_LIB=$NDK_ABI-linux-androideabi
 	export CLANG_TARGET=armv7a-linux-androideabi
+	export NDK_ABI_B=$NDK_ABI
 elif [ $A_ABI = "x86" ]; then
 	export NDK_ABI=i686
 	export SYSROOT_LIB=$NDK_ABI-linux-android
 	export CLANG_TARGET=$SYSROOT_LIB
+	export NDK_ABI_B=$NDK_ABI
 elif [ $A_ABI = "x86_64" ]; then
 	export NDK_ABI=x86_64
 	export SYSROOT_LIB=$NDK_ABI-linux-android
 	export CLANG_TARGET=$SYSROOT_LIB
+	export NDK_ABI_B=x86-64
 else
 	echo "!! architecture not supported (A_ABI=$A_ABI)"
 	exit 1

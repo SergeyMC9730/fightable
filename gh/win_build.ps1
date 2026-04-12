@@ -15,7 +15,7 @@ Copy-Item -Path "./build/fightable-simple-window.exe" -Destination "./winout/"
 Copy-Item -Path "./build/assets" -Destination "./winout/" -Recurse
 Copy-Item -Path "./extlib/lib/libmicrohttpd-12.dll" -Destination "./winout/"
 Copy-Item -Path "./extlib/lib/libopenmpt.dll" -Destination "./winout/"
-Copy-Item -Path "./extlib/lib/libopenmpt-mpg123.dll" -Destination "./winout/"
+# Copy-Item -Path "./extlib/lib/libopenmpt-mpg123.dll" -Destination "./winout/"
 Copy-Item -Path "./extlib/lib/libopenmpt-ogg.dll" -Destination "./winout/"
 Copy-Item -Path "./extlib/lib/libopenmpt-vorbis.dll" -Destination "./winout/"
 Copy-Item -Path "./extlib/lib/libopenmpt-zlib.dll" -Destination "./winout/"
