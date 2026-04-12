@@ -100,3 +100,10 @@ jobs:
 
       - name: Build project
         run: gh/win_build.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fightable-windows-x86_64
+          path: |
+            ${{github.workspace}}/winout
+          if-no-files-found: error
