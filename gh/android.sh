@@ -113,6 +113,10 @@ compile_curl() {
 
     sleep 3
 
+    ls libs -la
+    ls jni/build/zlib -la
+    ls jni/build/openssl -la
+
     sudo cp jni/curl/include/curl $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/ -rv
     sudo cp libs/$W_ARCH/libcurl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/zlib/$W_ARCH/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
