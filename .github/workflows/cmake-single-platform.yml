@@ -62,14 +62,24 @@ jobs:
       - name: Install external dependencies
         run: bash ${{github.workspace}}/gh/ubuntu_deps_x86_64.sh
 
-      - name: Generate an APK file
+      - name: Generate the APK file
         run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}
+
+      - name: Sign the APK file
+        id: sign_app
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: bin
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "29.0.3"
 
       - uses: actions/upload-artifact@v4
         with:
           name: fightable-android-universal
-          path: |
-            ${{github.workspace}}/bin
+          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
           if-no-files-found: error
   windows:
     runs-on: windows-latest
@@ -104,6 +114,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: fightable-windows-x86_64
-          path: |
-            ${{github.workspace}}/winout
+          path: ${{github.workspace}}/winout
           if-no-files-found: error

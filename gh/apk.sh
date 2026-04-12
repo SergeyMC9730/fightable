@@ -20,7 +20,5 @@ echo ---------------
 ls $BPATH/lib -la
 echo ---------------
 file $BPATH/lib/*
-echo ---------------
-ls $BPATH/logs -la
 
 source android_setup.sh

@@ -9,10 +9,12 @@ else
 fi
 
 export NDK_VERSION=$(ls -1 $ANDROID_SDK_ROOT/ndk 2>/dev/null | sort -V | tail -n1)
+export BUILD_TOOLS_VERSION=$(ls -1 $ANDROID_SDK_ROOT/build-tools 2>/dev/null | sort -V | tail -n1)
 export NDK=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
 export NDK_ROOT=$NDK
 
 echo "NDK version: " $NDK_VERSION
+echo "Build Tools version: " $NDK_VERSION
 
 export ANDROID_SDK=$SDK
 export ANDROID_NDK=$NDK
@@ -25,6 +27,6 @@ export PACKAGE_NAME=dogotrigger.fightable
 
 # export ANDROID_HOME=$ANDROID_SDK
 
-export BUILD_TOOLS=$ANDROID_SDK_ROOT/build-tools/29.0.3
+export BUILD_TOOLS=$ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS_VERSION
 
 export BUILD_TYPE=RelWithDebInfo
