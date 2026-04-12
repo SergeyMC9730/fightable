@@ -4,7 +4,7 @@ if [[ "${ANDROID_SDK_ROOT+x}" = "x" ]]; then
     export SDK=$ANDROID_SDK_ROOT
 else
     echo "using default sdk values"
-    export ANDROID_SDK_ROOT=/usr/lib/android_sdk
+    export ANDROID_SDK_ROOT=/usr/lib/android-sdk
     export SDK=/usr/lib/android-sdk
 fi
 
