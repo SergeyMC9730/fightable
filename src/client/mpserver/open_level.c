@@ -9,7 +9,11 @@
 #include "fightable/mp_shared.h"
 #include <fightable/mp_server.h>
 #include <stdio.h>
+#ifdef TARGET_UNIX
 #include <unistd.h>
+#else
+#include <fightable/filesystem.h>
+#endif
 #include <fightable/level.h>
 #include <fightable/state.h>
 #include <fightable/renderer.h>
@@ -24,7 +28,11 @@ void _fMpOnOpenLevel(struct nt_file_selector_menu *ctx, const char *path) {
     packet_template->http_port = __state.mp_server_http_port;
 
     remove(packet_template->level_path);
+#ifdef TARGET_UNIX
     link(path, packet_template->level_path);
+#else
+    _fFsFileCopy(path, packet_template->level_path);
+#endif
 
     struct flevel *lvl = _fLevelLoadFromFileSelector(packet_template->level_path);
 
