@@ -8,6 +8,8 @@ extern "C" {
 
 struct felplayer {
 	struct fentity base;
+	unsigned int regen_ticks;
+	unsigned int regen_ticks_max;
 };
 
 void _flPlayerInit(struct felplayer* instance);

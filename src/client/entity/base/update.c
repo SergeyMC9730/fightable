@@ -23,7 +23,7 @@ void _fEntityUpdate(struct fentity* entity) {
     const double delta = _fEntityGetDelta(entity);
 
     if (entity->moving_horizontally && !entity->moving_negative) {
-        entity->speed.x += delta * 180.f;
+        entity->speed.x += delta * entity->accel_speed.x; // 180
         if (entity->speed.x > max_speed_x) {
             entity->speed.x = max_speed_x;
         }
@@ -32,7 +32,7 @@ void _fEntityUpdate(struct fentity* entity) {
         entity->render_direction = ENTITY_DIR_RIGHT;
     }
     if (entity->moving_horizontally && entity->moving_negative) {
-        entity->speed.x -= delta * 180.f;
+        entity->speed.x -= delta * entity->accel_speed.x; // 180
         if (entity->speed.x < -max_speed_x) {
             entity->speed.x = -max_speed_x;
         }
@@ -42,7 +42,7 @@ void _fEntityUpdate(struct fentity* entity) {
     }
     else if (!entity->moving_horizontally) {
         if (entity->complete_nx) {
-            entity->speed.x += delta * 350.f;
+            entity->speed.x += delta * entity->accel_speed.x * 2; // 350
 
             if (entity->speed.x > 0) {
                 entity->speed.x = 0;
@@ -50,7 +50,7 @@ void _fEntityUpdate(struct fentity* entity) {
             }
         }
         if (entity->complete_px) {
-            entity->speed.x -= delta * 350.f;
+            entity->speed.x -= delta * entity->accel_speed.x * 2; // 350
 
             if (entity->speed.x < 0) {
                 entity->speed.x = 0;
@@ -60,7 +60,7 @@ void _fEntityUpdate(struct fentity* entity) {
     }
 
     if (!entity->on_ground && !entity->no_gravity) {
-        entity->speed.y += delta * 100.f;
+        entity->speed.y += delta * entity->accel_speed.y; // 100
         if (entity->speed.y > max_speed_y) {
             entity->speed.y = max_speed_y;
         }

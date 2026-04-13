@@ -13,6 +13,8 @@ void _flEnemyInit(struct felenemy* instance) {
 
 	_fEntityInit(&instance->base);
 
+	instance->base.max_hp = 100;
+	instance->base.hp = 100;
 	instance->base.global_entity_id = ENTITY_ENEMY;
 	instance->base.draw = (void(*)(struct fentity *))_flEnemyDraw;
 	instance->base.update = (void(*)(struct fentity *))_flEnemyUpdate;
@@ -25,4 +27,6 @@ void _flEnemyInit(struct felenemy* instance) {
 
 	instance->speed_x_mul = (float)GetRandomValue(500, 900) / 1000.f;
 	instance->base.max_speed.x *= instance->speed_x_mul;
+
+	_fEntityAddAccessory(&instance->base, ENTITY_ACC_ENEMY_GUN);
 }

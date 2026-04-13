@@ -38,12 +38,15 @@ enum fentity_accessory_obj {
     ENTITY_ACC_HAT_1        = 1,
     ENTITY_ACC_HAT_2        = 2,
     ENTITY_ACC_HAT_3        = 3,
-    ENTITY_ACC_GLASSES_1    = 4
+    ENTITY_ACC_GLASSES_1    = 4,
+    ENTITY_ACC_ENEMY_GUN    = 5,
+    ENTITY_ACC_PLAYER_GUN   = 6
 };
 enum fentity_accessory_type {
     ENTITY_ACCT_NONE = 0,
     ENTITY_ACCT_HAT = 1,
-    ENTITY_ACCT_GLASSES = 2
+    ENTITY_ACCT_GLASSES = 2,
+    ENTITY_ACCT_GUN = 3
 };
 
 struct fentity_hitbox {
@@ -57,6 +60,7 @@ struct fentity_hitbox {
 
 struct fentity {
     Vector2 speed;
+    Vector2 accel_speed;
 
     unsigned char on_ground : 1;
     unsigned char moving_horizontally : 1;
@@ -129,6 +133,8 @@ void _fEntityKill(struct fentity* entity);
 void _fEntityMove(struct fentity* entity, Vector2 pos);
 void _fEntityInit(struct fentity* entity);
 void _fEntityJump(struct fentity* entity, unsigned char holding);
+void _fEntityDestroy(struct fentity* entity); // ENTITY IS UNUSABLE AFTER THIS CALL
+void _fEntityHeal(struct fentity* entity, float hp, unsigned char show_text);
 
 #include <fightable/intvec.h>
 
@@ -139,6 +145,7 @@ void _fEntitySetPosition(struct fentity* entity, Vector2 pos);
 
 void _fEntityDrawAccessory(struct fentity* entity);
 void _fEntityAddAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);
+unsigned char _fEntityHasAccessory(struct fentity* entity, enum fentity_accessory_obj accessory);
 
 enum fentity_accessory_type _fAccessoryGetType(enum fentity_accessory_obj accessory);
 
@@ -156,6 +163,8 @@ void _fEntityFlipDirection(struct fentity* entity);
 void _fEntityUpdateHitbox(struct fentity_hitbox *env);
 
 float _fEntityDistanceToEntity(struct fentity *entity_a, struct fentity *entity_b);
+
+void _fEntityDoLeftClickAction(struct fentity* entity);
 
 #ifdef __cplusplus
 }

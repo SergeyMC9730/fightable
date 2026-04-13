@@ -23,4 +23,6 @@ void _fEntityInit(struct fentity* entity) {
     entity->entity_runtime_id = rand();
     entity->max_speed.x = 1.5f / 1.1f * 70.f;
     entity->max_speed.y = 3.f * 20.f;
+    entity->accel_speed.x = 180.f;
+    entity->accel_speed.y = 100.f;
 }

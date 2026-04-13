@@ -66,7 +66,7 @@ void _fLevelTick(struct flevel* level) {
             if (!entity) continue;
             if (entity->dead) continue;
             if (entity->hitbox.hitbox.y > 1024) {
-                entity->damage(entity, 4);
+                entity->damage(entity, 10);
             }
             if (entity == player) continue;
 
@@ -74,6 +74,10 @@ void _fLevelTick(struct flevel* level) {
             entity->obstacles_length = level->data_size;
             entity->custom_delta = delta;
             entity->update(entity);
+
+            if (entity->object_destroyed && entity->global_entity_id != ENTITY_PLAYER) {
+                free(entity);
+            }
         }
     }
 }

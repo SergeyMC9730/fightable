@@ -4,10 +4,4 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#define DEMO_MODE
-
-#include <fightable/debug.h>
-
-#if defined(TARGET_UNIX) || defined(TARGET_WIN32)
-#define TARGET_SUPPORTS_OVERLAY
-#endif
+#define EBULLET_SCALING (1.f / 1.35f)

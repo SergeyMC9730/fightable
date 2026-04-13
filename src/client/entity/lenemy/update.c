@@ -70,6 +70,12 @@ void _flEnemyUpdate(struct felenemy* instance) {
             float dist = _fEntityDistanceToEntity(entity, player);
             if (dist <= (64.f / instance->speed_x_mul)) {
                 instance->followed_entity = player;
+                if (instance->left_click_timeout <= 0) {
+                    _fEntityDoLeftClickAction(entity);
+                    instance->left_click_timeout = 0.8f;
+                } else {
+                    instance->left_click_timeout -= _fEntityGetDelta(entity);
+                }
             } else {
                 instance->followed_entity = NULL;
             }

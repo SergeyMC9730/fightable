@@ -431,6 +431,9 @@ set(FIGHTABLE_SRC
     src/client/entity/lenemy/perform_death.c
     src/client/entity/lenemy/update.c
     src/client/entity/base/spawner.c
+    src/client/entity/bullet.c
+    src/client/entity/base/left_click.c
+    src/client/entity/base/heal.c
     ${FIGHTABLE_GPU_SRC}
 )
 

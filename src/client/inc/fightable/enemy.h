@@ -10,6 +10,7 @@ struct felenemy {
 	struct fentity base;
 	struct fentity *followed_entity;
 	float speed_x_mul;
+	float left_click_timeout;
 };
 
 #ifdef __cplusplus

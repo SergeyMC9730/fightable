@@ -10,4 +10,5 @@
 #define ENTITY_REMOTE_PLAYER	2
 #define ENTITY_TEXT				3
 #define ENTITY_ENEMY            4
+#define ENTITY_BULLET           5
 #define ENTITY_WASP             100

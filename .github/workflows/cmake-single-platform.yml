@@ -65,21 +65,34 @@ jobs:
       - name: Generate the APK file
         run: bash ${{github.workspace}}/gh/apk.sh ${{github.workspace}}
 
-      - name: Sign the APK file
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: bin
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Load keystore
         env:
-          BUILD_TOOLS_VERSION: "29.0.14206865"
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: echo "$SIGNING_KEY" | base64 --decode > bin/.keystore
+
+      - name: Sign the APK
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ANDROID_API: ${{ secrets.ANDROID_API }}
+        run: |
+          # Find the highest version of build-tools
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -n 1)
+          echo "build tools dir: $BUILD_TOOLS_DIR"
+
+          # Sign the APK
+          ${BUILD_TOOLS_DIR}apksigner sign \
+            --ks bin/.keystore \
+            --ks-pass pass:$KEY_STORE_PASSWORD \
+            --key-pass pass:$KEY_PASSWORD \
+            --min-sdk-version $ANDROID_API \
+            bin/app.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: fightable-android-universal
-          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          path: ${{ bin/app.apk }}
           if-no-files-found: error
   windows:
     runs-on: windows-latest

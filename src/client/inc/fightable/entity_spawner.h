@@ -12,7 +12,9 @@ extern "C" {
 
 struct fentity;
 
-void _fEntitySpawnTempLabel(struct fentity *instance, char *data);
+struct fentity *_fEntitySpawnTempLabel(struct fentity *instance, char *data);
+struct fentity *_fEntitySpawnEnemyBullet(struct fentity *instance, unsigned char level);
+struct fentity *_fEntitySpawnPlayerBullet(struct fentity *instance, unsigned char level);
 
 #ifdef __cplusplus
 }
