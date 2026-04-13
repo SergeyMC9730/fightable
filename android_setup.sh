@@ -6,12 +6,20 @@ source setup_android_vars.sh
 
 mkdir -pv bin
 
+echo $BUILD_TOOLS
+echo "-------"
 ls $BUILD_TOOLS
+echo "-------"
 ls -la $ANDROID_SDK
+echo "-------"
 ls -la $ANDROID_SDK/platforms
+echo "-------"
 ls -la $ANDROID_SDK/platforms/android-$ANDROID_API
+echo "-------"
+ls -la $ANDROID_SDK/platforms/android-26
+echo "-------"
 
-PLATDIR=$(ls $ANDROID_SDK/platforms -1 | tail -n 1)
+PLATDIR=$(ls -1 $ANDROID_SDK_ROOT/platforms 2>/dev/null | sort -V | head -n1)
 echo $PLATDIR
 
 $BUILD_TOOLS/aapt package -f -I "${ANDROID_SDK}/platforms/$PLATDIR/android.jar" -M AndroidManifest.xml -A src/assets -S res -m -F bin/app-unsigned.apk

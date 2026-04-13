@@ -78,7 +78,7 @@ jobs:
           ANDROID_API: ${{ secrets.ANDROID_API }}
         run: |
           # Find the highest version of build-tools
-          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -n 1)
+          BUILD_TOOLS_DIR=$(ls -1 $ANDROID_HOME/build-tools/*/ | sort -V | head -n 1)
           echo "build tools dir: $BUILD_TOOLS_DIR"
 
           # Sign the APK
