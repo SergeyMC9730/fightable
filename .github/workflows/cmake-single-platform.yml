@@ -92,7 +92,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: fightable-android-universal
-          path: ${{ bin/app.apk }}
+          path: bin/app.apk
           if-no-files-found: error
   windows:
     runs-on: windows-latest
