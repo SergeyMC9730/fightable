@@ -12,12 +12,56 @@
 #include <android_native_app_glue.h>
 #endif
 
-char fTempStorageBuffer[512] = {};
+char fTempStorageBuffer[512] = {0};
 
 const char *_fStorageGetWritable() {
 #ifdef TARGET_ANDROID
-    return ".";
-#elif defined TARGET_UNIX
+    if (!fTempStorageBuffer[0] && __state.system && __state.system->activity) {
+        int attempt = 1;
+        if (__state.system->activity->internalDataPath) {
+            snprintf(fTempStorageBuffer, sizeof(fTempStorageBuffer), "%s", __state.system->activity->internalDataPath);
+        } else if (__state.system->activity->externalDataPath) {
+            attempt = 2;
+            snprintf(fTempStorageBuffer, sizeof(fTempStorageBuffer), "%s", __state.system->activity->externalDataPath);
+        } else {
+            attempt = 3;
+            JNIEnv* env = __state.system->activity->env;
+            jobject activity = __state.system->activity->clazz;
+
+            if (env && activity) {
+                // Get the internal storage directory
+                jclass class_activity = (*env)->GetObjectClass(env, activity);
+                jmethodID method_getFilesDir = (*env)->GetMethodID(env, class_activity, "getFilesDir", "()Ljava/io/File;");
+
+                if (method_getFilesDir) {
+                    jobject file = (*env)->CallObjectMethod(env, activity, method_getFilesDir);
+
+                    if (file) {
+                        jmethodID method_getPath = (*env)->GetMethodID(env, (*env)->GetObjectClass(env, file), "getPath", "()Ljava/lang/String;");
+
+                        if (method_getPath) {
+                            jstring path_str = (*env)->CallObjectMethod(env, file, method_getPath);
+                            const char* path = (*env)->GetStringUTFChars(env, path_str, NULL);
+
+                            if (path) {
+                                snprintf(fTempStorageBuffer, sizeof(fTempStorageBuffer), "%s", path);
+                                (*env)->ReleaseStringUTFChars(env, path_str, path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!fTempStorageBuffer[0]) {
+            attempt = 4;
+            snprintf(fTempStorageBuffer, sizeof(fTempStorageBuffer), "/data/data/dogotrigger.fightable/files");
+        }
+
+        TraceLog(LOG_INFO, "Tried to determine storage path: %s (attempt=%d)", fTempStorageBuffer, attempt);
+        return (const char *)fTempStorageBuffer;
+    }
+#elif defined(TARGET_UNIX)
     char *home = getenv("HOME");
     if (!home) {
         return ".fightable";
