@@ -4,7 +4,6 @@
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
-#include "fightable/level.h"
 #define WITH_PLACEHOLDERS
 
 #include <fightable/editor.hpp>
@@ -174,33 +173,33 @@ void _fEditorDraw(struct feditor *editor) {
             editor->holded_previosly = 0;
         }
 
-#ifdef TARGET_ANDROID
-        mobile_swipe_area.height /= 2;
+        if (__state.ui_mode == PU_MOBILE) {
+            mobile_swipe_area.height /= 2;
 
-        DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {253, 249, 0, 128});
-        DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, YELLOW);
+            DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {253, 249, 0, 128});
+            DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, YELLOW);
 
-        if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
-            mouse_out_of_bounds = true;
+            if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
+                mouse_out_of_bounds = true;
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                _fEditorSwipeCurrentObjects(editor, 1.f);
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    _fEditorSwipeCurrentObjects(editor, 1.f);
+                }
+            }
+
+            mobile_swipe_area.y += mobile_swipe_area.height;
+
+            DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {255, 64, 64, 128});
+            DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, RED);
+
+            if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
+                mouse_out_of_bounds = true;
+
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    _fEditorSwipeCurrentObjects(editor, -1.f);
+                }
             }
         }
-
-        mobile_swipe_area.y += mobile_swipe_area.height;
-
-        DrawRectangleRounded(mobile_swipe_area, 2.f, 8.f, {255, 64, 64, 128});
-        DrawRectangleRoundedLines(mobile_swipe_area, 1.f, 8.f, RED);
-
-        if (CheckCollisionPointRec(mouse_pos, mobile_swipe_area)) {
-            mouse_out_of_bounds = true;
-
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                _fEditorSwipeCurrentObjects(editor, -1.f);
-            }
-        }
-#endif
         if(selected_object.has_value() && IsKeyPressed(KEY_DELETE)) {
             _fEditorPlaceBlock(editor, BLOCK_AIR, selected_block_pos);
         }
@@ -522,15 +521,15 @@ void _fEditorDraw(struct feditor *editor) {
     if (editor->should_playback) {
         bool flag = false;
 
-#ifndef TARGET_ANDROID
-        if (_fTranslationGetCurrentLanguage() == FLI_EnUs) {
-            _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
+        if (__state.ui_mode == PU_PC) {
+            if (_fTranslationGetCurrentLanguage() == FLI_EnUs) {
+                _fTextDraw(&__state.text_manager, "F1 to exit", {2, 2}, BLUE, 1);
+            } else {
+                _fTranslationQueueTextDraw({2, 2}, "editor.play.f1", 0.5, BLUE, 1);
+            }
         } else {
-            _fTranslationQueueTextDraw({2, 2}, "editor.play.f1", 0.5, BLUE, 1);
+            flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE, "editor.play.exit");
         }
-#else
-        flag = _fButtonDrawSimple("Exit", (IVector2){4, 4}, WHITE, "editor.play.exit");
-#endif
 
         if ((IsKeyPressed(KEY_F1) && !editor->f1_lock) || flag) {
             _fLevelUnloadProcessor(editor->level);

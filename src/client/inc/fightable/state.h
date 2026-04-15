@@ -40,6 +40,7 @@ typedef struct openmpt_module openmpt_module;
 #endif
 #include <nt5emul/tui/file_selector.h>
 #include <fightable/multiline_text_instance.h>
+#include <fightable/platform_ui.h>
 #if _WIN32
     #define NOUSER
     #define NOGDI
@@ -235,6 +236,8 @@ struct fightable_state {
 
     float world_tick_time;
     float world_tick_time_ext;
+
+    enum fplatform_ui ui_mode;
 };
 
 extern struct fightable_state __state;

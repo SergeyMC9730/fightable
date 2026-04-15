@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -23,9 +23,11 @@ Vector2 _fLoaderMainPrepareUi(Vector2 *win_sz, Vector2 *actual_sz, Vector2 *edit
 #ifdef TARGET_ANDROID
     __state.initial_game_size = *win_sz;
     *actual_sz = (Vector2){0, 0};
+    __state.ui_mode = PU_MOBILE;
 #else
     __state.initial_game_size = *actual_sz;
     SetWindowSize(actual_sz->x, actual_sz->y);
+    __state.ui_mode = PU_PC;
 #endif
 
     return ui_scaling;

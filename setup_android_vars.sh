@@ -14,7 +14,7 @@ export NDK=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION
 export NDK_ROOT=$NDK
 
 echo "NDK version: " $NDK_VERSION
-echo "Build Tools version: " $NDK_VERSION
+echo "Build Tools version: " $BUILD_TOOLS_VERSION
 
 export ANDROID_SDK=$SDK
 export ANDROID_NDK=$NDK

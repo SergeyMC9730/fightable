@@ -122,7 +122,9 @@ compile_curl() {
     sudo cp jni/build/zlib/$NDK_ABI_B/lib/libz.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/zlib/$NDK_ABI_B/lib/libz.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/openssl/$NDK_ABI_B/lib/libssl.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$NDK_ABI_B/lib/libssl.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
     sudo cp jni/build/openssl/$NDK_ABI_B/lib/libcrypto.a $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
+    sudo cp jni/build/openssl/$NDK_ABI_B/lib/libcrypto.so $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SYSROOT_LIB/ -v
 
     echo "curl: end date: $(date)"
 }

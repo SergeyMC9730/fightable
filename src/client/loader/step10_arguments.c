@@ -50,6 +50,8 @@ void _fLoaderMainProcessArguments(Vector2 *win_sz, Vector2 *actual_sz, Vector2 *
         editor_sz->y *= ui_scaling->y;
 
         _ntTuiLoadEnvironmentDefault(1.25f);
+
+        __state.ui_mode = PU_MOBILE;
     } else {
         _ntTuiLoadEnvironmentDefault(1.f);
     }
