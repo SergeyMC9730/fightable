@@ -59,8 +59,8 @@ const char *_fStorageGetWritable() {
         }
 
         TraceLog(LOG_INFO, "Tried to determine storage path: %s (attempt=%d)", fTempStorageBuffer, attempt);
-        return (const char *)fTempStorageBuffer;
     }
+    return (const char *)fTempStorageBuffer;
 #elif defined(TARGET_UNIX)
     char *home = getenv("HOME");
     if (!home) {
