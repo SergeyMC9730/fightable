@@ -21,10 +21,10 @@ void _fLoaderMainPrepareStorage() {
 #endif
     char *new_assets = _fStorageAppend("assets");
 
-    TraceLog(LOG_INFO, "[LOADER] Copying game assets");
-#ifndef TARGET_ANDROID
+    TraceLog(LOG_INFO, "[LOADER] Copying game assets (%s to %s)", assets_dir, new_assets);
     _fFsDirectoryCopy(assets_dir, new_assets);
-#else
+#ifdef TARGET_ANDROID
+    TraceLog(LOG_INFO, "[LOADER] Using Asset Manager to copy the assets");
     _fLoaderMainLoadAssets();
 #endif
     ChangeDirectory(_fStorageGetWritable());

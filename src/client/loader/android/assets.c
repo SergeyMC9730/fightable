@@ -14,6 +14,8 @@
 #include <fightable/filesystem.h>
 
 unsigned char _fLoaderMainCopyFromApk(const char *asset_path, const char *dest_path) {
+    TraceLog(LOG_ERROR, "[LOADER ANDROID] Copying data from %s to %s", asset_path, dest_path);
+
     if (!__state.system || !__state.system->activity) {
         TraceLog(LOG_ERROR, "[LOADER ANDROID] Android context is not loaded");
         return 0;
@@ -90,6 +92,8 @@ unsigned char _fLoaderMainCopyFromApk(const char *asset_path, const char *dest_p
 }
 
 void _fLoaderMainLoadAssets() {
+    TraceLog(LOG_INFO, "[LOADER ANDROID] Android specific loader welcomes you");
+
     const char* writable = _fStorageGetWritable();
     char *assets_dest = (char *)malloc(512);
     snprintf(assets_dest, 512, "%s/assets", writable);
