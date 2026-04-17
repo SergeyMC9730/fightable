@@ -72,7 +72,7 @@ compile_mpt() {
 compile_mhd() {
     echo "mhd: start date: $(date)"
 
-	cd libmicrohttpd-*
+	cd libmicrohttpd-1.0.5
 
 	export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
 	export TARGET=$CLANG_TARGET
