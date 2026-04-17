@@ -84,7 +84,7 @@ unsigned char _fLoaderMainCopyFromApk(const char *asset_path, const char *dest_p
     AAssetDir_close(dir);
 
     free(src_full);
-    free(src_dest);
+    free(dest_full);
 
     return success;
 }
