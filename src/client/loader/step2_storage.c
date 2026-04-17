@@ -7,6 +7,7 @@
 #include <fraylib.h>
 #include <fightable/storage.h>
 #include <fightable/filesystem.h>
+#include <fightable/loader.h>
 #include <stdlib.h>
 
 void _fLoaderMainPrepareStorage() {
@@ -21,7 +22,11 @@ void _fLoaderMainPrepareStorage() {
     char *new_assets = _fStorageAppend("assets");
 
     TraceLog(LOG_INFO, "[LOADER] Copying game assets");
+#ifndef TARGET_ANDROID
     _fFsDirectoryCopy(assets_dir, new_assets);
+#else
+    _fLoaderMainLoadAssets();
+#endif
     ChangeDirectory(_fStorageGetWritable());
 
     free(new_assets);

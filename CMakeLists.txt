@@ -434,6 +434,7 @@ set(FIGHTABLE_SRC
     src/client/entity/bullet.c
     src/client/entity/base/left_click.c
     src/client/entity/base/heal.c
+    src/client/loader/android/assets.c
     ${FIGHTABLE_GPU_SRC}
 )
 

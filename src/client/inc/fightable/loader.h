@@ -1,5 +1,5 @@
 
-//          Sergei Baigerov 2024 - 2025.
+//          Sergei Baigerov 2024 - 2026.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@ void _fLoaderMainProcessAssets(struct ftilemap *tilemapA, struct ftilemap *tilem
 void _fLoaderMainProcessArguments(Vector2 *win_sz, Vector2 *actual_sz, Vector2 *editor_sz, unsigned int argc, char **argv, Vector2 *ui_scaling);
 void _fLoaderMainTweakUiSettings(Vector2 *actual_sz, Vector2 *editor_sz);
 void _fLoaderMainPrepareEnvironment(Vector2 *actual_sz, Vector2 *win_sz, Vector2 *ui_scaling);
+void _fLoaderMainLoadAssets();
 
 #ifdef __cplusplus
 }

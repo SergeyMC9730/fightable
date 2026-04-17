@@ -19,7 +19,7 @@ struct ftr_queue {
 };
 
 std::queue<ftr_queue> __trQueue;
-flang_id __trLang = FLI_EnUs;
+flang_id __trLang = FLI_RuRu;
 std::vector<ftr_entry> __trStrings = {
     {
         "menu.base.play",
